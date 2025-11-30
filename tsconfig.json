@@ -1,25 +1,22 @@
 {
   "compilerOptions": {
-    /* Language and Environment */
     "target": "es2022",
     "lib": ["es2022", "dom", "dom.iterable"],
     "jsx": "react-jsx",
 
-    /* Modules */
-    "module": "commonjs",
+    // 👇 use ESM here, not CJS
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "rootDir": "src",
 
-    /* Emit */
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "dist",
 
-    /* Interop Constraints */
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
 
-    /* Type Checking */
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -30,7 +27,6 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
 
-    /* Completeness */
     "skipLibCheck": true
   },
   "include": ["src"]

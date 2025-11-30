@@ -1,5 +1,5 @@
-import { injectCssVariables } from './src/remarkable-pro/theme/styles/styles.utils';
-import { Theme } from './src/remarkable-pro/theme/theme.types';
+import { injectCssVariables } from './src/theme/styles/styles.utils';
+import { Theme } from './src/theme/theme.types';
 
 const injectInter = () => {
   if (typeof document === 'undefined') return;

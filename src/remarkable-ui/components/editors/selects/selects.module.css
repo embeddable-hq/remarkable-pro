@@ -1,8 +1,0 @@
-.searchField {
-  margin-bottom: var(--em-selectfield-content-gap, 0.5rem);
-}
-
-.submitButton {
-  margin-top: var(--em-selectfield-content-gap, 0.5rem);
-  justify-content: center;
-}
