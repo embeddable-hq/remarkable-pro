@@ -1,0 +1,17 @@
+node_modules
+dist
+
+.embeddable
+.embeddable-build
+.embeddable-dev-build
+.embeddable-dev-tmp
+.embeddable-tmp
+
+
+*storybook.log
+storybook-static
+
+.DS_Store
+
+embeddable.config.js
+.cursorindexingignore
