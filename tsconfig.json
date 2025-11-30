@@ -4,7 +4,6 @@
     "lib": ["es2022", "dom", "dom.iterable"],
     "jsx": "react-jsx",
 
-    // 👇 use ESM here, not CJS
     "module": "ESNext",
     "moduleResolution": "bundler",
     "rootDir": "src",
