@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.2
+
+### Patch Changes
+
+- 38f17cc: Release the new Remarkable PRO
+
 ## 1.0.5
 
 ### Patch Changes
