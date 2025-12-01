@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.3
+
+### Patch Changes
+
+- d9befb4: Cleanup package.json
+
 ## 0.0.2
 
 ### Patch Changes
