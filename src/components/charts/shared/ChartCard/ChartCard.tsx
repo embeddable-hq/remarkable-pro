@@ -6,7 +6,7 @@ import {
   CardFeedback,
   CardHeader,
   Skeleton,
-} from '@embeddable.com/remarkable-ui-v0';
+} from '@embeddable.com/remarkable-ui';
 import styles from './ChartCard.module.css';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { useTheme } from '@embeddable.com/react';

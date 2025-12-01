@@ -4,7 +4,7 @@ import { DataResponse, Measure, TimeRange } from '@embeddable.com/core';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
-import { KpiChart } from '@embeddable.com/remarkable-ui-v0';
+import { KpiChart } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { useEffect } from 'react';
 import {

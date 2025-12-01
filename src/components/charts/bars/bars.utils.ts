@@ -5,7 +5,7 @@ import { ChartData, ChartOptions } from 'chart.js';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { groupTailAsOther } from '../charts.utils';
 import { getColor } from '../../../theme/styles/styles.utils';
-import { getChartColors, getChartContrastColors } from '@embeddable.com/remarkable-ui-v0';
+import { getChartColors, getChartContrastColors } from '@embeddable.com/remarkable-ui';
 import { getObjectStableKey } from '../../../utils.ts/object.utils';
 import { Context } from 'chartjs-plugin-datalabels';
 

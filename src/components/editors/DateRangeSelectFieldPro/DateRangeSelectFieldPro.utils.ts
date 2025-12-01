@@ -1,5 +1,5 @@
 import { DateRangeSelectFieldProOption } from './DateRangeSelectFieldPro.types';
-import { SelectListOptionProps } from '@embeddable.com/remarkable-ui-v0';
+import { SelectListOptionProps } from '@embeddable.com/remarkable-ui';
 import { getTimeRangeLabel } from '../editors.timeRange.utils';
 import { resolveI18nString } from '../../component.utils';
 

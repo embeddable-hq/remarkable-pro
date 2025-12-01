@@ -1,5 +1,5 @@
 import { useTheme } from '@embeddable.com/react';
-import { SingleSelectField } from '@embeddable.com/remarkable-ui-v0';
+import { SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../theme/theme.types';
 import { useLoadDayjsLocale } from '../../../utils.ts/date.utils';
 import { getDateRangeSelectFieldProOptions } from './DateRangeSelectFieldPro.utils';

@@ -4,7 +4,7 @@ import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
-import { PivotTable } from '@embeddable.com/remarkable-ui-v0';
+import { PivotTable } from '@embeddable.com/remarkable-ui';
 import { useRef } from 'react';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import {

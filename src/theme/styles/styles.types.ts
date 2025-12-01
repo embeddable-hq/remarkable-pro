@@ -1,3 +1,3 @@
-import { Styles } from '@embeddable.com/remarkable-ui-v0';
+import { Styles } from '@embeddable.com/remarkable-ui';
 
 export type ThemeStyles = Styles;

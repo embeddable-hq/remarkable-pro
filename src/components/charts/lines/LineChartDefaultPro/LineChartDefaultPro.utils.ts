@@ -3,7 +3,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { ChartData, ChartOptions } from 'chart.js';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getObjectStableKey } from '../../../../utils.ts/object.utils';
-import { getChartContrastColors, getStyleNumber } from '@embeddable.com/remarkable-ui-v0';
+import { getChartContrastColors, getStyleNumber } from '@embeddable.com/remarkable-ui';
 import { getColor } from '../../../../theme/styles/styles.utils';
 import { mergician } from 'mergician';
 import { isColorValid, setColorAlpha } from '../../../../utils.ts/color.utils';

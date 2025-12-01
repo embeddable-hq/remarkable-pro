@@ -5,7 +5,7 @@ import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { getColor } from '../../../theme/styles/styles.utils';
-import { getChartColors } from '@embeddable.com/remarkable-ui-v0';
+import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { i18n } from '../../../theme/i18n/i18n';
 import { getObjectStableKey } from '../../../utils.ts/object.utils';
 

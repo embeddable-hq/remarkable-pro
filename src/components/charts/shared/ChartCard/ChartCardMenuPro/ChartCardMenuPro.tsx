@@ -9,7 +9,7 @@ import {
   ActionIcon,
   SelectFieldContent,
   SelectListOption,
-} from '@embeddable.com/remarkable-ui-v0';
+} from '@embeddable.com/remarkable-ui';
 import styles from './ChartCardMenuPro.module.css';
 import { ChartCardMenuOptionOnClickProps } from '../../../../../theme/defaults/defaults.ChartCardMenu.constants';
 

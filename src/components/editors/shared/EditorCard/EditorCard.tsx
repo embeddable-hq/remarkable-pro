@@ -3,7 +3,7 @@ import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import styles from './EditorCard.module.css';
 import { FC } from 'react';
 import { Theme } from '../../../../theme/theme.types';
-import { Card, CardContent, CardFeedback, CardHeader } from '@embeddable.com/remarkable-ui-v0';
+import { Card, CardContent, CardFeedback, CardHeader } from '@embeddable.com/remarkable-ui';
 import { IconAlertCircle } from '@tabler/icons-react';
 
 type EditorCardProps = {

@@ -5,7 +5,7 @@ import { Theme } from '../../../theme/theme.types';
 import { EditorCard } from '../shared/EditorCard/EditorCard';
 import { resolveI18nProps } from '../../component.utils';
 import { i18n } from '../../../theme/i18n/i18n';
-import { SingleSelectField } from '@embeddable.com/remarkable-ui-v0';
+import { SingleSelectField } from '@embeddable.com/remarkable-ui';
 
 export const MAX_OPTIONS = 200;
 
