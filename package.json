@@ -14,13 +14,12 @@
   },
   "scripts": {
     "build": "tsc",
-    "process:css-variables": "node scripts/process-css-variables.js",
     "build-storybook": "storybook build",
     "circular:check": "madge --circular .",
     "embeddable:build": "embeddable build",
     "embeddable:dev": "embeddable dev",
     "embeddable:login": "embeddable login",
-    "embeddable:package": "embeddable buildPackage && npm run process:css-variables",
+    "embeddable:package": "embeddable buildPackage",
     "embeddable:push": "embeddable push",
     "embeddable:upgrade": "npx npm-check-updates -u \"/embeddable/\"",
     "eslint:check": "eslint .",
@@ -31,8 +30,7 @@
     "prettier:write": "prettier . --write",
     "release": "npm run embeddable:package && changeset publish",
     "storybook": "storybook dev -p 6006",
-    "types:check": "tsc --noEmit --incremental false",
-    "postinstall": "node -e \"try{require('child_process').execSync('xattr -dr com.apple.quarantine node_modules/@swc || true',{stdio:'inherit'})}catch(e){}\""
+    "types:check": "tsc --noEmit --incremental false"
   },
   "keywords": [
     "embeddable",
