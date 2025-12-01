@@ -5,7 +5,7 @@ import { ChartData, ChartOptions } from 'chart.js';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { groupTailAsOther } from '../charts.utils';
 import { getColor } from '../../../theme/styles/styles.utils';
-import { chartColors, chartContrastColors } from '@embeddable.com/remarkable-ui-v0';
+import { getChartColors, getChartContrastColors } from '@embeddable.com/remarkable-ui-v0';
 import { getObjectStableKey } from '../../../utils.ts/object.utils';
 import { Context } from 'chartjs-plugin-datalabels';
 
@@ -26,7 +26,7 @@ export const getBarStackedChartProData = (
   const groupBy = [...new Set(data.map((d) => d[groupDimensionName]))].filter((d) => d != null);
 
   const themeKey = getObjectStableKey(theme);
-
+  const chartContrastColors = getChartContrastColors();
   const datasets = groupBy.map((groupByItem, index) => {
     const backgroundColor = getColor(
       `${themeKey}.charts.backgroundColors`,
@@ -81,6 +81,7 @@ export const getBarChartProData = (
   const themeFormatter = getThemeFormatter(theme);
   const themeKey = getObjectStableKey(theme);
   const groupedData = groupTailAsOther(props.data, props.dimension, props.measures, props.maxItems);
+  const chartColors = getChartColors();
 
   return {
     labels: groupedData.map((item) => {

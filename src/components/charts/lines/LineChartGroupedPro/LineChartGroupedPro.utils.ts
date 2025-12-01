@@ -6,7 +6,7 @@ import { mergician } from 'mergician';
 import { getObjectStableKey } from '../../../../utils.ts/object.utils';
 import { getColor } from '../../../../theme/styles/styles.utils';
 import { setColorAlpha } from '../../../../utils.ts/color.utils';
-import { chartContrastColors } from '@embeddable.com/remarkable-ui-v0';
+import { getChartContrastColors } from '@embeddable.com/remarkable-ui-v0';
 import { getLineChartProOptions, LineChartProOptionsClick } from '../lines.utils';
 
 export const getLineChartGroupedProData = (
@@ -26,7 +26,7 @@ export const getLineChartGroupedProData = (
   const groupBy = [...new Set(data.map((d) => d[groupDimension.name]))].filter((d) => d != null);
 
   const themeKey = getObjectStableKey(theme);
-
+  const chartContrastColors = getChartContrastColors();
   const datasets: ChartData<'line'>['datasets'] = groupBy.map((groupByItem, index) => {
     const backgroundColor = getColor(
       `${themeKey}.charts.backgroundColors`,

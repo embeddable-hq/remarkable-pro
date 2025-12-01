@@ -3,7 +3,7 @@ import { ChartData, ChartOptions } from 'chart.js';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getObjectStableKey } from '../../../../utils.ts/object.utils';
 import {
-  chartContrastColors,
+  getChartContrastColors,
   getChartjsAxisOptionsScalesTicksDefault,
   getChartjsAxisOptionsScalesTitle,
   getStyleNumber,
@@ -48,7 +48,7 @@ const getLineChartComparisonDataset = (
   const isLineDashed = Boolean(
     measure.inputs?.[isPreviousPeriod ? 'previousLineDashed' : 'lineDashed'],
   );
-
+  const chartContrastColors = getChartContrastColors();
   const lineColorTemp = measure.inputs?.[isPreviousPeriod ? 'previousLineColor' : 'lineColor'];
   const lineColor = isColorValid(lineColorTemp)
     ? lineColorTemp

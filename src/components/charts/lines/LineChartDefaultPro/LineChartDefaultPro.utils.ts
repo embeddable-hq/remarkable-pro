@@ -3,7 +3,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { ChartData, ChartOptions } from 'chart.js';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getObjectStableKey } from '../../../../utils.ts/object.utils';
-import { chartContrastColors, getStyleNumber } from '@embeddable.com/remarkable-ui-v0';
+import { getChartContrastColors, getStyleNumber } from '@embeddable.com/remarkable-ui-v0';
 import { getColor } from '../../../../theme/styles/styles.utils';
 import { mergician } from 'mergician';
 import { isColorValid, setColorAlpha } from '../../../../utils.ts/color.utils';
@@ -39,7 +39,7 @@ export const getLineChartProData = (
       const values = groupedData.map((item) => item[measure.name] ?? (zeroFill ? 0 : null));
 
       const lineColor = measure.inputs?.['lineColor'];
-
+      const chartContrastColors = getChartContrastColors();
       const backgroundColor = isColorValid(lineColor)
         ? lineColor
         : getColor(

@@ -54,7 +54,7 @@
     ]
   },
   "dependencies": {
-    "@embeddable.com/remarkable-ui-v0": "0.0.15",
+    "@embeddable.com/remarkable-ui-v0": "0.0.17",
     "@changesets/cli": "^2.29.6",
     "@embeddable.com/core": "^2.13.0",
     "@embeddable.com/react": "^2.12.0",

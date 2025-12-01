@@ -5,7 +5,7 @@ import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { getColor } from '../../../theme/styles/styles.utils';
-import { chartColors } from '@embeddable.com/remarkable-ui-v0';
+import { getChartColors } from '@embeddable.com/remarkable-ui-v0';
 import { i18n } from '../../../theme/i18n/i18n';
 import { getObjectStableKey } from '../../../utils.ts/object.utils';
 
@@ -34,7 +34,7 @@ export const getPieChartProData = (
   );
 
   const themeKey = getObjectStableKey(theme);
-
+  const chartColors = getChartColors();
   const backgroundColor = groupedData.map((item, i) =>
     getColor(
       `${themeKey}.charts.backgroundColors`,
