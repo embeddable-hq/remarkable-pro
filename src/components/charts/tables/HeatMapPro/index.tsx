@@ -4,11 +4,7 @@ import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
-import {
-  HeatMap,
-  HeatMapPropsDimension,
-  HeatMapPropsMeasure,
-} from '@embeddable.com/remarkable-ui-v0';
+import { HeatMap, HeatMapPropsDimension, HeatMapPropsMeasure } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 

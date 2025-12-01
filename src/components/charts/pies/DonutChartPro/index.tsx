@@ -4,7 +4,7 @@ import { getPieChartProOptions, getPieChartProData } from '../pies.utils';
 import { DefaultPieChartProps } from '../pies.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
-import { DonutChart } from '@embeddable.com/remarkable-ui-v0';
+import { DonutChart } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
 import { resolveI18nProps } from '../../../component.utils';
 

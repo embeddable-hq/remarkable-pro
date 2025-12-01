@@ -10,7 +10,7 @@ import {
 } from './LineChartGroupedPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartProOptionsClick } from '../lines.utils';
-import { LineChart } from '@embeddable.com/remarkable-ui-v0';
+import { LineChart } from '@embeddable.com/remarkable-ui';
 
 export type LineChartGroupedProPropsOnLineClicked = {
   axisDimensionValue: string | null;

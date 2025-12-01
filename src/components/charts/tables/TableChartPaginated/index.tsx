@@ -10,9 +10,9 @@ import {
   TablePaginated,
   useTableGetRowsPerPage,
   useDebounce,
-} from '@embeddable.com/remarkable-ui-v0';
+} from '@embeddable.com/remarkable-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useObserverHeight } from '@embeddable.com/remarkable-ui-v0';
+import { useObserverHeight } from '@embeddable.com/remarkable-ui';
 import { getTableHeaders, getTableRows } from '../tables.utils';
 import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
 

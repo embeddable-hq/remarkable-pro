@@ -1,6 +1,6 @@
 import { Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
-import { PivotTableProps } from '@embeddable.com/remarkable-ui-v0';
+import { PivotTableProps } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

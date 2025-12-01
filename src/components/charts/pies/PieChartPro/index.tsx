@@ -1,5 +1,5 @@
 import { useTheme } from '@embeddable.com/react';
-import { PieChart } from '@embeddable.com/remarkable-ui-v0';
+import { PieChart } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../../theme/theme.types';
 import { getPieChartProOptions, getPieChartProData } from '../pies.utils';
 import { DefaultPieChartProps } from '../pies.types';

@@ -1,13 +1,13 @@
 import { DataResponse, Dimension, DimensionOrMeasure } from '@embeddable.com/core';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { CssSize } from '@embeddable.com/remarkable-ui-v0';
+import { CssSize } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../theme/theme.types';
 import {
   getStyleNumber,
   TableHeaderAlign,
   TableHeaderItem,
   TableHeaderItemAlign,
-} from '@embeddable.com/remarkable-ui-v0';
+} from '@embeddable.com/remarkable-ui';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const getTableHeaderAlign = (dimOrMeas: DimensionOrMeasure): TableHeaderItemAlign => {

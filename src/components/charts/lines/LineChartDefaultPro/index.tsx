@@ -7,7 +7,7 @@ import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { getLineChartProData, getLineChartProOptions } from './LineChartDefaultPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartProOptionsClick } from '../lines.utils';
-import { LineChart } from '@embeddable.com/remarkable-ui-v0';
+import { LineChart } from '@embeddable.com/remarkable-ui';
 
 export type LineChartProPropsOnLineClicked = { axisDimensionValue: string | null };
 

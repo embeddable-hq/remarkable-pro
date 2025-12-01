@@ -1,6 +1,6 @@
 import { useState, useEffect, FC } from 'react';
 import styles from './ColorEditor.module.css';
-import { ActionIcon } from '@embeddable.com/remarkable-ui-v0';
+import { ActionIcon } from '@embeddable.com/remarkable-ui';
 import { IconX } from '@tabler/icons-react';
 
 type ColorInputProps = {

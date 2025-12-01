@@ -6,7 +6,7 @@ import { mergician } from 'mergician';
 import { getObjectStableKey } from '../../../../utils.ts/object.utils';
 import { getColor } from '../../../../theme/styles/styles.utils';
 import { setColorAlpha } from '../../../../utils.ts/color.utils';
-import { getChartContrastColors } from '@embeddable.com/remarkable-ui-v0';
+import { getChartContrastColors } from '@embeddable.com/remarkable-ui';
 import { getLineChartProOptions, LineChartProOptionsClick } from '../lines.utils';
 
 export const getLineChartGroupedProData = (
