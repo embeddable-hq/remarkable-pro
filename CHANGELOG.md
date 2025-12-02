@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.4
+
+### Patch Changes
+
+- b90df89: Fix sorting on Pivot Table
+
 ## 0.0.3
 
 ### Patch Changes
