@@ -5,13 +5,14 @@ import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { PivotTable } from '@embeddable.com/remarkable-ui';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import {
   getPivotColumnTotalsFor,
   getPivotDimension,
   getPivotMeasures,
   getPivotRowTotalsFor,
+  getPivotTableRows,
 } from './PivotPro.utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -36,6 +37,14 @@ const PivotTablePro = (props: PivotTableProProps) => {
   const { measures, rowDimension, columnDimension, displayNullAs, columnWidth, firstColumnWidth } =
     props;
 
+  const colOrder = Array.from(
+    new Set((props.results.data ?? []).filter(Boolean).map((d) => d[columnDimension.name])),
+  );
+
+  const rowOrder = Array.from(
+    new Set((props.results.data ?? []).filter(Boolean).map((d) => d[rowDimension.name])),
+  );
+
   // Fill gaps for the column dimension
   const resultsColumnDimensionFillGaps = useFillGaps({
     results: props.results,
@@ -43,10 +52,28 @@ const PivotTablePro = (props: PivotTableProProps) => {
   });
 
   // Fill gaps for the row dimension
-  const results = useFillGaps({
+  const resultsRowColumnDimensionFillGaps = useFillGaps({
     results: resultsColumnDimensionFillGaps,
     dimension: rowDimension,
   });
+
+  const results = useMemo(() => {
+    return getPivotTableRows(
+      resultsRowColumnDimensionFillGaps,
+      colOrder,
+      rowOrder,
+      columnDimension,
+      rowDimension,
+      measures,
+    );
+  }, [
+    resultsRowColumnDimensionFillGaps,
+    colOrder,
+    rowOrder,
+    columnDimension,
+    rowDimension,
+    measures,
+  ]);
 
   const cardContentRef = useRef<HTMLDivElement>(null);
 
@@ -55,7 +82,6 @@ const PivotTablePro = (props: PivotTableProProps) => {
   const pivotColumnDimension = getPivotDimension({ dimension: columnDimension }, theme);
   const pivotColumnTotalsFor = getPivotColumnTotalsFor(measures);
   const pivotRowTotalsFor = getPivotRowTotalsFor(measures);
-
   return (
     <ChartCard
       ref={cardContentRef}
@@ -63,13 +89,13 @@ const PivotTablePro = (props: PivotTableProProps) => {
       subtitle={description}
       data={props.results}
       dimensionsAndMeasures={[rowDimension, columnDimension, ...measures]}
-      errorMessage={results?.error}
+      errorMessage={props.results?.error}
     >
       <PivotTable
         firstColumnWidth={firstColumnWidth}
         columnWidth={columnWidth}
         totalLabel={i18n.t('charts.pivotTable.total')}
-        data={results.data ?? []}
+        data={results}
         measures={pivotMeasures}
         rowDimension={pivotRowDimension}
         columnDimension={pivotColumnDimension}

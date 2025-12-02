@@ -52,7 +52,7 @@
     ]
   },
   "dependencies": {
-    "@embeddable.com/remarkable-ui": "2.0.1",
+    "@embeddable.com/remarkable-ui": "2.0.3",
     "@changesets/cli": "^2.29.6",
     "@embeddable.com/core": "^2.13.0",
     "@embeddable.com/react": "^2.12.0",
