@@ -1,26 +1,77 @@
-# Remarkable UI
+# Remarkable PRO is Embeddable’s production-ready component suite.
 
-**Remarkable UI** is an open-source library of **beautiful components** for analytics – charts, controls, tables, and more – designed to be styled with **granular CSS variables**.
+Remarkable PRO is component library to use inside of [Embeddable](https://embeddable.com/).
 
-👉 Remarkable UI forms part of the [Embeddable](https://embeddable.com) ecosystem but can also be used independently.
+It provides [Embeddable](https://embeddable.com/) ready-to-go components, editors and granular styling via CSS variables inside the theme.
 
-## 🎨 Styling with CSS Variables
+Under the hood it uses the open source [Remarkable UI](https://www.npmjs.com/package/@embeddable.com/remarkable-ui) library.
 
-Every part of a Remarkable UI component can be styled with granular CSS variables.
+## 📦 Installation
 
-There are **three layers** of variables in our system:
+```bash
+npm install @embeddable.com/remarkable-pro
+```
 
-1. **Base variables**
-   – Raw CSS primitives (colors, spacing, type scales)  
-   – _Don’t override_—they’re the foundation.
-2. **Semantic variables**  
-   – “Meaningful” tokens built from base vars (e.g. --background-default, --foreground-error, --font-default)  
-   – Control _global_ look-and-feel: light vs. dark palettes, brand colors, default text styles.
-3. **Component variables**  
-   – Element-specific tokens (namespaced by component, e.g. --icn-btn-background-hover, --dropdown-padding)  
-   – Fine-tune individual components without touching global semantics.
+## 🧩 Setup (embeddable.config.ts)
+
+```ts
+export default defineConfig({
+  ...
+  componentLibraries: ["@embeddable.com/remarkable-pro"]
+});
+```
+
+## 🚀 Remarkable PRO includes
+
+- All core visualisations: bar, line, pie/donut, KPI tiles, tables, heatmaps, etc.
+- All essential controls: dropdowns, multi-selects, date pickers (UTC-safe), and - custom filters.
+- In-built interactivity: every chart supports click to filter.
+- i18n: internationalisation, built-in.
+- Consistent colors: automatic color-value assignment. And lots more.
+
+## 🎨 Theme styling
+
+The components and editors are part of the [Remarkable UI](https://www.npmjs.com/package/@embeddable.com/remarkable-ui) library, that uses its own [design system](https://github.com/embeddable-hq/remarkable-ui/blob/main/src/styles/global.tokens.ts) to style them.
+
+To update this styles, simply specify your css variable overrides inside your root embeddable.theme.ts file.
+
+```ts
+const themeProvider = (clientContext: any, parentTheme: Theme): Theme => {
+  const newTheme: DeepPartial<Theme> = {
+    styles: {
+      '--em-button-background--primary': 'gray',
+      '--em-card-border-radius': '20px',
+      ...
+    },
+  };
+  const theme = defineTheme(parentTheme, newTheme) as Theme;
+  return theme;
+};
+```
+
+## 📁 Project Structure
+
+```
+src/
+  assets/        # Icons and static assets
+  components/    # Chart, table, editor components
+  editors/       # Editor components and utilities
+  theme/         # Theme constants, types, and utils
+  types/         # Shared TypeScript types
+  utils.ts/      # Utility functions
+```
 
 ## 🛠 Contributing
 
-Remarkable UI is under active development, and we’d love feedback or contributions.  
-Feel free to open issues or suggest improvements.
+We welcome feedback and contributions!
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Open a pull request
+
+Please follow our code style and add tests for new features.
+
+## 📄 License
+
+MIT — see the `LICENSE` file for details.
