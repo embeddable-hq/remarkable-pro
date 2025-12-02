@@ -1,4 +1,4 @@
-import { Dimension, Measure } from '@embeddable.com/core';
+import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
 import { PivotTableProps } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
@@ -51,4 +51,45 @@ export const getPivotRowTotalsFor = (
   measures: Measure[],
 ): PivotTableProps<any>['rowTotalsFor'] | undefined => {
   return measures.filter((m) => m.inputs?.showRowTotal).map((m) => m.name);
+};
+
+export const getPivotTableRows = (
+  results: DataResponse,
+  columnOrder: string[],
+  columnDimension: Dimension,
+  rowDimension: Dimension,
+  measures: Measure[],
+) => {
+  const firstRow = results.data?.[0];
+
+  const leaderRows = columnOrder.map((col) => {
+    if (!firstRow) return;
+
+    const exists = results.data?.find(
+      (x) =>
+        x[columnDimension.name] === col && x[rowDimension.name] === firstRow[rowDimension.name],
+    );
+    if (exists) {
+      return exists;
+    }
+
+    return {
+      ...firstRow,
+      [columnDimension.name]: col,
+      ...measures.reduce((acc: any, measure) => {
+        acc[measure.name] = undefined;
+        return acc;
+      }, {}),
+    };
+  });
+
+  const restResults = (results.data ?? [])?.filter((resultRow) =>
+    leaderRows.find(
+      (leaderRow) =>
+        leaderRow[columnDimension.name] !== resultRow[columnDimension.name] &&
+        leaderRow[rowDimension.name] !== resultRow[rowDimension.name],
+    ),
+  );
+
+  return [...leaderRows, ...restResults];
 };
