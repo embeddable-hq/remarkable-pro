@@ -41,6 +41,10 @@ const PivotTablePro = (props: PivotTableProProps) => {
     new Set((props.results.data ?? []).filter(Boolean).map((d) => d[columnDimension.name])),
   );
 
+  const rowOrder = Array.from(
+    new Set((props.results.data ?? []).filter(Boolean).map((d) => d[rowDimension.name])),
+  );
+
   // Fill gaps for the column dimension
   const resultsColumnDimensionFillGaps = useFillGaps({
     results: props.results,
@@ -57,11 +61,19 @@ const PivotTablePro = (props: PivotTableProProps) => {
     return getPivotTableRows(
       resultsRowColumnDimensionFillGaps,
       colOrder,
+      rowOrder,
       columnDimension,
       rowDimension,
       measures,
     );
-  }, [resultsRowColumnDimensionFillGaps, colOrder, columnDimension, rowDimension, measures]);
+  }, [
+    resultsRowColumnDimensionFillGaps,
+    colOrder,
+    rowOrder,
+    columnDimension,
+    rowDimension,
+    measures,
+  ]);
 
   const cardContentRef = useRef<HTMLDivElement>(null);
 

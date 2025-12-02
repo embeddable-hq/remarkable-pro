@@ -53,43 +53,125 @@ export const getPivotRowTotalsFor = (
   return measures.filter((m) => m.inputs?.showRowTotal).map((m) => m.name);
 };
 
+type Order = 'asc' | 'desc' | 'equal';
+
+function predominantOrder(arr: (string | number | boolean)[]): Order {
+  let asc = 0;
+  let desc = 0;
+
+  for (let i = 0; i < arr.length - 1; i++) {
+    const a = arr[i];
+    const b = arr[i + 1];
+
+    if (a == null || b == null) continue;
+
+    if (a < b) asc++;
+    else if (a > b) desc++;
+  }
+
+  if (asc > desc) return 'asc';
+  if (desc > asc) return 'desc';
+  return 'equal';
+}
+
+function isOrderMixed(arr: (string | number | boolean)[]): boolean {
+  let asc = 0;
+  let desc = 0;
+
+  for (let i = 0; i < arr.length - 1; i++) {
+    const a = arr[i];
+    const b = arr[i + 1];
+
+    if (a == null || b == null) continue;
+
+    if (a < b) asc++;
+    else if (a > b) desc++;
+  }
+
+  return asc > 0 && desc > 0;
+}
+
+const getSortComparator = (order: Order) => {
+  return <T>(a: T, b: T) => {
+    if (order === 'asc') {
+      return a < b ? -1 : a > b ? 1 : 0;
+    }
+    if (order === 'desc') {
+      return a > b ? -1 : a < b ? 1 : 0;
+    }
+    return 0;
+  };
+};
+
 export const getPivotTableRows = (
   results: DataResponse,
-  columnOrder: string[],
+  columnOrder: (string | number | boolean)[],
+  rowOrder: (string | number | boolean)[],
   columnDimension: Dimension,
   rowDimension: Dimension,
   measures: Measure[],
 ) => {
-  const firstRow = results.data?.[0];
+  const data = results.data ?? [];
+  const firstRow = data[0];
 
-  const leaderRows = columnOrder.map((col) => {
-    if (!firstRow) return;
+  if (!firstRow) return [];
 
-    const exists = results.data?.find(
-      (x) =>
-        x[columnDimension.name] === col && x[rowDimension.name] === firstRow[rowDimension.name],
-    );
-    if (exists) {
-      return exists;
+  const buildEmptyMeasures = () =>
+    measures.reduce<Record<string, unknown>>((acc, measure) => {
+      acc[measure.name] = undefined;
+      return acc;
+    }, {});
+
+  const reorderByAxis = (
+    axisOrder: (string | number | boolean)[],
+    axisDimension: Dimension,
+    fixedDimension: Dimension,
+  ) => {
+    if (!isOrderMixed(axisOrder)) {
+      return data;
     }
 
-    return {
-      ...firstRow,
-      [columnDimension.name]: col,
-      ...measures.reduce((acc: any, measure) => {
-        acc[measure.name] = undefined;
-        return acc;
-      }, {}),
-    };
-  });
+    const order = predominantOrder(axisOrder);
+    const sortedAxisOrder = [...axisOrder].sort(getSortComparator(order));
 
-  const restResults = (results.data ?? [])?.filter((resultRow) =>
-    leaderRows.find(
-      (leaderRow) =>
-        leaderRow[columnDimension.name] !== resultRow[columnDimension.name] &&
-        leaderRow[rowDimension.name] !== resultRow[rowDimension.name],
-    ),
-  );
+    // “Leader” rows: one per value in the axis order, at the fixed dimension’s first value
+    const leaderRows = sortedAxisOrder.map((value) => {
+      const existing = data.find(
+        (x) =>
+          x[axisDimension.name] === value &&
+          x[fixedDimension.name] === firstRow[fixedDimension.name],
+      );
 
-  return [...leaderRows, ...restResults];
+      if (existing) return existing;
+
+      return {
+        ...firstRow,
+        [axisDimension.name]: value,
+        ...buildEmptyMeasures(),
+      };
+    });
+
+    // Remove rows that are already covered by leaderRows (same [axis, fixed] tuple)
+    const restResults = data.filter(
+      (resultRow) =>
+        !leaderRows.some(
+          (leaderRow) =>
+            leaderRow[axisDimension.name] === resultRow[axisDimension.name] &&
+            leaderRow[fixedDimension.name] === resultRow[fixedDimension.name],
+        ),
+    );
+
+    return [...leaderRows, ...restResults];
+  };
+
+  // Preserve original behavior: fix columns if mixed, otherwise rows if mixed
+  if (isOrderMixed(columnOrder)) {
+    return reorderByAxis(columnOrder, columnDimension, rowDimension);
+  }
+
+  if (isOrderMixed(rowOrder)) {
+    return reorderByAxis(rowOrder, rowDimension, columnDimension);
+  }
+
+  return data;
 };
