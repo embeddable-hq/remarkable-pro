@@ -36,6 +36,10 @@ const PivotTablePro = (props: PivotTableProProps) => {
   const { measures, rowDimension, columnDimension, displayNullAs, columnWidth, firstColumnWidth } =
     props;
 
+  const colOrder = Array.from(
+    new Set((props.results.data ?? []).map((d) => String(d[columnDimension.name] ?? ''))),
+  );
+
   // Fill gaps for the column dimension
   const resultsColumnDimensionFillGaps = useFillGaps({
     results: props.results,
@@ -43,10 +47,25 @@ const PivotTablePro = (props: PivotTableProProps) => {
   });
 
   // Fill gaps for the row dimension
-  const results = useFillGaps({
+  const resultsRowColumnDimensionFillGaps = useFillGaps({
     results: resultsColumnDimensionFillGaps,
     dimension: rowDimension,
   });
+
+  const firstRow = resultsRowColumnDimensionFillGaps.data?.[0];
+  const leaderRows = colOrder.map((col) => {
+    if (!firstRow) return;
+
+    if (firstRow[columnDimension.name] === col) {
+      return firstRow;
+    }
+
+    return { ...firstRow, [columnDimension.name]: col, [rowDimension.name]: null };
+  });
+
+  const restResults = resultsRowColumnDimensionFillGaps.data?.slice(1) || [];
+  console.log('leaderRows', leaderRows);
+  const results = [...leaderRows, ...restResults];
 
   const cardContentRef = useRef<HTMLDivElement>(null);
 
@@ -63,13 +82,13 @@ const PivotTablePro = (props: PivotTableProProps) => {
       subtitle={description}
       data={props.results}
       dimensionsAndMeasures={[rowDimension, columnDimension, ...measures]}
-      errorMessage={results?.error}
+      errorMessage={props.results?.error}
     >
       <PivotTable
         firstColumnWidth={firstColumnWidth}
         columnWidth={columnWidth}
         totalLabel={i18n.t('charts.pivotTable.total')}
-        data={results.data ?? []}
+        data={results}
         measures={pivotMeasures}
         rowDimension={pivotRowDimension}
         columnDimension={pivotColumnDimension}
