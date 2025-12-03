@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.5
+
+### Patch Changes
+
+- 31c3cd8: Fix HeatMap sorting results
+
 ## 0.0.4
 
 ### Patch Changes
