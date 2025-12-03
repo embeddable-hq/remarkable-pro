@@ -5,15 +5,15 @@ import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { PivotTable } from '@embeddable.com/remarkable-ui';
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import {
   getPivotColumnTotalsFor,
   getPivotDimension,
   getPivotMeasures,
   getPivotRowTotalsFor,
-  getPivotTableRows,
 } from './PivotPro.utils';
+import { useGetTableSortedResults } from '../tables.hooks';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -37,7 +37,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
   const { measures, rowDimension, columnDimension, displayNullAs, columnWidth, firstColumnWidth } =
     props;
 
-  const colOrder = Array.from(
+  const columnOrder = Array.from(
     new Set((props.results.data ?? []).filter(Boolean).map((d) => d[columnDimension.name])),
   );
 
@@ -57,23 +57,14 @@ const PivotTablePro = (props: PivotTableProProps) => {
     dimension: rowDimension,
   });
 
-  const results = useMemo(() => {
-    return getPivotTableRows(
-      resultsRowColumnDimensionFillGaps,
-      colOrder,
-      rowOrder,
-      columnDimension,
-      rowDimension,
-      measures,
-    );
-  }, [
-    resultsRowColumnDimensionFillGaps,
-    colOrder,
+  const results = useGetTableSortedResults({
+    results: resultsRowColumnDimensionFillGaps,
+    columnOrder,
     rowOrder,
     columnDimension,
     rowDimension,
     measures,
-  ]);
+  });
 
   const cardContentRef = useRef<HTMLDivElement>(null);
 

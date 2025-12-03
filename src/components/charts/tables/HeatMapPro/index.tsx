@@ -7,9 +7,7 @@ import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { HeatMap, HeatMapPropsDimension, HeatMapPropsMeasure } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { getPivotTableRows } from '../PivotTablePro/PivotPro.utils';
-import { measures } from '../../../component.constants';
-import { useMemo } from 'react';
+import { useGetTableSortedResults } from '../tables.hooks';
 
 type HeatMapProProps = {
   columnDimension: Dimension;
@@ -79,7 +77,7 @@ const HeatMapPro = (props: HeatMapProProps) => {
     maxThreshold,
   } = props;
 
-  const colOrder = Array.from(
+  const columnOrder = Array.from(
     new Set((props.results.data ?? []).filter(Boolean).map((d) => d[columnDimension.name])),
   );
 
@@ -99,23 +97,14 @@ const HeatMapPro = (props: HeatMapProProps) => {
     dimension: rowDimension,
   });
 
-  const results = useMemo(() => {
-    return getPivotTableRows(
-      resultsRowColumnDimensionFillGaps,
-      colOrder,
-      rowOrder,
-      columnDimension,
-      rowDimension,
-      [measure],
-    );
-  }, [
-    resultsRowColumnDimensionFillGaps,
-    colOrder,
+  const results = useGetTableSortedResults({
+    results: resultsRowColumnDimensionFillGaps,
+    columnOrder,
     rowOrder,
     columnDimension,
     rowDimension,
-    measures,
-  ]);
+    measures: [measure],
+  });
 
   const pivotMeasures = getHeatMeasure({ measure }, theme);
   const pivotRowDimension = getHeatDimension({ dimension: rowDimension }, theme);
