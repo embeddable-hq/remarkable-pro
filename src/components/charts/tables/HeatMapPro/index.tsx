@@ -7,6 +7,9 @@ import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { HeatMap, HeatMapPropsDimension, HeatMapPropsMeasure } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
+import { getPivotTableRows } from '../PivotTablePro/PivotPro.utils';
+import { measures } from '../../../component.constants';
+import { useMemo } from 'react';
 
 type HeatMapProProps = {
   columnDimension: Dimension;
@@ -76,6 +79,14 @@ const HeatMapPro = (props: HeatMapProProps) => {
     maxThreshold,
   } = props;
 
+  const colOrder = Array.from(
+    new Set((props.results.data ?? []).filter(Boolean).map((d) => d[columnDimension.name])),
+  );
+
+  const rowOrder = Array.from(
+    new Set((props.results.data ?? []).filter(Boolean).map((d) => d[rowDimension.name])),
+  );
+
   // Fill gaps for the column dimension
   const resultsColumnDimensionFillGaps = useFillGaps({
     results: props.results,
@@ -83,10 +94,28 @@ const HeatMapPro = (props: HeatMapProProps) => {
   });
 
   // Fill gaps for the row dimension
-  const results = useFillGaps({
+  const resultsRowColumnDimensionFillGaps = useFillGaps({
     results: resultsColumnDimensionFillGaps,
     dimension: rowDimension,
   });
+
+  const results = useMemo(() => {
+    return getPivotTableRows(
+      resultsRowColumnDimensionFillGaps,
+      colOrder,
+      rowOrder,
+      columnDimension,
+      rowDimension,
+      [measure],
+    );
+  }, [
+    resultsRowColumnDimensionFillGaps,
+    colOrder,
+    rowOrder,
+    columnDimension,
+    rowDimension,
+    measures,
+  ]);
 
   const pivotMeasures = getHeatMeasure({ measure }, theme);
   const pivotRowDimension = getHeatDimension({ dimension: rowDimension }, theme);
@@ -98,10 +127,10 @@ const HeatMapPro = (props: HeatMapProProps) => {
       subtitle={description}
       data={props.results}
       dimensionsAndMeasures={[rowDimension, columnDimension, measure]}
-      errorMessage={results?.error}
+      errorMessage={props.results?.error}
     >
       <HeatMap
-        data={results.data ?? []}
+        data={results}
         measure={pivotMeasures}
         rowDimension={pivotRowDimension}
         columnDimension={pivotColumnDimension}
