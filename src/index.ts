@@ -24,19 +24,45 @@ export { getThemeFormatter } from './theme/formatter/formatter.utils';
 export { resolveI18nProps } from './components/component.utils';
 
 // Components charts
-export { ChartCard } from './components/charts/shared/ChartCard/ChartCard';
-export * from './components/component.constants';
-export * from './components/charts/pies/pies.types';
-export * as PieChartPro from './components/charts/pies/PieChartPro';
+export * as BarChartDefaultPro from './components/charts/bars/BarChartDefaultPro';
+export * as BarChartStackedPro from './components/charts/bars/BarChartStackedPro';
+export * as BarChartGroupedPro from './components/charts/bars/BarChartGroupedPro';
+export * as BarChartDefaultHorizontalPro from './components/charts/bars/BarChartDefaultHorizontalPro';
+export * as BarChartStackedHorizontalPro from './components/charts/bars/BarChartStackedHorizontalPro';
+export * as BarChartGroupedHorizontalPro from './components/charts/bars/BarChartGroupedHorizontalPro';
+export * from './components/charts/bars/bars.utils';
+
+export * as KpiChartNumberPro from './components/charts/kpis/KpiChartNumberPro';
+export * as KpiChartNumberComparisonPro from './components/charts/kpis/KpiChartNumberComparisonPro';
+
+export * as LineChartDefaultPro from './components/charts/lines/LineChartDefaultPro';
+export * as LineChartGroupedPro from './components/charts/lines/LineChartGroupedPro';
+export * as LineChartComparisonDefaultPro from './components/charts/lines/LineChartComparisonDefaultPro';
+export * from './components/charts/lines/LineChartComparisonDefaultPro/LineChartComparisonDefaultPro.utils';
+export * from './components/charts/lines/LineChartDefaultPro/LineChartDefaultPro.utils';
+export * from './components/charts/lines/LineChartGroupedPro/LineChartGroupedPro.utils';
+
 export * as DonutChartPro from './components/charts/pies/DonutChartPro';
+export * as PieChartPro from './components/charts/pies/PieChartPro';
 export * as DonutLabelChartPro from './components/charts/pies/DonutLabelChartPro';
+export * from './components/charts/pies/pies.types';
 export * from './components/charts/pies/pies.utils';
 
+export * as HeatMapPro from './components/charts/tables/HeatMapPro';
+export * as PivotTablePro from './components/charts/tables/PivotTablePro';
+export * as TableChartPaginatedPro from './components/charts/tables/TableChartPaginated';
+
+export { ChartCard } from './components/charts/shared/ChartCard/ChartCard';
+export * from './components/component.constants';
+
 //Components editors
-export { EditorCard } from './components/editors/shared/EditorCard/EditorCard';
+export * as ComparisonPeriodSelectFieldPro from './components/editors/ComparisonPeriodSelectFieldPro';
+export * from './components/editors/ComparisonPeriodSelectFieldPro/ComparisonPeriodSelectFieldPro.utils';
+export * as DateRangeSelectFieldPro from './components/editors/DateRangeSelectFieldPro';
+export * from './components/editors/DateRangeSelectFieldPro/DateRangeSelectFieldPro.utils';
 export * as MultiSelectFieldPro from './components/editors/MultiSelectFieldPro';
 export * as SingleSelectFieldPro from './components/editors/SingleSelectFieldPro';
-export * as DateRangeSelectFieldPro from './components/editors/DateRangeSelectFieldPro';
+export { EditorCard } from './components/editors/shared/EditorCard/EditorCard';
 
 // Custom Types
 export { default as ComparisonPeriodType } from './components/types/ComparisonPeriod.type.emb';

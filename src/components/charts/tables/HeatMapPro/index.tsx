@@ -7,6 +7,7 @@ import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { HeatMap, HeatMapPropsDimension, HeatMapPropsMeasure } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
+import { useGetTableSortedResults } from '../tables.hooks';
 
 type HeatMapProProps = {
   columnDimension: Dimension;
@@ -76,6 +77,14 @@ const HeatMapPro = (props: HeatMapProProps) => {
     maxThreshold,
   } = props;
 
+  const columnOrder = Array.from(
+    new Set((props.results.data ?? []).filter(Boolean).map((d) => d[columnDimension.name])),
+  );
+
+  const rowOrder = Array.from(
+    new Set((props.results.data ?? []).filter(Boolean).map((d) => d[rowDimension.name])),
+  );
+
   // Fill gaps for the column dimension
   const resultsColumnDimensionFillGaps = useFillGaps({
     results: props.results,
@@ -83,9 +92,18 @@ const HeatMapPro = (props: HeatMapProProps) => {
   });
 
   // Fill gaps for the row dimension
-  const results = useFillGaps({
+  const resultsRowColumnDimensionFillGaps = useFillGaps({
     results: resultsColumnDimensionFillGaps,
     dimension: rowDimension,
+  });
+
+  const results = useGetTableSortedResults({
+    results: resultsRowColumnDimensionFillGaps,
+    columnOrder,
+    rowOrder,
+    columnDimension,
+    rowDimension,
+    measures: [measure],
   });
 
   const pivotMeasures = getHeatMeasure({ measure }, theme);
@@ -98,10 +116,10 @@ const HeatMapPro = (props: HeatMapProProps) => {
       subtitle={description}
       data={props.results}
       dimensionsAndMeasures={[rowDimension, columnDimension, measure]}
-      errorMessage={results?.error}
+      errorMessage={props.results?.error}
     >
       <HeatMap
-        data={results.data ?? []}
+        data={results}
         measure={pivotMeasures}
         rowDimension={pivotRowDimension}
         columnDimension={pivotColumnDimension}
