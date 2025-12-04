@@ -10,4 +10,5 @@
   width: var(--em-card-loader-size, 1.5rem);
   height: var(--em-card-loader-size, 1.5rem);
   background: var(--em-card-background, #f7f7f8);
+  color: var(--em-card-loader-color, #212129);
 }
