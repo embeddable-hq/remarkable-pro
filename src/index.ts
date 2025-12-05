@@ -51,6 +51,7 @@ export * from './components/charts/pies/pies.utils';
 export * as HeatMapPro from './components/charts/tables/HeatMapPro';
 export * as PivotTablePro from './components/charts/tables/PivotTablePro';
 export * as TableChartPaginatedPro from './components/charts/tables/TableChartPaginated';
+export * from './components/charts/tables/tables.utils';
 
 export { ChartCard } from './components/charts/shared/ChartCard/ChartCard';
 export * from './components/component.constants';
