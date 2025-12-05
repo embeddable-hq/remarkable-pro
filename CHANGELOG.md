@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.6
+
+### Patch Changes
+
+- d3d25fb: Export table utils
+
 ## 0.0.5
 
 ### Patch Changes
