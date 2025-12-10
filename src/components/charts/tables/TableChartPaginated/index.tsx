@@ -154,7 +154,7 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
       ...prevState,
       hasTotalResults: false,
     }));
-  }, [dimensionsAndMeasures]);
+  }, [dimensionsAndMeasures, pageSize]);
 
   useEffect(() => {
     if (totalResults?.total) {
