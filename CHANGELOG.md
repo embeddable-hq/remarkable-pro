@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.7
+
+### Patch Changes
+
+- 6a41460: Improve useFillGaps to return empty if results are empty
+
 ## 0.0.6
 
 ### Patch Changes
