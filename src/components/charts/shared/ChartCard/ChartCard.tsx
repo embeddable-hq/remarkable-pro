@@ -72,7 +72,8 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
     };
 
     return (
-      <Card className={styles.chartCard} {...props}>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      <Card className={styles.chartCard} {...(props as any)}>
         <CardHeader
           title={title}
           subtitle={subtitle}
