@@ -63,6 +63,7 @@ const defaultState: TableChartPaginatedProState = {
   pageSize: undefined,
   sort: undefined,
   isLoadingDownloadData: false,
+  hasTotalResults: false,
 };
 
 export default defineComponent(TablePaginatedChart, meta, {
@@ -106,8 +107,16 @@ export default defineComponent(TablePaginatedChart, meta, {
             select: dimensionsAndMeasuresToLoad,
             offset: state.page * state.pageSize,
             limit: state.pageSize,
-            countRows: true,
             orderBy,
+          })
+        : undefined,
+      totalResults: !state?.hasTotalResults
+        ? loadData({
+            from: inputs.dataset,
+            select: dimensionsAndMeasuresToLoad,
+            offset: 0,
+            limit: 0,
+            countRows: true,
           })
         : undefined,
       allResults: state?.isLoadingDownloadData

@@ -43,32 +43,34 @@ export type TableChartPaginatedProState = {
   pageSize?: number;
   sort?: { id: string; direction: OrderDirection } | undefined;
   isLoadingDownloadData: boolean;
+  hasTotalResults: boolean;
 };
 
 type TableChartPaginatedProProps = {
-  embeddableState: TableChartPaginatedProState;
-  title: string;
-  description: string;
-  displayNullAs?: string;
-  results: DataResponse;
-  dimensionsAndMeasures: DimensionOrMeasure[];
-  showIndex: boolean;
   allResults?: DataResponse;
   clickDimension?: Dimension;
+  description: string;
+  dimensionsAndMeasures: DimensionOrMeasure[];
+  displayNullAs?: string;
+  embeddableState: TableChartPaginatedProState;
+  results: DataResponse;
+  showIndex: boolean;
   state: TableChartPaginatedProState;
-  setState: React.Dispatch<React.SetStateAction<TableChartPaginatedProState>>;
+  title: string;
+  totalResults?: DataResponse;
   onRowClicked: (rowDimensionValue: TableChartPaginatedProOnRowClickArg) => void;
+  setState: React.Dispatch<React.SetStateAction<TableChartPaginatedProState>>;
 };
 
 const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const [total, setTotal] = useState<number | undefined>(undefined);
   const [isDownloadingData, setIsDownloadingData] = useState(false);
 
   const { description, title } = resolveI18nProps(props);
   const {
+    totalResults,
     results,
     allResults,
     dimensionsAndMeasures,
@@ -148,10 +150,20 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
 
   // Sync total from results
   useEffect(() => {
-    if (results?.total && results.total !== total) {
-      setTotal(results.total);
+    setState((prevState) => ({
+      ...prevState,
+      hasTotalResults: false,
+    }));
+  }, [dimensionsAndMeasures, pageSize]);
+
+  useEffect(() => {
+    if (totalResults?.total) {
+      setState((prevState) => ({
+        ...prevState,
+        hasTotalResults: true,
+      }));
     }
-  }, [results, total]);
+  }, [totalResults]);
 
   // Handle data download when allResults is ready
   useEffect(() => {
@@ -186,9 +198,9 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
         pageSize={pageSize}
         paginationLabel={i18n.t('charts.tablePaginated.pagination', {
           page: state.page + 1,
-          totalPages: getTableTotalPages(total, pageSize) ?? '?',
+          totalPages: getTableTotalPages(totalResults?.total, pageSize) ?? '?',
         })}
-        total={total}
+        total={totalResults?.total}
         sort={localSort}
         onSortChange={(newSort) => {
           setLocalSort(newSort as TableChartPaginatedProState['sort']);
