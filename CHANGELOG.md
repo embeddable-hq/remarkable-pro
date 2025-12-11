@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.9
+
+### Patch Changes
+
+- 26d5596: Update Remarkable-UI library
+
 ## 0.0.8
 
 ### Patch Changes
