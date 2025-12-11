@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.8
+
+### Patch Changes
+
+- 117188c: Separate loadData for PaginatedTable totals
+
 ## 0.0.7
 
 ### Patch Changes
