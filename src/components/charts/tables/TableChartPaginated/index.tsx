@@ -10,9 +10,9 @@ import {
   TablePaginated,
   useTableGetRowsPerPage,
   useDebounce,
+  useResizeObserver,
 } from '@embeddable.com/remarkable-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useObserverHeight } from '@embeddable.com/remarkable-ui';
 import { getTableHeaders, getTableRows } from '../tables.utils';
 import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
 
@@ -88,9 +88,9 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
   const rows = results?.data || [];
   const tableRows = getTableRows({ rows, clickDimension });
   const cardContentRef = useRef<HTMLDivElement>(null);
-  const chartHeight = useObserverHeight(cardContentRef);
+  const { height } = useResizeObserver(cardContentRef);
   const pageSize = useTableGetRowsPerPage({
-    availableHeight: chartHeight,
+    availableHeight: height,
     headerHeight,
     rowHeight,
     footerHeight,
