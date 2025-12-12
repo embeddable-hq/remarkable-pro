@@ -110,6 +110,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
         comparisonLabel={comparisonLabel}
         percentageDecimalPlaces={percentageDecimalPlaces}
         noPreviousDataLabel={i18n.t('charts.kpiChart.noPreviousData')}
+        equalComparisonLabel={i18n.t('charts.kpiChart.equalComparison')}
       />
     </ChartCard>
   );

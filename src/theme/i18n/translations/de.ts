@@ -38,6 +38,7 @@ export const de: ResourceLanguage = {
       },
       kpiChart: {
         noPreviousData: 'Keine vorherigen Daten',
+        equalComparison: 'Keine Veränderung',
       },
     },
     editors: {

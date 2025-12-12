@@ -27,6 +27,7 @@ export const en: ResourceLanguage = {
       },
       kpiChart: {
         noPreviousData: 'No previous data',
+        equalComparison: 'No change',
       },
     },
     editors: {
