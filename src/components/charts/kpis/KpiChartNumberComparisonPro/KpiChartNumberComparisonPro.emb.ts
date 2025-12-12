@@ -68,48 +68,56 @@ type KpiChartNumberComparisonProState = {
   comparisonDateRange: TimeRange;
 };
 
-export default defineComponent(KpiChartNumberComparisonPro, meta, {
-  props: (
-    inputs: Inputs<typeof meta>,
-    [state, setState]: [
-      KpiChartNumberComparisonProState,
-      (state: KpiChartNumberComparisonProState) => void,
-    ],
-  ) => {
-    return {
-      ...inputs,
-      comparisonDateRange: state?.comparisonDateRange,
-      setComparisonDateRange: (comparisonDateRange: TimeRange) => setState({ comparisonDateRange }),
-      results: loadData({
-        from: inputs.dataset,
-        select: [inputs.measure],
-        limit: 1,
-        filters:
-          inputs.primaryDateRange && inputs.timeProperty
-            ? [
-                {
-                  property: inputs.timeProperty,
-                  operator: 'inDateRange',
-                  value: inputs.primaryDateRange,
-                },
-              ]
+const KpiChartNumberComparisonProExport: ReturnType<typeof defineComponent> = defineComponent(
+  KpiChartNumberComparisonPro,
+  meta,
+  {
+    props: (
+      inputs: Inputs<typeof meta>,
+      [state, setState]: [
+        KpiChartNumberComparisonProState,
+        (state: KpiChartNumberComparisonProState) => void,
+      ],
+    ) => {
+      return {
+        ...inputs,
+        comparisonPeriod: inputs.comparisonPeriod as string | undefined,
+        comparisonDateRange: state?.comparisonDateRange,
+        setComparisonDateRange: (comparisonDateRange: TimeRange) =>
+          setState({ comparisonDateRange }),
+        results: loadData({
+          from: inputs.dataset,
+          select: [inputs.measure],
+          limit: 1,
+          filters:
+            inputs.primaryDateRange && inputs.timeProperty
+              ? [
+                  {
+                    property: inputs.timeProperty,
+                    operator: 'inDateRange',
+                    value: inputs.primaryDateRange,
+                  },
+                ]
+              : undefined,
+        }),
+        resultsComparison:
+          inputs.primaryDateRange && inputs.timeProperty && state?.comparisonDateRange
+            ? loadData({
+                from: inputs.dataset,
+                select: [inputs.measure],
+                limit: 1,
+                filters: [
+                  {
+                    property: inputs.timeProperty,
+                    operator: 'inDateRange',
+                    value: state.comparisonDateRange,
+                  },
+                ],
+              })
             : undefined,
-      }),
-      resultsComparison:
-        inputs.primaryDateRange && inputs.timeProperty && state?.comparisonDateRange
-          ? loadData({
-              from: inputs.dataset,
-              select: [inputs.measure],
-              limit: 1,
-              filters: [
-                {
-                  property: inputs.timeProperty,
-                  operator: 'inDateRange',
-                  value: state.comparisonDateRange,
-                },
-              ],
-            })
-          : undefined,
-    };
+      };
+    },
   },
-});
+);
+
+export default KpiChartNumberComparisonProExport;
