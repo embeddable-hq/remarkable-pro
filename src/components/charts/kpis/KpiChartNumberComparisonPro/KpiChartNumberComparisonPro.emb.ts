@@ -78,6 +78,7 @@ export default defineComponent(KpiChartNumberComparisonPro, meta, {
   ) => {
     return {
       ...inputs,
+      comparisonPeriod: inputs.comparisonPeriod as string | undefined,
       comparisonDateRange: state?.comparisonDateRange,
       setComparisonDateRange: (comparisonDateRange: TimeRange) => setState({ comparisonDateRange }),
       results: loadData({
