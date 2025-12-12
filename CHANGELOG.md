@@ -1,5 +1,12 @@
 # @embeddable/remarkable-ui
 
+## 0.0.10
+
+### Patch Changes
+
+- 097797d: Improve KPI resize behavior
+- d17fe43: Improve KPI chart emb.ts file
+
 ## 0.0.9
 
 ### Patch Changes
