@@ -59,7 +59,7 @@ export const meta = {
     {
       ...genericNumber,
       name: 'changeFontSize',
-      label: 'Change Font Size',
+      label: 'Trend Font Size',
     },
   ],
 } as const satisfies EmbeddedComponentMeta;
@@ -69,7 +69,6 @@ type KpiChartNumberComparisonProState = {
 };
 
 export default defineComponent(KpiChartNumberComparisonPro, meta, {
-  /* @ts-expect-error - to be fixed in @embeddable.com/react */
   props: (
     inputs: Inputs<typeof meta>,
     [state, setState]: [

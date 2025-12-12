@@ -22,7 +22,6 @@ type ChartCardProps = {
   subtitle?: string;
   children: React.ReactNode;
   data: DataResponse;
-  isLoading?: boolean;
   errorMessage?: string;
   style?: CSSProperties;
   dimensionsAndMeasures?: (Dimension | Measure)[];
@@ -31,7 +30,7 @@ type ChartCardProps = {
 
 export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
   (
-    { title, subtitle, children, data, errorMessage, dimensionsAndMeasures = [], ...props },
+    { title, subtitle, children, data, errorMessage, dimensionsAndMeasures = [], onCustomDownload },
     ref,
   ) => {
     const theme: Theme = useTheme() as Theme;
@@ -72,8 +71,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
     };
 
     return (
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      <Card className={styles.chartCard} {...(props as any)}>
+      <Card className={styles.chartCard}>
         <CardHeader
           title={title}
           subtitle={subtitle}
@@ -92,14 +90,14 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
                   containerRef={chartRef}
                   data={data?.data}
                   dimensionsAndMeasures={dimensionsAndMeasures}
-                  onCustomDownload={props.onCustomDownload}
+                  onCustomDownload={onCustomDownload}
                 />
               </div>
             </div>
           }
         />
 
-        <CardContent ref={props.onCustomDownload ? ref : chartRef}>{getDisplay()}</CardContent>
+        <CardContent ref={onCustomDownload ? ref : chartRef}>{getDisplay()}</CardContent>
       </Card>
     );
   },

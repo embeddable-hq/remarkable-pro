@@ -25,6 +25,10 @@ export const en: ResourceLanguage = {
       pivotTable: {
         total: 'Total',
       },
+      kpiChart: {
+        noPreviousData: 'No previous data',
+        equalComparison: 'No change',
+      },
     },
     editors: {
       errorTitle: 'Something went wrong.',
