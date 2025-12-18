@@ -16,7 +16,7 @@ export const meta = {
     {
       ...genericBoolean,
       name: 'showCustomRangeOptions',
-      label: 'Show custom range options',
+      label: 'Show custom date-range option',
       defaultValue: true,
     },
     { ...genericBoolean, name: 'clearable', label: 'Can be cleared', defaultValue: true },
