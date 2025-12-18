@@ -24,8 +24,15 @@ export const getTimeRangeLabel = (range: TimeRange, dateFormat: string): string 
     return '';
   }
 
-  const labelFrom = dayjs(from).utc().format(dateFormat);
-  const labelTo = dayjs(to).utc().format(dateFormat);
+  const currentUTCYear = new Date().getUTCFullYear();
+
+  const isDifferentYear =
+    currentUTCYear !== from.getUTCFullYear() || currentUTCYear !== to.getUTCFullYear();
+
+  const format = isDifferentYear ? 'DD MMM YYYY' : dateFormat;
+
+  const labelFrom = dayjs(from).utc().format(format);
+  const labelTo = dayjs(to).utc().format(format);
 
   if (labelFrom === labelTo) {
     return labelFrom;

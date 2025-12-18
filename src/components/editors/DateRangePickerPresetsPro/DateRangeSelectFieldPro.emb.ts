@@ -5,7 +5,7 @@ import { description, genericBoolean, placeholder, title } from '../../component
 
 export const meta = {
   name: 'DateRangeSelectFieldPro',
-  label: 'Date Range Select Field',
+  label: 'Date-Range Picker - Presets',
   category: 'Dropdowns',
   defaultWidth: 300,
   defaultHeight: 120,
@@ -13,12 +13,24 @@ export const meta = {
     { ...title },
     { ...description },
     { ...placeholder, defaultValue: 'Select a date-range' },
+    {
+      ...genericBoolean,
+      name: 'showCustomRangeOptions',
+      label: 'Show custom range options',
+      defaultValue: true,
+    },
     { ...genericBoolean, name: 'clearable', label: 'Can be cleared', defaultValue: true },
     {
       name: 'selectedValue',
       type: 'timeRange',
       label: 'Selected Value',
       category: 'Pre-configured variables',
+    },
+    {
+      ...genericBoolean,
+      name: 'showTwoMonths',
+      label: 'Show two months',
+      defaultValue: false,
     },
   ],
   events: [
@@ -52,15 +64,8 @@ export default defineComponent(DateTimeSelectFieldPro, meta, {
     };
   },
   events: {
-    onChange: (range) => {
-      return {
-        value: range
-          ? {
-              ...range,
-              relativeTimeString: '', // This is prioritised over the from and to dates, so we don't pass this for now (as we don't want Cube parsing this instead of using the calculated dates)
-            }
-          : Value.noFilter(),
-      };
-    },
+    onChange: (range) => ({
+      value: range ?? Value.noFilter(),
+    }),
   },
 });

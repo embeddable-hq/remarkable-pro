@@ -32,6 +32,12 @@ export const en: ResourceLanguage = {
     },
     editors: {
       errorTitle: 'Something went wrong.',
+      dateRangePicker: {
+        custom: 'Custom',
+        backToPresets: 'Back to presets',
+        apply: 'Apply',
+        placeholder: 'Select date range',
+      },
     },
     defaults: {
       comparisonPeriodOptions: {
