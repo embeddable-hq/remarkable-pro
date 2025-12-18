@@ -1,14 +1,16 @@
 import { useTheme } from '@embeddable.com/react';
 import { DateRange, DateRangePickerField } from '@embeddable.com/remarkable-ui';
-import { Theme } from '../../../theme/theme.types';
-import { useLoadDayjsLocale } from '../../../utils.ts/date.utils';
+import { Theme } from '../../../../theme/theme.types';
+import { useLoadDayjsLocale } from '../../../../utils.ts/date.utils';
 import { TimeRange } from '@embeddable.com/core';
-import { resolveI18nProps } from '../../component.utils';
-import { EditorCard } from '../shared/EditorCard/EditorCard';
-import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
-
-import { getTimeRangeLabel } from '../editors.timeRange.utils';
-import { getDateRangeFromTimeRange, getTimeRangeFromDateRange } from '../dates/dates.utils';
+import { resolveI18nProps } from '../../../component.utils';
+import { EditorCard } from '../../shared/EditorCard/EditorCard';
+import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
+import {
+  getDateRangeFromTimeRange,
+  getTimeRangeFromDateRange,
+  getTimeRangeLabel,
+} from '../dates.utils';
 
 type DateRangePickerPresetsProps = {
   description?: string;
@@ -39,8 +41,8 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
     onChange(timeRange);
   };
 
-  const displayValue =
-    selectedValue?.from && selectedValue?.to ? getTimeRangeLabel(selectedValue, 'MMM DD') : '';
+  const dateRangeOptions = theme.defaults.dateRangesOptions;
+  const displayValue = getTimeRangeLabel(selectedValue, 'MMM DD', dateRangeOptions);
 
   const locale = theme.i18n.language ?? theme.formatter.locale;
 
@@ -52,7 +54,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
         placeholder={placeholder}
         displayValue={displayValue}
         numberOfMonths={showTwoMonths ? 2 : 1}
-        value={getDateRangeFromTimeRange(selectedValue)}
+        value={getDateRangeFromTimeRange(selectedValue, dateRangeOptions)}
         onChange={handleChange}
         submitLabel={i18n.t('editors.dateRangePicker.apply')}
       />

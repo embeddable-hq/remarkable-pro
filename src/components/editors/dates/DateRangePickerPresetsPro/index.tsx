@@ -10,18 +10,21 @@ import {
   SelectFieldTrigger,
   isSameDateRange,
 } from '@embeddable.com/remarkable-ui';
-import { Theme } from '../../../theme/theme.types';
-import { useLoadDayjsLocale } from '../../../utils.ts/date.utils';
+import { Theme } from '../../../../theme/theme.types';
+import { useLoadDayjsLocale } from '../../../../utils.ts/date.utils';
 import { getDateRangeSelectFieldProOptions } from './DateRangePickerPresetsPro.utils';
 import { TimeRange } from '@embeddable.com/core';
-import { resolveI18nProps } from '../../component.utils';
-import { EditorCard } from '../shared/EditorCard/EditorCard';
+import { resolveI18nProps } from '../../../component.utils';
+import { EditorCard } from '../../shared/EditorCard/EditorCard';
 import { IconCalendarFilled, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
-import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
+import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { useState } from 'react';
 import styles from './DateRangePickerPresetsPro.module.css';
-import { getTimeRangeLabel } from '../editors.timeRange.utils';
-import { getDateRangeFromTimeRange, getTimeRangeFromDateRange } from '../dates/dates.utils';
+import {
+  getDateRangeFromTimeRange,
+  getTimeRangeFromDateRange,
+  getTimeRangeLabel,
+} from '../dates.utils';
 
 type DateRangePickerPresetsProps = {
   description?: string;

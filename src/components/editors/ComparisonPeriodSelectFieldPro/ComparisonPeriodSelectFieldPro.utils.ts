@@ -1,8 +1,8 @@
 import { SelectListOptionProps } from '@embeddable.com/remarkable-ui';
 import { TimeRange } from '@embeddable.com/core';
 import { ComparisonPeriodSelectFieldProOption } from './ComparisonPeriodSelectFieldPro.types';
-import { getTimeRangeLabel } from '../editors.timeRange.utils';
 import { resolveI18nString } from '../../component.utils';
+import { getTimeRangeLabel } from '../dates/dates.utils';
 
 // Checks if the comparison period type is available in the embeddable types
 export const isComparisonPeriodAvailable = (

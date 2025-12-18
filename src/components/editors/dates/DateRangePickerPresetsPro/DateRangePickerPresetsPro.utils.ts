@@ -1,7 +1,7 @@
 import { DateRangeSelectFieldProOption } from './DateRangePickerPresetsPro.types';
 import { SelectListOptionProps } from '@embeddable.com/remarkable-ui';
-import { getTimeRangeLabel } from '../editors.timeRange.utils';
-import { resolveI18nString } from '../../component.utils';
+import { resolveI18nString } from '../../../component.utils';
+import { getTimeRangeLabel } from '../dates.utils';
 
 export const getDateRangeSelectFieldProOptions = (
   dateRangeSelectFieldProOptions: DateRangeSelectFieldProOption[],
