@@ -59,7 +59,7 @@
     "@changesets/cli": "^2.29.6",
     "@embeddable.com/core": "^2.13.2",
     "@embeddable.com/react": "^2.12.2",
-    "@embeddable.com/remarkable-ui": "file:../remarkable-ui",
+    "@embeddable.com/remarkable-ui": "^2.0.16",
     "@tabler/icons-react": "^3.34.1",
     "chart.js": "^4.5.0",
     "chartjs-plugin-datalabels": "^2.2.0",
