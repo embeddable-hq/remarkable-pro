@@ -8,6 +8,7 @@ import {
   SelectListOption,
   DateRange,
   SelectFieldTrigger,
+  isSameDateRange,
 } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../theme/theme.types';
 import { useLoadDayjsLocale } from '../../../utils.ts/date.utils';
@@ -96,6 +97,8 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const valueLabel = getValueLabel();
 
   const locale = theme.i18n.language ?? theme.formatter.locale;
+  const isSubmitDisabled = isSameDateRange(dateRange, selectedValue);
+  const numberOfMonths = showTwoMonths ? 2 : 1;
 
   return (
     <EditorCard title={title} subtitle={description}>
@@ -128,11 +131,15 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
               )}
               <DateRangePicker
                 locale={locale}
-                numberOfMonths={showTwoMonths ? 2 : 1}
+                numberOfMonths={numberOfMonths}
                 value={dateRange}
                 onChange={setDateRange}
               />
-              <Button size="small" onClick={() => handleDateRangeChange(dateRange)}>
+              <Button
+                size="small"
+                disabled={isSubmitDisabled}
+                onClick={() => handleDateRangeChange(dateRange)}
+              >
                 {i18n.t('editors.dateRangePicker.apply')}
               </Button>
             </div>

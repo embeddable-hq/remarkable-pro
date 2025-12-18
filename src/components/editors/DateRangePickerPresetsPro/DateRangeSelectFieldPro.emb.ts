@@ -19,18 +19,18 @@ export const meta = {
       label: 'Show custom date-range option',
       defaultValue: true,
     },
+    {
+      ...genericBoolean,
+      name: 'showTwoMonths',
+      label: 'Show two-month view',
+      defaultValue: false,
+    },
     { ...genericBoolean, name: 'clearable', label: 'Can be cleared', defaultValue: true },
     {
       name: 'selectedValue',
       type: 'timeRange',
       label: 'Selected Value',
       category: 'Pre-configured variables',
-    },
-    {
-      ...genericBoolean,
-      name: 'showTwoMonths',
-      label: 'Show two months',
-      defaultValue: false,
     },
   ],
   events: [
