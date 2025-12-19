@@ -12,7 +12,7 @@ import {
   isComparisonPeriodAvailable,
 } from './ComparisonPeriodSelectFieldPro.utils';
 import { useEffect, useMemo } from 'react';
-import { getTimeRangeFromTo } from '../dates/dates.utils';
+import { getTimeRangeFromPresets } from '../dates/dates.utils';
 
 type DateComparisonSelectFieldPro = {
   title?: string;
@@ -46,7 +46,7 @@ const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
   const { dayjsLocaleReady } = useLoadDayjsLocale();
 
   // Obtain the actual range for the selected primaryDateRange
-  const primaryDateRange = getTimeRangeFromTo(
+  const primaryDateRange = getTimeRangeFromPresets(
     props.primaryDateRange,
     theme.defaults.dateRangesOptions,
   );

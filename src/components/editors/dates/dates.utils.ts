@@ -6,15 +6,27 @@ import { DateRangeOption } from '../../../theme/defaults/defaults.DateRanges.con
 
 dayjs.extend(utc);
 
-export const getTimeRangeFromTo = (
+export const getTimeRangeFromPresets = (
   receivedTimeRange: TimeRange,
   options?: DateRangeOption[],
 ): TimeRange => {
-  return receivedTimeRange?.relativeTimeString
-    ? (options
-        ?.find((dateRange) => dateRange.value === receivedTimeRange?.relativeTimeString)
-        ?.getRange() as TimeRange)
-    : receivedTimeRange;
+  if (options?.length === 0) {
+    return receivedTimeRange;
+  }
+
+  if (receivedTimeRange?.relativeTimeString) {
+    const selectedOption = options
+      ?.find((dateRange) => dateRange.value === receivedTimeRange?.relativeTimeString)
+      ?.getRange();
+
+    const { from, to } = selectedOption || {};
+
+    if (selectedOption) {
+      return { from, to, relativeTimeString: receivedTimeRange.relativeTimeString };
+    }
+  }
+
+  return receivedTimeRange;
 };
 
 export const getTimeRangeLabel = (

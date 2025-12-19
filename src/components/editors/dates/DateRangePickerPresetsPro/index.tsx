@@ -9,6 +9,7 @@ import {
   DateRange,
   SelectFieldTrigger,
   isSameDateRange,
+  shallowEqual,
 } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../../theme/theme.types';
 import { useLoadDayjsLocale } from '../../../../utils.ts/date.utils';
@@ -18,11 +19,12 @@ import { resolveI18nProps } from '../../../component.utils';
 import { EditorCard } from '../../shared/EditorCard/EditorCard';
 import { IconCalendarFilled, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './DateRangePickerPresetsPro.module.css';
 import {
   getDateRangeFromTimeRange,
   getTimeRangeFromDateRange,
+  getTimeRangeFromPresets,
   getTimeRangeLabel,
 } from '../dates.utils';
 
@@ -47,10 +49,22 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(
-    getDateRangeFromTimeRange(props.selectedValue),
+    getDateRangeFromTimeRange(selectedValue),
   );
 
   const dateRangeOptions = theme.defaults.dateRangesOptions;
+
+  useEffect(() => {
+    if (!dayjsLocaleReady) {
+      return;
+    }
+    // Step 1: Convert relativeTimeString to actual time range (from/to)
+    const newTimeRange = getTimeRangeFromPresets(selectedValue, dateRangeOptions);
+
+    if (!shallowEqual(newTimeRange, selectedValue)) {
+      onChange(newTimeRange);
+    }
+  }, [selectedValue, dayjsLocaleReady, onChange, dateRangeOptions]);
 
   if (!dayjsLocaleReady) {
     return null;
@@ -61,14 +75,12 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const options = getDateRangeSelectFieldProOptions(dateRangeOptions);
 
   const handleOptionChange = (newValue: string | undefined) => {
-    const option = dateRangeOptions.find((opt) => opt.value === newValue);
-    const range = option?.getRange();
+    const newTimeRange = getTimeRangeFromPresets(
+      { relativeTimeString: newValue } as TimeRange,
+      dateRangeOptions,
+    );
 
-    onChange({
-      relativeTimeString: newValue,
-      from: range?.from,
-      to: range?.to,
-    });
+    onChange(newTimeRange);
     setDateRange(undefined);
   };
 
