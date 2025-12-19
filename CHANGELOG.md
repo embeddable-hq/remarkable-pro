@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.12
+
+### Patch Changes
+
+- e2fe260: DateRangePickerCustom and DateRangePickerPresets new components
+
 ## 0.0.11
 
 ### Patch Changes
