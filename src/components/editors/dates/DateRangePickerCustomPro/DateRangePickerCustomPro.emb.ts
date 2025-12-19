@@ -1,11 +1,11 @@
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import { Value } from '@embeddable.com/core';
 import DateTimeSelectFieldPro from './index';
-import { description, genericBoolean, placeholder, title } from '../../component.constants';
+import { description, genericBoolean, placeholder, title } from '../../../component.constants';
 
 export const meta = {
-  name: 'DateRangeSelectFieldPro',
-  label: 'Date Range Select Field',
+  name: 'DateRangePickerCustomPro',
+  label: 'Date-Range Picker - Custom',
   category: 'Dropdowns',
   defaultWidth: 300,
   defaultHeight: 120,
@@ -19,6 +19,12 @@ export const meta = {
       type: 'timeRange',
       label: 'Selected Value',
       category: 'Pre-configured variables',
+    },
+    {
+      ...genericBoolean,
+      name: 'showTwoMonths',
+      label: 'Show two months',
+      defaultValue: false,
     },
   ],
   events: [
@@ -52,15 +58,8 @@ export default defineComponent(DateTimeSelectFieldPro, meta, {
     };
   },
   events: {
-    onChange: (range) => {
-      return {
-        value: range
-          ? {
-              ...range,
-              relativeTimeString: '', // This is prioritised over the from and to dates, so we don't pass this for now (as we don't want Cube parsing this instead of using the calculated dates)
-            }
-          : Value.noFilter(),
-      };
-    },
+    onChange: (range) => ({
+      value: range ?? Value.noFilter(),
+    }),
   },
 });

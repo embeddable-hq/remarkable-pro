@@ -128,16 +128,16 @@ type UseLoadDayjsLocaleProps = {
 export const useLoadDayjsLocale = (): UseLoadDayjsLocaleProps => {
   const theme: Theme = useTheme() as Theme;
   const [dayjsLocaleReady, setDayjsLocaleReady] = useState(false);
-
   useEffect(() => {
+    const locale = theme.i18n.language ?? theme.formatter.locale;
     const loadLocale = async () => {
       setDayjsLocaleReady(false);
-      await loadDayjsLocale(theme.formatter.locale);
+      await loadDayjsLocale(locale);
       setDayjsLocaleReady(true);
     };
 
     loadLocale();
-  }, [theme.formatter.locale]);
+  }, [theme.i18n.language, theme.formatter.locale]);
 
   return { dayjsLocaleReady };
 };

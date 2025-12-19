@@ -1,0 +1,9 @@
+.dateRangePickerContent {
+  max-height: 400px !important;
+}
+
+.dateRangePickerContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--em-core-spacing--0200, 0.5rem);
+}

@@ -43,6 +43,12 @@ export const de: ResourceLanguage = {
     },
     editors: {
       errorTitle: 'Etwas ist schiefgelaufen.',
+      dateRangePicker: {
+        custom: 'Benutzerdefiniert',
+        backToPresets: 'Zurück zu den Voreinstellungen',
+        apply: 'Anwenden',
+        placeholder: 'Datumsbereich auswählen',
+      },
     },
     defaults: {
       comparisonPeriodOptions: {

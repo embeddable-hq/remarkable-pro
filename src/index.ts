@@ -59,8 +59,8 @@ export * from './components/component.constants';
 //Components editors
 export * as ComparisonPeriodSelectFieldPro from './components/editors/ComparisonPeriodSelectFieldPro';
 export * from './components/editors/ComparisonPeriodSelectFieldPro/ComparisonPeriodSelectFieldPro.utils';
-export * as DateRangeSelectFieldPro from './components/editors/DateRangeSelectFieldPro';
-export * from './components/editors/DateRangeSelectFieldPro/DateRangeSelectFieldPro.utils';
+export * as DateRangeSelectFieldPro from './components/editors/dates/DateRangePickerPresetsPro';
+export * from './components/editors/dates/DateRangePickerPresetsPro/DateRangePickerPresetsPro.utils';
 export * as MultiSelectFieldPro from './components/editors/MultiSelectFieldPro';
 export * as SingleSelectFieldPro from './components/editors/SingleSelectFieldPro';
 export { EditorCard } from './components/editors/shared/EditorCard/EditorCard';
