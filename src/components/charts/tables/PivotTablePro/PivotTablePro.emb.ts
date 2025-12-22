@@ -1,41 +1,32 @@
 import { loadData } from '@embeddable.com/core';
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import PivotTablePro from './index';
-import {
-  dataset,
-  description,
-  title,
-  maxResults,
-  measures,
-  subInputGenericBoolean,
-  genericString,
-  dimensionWithDateBounds,
-  genericNumber,
-} from '../../../component.constants';
+import { inputs } from '../../../component.inputs.constants';
+import { subInputs } from '../../../component.subinputs.constants';
 
 export const meta = {
   name: 'PivotTablePro',
   label: 'Pivot Table',
   category: 'Table Charts',
   inputs: [
-    dataset,
+    inputs.dataset,
     {
-      ...measures,
+      ...inputs.measures,
       label: 'Measures To Display',
       inputs: [
-        ...measures.inputs,
+        ...inputs.measures.inputs,
         {
-          ...subInputGenericBoolean,
+          ...subInputs.boolean,
           name: 'showColumnTotal',
           label: 'Show Column Total',
         },
         {
-          ...subInputGenericBoolean,
+          ...subInputs.boolean,
           name: 'showRowTotal',
           label: 'Show Row Total',
         },
         {
-          ...subInputGenericBoolean,
+          ...subInputs.boolean,
           name: 'showAsPercentage',
           label: 'Show As Percentage',
           description: 'If turned on, other measures may be ignored',
@@ -44,32 +35,33 @@ export const meta = {
       ],
     },
     {
-      ...dimensionWithDateBounds,
+      ...inputs.dimensionWithDateBounds,
       label: 'Row Dimension',
       name: 'rowDimension',
     },
     {
-      ...dimensionWithDateBounds,
+      ...inputs.dimensionWithDateBounds,
       label: 'Column Dimension',
       name: 'columnDimension',
     },
-    title,
-    description,
-    { ...genericString, name: 'displayNullAs', label: 'Display Null As' },
+    inputs.title,
+    inputs.description,
+    inputs.displayNullAs,
     {
-      ...genericNumber,
+      ...inputs.number,
       name: 'firstColumnWidth',
       label: 'First Column Width',
       description: 'Set the width in px (e.g. 200)',
+      category: 'Component Settings',
     },
     {
-      ...genericNumber,
+      ...inputs.number,
       name: 'columnWidth',
       label: 'Column Width',
       description: 'Set the width in px (e.g. 200)',
+      category: 'Component Settings',
     },
-
-    maxResults,
+    inputs.maxResults,
   ],
 } as const satisfies EmbeddedComponentMeta;
 

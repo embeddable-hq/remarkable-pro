@@ -1,8 +1,8 @@
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import { Value } from '@embeddable.com/core';
 import ComparisonPeriodSelectFieldPro from './index';
-import { description, placeholder, title } from '../../component.constants';
 import ComparisonPeriodType from '../../types/ComparisonPeriod.type.emb';
+import { inputs } from '../../component.inputs.constants';
 
 export const meta = {
   name: 'ComparisonPeriodSelectFieldPro',
@@ -11,19 +11,18 @@ export const meta = {
   defaultWidth: 300,
   defaultHeight: 120,
   inputs: [
-    { ...title },
-    { ...description },
-    { ...placeholder, defaultValue: 'Select a date-comparison' },
+    { ...inputs.title },
+    { ...inputs.description },
+    { ...inputs.placeholder, defaultValue: 'Select a date-comparison' },
     {
+      ...inputs.timeRange,
       name: 'primaryDateRange',
-      type: 'timeRange',
       label: 'Primary Date Range',
       category: 'Pre-configured variables',
       description: 'Pick the main time period. The comparison range is based on this selection.',
     },
     {
-      name: 'comparisonPeriod',
-      type: ComparisonPeriodType,
+      ...inputs.comparisonPeriod,
       label: 'Selected Comparison Period',
       category: 'Pre-configured variables',
     },
@@ -53,7 +52,6 @@ export const meta = {
 } as const satisfies EmbeddedComponentMeta;
 
 export default defineComponent(ComparisonPeriodSelectFieldPro, meta, {
-  /* @ts-expect-error - to be fixed in @embeddable.com/react */
   props: (inputs: Inputs<typeof meta>) => inputs,
   events: {
     onChange: (value) => {

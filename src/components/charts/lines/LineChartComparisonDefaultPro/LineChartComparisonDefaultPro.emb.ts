@@ -1,85 +1,68 @@
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
-import {
-  dataset,
-  description,
-  dimension,
-  dimensionTime,
-  genericBoolean,
-  genericTimeRange,
-  maxResults,
-  measures,
-  reverseXAxis,
-  showLegend,
-  showLogarithmicScale,
-  showTooltips,
-  showValueLabels,
-  title,
-  xAxisLabel,
-  yAxisLabel,
-  yAxisRangeMax,
-  yAxisRangeMin,
-} from '../../../component.constants';
 import LineChartComparisonDefaultPro from './index';
 import { loadData, OrderBy, TimeRange, Value } from '@embeddable.com/core';
-import ComparisonPeriodType from '../../../types/ComparisonPeriod.type.emb';
 import { LineChartProOptionsClickArg } from '../lines.utils';
-import ColorType from '../../../../editors/ColorEditor/Color.type.emb';
+import { inputs } from '../../../component.inputs.constants';
+import { subInputs } from '../../../component.subinputs.constants';
 
 export const meta = {
   name: 'LineChartComparisonDefaultPro',
   label: 'Line Chart Comparison - Default',
   category: 'Line Charts',
   inputs: [
-    dataset,
+    inputs.dataset,
     {
-      ...measures,
+      ...inputs.measures,
       inputs: [
-        ...measures.inputs,
-        { ...genericBoolean, name: 'fillUnderLine', label: 'Fill under line' },
+        ...inputs.measures.inputs,
+        { ...subInputs.boolean, name: 'fillUnderLine', label: 'Fill under line' },
         {
-          type: ColorType,
+          ...subInputs.color,
           category: 'Component Settings',
           name: 'lineColor',
           label: 'Line color',
         },
         {
-          type: ColorType,
+          ...subInputs.color,
           category: 'Component Settings',
           name: 'previousLineColor',
           label: 'Previous line color',
         },
         {
-          ...genericBoolean,
+          ...subInputs.boolean,
           name: 'lineDashed',
           label: 'Primary line dashed',
           defaultValue: false,
         },
         {
-          ...genericBoolean,
+          ...subInputs.boolean,
           name: 'previousLineDashed',
           label: 'Compared line dashed',
           defaultValue: true,
         },
-        { ...genericBoolean, name: 'connectGaps', label: 'Connect gaps', defaultValue: true },
+        {
+          ...subInputs.boolean,
+          name: 'connectGaps',
+          label: 'Connect gaps',
+          defaultValue: true,
+        },
       ],
     },
-    { ...dimension, label: 'X-axis', name: 'xAxis' },
+    { ...inputs.dimension, label: 'X-axis', name: 'xAxis' },
     {
-      ...genericTimeRange,
+      ...inputs.timeRange,
       name: 'primaryDateRange',
       label: 'Primary Date Range',
       description: 'You can also connect this to a date range selector using its variable',
       category: 'Component Data',
     },
     {
-      name: 'comparisonPeriod',
-      type: ComparisonPeriodType,
-      label: 'Comparison Period',
+      ...inputs.comparisonPeriod,
       description: 'You can also connect this to a comparison period selector using its variable',
       category: 'Component Data',
     },
     {
-      ...dimensionTime,
+      ...inputs.dimensionTime,
       name: 'timePropertyForNonTimeDimensions',
       label: 'Time property for non time dimensions',
       description:
@@ -87,24 +70,25 @@ export const meta = {
       required: false,
     },
 
-    title,
-    description,
-    showLegend,
-    showTooltips,
-    showValueLabels,
-    showLogarithmicScale,
-    xAxisLabel,
-    yAxisLabel,
-    reverseXAxis,
-    yAxisRangeMin,
-    yAxisRangeMax,
+    inputs.title,
+    inputs.description,
+    inputs.showLegend,
+    inputs.showTooltips,
+    inputs.showValueLabels,
+    inputs.showLogarithmicScale,
+    inputs.xAxisLabel,
+    inputs.yAxisLabel,
+    inputs.reverseXAxis,
+    inputs.yAxisRangeMin,
+    inputs.yAxisRangeMax,
     {
-      ...genericBoolean,
+      ...inputs.boolean,
       name: 'showComparisonAxis',
       label: 'Display a comparison X-axis',
       defaultValue: true,
+      category: 'Component Settings',
     },
-    maxResults,
+    inputs.maxResults,
   ],
   events: [
     {
@@ -126,8 +110,6 @@ type LineChartComparisonDefaultProState = {
 };
 
 export default defineComponent(LineChartComparisonDefaultPro, meta, {
-  /* @ts-expect-error - to be fixed in @embeddable.com/react */
-
   props: (
     inputs: Inputs<typeof meta>,
     [state, setState]: [

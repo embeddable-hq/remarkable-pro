@@ -1,41 +1,30 @@
 import DonutChartPro from './index';
 import { Value, loadData } from '@embeddable.com/core';
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
-import {
-  dataset,
-  description,
-  dimension,
-  measure,
-  maxLegendItems,
-  showLegend,
-  showTooltips,
-  showValueLabels,
-  title,
-} from '../../../component.constants';
+import { inputs } from '../../../component.inputs.constants';
 
 export const meta = {
   name: 'DonutLabelChartPro',
   label: 'Donut Label Chart',
   category: 'Pie Charts',
   inputs: [
-    dataset,
-    measure,
-    dimension,
-    { ...measure, name: 'innerLabelMeasure', label: 'Inner Label Measure' },
+    inputs.dataset,
+    inputs.measure,
+    inputs.dimension,
+    { ...inputs.measure, name: 'innerLabelMeasure', label: 'Inner Label Measure' },
     {
+      ...inputs.string,
       name: 'innerLabelText',
-      type: 'string',
       label: 'Inner Label Text',
       description: 'Text to display inside the donut chart',
-      required: false,
       category: 'Component Data',
     },
-    title,
-    description,
-    showLegend,
-    maxLegendItems,
-    showTooltips,
-    showValueLabels,
+    inputs.title,
+    inputs.description,
+    inputs.showLegend,
+    inputs.maxLegendItems,
+    inputs.showTooltips,
+    inputs.showValueLabels,
   ],
   events: [
     {

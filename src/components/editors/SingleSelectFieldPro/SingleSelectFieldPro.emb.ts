@@ -1,7 +1,7 @@
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import { Value, loadData } from '@embeddable.com/core';
-import { dataset, description, dimension, placeholder, title } from '../../component.constants';
 import SingleSelectFieldPro, { MAX_OPTIONS } from '.';
+import { inputs } from '../../component.inputs.constants';
 
 export const meta = {
   name: 'SingleSelectFieldPro',
@@ -10,26 +10,26 @@ export const meta = {
   defaultWidth: 300,
   defaultHeight: 120,
   inputs: [
-    dataset,
-    { ...dimension, label: 'Dimension (to load Dropdown values)' },
-    title,
-    description,
-    { ...placeholder, defaultValue: 'Select value...' },
+    inputs.dataset,
+    { ...inputs.dimension, label: 'Dimension (to load Dropdown values)' },
+    inputs.title,
+    inputs.description,
+    { ...inputs.placeholder, defaultValue: 'Select value...' },
     {
+      ...inputs.number,
       name: 'maxOptions',
-      type: 'number',
       label: 'Maximum options',
       category: 'Component Settings',
       defaultValue: MAX_OPTIONS,
     },
     {
+      ...inputs.string,
       name: 'selectedValue',
-      type: 'string',
       label: 'Selected Value',
       category: 'Pre-configured Variables',
     },
     {
-      type: 'dimension',
+      ...inputs.dimension,
       config: {
         dataset: 'dataset',
       },

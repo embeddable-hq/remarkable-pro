@@ -1,63 +1,54 @@
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
-import {
-  dataset,
-  description,
-  dimensionTime,
-  genericBoolean,
-  genericNumber,
-  genericTimeRange,
-  measure,
-  title,
-} from '../../../component.constants';
 import KpiChartNumberComparisonPro from './index';
 import { loadData, TimeRange } from '@embeddable.com/core';
-import ComparisonPeriodType from '../../../types/ComparisonPeriod.type.emb';
+import { inputs } from '../../../component.inputs.constants';
 
 export const meta = {
   name: 'KpiChartNumberComparisonPro',
   label: 'Kpi Chart - Number Comparison',
   category: 'Kpi Charts',
   inputs: [
-    dataset,
-    measure,
-    { ...dimensionTime, name: 'timeProperty', label: 'Time Property' },
+    inputs.dataset,
+    inputs.measure,
+    { ...inputs.dimensionTime, name: 'timeProperty', label: 'Time Property' },
     {
-      ...genericTimeRange,
+      ...inputs.timeRange,
       name: 'primaryDateRange',
       label: 'Primary Date Range',
       description: 'You can also connect this to a date range selector using its variable',
       category: 'Component Data',
     },
     {
-      name: 'comparisonPeriod',
-      type: ComparisonPeriodType,
+      ...inputs.comparisonPeriod,
       label: 'Comparison Period',
       description: 'You can also connect this to a comparison period selector using its variable',
       category: 'Component Data',
     },
-    title,
-    description,
+    inputs.title,
+    inputs.description,
     {
-      ...genericBoolean,
+      ...inputs.boolean,
       name: 'displayChangeAsPercentage',
       label: 'Display Change as %',
       defaultValue: false,
+      category: 'Component Settings',
     },
     {
-      ...genericNumber,
+      ...inputs.number,
       name: 'percentageDecimalPlaces',
       label: 'Percentage Decimal Places',
       defaultValue: 1,
     },
     {
-      ...genericBoolean,
+      ...inputs.boolean,
       name: 'reversePositiveNegativeColors',
       label: 'Reverse Positive/Negative Colors',
       defaultValue: false,
+      category: 'Component Settings',
     },
-    { ...genericNumber, name: 'fontSize', label: 'Font Size' },
+    inputs.fontSize,
     {
-      ...genericNumber,
+      ...inputs.fontSize,
       name: 'changeFontSize',
       label: 'Trend Font Size',
     },

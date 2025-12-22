@@ -1,7 +1,7 @@
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import { Value, loadData } from '@embeddable.com/core';
-import { dataset, description, dimension, placeholder, title } from '../../component.constants';
 import MultiSelectFieldPro, { MAX_OPTIONS } from '.';
+import { inputs } from '../../component.inputs.constants';
 
 export const meta = {
   name: 'MultiSelectFieldPro',
@@ -10,30 +10,27 @@ export const meta = {
   defaultWidth: 300,
   defaultHeight: 120,
   inputs: [
-    dataset,
-    { ...dimension, label: 'Dimension (to load Dropdown values)' },
-    title,
-    description,
-    { ...placeholder, defaultValue: 'Select values...' },
+    inputs.dataset,
+    { ...inputs.dimension, label: 'Dimension (to load Dropdown values)' },
+    inputs.title,
+    inputs.description,
+    { ...inputs.placeholder, defaultValue: 'Select values...' },
     {
+      ...inputs.number,
       name: 'maxOptions',
-      type: 'number',
       label: 'Maximum options',
       category: 'Component Settings',
       defaultValue: MAX_OPTIONS,
     },
     {
+      ...inputs.string,
       name: 'selectedValues',
-      type: 'string',
       array: true,
       label: 'Selected Values',
       category: 'Pre-configured Variables',
     },
     {
-      type: 'dimension',
-      config: {
-        dataset: 'dataset',
-      },
+      ...inputs.dimension,
       required: false,
       name: 'optionalSecondDimension',
       label: 'Optional secondary dimension',
