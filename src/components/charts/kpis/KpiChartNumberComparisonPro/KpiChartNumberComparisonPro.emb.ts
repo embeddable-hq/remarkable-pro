@@ -38,6 +38,7 @@ export const meta = {
       name: 'percentageDecimalPlaces',
       label: 'Percentage Decimal Places',
       defaultValue: 1,
+      category: 'Component Settings',
     },
     {
       ...inputs.boolean,
