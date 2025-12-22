@@ -1,6 +1,10 @@
 import ColorType from '../editors/ColorEditor/Color.type.emb';
 import AlignType from './types/Align.type.emb';
 
+/* -------------------- */
+/* ----- Generics ----- */
+/* -------------------- */
+
 const number = {
   name: 'number',
   type: 'number',
@@ -24,6 +28,10 @@ const timeRange = {
   type: 'timeRange',
   label: 'Time Range',
 } as const;
+
+/* ------------------ */
+/* ----- Common ----- */
+/* ------------------ */
 
 const width = {
   name: 'width',

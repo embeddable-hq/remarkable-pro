@@ -264,6 +264,21 @@ const fontSize = {
   category: 'Component Settings',
 } as const;
 
+const clearable = {
+  type: 'boolean',
+  name: 'clearable',
+  label: 'Can be cleared',
+  defaultValue: true,
+  category: 'Component Settings',
+} as const;
+
+const displayNullAs = {
+  ...string,
+  name: 'displayNullAs',
+  label: 'Display Null As',
+  category: 'Component Settings',
+} as const;
+
 const xAxisLabel = {
   name: 'xAxisLabel',
   type: 'string',
@@ -336,15 +351,6 @@ const yAxisMaxItems = {
   category: 'Axes Settings',
 } as const;
 
-const clearable = {
-  type: 'boolean',
-  name: 'clearable',
-  label: 'Can be cleared',
-  defaultValue: true,
-} as const;
-
-const displayNullAs = { ...string, name: 'displayNullAs', label: 'Display Null As' } as const;
-
 export const inputs = {
   boolean,
   timeRange,
@@ -355,6 +361,7 @@ export const inputs = {
   dataset,
   maxLegendItems,
   dimension,
+  groupBy,
   dimensionSimple,
   dimensionTime,
   dimensionWithDateBounds,
@@ -363,6 +370,7 @@ export const inputs = {
   dimensionsAndMeasures,
   measure,
   measures,
+  comparisonPeriod,
   maxResults,
   placeholder,
   showLegend,
@@ -371,6 +379,10 @@ export const inputs = {
   showTotalLabels,
   showLogarithmicScale,
   displayPercentages,
+  color,
+  fontSize,
+  clearable,
+  displayNullAs,
   xAxisLabel,
   yAxisLabel,
   reverseXAxis,
@@ -381,10 +393,4 @@ export const inputs = {
   xAxisRangeMax,
   xAxisMaxItems,
   yAxisMaxItems,
-  color,
-  comparisonPeriod,
-  fontSize,
-  clearable,
-  groupBy,
-  displayNullAs,
 } as const;
