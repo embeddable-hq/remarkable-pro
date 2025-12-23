@@ -2,6 +2,7 @@ import { loadData } from '@embeddable.com/core';
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import HeatMapPro from './index';
 import { inputs } from '../../../component.inputs.constants';
+import { getStyle } from '@embeddable.com/remarkable-ui';
 
 export const meta = {
   name: 'HeatMapPro',
@@ -27,22 +28,17 @@ export const meta = {
       ...inputs.color,
       name: 'maxColor',
       label: 'Max Color',
-      defaultValue: 'green',
-      required: true,
     },
     {
       ...inputs.color,
       name: 'midColor',
       label: 'Mid Color',
-      defaultValue: 'yellow',
-      required: true,
+      defaultValue: getStyle('--em-tablechart-heatmap-color', '#FF5400'),
     },
     {
       ...inputs.color,
       name: 'minColor',
       label: 'Min Color',
-      defaultValue: 'red',
-      required: true,
     },
 
     {
