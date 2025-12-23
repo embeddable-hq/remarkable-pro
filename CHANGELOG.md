@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.15
+
+### Patch Changes
+
+- 16d239d: Improve inputs and subInputs providing reusability
+
 ## 0.0.14
 
 ### Patch Changes
