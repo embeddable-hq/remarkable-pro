@@ -70,7 +70,11 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
     setComparisonDateRange(newComparisonDateRange);
   }, [comparisonPeriod, JSON.stringify(primaryDateRange), theme]);
 
-  const results = useFillGaps({ results: props.results, dimension: xAxis });
+  const results = useFillGaps({
+    results: props.results,
+    dimension: xAxis,
+    externalDateBounds: primaryDateRange,
+  });
 
   const resultsComparison = useFillGaps({
     results: props.resultsComparison,
