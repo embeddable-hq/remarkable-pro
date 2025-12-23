@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.14
+
+### Patch Changes
+
+- a479984: Add new default comparison periods (same period last X)
+
 ## 0.0.13
 
 ### Patch Changes
