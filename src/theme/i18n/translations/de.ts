@@ -57,6 +57,10 @@ export const de: ResourceLanguage = {
         previousMonth: 'Vorheriger Monat',
         previousQuarter: 'Vorheriges Quartal',
         previousYear: 'Vorheriges Jahr',
+        samePeriodLastWeek: 'Gleicher Zeitraum letzte Woche',
+        samePeriodLastMonth: 'Gleicher Zeitraum letzten Monat',
+        samePeriodLastQuarter: 'Gleicher Zeitraum letztes Quartal',
+        samePeriodLastYear: 'Gleicher Zeitraum letztes Jahr',
       },
       dateRangeOptions: {
         today: 'Heute',
