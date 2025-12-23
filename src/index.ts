@@ -55,6 +55,7 @@ export * from './components/charts/tables/tables.utils';
 
 export { ChartCard } from './components/charts/shared/ChartCard/ChartCard';
 export * from './components/component.inputs.constants';
+export * from './components/component.subinputs.constants';
 
 //Components editors
 export * as ComparisonPeriodSelectFieldPro from './components/editors/ComparisonPeriodSelectFieldPro';
