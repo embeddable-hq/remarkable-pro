@@ -4,39 +4,35 @@ import TablePaginatedChart, {
   TableChartPaginatedProOnRowClickArg,
   TableChartPaginatedProState,
 } from './index';
-import {
-  dataset,
-  description,
-  title,
-  dimensionsAndMeasures,
-  subInputWidth,
-  subInputAlign,
-  genericBoolean,
-  genericString,
-  maxResults,
-  dimensionSimple,
-} from '../../../component.constants';
 import { mergician } from 'mergician';
+import { inputs } from '../../../component.inputs.constants';
+import { subInputs } from '../../../component.subinputs.constants';
 
 export const meta = {
   name: 'TableChartPaginated',
   label: 'Table Chart - Paginated',
   category: 'Table Charts',
   inputs: [
-    dataset,
+    inputs.dataset,
     {
-      ...dimensionsAndMeasures,
+      ...inputs.dimensionsAndMeasures,
       label: 'Columns',
-      inputs: [...dimensionsAndMeasures.inputs, subInputWidth, subInputAlign],
+      inputs: [...inputs.dimensionsAndMeasures.inputs, subInputs.width, subInputs.align],
     },
-    title,
-    description,
+    inputs.title,
+    inputs.description,
 
-    { ...genericBoolean, name: 'showIndex', label: 'Show Index Column', defaultValue: true },
-    { ...genericString, name: 'displayNullAs', label: 'Display null as' },
-    { ...maxResults, label: 'Max Results to Download' },
     {
-      ...dimensionSimple,
+      ...inputs.boolean,
+      name: 'showIndex',
+      label: 'Show Index Column',
+      defaultValue: true,
+      category: 'Component Settings',
+    },
+    inputs.displayNullAs,
+    { ...inputs.maxResults, label: 'Max Results to Download' },
+    {
+      ...inputs.dimensionSimple,
       label: 'Dimension to set on click',
       name: 'clickDimension',
       category: 'Data Mapping for Interactions',

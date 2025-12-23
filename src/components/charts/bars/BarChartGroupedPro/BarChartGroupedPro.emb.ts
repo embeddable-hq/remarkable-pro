@@ -1,46 +1,29 @@
 import { Value, loadData } from '@embeddable.com/core';
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import BarChartGroupedPro from './index';
-import {
-  dataset,
-  description,
-  dimensionWithDateBounds,
-  dimension,
-  showLegend,
-  showTooltips,
-  showValueLabels,
-  title,
-  measure,
-  showLogarithmicScale,
-  xAxisLabel,
-  yAxisLabel,
-  reverseXAxis,
-  yAxisRangeMin,
-  yAxisRangeMax,
-  maxResults,
-} from '../../../component.constants';
+import { inputs } from '../../../component.inputs.constants';
 
 export const meta = {
   name: 'BarChartGroupedPro',
   label: 'Bar Chart - Grouped',
   category: 'Bar Charts',
   inputs: [
-    dataset,
-    measure,
-    { ...dimensionWithDateBounds, name: 'xAxis', label: 'X-axis' },
-    { ...dimension, name: 'groupBy', label: 'Group by' },
-    title,
-    description,
-    maxResults,
-    showLegend,
-    showTooltips,
-    { ...showValueLabels, defaultValue: false },
-    showLogarithmicScale,
-    xAxisLabel,
-    yAxisLabel,
-    reverseXAxis,
-    yAxisRangeMin,
-    yAxisRangeMax,
+    inputs.dataset,
+    inputs.measure,
+    { ...inputs.dimensionWithDateBounds, name: 'xAxis', label: 'X-axis' },
+    inputs.groupBy,
+    inputs.title,
+    inputs.description,
+    inputs.maxResults,
+    inputs.showLegend,
+    inputs.showTooltips,
+    { ...inputs.showValueLabels, defaultValue: false },
+    inputs.showLogarithmicScale,
+    inputs.xAxisLabel,
+    inputs.yAxisLabel,
+    inputs.reverseXAxis,
+    inputs.yAxisRangeMin,
+    inputs.yAxisRangeMax,
   ],
   events: [
     {

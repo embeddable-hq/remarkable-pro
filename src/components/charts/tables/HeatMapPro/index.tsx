@@ -15,11 +15,11 @@ type HeatMapProProps = {
   description: string;
   displayNullAs?: string;
   firstColumnWidth?: number;
-  maxColor: string;
+  maxColor?: string;
   maxThreshold?: string;
   measure: Measure;
   midColor: string;
-  minColor: string;
+  minColor?: string;
   minThreshold?: string;
   results: DataResponse;
   rowDimension: Dimension;

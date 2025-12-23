@@ -1,44 +1,28 @@
 import { Value, loadData } from '@embeddable.com/core';
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import BarChartDefaultPro from './index';
-import {
-  dataset,
-  description,
-  dimensionWithDateBounds,
-  showLegend,
-  showTooltips,
-  showValueLabels,
-  title,
-  measures,
-  showLogarithmicScale,
-  xAxisLabel,
-  yAxisLabel,
-  reverseXAxis,
-  yAxisRangeMin,
-  yAxisRangeMax,
-  xAxisMaxItems,
-} from '../../../component.constants';
+import { inputs } from '../../../component.inputs.constants';
 
 export const meta = {
   name: 'BarChartDefaultPro',
   label: 'Bar Chart - Default',
   category: 'Bar Charts',
   inputs: [
-    dataset,
-    measures,
-    { ...dimensionWithDateBounds, label: 'X-axis' },
-    title,
-    description,
-    showLegend,
-    showTooltips,
-    showValueLabels,
-    showLogarithmicScale,
-    xAxisLabel,
-    yAxisLabel,
-    reverseXAxis,
-    yAxisRangeMin,
-    yAxisRangeMax,
-    xAxisMaxItems,
+    inputs.dataset,
+    inputs.measures,
+    { ...inputs.dimensionWithDateBounds, label: 'X-axis' },
+    inputs.title,
+    inputs.description,
+    inputs.showLegend,
+    inputs.showTooltips,
+    inputs.showValueLabels,
+    inputs.showLogarithmicScale,
+    inputs.xAxisLabel,
+    inputs.yAxisLabel,
+    inputs.reverseXAxis,
+    inputs.yAxisRangeMin,
+    inputs.yAxisRangeMax,
+    inputs.xAxisMaxItems,
   ],
   events: [
     {

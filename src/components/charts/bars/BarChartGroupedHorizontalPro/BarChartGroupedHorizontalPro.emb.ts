@@ -1,46 +1,29 @@
 import { Value, loadData } from '@embeddable.com/core';
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import BarChartGroupedHorizontalPro from './index';
-import {
-  dataset,
-  description,
-  dimensionWithDateBounds,
-  dimension,
-  showLegend,
-  showTooltips,
-  showValueLabels,
-  title,
-  measure,
-  showLogarithmicScale,
-  xAxisLabel,
-  yAxisLabel,
-  reverseYAxis,
-  xAxisRangeMin,
-  xAxisRangeMax,
-  maxResults,
-} from '../../../component.constants';
+import { inputs } from '../../../component.inputs.constants';
 
 export const meta = {
   name: 'BarChartGroupedHorizontalPro',
   label: 'Bar Chart - Grouped Horizontal',
   category: 'Bar Charts',
   inputs: [
-    dataset,
-    measure,
-    { ...dimensionWithDateBounds, name: 'yAxis', label: 'Y-axis' },
-    { ...dimension, name: 'groupBy', label: 'Group by' },
-    title,
-    description,
-    maxResults,
-    showLegend,
-    showTooltips,
-    { ...showValueLabels, defaultValue: false },
-    showLogarithmicScale,
-    xAxisLabel,
-    yAxisLabel,
-    reverseYAxis,
-    xAxisRangeMin,
-    xAxisRangeMax,
+    inputs.dataset,
+    inputs.measure,
+    { ...inputs.dimensionWithDateBounds, name: 'yAxis', label: 'Y-axis' },
+    { ...inputs.dimension, name: 'groupBy', label: 'Group by' },
+    inputs.title,
+    inputs.description,
+    inputs.maxResults,
+    inputs.showLegend,
+    inputs.showTooltips,
+    { ...inputs.showValueLabels, defaultValue: false },
+    inputs.showLogarithmicScale,
+    inputs.xAxisLabel,
+    inputs.yAxisLabel,
+    inputs.reverseYAxis,
+    inputs.xAxisRangeMin,
+    inputs.xAxisRangeMax,
   ],
   events: [
     {

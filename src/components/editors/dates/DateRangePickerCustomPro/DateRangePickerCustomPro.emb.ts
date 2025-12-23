@@ -1,7 +1,7 @@
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import { Value } from '@embeddable.com/core';
 import DateTimeSelectFieldPro from './index';
-import { description, genericBoolean, placeholder, title } from '../../../component.constants';
+import { inputs } from '../../../component.inputs.constants';
 
 export const meta = {
   name: 'DateRangePickerCustomPro',
@@ -10,21 +10,22 @@ export const meta = {
   defaultWidth: 300,
   defaultHeight: 120,
   inputs: [
-    { ...title },
-    { ...description },
-    { ...placeholder, defaultValue: 'Select a date-range' },
-    { ...genericBoolean, name: 'clearable', label: 'Can be cleared', defaultValue: true },
+    inputs.title,
+    inputs.description,
+    { ...inputs.placeholder, defaultValue: 'Select a date-range' },
+    inputs.clearable,
     {
+      ...inputs.timeRange,
       name: 'selectedValue',
-      type: 'timeRange',
       label: 'Selected Value',
       category: 'Pre-configured variables',
     },
     {
-      ...genericBoolean,
+      ...inputs.boolean,
       name: 'showTwoMonths',
       label: 'Show two months',
       defaultValue: false,
+      category: 'Component Settings',
     },
   ],
   events: [

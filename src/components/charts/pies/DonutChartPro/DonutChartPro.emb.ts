@@ -1,32 +1,22 @@
 import { Value, loadData } from '@embeddable.com/core';
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import DonutChartPro from './index';
-import {
-  dimension,
-  dataset,
-  description,
-  measure,
-  maxLegendItems,
-  showLegend,
-  showTooltips,
-  showValueLabels,
-  title,
-} from '../../../component.constants';
+import { inputs } from '../../../component.inputs.constants';
 
 export const meta = {
   name: 'DonutChartPro',
   label: 'Donut Chart',
   category: 'Pie Charts',
   inputs: [
-    dataset,
-    measure,
-    dimension,
-    title,
-    description,
-    showLegend,
-    maxLegendItems,
-    showTooltips,
-    showValueLabels,
+    inputs.dataset,
+    inputs.measure,
+    inputs.dimension,
+    inputs.title,
+    inputs.description,
+    inputs.showLegend,
+    inputs.maxLegendItems,
+    inputs.showTooltips,
+    inputs.showValueLabels,
   ],
   events: [
     {

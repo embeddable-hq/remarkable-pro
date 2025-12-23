@@ -1,55 +1,48 @@
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
-import {
-  dataset,
-  description,
-  dimension,
-  dimensionWithDateBounds,
-  genericBoolean,
-  maxResults,
-  measure,
-  reverseXAxis,
-  showLegend,
-  showLogarithmicScale,
-  showTooltips,
-  showValueLabels,
-  title,
-  xAxisLabel,
-  yAxisLabel,
-  yAxisRangeMax,
-  yAxisRangeMin,
-} from '../../../component.constants';
 import LineChartGroupedPro from './index';
 import { loadData, Value } from '@embeddable.com/core';
 import { LineChartProOptionsClickArg } from '../lines.utils';
+import { inputs } from '../../../component.inputs.constants';
 
 export const meta = {
   name: 'LineChartGroupedPro',
   label: 'Line Chart - Grouped',
   category: 'Line Charts',
   inputs: [
-    dataset,
+    inputs.dataset,
     {
-      ...measure,
+      ...inputs.measure,
       inputs: [
-        ...measure.inputs,
-        { ...genericBoolean, name: 'fillUnderLine', label: 'Fill under line' },
-        { ...genericBoolean, name: 'connectGaps', label: 'Connect gaps', defaultValue: true },
+        ...inputs.measure.inputs,
+        {
+          ...inputs.boolean,
+          name: 'fillUnderLine',
+          label: 'Fill under line',
+          category: 'Component Settings',
+        },
+        {
+          ...inputs.boolean,
+          name: 'connectGaps',
+          label: 'Connect gaps',
+          defaultValue: true,
+          category: 'Component Settings',
+        },
       ],
     },
-    { ...dimensionWithDateBounds, name: 'xAxis', label: 'X-axis' },
-    { ...dimension, name: 'groupBy', label: 'Group by' },
-    title,
-    description,
-    maxResults,
-    showLegend,
-    showTooltips,
-    showValueLabels,
-    showLogarithmicScale,
-    xAxisLabel,
-    yAxisLabel,
-    reverseXAxis,
-    yAxisRangeMin,
-    yAxisRangeMax,
+    { ...inputs.dimensionWithDateBounds, name: 'xAxis', label: 'X-axis' },
+    inputs.groupBy,
+    inputs.title,
+    inputs.description,
+    inputs.maxResults,
+    inputs.showLegend,
+    inputs.showTooltips,
+    inputs.showValueLabels,
+    inputs.showLogarithmicScale,
+    inputs.xAxisLabel,
+    inputs.yAxisLabel,
+    inputs.reverseXAxis,
+    inputs.yAxisRangeMin,
+    inputs.yAxisRangeMax,
   ],
   events: [
     {

@@ -1,91 +1,82 @@
 import { loadData } from '@embeddable.com/core';
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import HeatMapPro from './index';
-import {
-  dataset,
-  description,
-  title,
-  maxResults,
-  genericString,
-  dimensionWithDateBounds,
-  genericNumber,
-  measure,
-  genericBoolean,
-} from '../../../component.constants';
-import ColorType from '../../../../editors/ColorEditor/Color.type.emb';
+import { inputs } from '../../../component.inputs.constants';
+import { getStyle } from '@embeddable.com/remarkable-ui';
 
 export const meta = {
   name: 'HeatMapPro',
   label: 'Heat Map',
   category: 'Table Charts',
   inputs: [
-    dataset,
-    measure,
+    inputs.dataset,
+    inputs.measure,
     {
-      ...dimensionWithDateBounds,
+      ...inputs.dimensionWithDateBounds,
       label: 'Row Dimension',
       name: 'rowDimension',
     },
     {
-      ...dimensionWithDateBounds,
+      ...inputs.dimensionWithDateBounds,
       label: 'Column Dimension',
       name: 'columnDimension',
     },
-    title,
-    description,
-    { ...genericString, name: 'displayNullAs', label: 'Display Null As' },
-
+    inputs.title,
+    inputs.description,
+    inputs.displayNullAs,
     {
-      type: ColorType,
+      ...inputs.color,
       name: 'maxColor',
       label: 'Max Color',
-      defaultValue: 'green',
-      required: true,
-      category: 'Component Settings',
     },
     {
-      type: ColorType,
+      ...inputs.color,
       name: 'midColor',
       label: 'Mid Color',
-      defaultValue: 'yellow',
-      required: true,
-      category: 'Component Settings',
+      defaultValue: getStyle('--em-tablechart-heatmap-color', '#FF5400'),
     },
     {
-      type: ColorType,
+      ...inputs.color,
       name: 'minColor',
       label: 'Min Color',
-      defaultValue: 'red',
-      required: true,
-      category: 'Component Settings',
     },
 
     {
-      ...genericString,
+      ...inputs.string,
       name: 'minThreshold',
       label: 'Max range lower limit',
       description: 'Enter a value as either a number (e.g. 20) or a percentage (e.g. 20%)',
+      category: 'Component Settings',
     },
     {
-      ...genericString,
+      ...inputs.string,
       name: 'maxThreshold',
       label: 'Min range upper limit',
       description: 'Enter a value as either a number (e.g. 20) or a percentage (e.g. 20%)',
+      category: 'Component Settings',
     },
-    { ...genericBoolean, name: 'showValues', label: 'Show Values', defaultValue: true },
     {
-      ...genericNumber,
+      ...inputs.boolean,
+      name: 'showValues',
+      label: 'Show Values',
+      defaultValue: true,
+      category: 'Component Settings',
+    },
+    {
+      ...inputs.number,
       name: 'firstColumnWidth',
       label: 'First Column Width',
       description: 'Set the width in px (e.g. 200)',
+      category: 'Component Settings',
     },
     {
-      ...genericNumber,
+      ...inputs.number,
       name: 'columnWidth',
       label: 'Column Width',
       description: 'Set the width in px (e.g. 200)',
+      category: 'Component Settings',
     },
-    maxResults,
+    inputs.maxResults,
   ],
 } as const satisfies EmbeddedComponentMeta;
 
