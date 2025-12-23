@@ -151,10 +151,7 @@ const getPreviousYearRange = (primaryDateRange: TimeRange) => {
   };
 };
 
-// --------------------
-// New "same period last X" options (shift both ends)
-// --------------------
-
+// Same period last X options (shift both ends)
 function shiftByUnit(
   range: TimeRange,
   unit: 'week' | 'month' | 'quarter' | 'year',
