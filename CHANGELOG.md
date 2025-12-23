@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.16
+
+### Patch Changes
+
+- 7a25509: Update Remarkable UI and export component subinputs
+
 ## 0.0.15
 
 ### Patch Changes
