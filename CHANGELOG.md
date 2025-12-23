@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.13
+
+### Patch Changes
+
+- cd35dd1: Improve fillgaps hook
+
 ## 0.0.12
 
 ### Patch Changes
