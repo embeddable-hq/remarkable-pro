@@ -46,6 +46,10 @@ export const en: ResourceLanguage = {
         previousMonth: 'Previous month',
         previousQuarter: 'Previous quarter',
         previousYear: 'Previous year',
+        samePeriodLastWeek: 'Same period last week',
+        samePeriodLastMonth: 'Same period last month',
+        samePeriodLastQuarter: 'Same period last quarter',
+        samePeriodLastYear: 'Same period last year',
       },
     },
     granularity: {
