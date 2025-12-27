@@ -275,7 +275,7 @@ const clearable = {
 const displayNullAs = {
   ...string,
   name: 'displayNullAs',
-  label: 'Display Null As',
+  label: 'Display null as',
   category: 'Component Settings',
 } as const;
 
