@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.17
+
+### Patch Changes
+
+- 748a696: Improve HeatMap emb.ts
+
 ## 0.0.16
 
 ### Patch Changes
