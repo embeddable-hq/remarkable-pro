@@ -4,52 +4,40 @@ import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, DimensionOrMeasure, OrderDirection } from '@embeddable.com/core';
-import {
-  getStyleNumber,
-  getTableTotalPages,
-  TablePaginated,
-  useTableGetRowsPerPage,
-  useResizeObserver,
-  TableSort,
-} from '@embeddable.com/remarkable-ui';
+import { TableScrollable, TableSort } from '@embeddable.com/remarkable-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getTableHeaders, getTableRows } from '../tables.utils';
 import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
+import deepEqual from 'fast-deep-equal';
+import { TABLE_SCROLLABLE_SIZE } from './TableScrollable.utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-const headerHeight = getStyleNumber('--em-tablechart-cell-height', '2.5rem') as number;
-const rowHeight = getStyleNumber('--em-tablechart-cell-height', '2.5rem') as number;
-const footerHeight = getStyleNumber('--em-tablechart-pagination-height', '3rem') as number;
-
 let downloadData: (data: DataResponse['data']) => void;
 
-export type TableChartPaginatedProOnRowClickArg = string | null;
-export type TableChartPaginatedProState = {
+export type TableScrollableProOnRowClickArg = string | null;
+export type TableScrollableProState = {
   page: number;
   pageSize?: number;
   sort?: { id: string; direction: OrderDirection } | undefined;
   isLoadingDownloadData: boolean;
-  hasTotalResults: boolean;
 };
 
-type TableChartPaginatedProProps = {
+type TableScrollableProProps = {
   allResults?: DataResponse;
   clickDimension?: Dimension;
   description: string;
   dimensionsAndMeasures: DimensionOrMeasure[];
   displayNullAs?: string;
-  embeddableState: TableChartPaginatedProState;
+  embeddableState: TableScrollableProState;
   results: DataResponse;
   showIndex: boolean;
-  state: TableChartPaginatedProState;
+  state: TableScrollableProState;
   title: string;
-  totalResults?: DataResponse;
-  onRowClicked: (rowDimensionValue: TableChartPaginatedProOnRowClickArg) => void;
-  setState: React.Dispatch<React.SetStateAction<TableChartPaginatedProState>>;
+  onRowClicked: (rowDimensionValue: TableScrollableProOnRowClickArg) => void;
+  setState: React.Dispatch<React.SetStateAction<TableScrollableProState>>;
 };
 
-const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
+const TableScrollablePro = (props: TableScrollableProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
@@ -57,7 +45,6 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
 
   const { description, title } = resolveI18nProps(props);
   const {
-    totalResults,
     results,
     allResults,
     dimensionsAndMeasures,
@@ -69,21 +56,27 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
     onRowClicked,
   } = props;
 
+  const [rowsToDisplay, setRowsToDisplay] = useState<any[]>([]); // to ignore unused var warning
+
   const headers = getTableHeaders({ dimensionsAndMeasures, displayNullAs }, theme);
   const rows = results?.data || [];
-  const tableRows = getTableRows({ rows, clickDimension });
+
   const cardContentRef = useRef<HTMLDivElement>(null);
-  const { height } = useResizeObserver(cardContentRef);
-  const pageSize = useTableGetRowsPerPage({
-    availableHeight: height,
-    headerHeight,
-    rowHeight,
-    footerHeight,
-  });
+
+  useEffect(() => {
+    if (!results?.data) return;
+
+    // Only update test data if there are changes
+    const lastRows = rowsToDisplay.slice(-1 * TABLE_SCROLLABLE_SIZE);
+
+    if (!deepEqual(lastRows, rows)) {
+      setRowsToDisplay((prev) => [...prev, ...rows]);
+    }
+  }, [rows]);
 
   // Stable updater for embeddable state
   const handleUpdateEmbeddableState = useCallback(
-    (newState: Partial<TableChartPaginatedProState>) => {
+    (newState: Partial<TableScrollableProState>) => {
       setState((prevState) => ({
         ...prevState,
         ...newState,
@@ -113,30 +106,6 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
     onRowClicked(rowDimensionValue);
   };
 
-  // Sync page size changes to embeddable state
-  useEffect(() => {
-    if (pageSize) {
-      handleUpdateEmbeddableState({ pageSize });
-    }
-  }, [pageSize, handleUpdateEmbeddableState]);
-
-  // Sync total from results
-  useEffect(() => {
-    setState((prevState) => ({
-      ...prevState,
-      hasTotalResults: false,
-    }));
-  }, [dimensionsAndMeasures, pageSize]);
-
-  useEffect(() => {
-    if (totalResults?.total) {
-      setState((prevState) => ({
-        ...prevState,
-        hasTotalResults: true,
-      }));
-    }
-  }, [totalResults]);
-
   // Handle data download when allResults is ready
   useEffect(() => {
     if (isDownloadingData) {
@@ -151,38 +120,56 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
     }
   }, [isDownloadingData, allResults, handleUpdateEmbeddableState]);
 
-  const handleSortChange = (newSort: TableSort<any> | undefined) => {
-    handleUpdateEmbeddableState({ sort: newSort as TableChartPaginatedProState['sort'] });
+  useEffect(() => {
+    setState((prevState) => ({
+      ...prevState,
+      hasTotalResults: false,
+    }));
+  }, [dimensionsAndMeasures]);
+
+  const handleNextPage = () => {
+    if (results.isLoading) return;
+    handleUpdateEmbeddableState({ page: state.page + 1 });
   };
+
+  const handleSortChange = (newSort: TableSort<any> | undefined) => {
+    setRowsToDisplay([]);
+    results.isLoading = true;
+    handleUpdateEmbeddableState({ sort: newSort as TableScrollableProState['sort'] });
+  };
+
+  const hasMoreData = (results?.data ?? [])?.length > 0;
+
+  const isLoading = Boolean(results?.isLoading || allResults?.isLoading);
 
   return (
     <ChartCard
       ref={cardContentRef}
       title={title}
       subtitle={description}
-      data={results}
+      data={{
+        isLoading,
+        data: rowsToDisplay,
+      }}
       dimensionsAndMeasures={dimensionsAndMeasures}
       errorMessage={results?.error}
       onCustomDownload={handleCustomDownload}
     >
-      <TablePaginated
+      <TableScrollable
+        hasMoreData={hasMoreData}
         onRowIndexClick={handleRowIndexClick}
         headers={headers}
-        rows={tableRows}
+        rows={getTableRows({ rows: rowsToDisplay, clickDimension })}
         showIndex={showIndex}
         page={state.page}
-        pageSize={pageSize}
-        paginationLabel={i18n.t('charts.tablePaginated.pagination', {
-          page: state.page + 1,
-          totalPages: getTableTotalPages(totalResults?.total, pageSize) ?? '?',
-        })}
-        total={totalResults?.total}
         sort={state.sort}
+        isLoading={results?.isLoading}
+        loadingLabel={i18n.t('common.loading')}
+        onNextPage={handleNextPage}
         onSortChange={handleSortChange}
-        onPageChange={(newPage) => handleUpdateEmbeddableState({ page: newPage })}
       />
     </ChartCard>
   );
 };
 
-export default TableChartPaginatedPro;
+export default TableScrollablePro;

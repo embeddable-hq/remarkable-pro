@@ -1,5 +1,6 @@
 import ColorType from '../editors/ColorEditor/Color.type.emb';
 import AlignType from './types/Align.type.emb';
+import TreatAsType from './types/TreatAs.type.emb';
 
 /* -------------------- */
 /* ----- Generics ----- */
@@ -103,6 +104,12 @@ const color = {
   label: 'Color',
 } as const;
 
+const treatAs = {
+  type: TreatAsType,
+  name: 'treatAs',
+  label: 'Treat as',
+} as const;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const dimensionMeasureSubInputs: any[] = [
   prefix,
@@ -144,4 +151,5 @@ export const subInputs = {
   dateBounds,
   granularity,
   color,
+  treatAs,
 };

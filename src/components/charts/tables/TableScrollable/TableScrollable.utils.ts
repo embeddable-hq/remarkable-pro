@@ -1,0 +1,1 @@
+export const TABLE_SCROLLABLE_SIZE = 25;

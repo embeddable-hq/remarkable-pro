@@ -139,7 +139,7 @@ const dataOthersFormatter = (theme: Theme, key: DimensionOrMeasure): StringForma
   const prefix = isDimension(key) ? 'dimension' : 'measure';
 
   return {
-    format: (value: string) => {
+    format: (value: string | object) => {
       if (value == null) {
         return '';
       }

@@ -4,6 +4,7 @@ import { Theme } from '../theme.types';
 import { cache } from '../../utils.ts/cache.utils';
 import { isValidISODate } from '../../utils.ts/data.utils';
 import { resolveI18nString } from '../../components/component.utils';
+import { TreatAsTypeOptions } from '../../components/types/TreatAs.type.emb';
 
 export type GetThemeFormatter = {
   string: (key: string) => string;
@@ -58,6 +59,22 @@ export const getThemeFormatter = (theme: Theme): GetThemeFormatter => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: (key: DimensionOrMeasure, value: any): string => {
       let newValue = value;
+
+      // Nulls
+      if (value == null) {
+        return key.inputs?.displayNullAs ?? '';
+      }
+
+      // JSON and Markdown
+      if (key.inputs?.treatAs === TreatAsTypeOptions.JSON) {
+        return JSON.stringify(value, null, 2);
+      } else if (key.inputs?.treatAs === TreatAsTypeOptions.MARKDOWN) {
+        return value;
+      }
+      // Objects
+      if (typeof value === 'object') {
+        return JSON.stringify(value);
+      }
 
       // Number
       if (key.nativeType === 'number') {
