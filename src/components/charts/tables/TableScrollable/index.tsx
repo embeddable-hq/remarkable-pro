@@ -4,7 +4,7 @@ import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, DimensionOrMeasure, OrderDirection } from '@embeddable.com/core';
-import { TableScrollable, TableSort } from '@embeddable.com/remarkable-ui';
+import { TableScrollable, TableScrollableHandle, TableSort } from '@embeddable.com/remarkable-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getTableHeaders, getTableRows } from '../tables.utils';
 import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
@@ -63,14 +63,36 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
 
   const cardContentRef = useRef<HTMLDivElement>(null);
 
+  const lastLoadedPage = useRef<number | undefined>(undefined);
+
+  const freshLoad = useRef(true);
+
   useEffect(() => {
     if (!results?.data) return;
+
+    if (freshLoad.current) {
+      setRowsToDisplay([...rows]);
+      lastLoadedPage.current = state.page;
+      freshLoad.current = false;
+      tableRef.current?.scrollToTop('smooth');
+      return;
+    }
 
     // Only update test data if there are changes
     const lastRows = rowsToDisplay.slice(-1 * TABLE_SCROLLABLE_SIZE);
 
-    if (!deepEqual(lastRows, rows)) {
+    const equalResults = deepEqual(lastRows, rows);
+
+    if (!equalResults) {
+      // Page 0
+      if (state.page === lastLoadedPage.current) {
+        setRowsToDisplay([...rows]);
+        return;
+      }
+
+      // Page X (append)
       setRowsToDisplay((prev) => [...prev, ...rows]);
+      lastLoadedPage.current = state.page;
     }
   }, [rows]);
 
@@ -133,14 +155,18 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   };
 
   const handleSortChange = (newSort: TableSort<any> | undefined) => {
-    setRowsToDisplay([]);
-    results.isLoading = true;
-    handleUpdateEmbeddableState({ sort: newSort as TableScrollableProState['sort'] });
+    // setRowsToDisplay([]);
+    // results.isLoading = true;
+    freshLoad.current = true;
+
+    handleUpdateEmbeddableState({ sort: newSort as TableScrollableProState['sort'], page: 0 });
   };
 
   const hasMoreData = (results?.data ?? [])?.length > 0;
 
   const isLoading = Boolean(results?.isLoading || allResults?.isLoading);
+
+  const tableRef = useRef<TableScrollableHandle | null>(null);
 
   return (
     <ChartCard
@@ -156,12 +182,12 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
       onCustomDownload={handleCustomDownload}
     >
       <TableScrollable
+        ref={tableRef}
         hasMoreData={hasMoreData}
         onRowIndexClick={handleRowIndexClick}
         headers={headers}
         rows={getTableRows({ rows: rowsToDisplay, clickDimension })}
         showIndex={showIndex}
-        page={state.page}
         sort={state.sort}
         isLoading={results?.isLoading}
         loadingLabel={i18n.t('common.loading')}
