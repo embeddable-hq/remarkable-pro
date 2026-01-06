@@ -3,12 +3,17 @@ import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
-import { DataResponse, Dimension, DimensionOrMeasure, OrderDirection } from '@embeddable.com/core';
+import {
+  DataResponse,
+  Dataset,
+  Dimension,
+  DimensionOrMeasure,
+  OrderDirection,
+} from '@embeddable.com/core';
 import { TableScrollable, TableScrollableHandle, TableSort } from '@embeddable.com/remarkable-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getTableHeaders, getTableRows } from '../tables.utils';
 import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
-import deepEqual from 'fast-deep-equal';
 import { TABLE_SCROLLABLE_SIZE } from './TableScrollable.utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -23,6 +28,7 @@ export type TableScrollableProState = {
 };
 
 type TableScrollableProProps = {
+  dataset: Dataset;
   allResults?: DataResponse;
   clickDimension?: Dimension;
   description: string;
@@ -42,9 +48,11 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   i18nSetup(theme);
 
   const [isDownloadingData, setIsDownloadingData] = useState(false);
+  const [rowsToDisplay, setRowsToDisplay] = useState<any[]>([]);
 
   const { description, title } = resolveI18nProps(props);
   const {
+    dataset,
     results,
     allResults,
     dimensionsAndMeasures,
@@ -56,44 +64,35 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     onRowClicked,
   } = props;
 
-  const [rowsToDisplay, setRowsToDisplay] = useState<any[]>([]); // to ignore unused var warning
-
   const headers = getTableHeaders({ dimensionsAndMeasures, displayNullAs }, theme);
-  const rows = results?.data || [];
+  const rows = results?.data ?? [];
 
   const cardContentRef = useRef<HTMLDivElement>(null);
+  const tableRef = useRef<TableScrollableHandle | null>(null);
+  const firstLoadPending = useRef(true);
 
-  const lastLoadedPage = useRef<number | undefined>(undefined);
-
-  const freshLoad = useRef(true);
+  useEffect(() => {
+    // Reset to first page when dataset variable values change
+    firstLoadPending.current = true;
+    setState((prevState) => ({
+      ...prevState,
+      page: 0,
+    }));
+  }, [dataset.variableValues]);
 
   useEffect(() => {
     if (!results?.data) return;
 
-    if (freshLoad.current) {
+    // First is pending
+    if (firstLoadPending.current) {
       setRowsToDisplay([...rows]);
-      lastLoadedPage.current = state.page;
-      freshLoad.current = false;
+      firstLoadPending.current = false;
       tableRef.current?.scrollToTop('smooth');
       return;
     }
 
-    // Only update test data if there are changes
-    const lastRows = rowsToDisplay.slice(-1 * TABLE_SCROLLABLE_SIZE);
-
-    const equalResults = deepEqual(lastRows, rows);
-
-    if (!equalResults) {
-      // Page 0
-      if (state.page === lastLoadedPage.current) {
-        setRowsToDisplay([...rows]);
-        return;
-      }
-
-      // Page X (append)
-      setRowsToDisplay((prev) => [...prev, ...rows]);
-      lastLoadedPage.current = state.page;
-    }
+    // Append new rows
+    setRowsToDisplay((prev) => [...prev, ...rows]);
   }, [rows]);
 
   // Stable updater for embeddable state
@@ -155,18 +154,12 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   };
 
   const handleSortChange = (newSort: TableSort<any> | undefined) => {
-    // setRowsToDisplay([]);
-    // results.isLoading = true;
-    freshLoad.current = true;
-
+    firstLoadPending.current = true;
     handleUpdateEmbeddableState({ sort: newSort as TableScrollableProState['sort'], page: 0 });
   };
 
-  const hasMoreData = (results?.data ?? [])?.length > 0;
-
+  const hasMoreData = results?.data && results.data.length === TABLE_SCROLLABLE_SIZE;
   const isLoading = Boolean(results?.isLoading || allResults?.isLoading);
-
-  const tableRef = useRef<TableScrollableHandle | null>(null);
 
   return (
     <ChartCard
