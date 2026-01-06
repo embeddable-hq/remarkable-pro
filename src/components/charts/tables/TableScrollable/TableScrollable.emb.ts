@@ -22,7 +22,7 @@ export const meta = {
         ...inputs.dimensionsAndMeasures.inputs,
         subInputs.width,
         subInputs.align,
-        subInputs.treatAs,
+        subInputs.displayFormat,
       ],
     },
     inputs.title,

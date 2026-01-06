@@ -10,7 +10,7 @@ import {
 } from '@embeddable.com/remarkable-ui';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { TreatAsTypeOptions } from '../../types/TreatAs.type.emb';
+import { DisplayFormatTypeOptions } from '../../types/DisplayFormat.type.emb';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const getTableHeaderAlign = (dimOrMeas: DimensionOrMeasure): TableHeaderItemAlign => {
@@ -56,9 +56,11 @@ export const getTableHeaders = (
 ): TableHeaderItem<any>[] => {
   const themeFormatter = getThemeFormatter(theme);
   return props.dimensionsAndMeasures.map((dimOrMeas) => {
-    const treatAs: string = dimOrMeas.inputs?.treatAs;
+    const displayFormat: string = dimOrMeas.inputs?.displayFormat;
     const hasCustomCellFormatter =
-      treatAs && (treatAs === TreatAsTypeOptions.JSON || treatAs === TreatAsTypeOptions.MARKDOWN);
+      displayFormat &&
+      (displayFormat === DisplayFormatTypeOptions.JSON ||
+        displayFormat === DisplayFormatTypeOptions.MARKDOWN);
 
     return {
       id: dimOrMeas.name,
@@ -76,7 +78,7 @@ export const getTableHeaders = (
         ? ({ value }) => {
             return (
               <TableBodyCellWithCopy value={value}>
-                {treatAs === TreatAsTypeOptions.MARKDOWN ? (
+                {displayFormat === DisplayFormatTypeOptions.MARKDOWN ? (
                   // Markdown
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
                 ) : (

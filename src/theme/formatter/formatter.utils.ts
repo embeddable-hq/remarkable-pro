@@ -4,7 +4,7 @@ import { Theme } from '../theme.types';
 import { cache } from '../../utils.ts/cache.utils';
 import { isValidISODate } from '../../utils.ts/data.utils';
 import { resolveI18nString } from '../../components/component.utils';
-import { TreatAsTypeOptions } from '../../components/types/TreatAs.type.emb';
+import { DisplayFormatTypeOptions } from '../../components/types/DisplayFormat.type.emb';
 
 export type GetThemeFormatter = {
   string: (key: string) => string;
@@ -66,9 +66,9 @@ export const getThemeFormatter = (theme: Theme): GetThemeFormatter => {
       }
 
       // JSON and Markdown
-      if (key.inputs?.treatAs === TreatAsTypeOptions.JSON) {
+      if (key.inputs?.displayFormat === DisplayFormatTypeOptions.JSON) {
         return JSON.stringify(value, null, 2);
-      } else if (key.inputs?.treatAs === TreatAsTypeOptions.MARKDOWN) {
+      } else if (key.inputs?.displayFormat === DisplayFormatTypeOptions.MARKDOWN) {
         return value;
       }
       // Objects

@@ -1,6 +1,6 @@
 import ColorType from '../editors/ColorEditor/Color.type.emb';
 import AlignType from './types/Align.type.emb';
-import TreatAsType from './types/TreatAs.type.emb';
+import DisplayFormatType from './types/DisplayFormat.type.emb';
 
 /* -------------------- */
 /* ----- Generics ----- */
@@ -104,10 +104,10 @@ const color = {
   label: 'Color',
 } as const;
 
-const treatAs = {
-  type: TreatAsType,
-  name: 'treatAs',
-  label: 'Treat as',
+const displayFormat = {
+  type: DisplayFormatType,
+  name: 'displayFormat',
+  label: 'Display format',
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -151,5 +151,5 @@ export const subInputs = {
   dateBounds,
   granularity,
   color,
-  treatAs,
+  displayFormat,
 };
