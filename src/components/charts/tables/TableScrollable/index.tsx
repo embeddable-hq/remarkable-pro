@@ -141,13 +141,6 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     }
   }, [isDownloadingData, allResults, handleUpdateEmbeddableState]);
 
-  useEffect(() => {
-    setState((prevState) => ({
-      ...prevState,
-      hasTotalResults: false,
-    }));
-  }, [dimensionsAndMeasures]);
-
   const handleNextPage = () => {
     if (results.isLoading) return;
     handleUpdateEmbeddableState({ page: state.page + 1 });
