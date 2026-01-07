@@ -67,6 +67,7 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.14",
     "dom-to-image-more": "^3.6.3",
+    "fast-equals": "^6.0.0",
     "i18next": "^25.3.2",
     "mergician": "^2.0.2",
     "react-markdown": "^10.1.0",

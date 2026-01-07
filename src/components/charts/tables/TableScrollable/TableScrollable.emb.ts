@@ -92,7 +92,7 @@ export default defineComponent(TablePaginatedChart, meta, {
 
     const dimensionsAndMeasuresToLoad = [
       ...inputs.dimensionsAndMeasures,
-      clickDimensionInDimensionsAndMeasures ? [] : inputs.clickDimension,
+      ...(clickDimensionInDimensionsAndMeasures ? [] : [inputs.clickDimension]),
     ];
 
     return {

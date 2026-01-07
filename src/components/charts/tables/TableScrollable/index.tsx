@@ -15,6 +15,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getTableHeaders, getTableRows } from '../tables.utils';
 import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
 import { TABLE_SCROLLABLE_SIZE } from './TableScrollable.utils';
+import { deepEqual } from 'fast-equals';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 let downloadData: (data: DataResponse['data']) => void;
@@ -70,10 +71,16 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   const cardContentRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<TableScrollableHandle | null>(null);
   const firstLoadPending = useRef(true);
+  const lastDatasetVariableRef = useRef<Dataset['variableValues'] | null>(null);
 
   useEffect(() => {
+    if (deepEqual(dataset.variableValues, lastDatasetVariableRef.current)) {
+      return;
+    }
+
     // Reset to first page when dataset variable values change
     firstLoadPending.current = true;
+    lastDatasetVariableRef.current = dataset.variableValues;
     setState((prevState) => ({
       ...prevState,
       page: 0,
@@ -123,7 +130,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   const handleRowIndexClick = (rowIndex: number) => {
     if (!clickDimension) return;
 
-    const rowDimensionValue = rows[rowIndex]?.[clickDimension.name];
+    const rowDimensionValue = rowsToDisplay[rowIndex]?.[clickDimension.name];
     onRowClicked(rowDimensionValue);
   };
 
