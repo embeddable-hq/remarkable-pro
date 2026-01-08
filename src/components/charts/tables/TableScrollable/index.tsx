@@ -160,6 +160,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
 
   const hasMoreData = results?.data && results.data.length === TABLE_SCROLLABLE_SIZE;
   const isLoading = Boolean(results?.isLoading || allResults?.isLoading);
+  const isLoadingTable = results?.isLoading && !firstLoadPending.current;
 
   return (
     <ChartCard
@@ -182,7 +183,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
         rows={getTableRows({ rows: rowsToDisplay, clickDimension })}
         showIndex={showIndex}
         sort={state.sort}
-        isLoading={results?.isLoading && !firstLoadPending.current}
+        isLoading={isLoadingTable}
         loadingLabel={i18n.t('common.loading')}
         onNextPage={handleNextPage}
         onSortChange={handleSortChange}
