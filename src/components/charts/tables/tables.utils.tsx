@@ -67,23 +67,42 @@ export const getTableHeaders = (
       title: themeFormatter.dimensionOrMeasureTitle(dimOrMeas),
       minWidth: getTableHeaderMinWidth(dimOrMeas),
       align: getTableHeaderAlign(dimOrMeas),
-      accessor: (row: any) => {
+      accessor: (row) => {
         const updatedDimOrMeas = {
           ...dimOrMeas,
           inputs: { ...dimOrMeas.inputs, displayNullAs: props.displayNullAs },
         };
         return themeFormatter.data(updatedDimOrMeas, row[dimOrMeas.name]);
       },
+      cellStyle: (value) => {
+        const tableCellStyle = dimOrMeas.inputs?.tableCellStyle;
+        if (tableCellStyle) {
+          const activeTableCellStyle = theme.defaults.tableCellStyleOptions?.find(
+            (style) => style.value === tableCellStyle,
+          );
+          if (activeTableCellStyle) {
+            return activeTableCellStyle.styles(value);
+          }
+        }
+        return undefined;
+      },
       cell: hasCustomCellFormatter
         ? ({ value }) => {
+            const currentValue: string | undefined =
+              typeof value === 'string'
+                ? value
+                : value !== undefined && value !== null
+                  ? String(value)
+                  : undefined;
+
             return (
               <TableBodyCellWithCopy value={value}>
                 {displayFormat === DisplayFormatTypeOptions.MARKDOWN ? (
                   // Markdown
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{currentValue}</ReactMarkdown>
                 ) : (
                   // JSON
-                  <pre>{value}</pre>
+                  <pre>{currentValue}</pre>
                 )}
               </TableBodyCellWithCopy>
             );

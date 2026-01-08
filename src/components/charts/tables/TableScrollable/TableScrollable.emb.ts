@@ -23,6 +23,7 @@ export const meta = {
         subInputs.width,
         subInputs.align,
         subInputs.displayFormat,
+        subInputs.tableCellStyle,
       ],
     },
     inputs.title,

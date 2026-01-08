@@ -17,7 +17,12 @@ export const meta = {
     {
       ...inputs.dimensionsAndMeasures,
       label: 'Columns',
-      inputs: [...inputs.dimensionsAndMeasures.inputs, subInputs.width, subInputs.align],
+      inputs: [
+        ...inputs.dimensionsAndMeasures.inputs,
+        subInputs.width,
+        subInputs.align,
+        subInputs.tableCellStyle,
+      ],
     },
     inputs.title,
     inputs.description,

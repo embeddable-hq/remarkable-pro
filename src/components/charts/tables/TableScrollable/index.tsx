@@ -182,7 +182,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
         rows={getTableRows({ rows: rowsToDisplay, clickDimension })}
         showIndex={showIndex}
         sort={state.sort}
-        isLoading={results?.isLoading}
+        isLoading={results?.isLoading && !firstLoadPending.current}
         loadingLabel={i18n.t('common.loading')}
         onNextPage={handleNextPage}
         onSortChange={handleSortChange}

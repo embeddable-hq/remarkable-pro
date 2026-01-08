@@ -46,6 +46,14 @@ export default defineConfig([
       'react-hooks/exhaustive-deps': 'warn', // Warn about missing deps in useEffect
       'react/react-in-jsx-scope': 0,
       'react/prop-types': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
     },
   },
 

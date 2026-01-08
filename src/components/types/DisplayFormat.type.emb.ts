@@ -1,8 +1,8 @@
 import { defineOption, defineType } from '@embeddable.com/core';
 
 export const DisplayFormatTypeOptions = {
-  MARKDOWN: 'markdown',
-  JSON: 'json',
+  MARKDOWN: 'Markdown',
+  JSON: 'Json',
 } as const;
 
 const DisplayFormatType = defineType('DisplayFormat', {
