@@ -7,6 +7,7 @@ export const en: ResourceLanguage = {
       noOptionsFound: 'No options found',
       noOptionsAvailable: 'No options available',
       compared: 'Compared',
+      loading: 'Loading...',
     },
     charts: {
       label: 'Label',

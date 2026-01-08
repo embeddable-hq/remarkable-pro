@@ -6,6 +6,7 @@ import { Theme, ThemeCharts, ThemeDefaults } from './theme.types';
 import { defaultComparisonPeriodOptions } from './defaults/defaults.ComparisonPeriods.constants';
 import { defaultDateRangeOptions } from './defaults/defaults.DateRanges.constants';
 import { defaultChartMenuProOptions } from './defaults/defaults.ChartCardMenu.constants';
+import { defaultTableCellStyleOptions } from './defaults/defaults.TableCellStyle.constants';
 
 const remarkableThemeI18n = {
   language: 'en',
@@ -23,6 +24,7 @@ const remarkableThemeDefaults: ThemeDefaults = {
   comparisonPeriodsOptions: defaultComparisonPeriodOptions,
   dateRangesOptions: defaultDateRangeOptions,
   chartMenuOptions: defaultChartMenuProOptions,
+  tableCellStyleOptions: defaultTableCellStyleOptions,
 };
 
 export const remarkableTheme: Theme = {

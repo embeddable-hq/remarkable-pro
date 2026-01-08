@@ -59,7 +59,7 @@
     "@changesets/cli": "^2.29.6",
     "@embeddable.com/core": "^2.13.2",
     "@embeddable.com/react": "^2.12.2",
-    "@embeddable.com/remarkable-ui": "^2.0.21",
+    "@embeddable.com/remarkable-ui": "^2.0.25",
     "@tabler/icons-react": "^3.34.1",
     "chart.js": "^4.5.0",
     "chartjs-plugin-datalabels": "^2.2.0",
@@ -67,8 +67,11 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.14",
     "dom-to-image-more": "^3.6.3",
+    "fast-equals": "^6.0.0",
     "i18next": "^25.3.2",
     "mergician": "^2.0.2",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
