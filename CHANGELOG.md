@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.18
+
+### Patch Changes
+
+- 22fde8a: ScrollableTable
+
 ## 0.0.17
 
 ### Patch Changes
