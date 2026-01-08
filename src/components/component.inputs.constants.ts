@@ -82,6 +82,12 @@ const groupBy = {
   label: 'Group By',
 } as const;
 
+const granularity = {
+  name: 'granularity',
+  type: 'granularity',
+  label: 'Granularity',
+} as const;
+
 const dimensionSimple = {
   name: 'dimensionSimple',
   type: 'dimension',
@@ -393,4 +399,5 @@ export const inputs = {
   xAxisRangeMax,
   xAxisMaxItems,
   yAxisMaxItems,
+  granularity,
 } as const;
