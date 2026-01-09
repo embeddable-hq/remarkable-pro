@@ -5,6 +5,7 @@ import { ChartOptions } from 'chart.js';
 import { ComparisonPeriodOption } from './defaults/defaults.ComparisonPeriods.constants';
 import { DateRangeOption } from './defaults/defaults.DateRanges.constants';
 import { ChartCardMenuOption } from './defaults/defaults.ChartCardMenu.constants';
+import { TableCellStyleOption } from './defaults/defaults.TableCellStyle.constants';
 
 export type ThemeI18n = { language: string; translations: Resource };
 
@@ -34,6 +35,7 @@ export type ThemeDefaults = {
   comparisonPeriodsOptions: ComparisonPeriodOption[];
   dateRangesOptions: DateRangeOption[];
   chartMenuOptions: ChartCardMenuOption[];
+  tableCellStyleOptions?: TableCellStyleOption[];
 };
 
 export type Theme = {

@@ -1,16 +1,17 @@
 import { loadData, OrderBy, Value } from '@embeddable.com/core';
 import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import TablePaginatedChart, {
-  TableChartPaginatedProOnRowClickArg,
-  TableChartPaginatedProState,
+  TableScrollableProOnRowClickArg,
+  TableScrollableProState,
 } from './index';
 import { mergician } from 'mergician';
 import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
+import { TABLE_SCROLLABLE_SIZE } from './TableScrollable.utils';
 
 export const meta = {
-  name: 'TableChartPaginated',
-  label: 'Table Chart - Paginated',
+  name: 'TableScrollable',
+  label: 'Table Chart - Scrollable',
   category: 'Table Charts',
   inputs: [
     inputs.dataset,
@@ -21,6 +22,7 @@ export const meta = {
         ...inputs.dimensionsAndMeasures.inputs,
         subInputs.width,
         subInputs.align,
+        subInputs.displayFormat,
         subInputs.tableCellStyle,
       ],
     },
@@ -59,19 +61,17 @@ export const meta = {
   ],
 } as const satisfies EmbeddedComponentMeta;
 
-const defaultState: TableChartPaginatedProState = {
+const defaultState: TableScrollableProState = {
   page: 0,
-  pageSize: undefined,
   sort: undefined,
   isLoadingDownloadData: false,
-  hasTotalResults: false,
 };
 
 export default defineComponent(TablePaginatedChart, meta, {
   /* @ts-expect-error - to be fixed in @embeddable.com/react */
   props: (
     inputs: Inputs<typeof meta>,
-    [state, setState]: [TableChartPaginatedProState, (state: TableChartPaginatedProState) => void],
+    [state, setState]: [TableScrollableProState, (state: TableScrollableProState) => void],
   ) => {
     const orderDimensionAndMeasure = inputs.dimensionsAndMeasures.find(
       (x) => x.name === state?.sort?.id,
@@ -102,24 +102,14 @@ export default defineComponent(TablePaginatedChart, meta, {
       state: mergician(defaultState, state ?? {}), // Merge with default state
       setState,
 
-      results: state?.pageSize
-        ? loadData({
-            from: inputs.dataset,
-            select: dimensionsAndMeasuresToLoad,
-            offset: state.page * state.pageSize,
-            limit: state.pageSize,
-            orderBy,
-          })
-        : undefined,
-      totalResults: !state?.hasTotalResults
-        ? loadData({
-            from: inputs.dataset,
-            select: dimensionsAndMeasuresToLoad,
-            offset: 0,
-            limit: 0,
-            countRows: true,
-          })
-        : undefined,
+      results: loadData({
+        from: inputs.dataset,
+        select: dimensionsAndMeasuresToLoad,
+        offset: (state?.page ? state.page : defaultState.page) * TABLE_SCROLLABLE_SIZE,
+        limit: TABLE_SCROLLABLE_SIZE,
+        orderBy,
+      }),
+
       allResults: state?.isLoadingDownloadData
         ? loadData({
             from: inputs.dataset,
@@ -131,7 +121,7 @@ export default defineComponent(TablePaginatedChart, meta, {
     };
   },
   events: {
-    onRowClicked: (rowDimensionValue: TableChartPaginatedProOnRowClickArg) => {
+    onRowClicked: (rowDimensionValue: TableScrollableProOnRowClickArg) => {
       return {
         rowDimensionValue: rowDimensionValue !== undefined ? rowDimensionValue : Value.noFilter(),
       };

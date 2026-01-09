@@ -1,7 +1,7 @@
 import { defineOption, defineType } from '@embeddable.com/core';
 
 const AlignType = defineType('align', {
-  label: 'Align',
+  label: 'Alignment',
   optionLabel: (value: string) => value,
 });
 
