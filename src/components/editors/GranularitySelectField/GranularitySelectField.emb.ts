@@ -13,7 +13,18 @@ export const meta = {
     inputs.title,
     inputs.description,
     { ...inputs.placeholder, defaultValue: 'Select a granularity' },
-    { ...inputs.granularity, label: 'Selected granularity', category: 'Pre-configured variables' },
+    {
+      ...inputs.granularities,
+      label: 'Available granularities',
+      category: 'Pre-configured variables',
+      // Ignore seconds and minutes
+      defaultValue: ['hour', 'day', 'week', 'month', 'quarter', 'year'],
+    },
+    {
+      ...inputs.granularity,
+      label: 'Selected granularity',
+      category: 'Pre-configured variables',
+    },
     {
       ...inputs.timeRange,
       name: 'primaryTimeRange',

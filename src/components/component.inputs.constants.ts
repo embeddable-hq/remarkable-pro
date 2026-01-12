@@ -88,6 +88,13 @@ const granularity = {
   label: 'Granularity',
 } as const;
 
+const granularities = {
+  name: 'granularities',
+  type: 'granularity',
+  label: 'Granularities',
+  array: true,
+} as const;
+
 const dimensionSimple = {
   name: 'dimensionSimple',
   type: 'dimension',
@@ -400,4 +407,5 @@ export const inputs = {
   xAxisMaxItems,
   yAxisMaxItems,
   granularity,
+  granularities,
 } as const;
