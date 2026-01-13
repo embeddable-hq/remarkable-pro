@@ -14,11 +14,8 @@ export const granularitySelectFieldOptions: SelectListOptionProps[] = [
   { value: 'year', label: 'Year' },
 ];
 
-const DEFAULT_MIN_BUCKETS = 2;
+const DEFAULT_MIN_BUCKETS = 1;
 const DEFAULT_MAX_BUCKETS = 100;
-
-// Force weeks to start on Monday (1) always.
-const WEEK_STARTS_ON = 1 as const;
 
 // Convert possibly-string timestamps to Date safely.
 const toDate = (d: unknown): Date | null => {
@@ -33,95 +30,40 @@ const toDate = (d: unknown): Date | null => {
 // Inclusive end -> Exclusive end helper (only used for sub-day diffs)
 const toExclusiveEnd = (endInclusive: Date): Date => new Date(endInclusive.getTime() + 1);
 
+const bucketCountByUnit = (start: Date, endExclusive: Date, unitMs: number): number => {
+  return (endExclusive.getTime() - start.getTime()) / unitMs;
+};
+
 // Bucket counting (treat end as INCLUSIVE)
 function bucketCount(start: Date, endInclusive: Date, granularity: Granularity): number {
   if (start > endInclusive) return 0;
 
   switch (granularity) {
     case 'second':
-      return diffCeil(start, toExclusiveEnd(endInclusive), 1000);
+      return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 1000);
 
     case 'minute':
-      return diffCeil(start, toExclusiveEnd(endInclusive), 60 * 1000);
+      return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 60 * 1000);
 
     case 'hour':
-      return diffCeil(start, toExclusiveEnd(endInclusive), 60 * 60 * 1000);
+      return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 60 * 60 * 1000);
 
     case 'day':
-      return diffInDaysByCalendar(start, endInclusive);
+      return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 24 * 60 * 60 * 1000);
 
     case 'week':
-      return diffInWeeksByCalendarMonday(start, endInclusive);
+      return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 7 * 24 * 60 * 60 * 1000);
 
     case 'month':
-      return diffInMonthsByCalendar(start, endInclusive);
+      return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 28 * 24 * 60 * 60 * 1000); // shortest month
 
     case 'quarter':
-      return diffInQuartersByCalendar(start, endInclusive);
+      return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 90 * 24 * 60 * 60 * 1000); // shortest quarter
 
     case 'year':
-      return diffInYearsByCalendar(start, endInclusive);
+      return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 365 * 24 * 60 * 60 * 1000); // shortest year
   }
 }
-
-const diffCeil = (start: Date, endExclusive: Date, unitMs: number): number => {
-  return Math.ceil((endExclusive.getTime() - start.getTime()) / unitMs);
-};
-
-const dayIndex = (d: Date): number => {
-  // Local midnight anchor (stable for calendar boundary math)
-  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  return Math.floor(x.getTime() / (24 * 60 * 60 * 1000));
-};
-
-// Distinct calendar days touched (inclusive)
-const diffInDaysByCalendar = (start: Date, endInclusive: Date): number => {
-  return dayIndex(endInclusive) - dayIndex(start) + 1;
-};
-
-// Week buckets always start Monday.
-const startOfWeekMonday = (d: Date): Date => {
-  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  x.setHours(0, 0, 0, 0);
-  const day = x.getDay(); // 0=Sun..6=Sat
-  const diff = (day - WEEK_STARTS_ON + 7) % 7; // WEEK_STARTS_ON=1 => Monday
-  x.setDate(x.getDate() - diff);
-  return x;
-};
-
-const weekIndexMonday = (d: Date): number => {
-  return dayIndex(startOfWeekMonday(d));
-};
-
-// Distinct Monday-start weeks touched (inclusive)
-const diffInWeeksByCalendarMonday = (start: Date, endInclusive: Date): number => {
-  const startWeek = weekIndexMonday(start);
-  const endWeek = weekIndexMonday(endInclusive);
-  return Math.floor((endWeek - startWeek) / 7) + 1;
-};
-
-const monthIndex = (d: Date): number => {
-  return d.getFullYear() * 12 + d.getMonth();
-};
-
-// Distinct months touched (inclusive)
-const diffInMonthsByCalendar = (start: Date, endInclusive: Date): number => {
-  return monthIndex(endInclusive) - monthIndex(start) + 1;
-};
-
-const quarterIndex = (d: Date): number => {
-  return d.getFullYear() * 4 + Math.floor(d.getMonth() / 3);
-};
-
-// Distinct quarters touched (inclusive)
-const diffInQuartersByCalendar = (start: Date, endInclusive: Date): number => {
-  return quarterIndex(endInclusive) - quarterIndex(start) + 1;
-};
-
-// Distinct years touched (inclusive)
-const diffInYearsByCalendar = (start: Date, endInclusive: Date): number => {
-  return endInclusive.getFullYear() - start.getFullYear() + 1;
-};
 
 const isGranularityValid = (start: Date, endInclusive: Date, granularity: Granularity): boolean => {
   const buckets = bucketCount(start, endInclusive, granularity);
