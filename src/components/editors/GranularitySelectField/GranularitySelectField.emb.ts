@@ -38,11 +38,11 @@ export const meta = {
   events: [
     {
       name: 'onChange',
-      label: 'selected granularity updated',
+      label: 'Selected granularity updated',
       properties: [
         {
           name: 'value',
-          label: 'selected granularity',
+          label: 'Selected granularity',
           type: 'granularity',
         },
       ],

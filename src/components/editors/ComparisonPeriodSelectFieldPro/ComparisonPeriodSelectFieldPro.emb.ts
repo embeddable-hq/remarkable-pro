@@ -30,11 +30,11 @@ export const meta = {
   events: [
     {
       name: 'onChange',
-      label: 'selected comparison-period updated',
+      label: 'Selected comparison-period updated',
       properties: [
         {
           name: 'value',
-          label: 'selected comparison-period',
+          label: 'Selected comparison-period',
           type: ComparisonPeriodType,
         },
       ],

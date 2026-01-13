@@ -41,11 +41,11 @@ export const meta = {
   events: [
     {
       name: 'onChange',
-      label: 'selected values updated',
+      label: 'Selected values updated',
       properties: [
         {
           name: 'value',
-          label: 'selected values',
+          label: 'Selected values',
           type: 'string',
           array: true,
         },
