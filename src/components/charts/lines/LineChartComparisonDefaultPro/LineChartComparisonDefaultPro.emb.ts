@@ -97,7 +97,7 @@ export const meta = {
       properties: [
         {
           name: 'axisDimensionValue',
-          label: 'Clicked Axis Dimension Value',
+          label: 'Clicked axis dimension value',
           type: 'string',
         },
       ],

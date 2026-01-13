@@ -32,17 +32,17 @@ export const meta = {
     {
       ...inputs.boolean,
       name: 'showIndex',
-      label: 'Show Index Column',
+      label: 'Show index column',
       defaultValue: true,
       category: 'Component Settings',
     },
     inputs.displayNullAs,
-    { ...inputs.maxResults, label: 'Max Results to Download' },
+    { ...inputs.maxResults, label: 'Max results to download' },
     {
       ...inputs.dimensionSimple,
       label: 'Dimension to set on click',
       name: 'clickDimension',
-      category: 'Data Mapping for Interactions',
+      category: 'Data mapping for interactions',
       required: false,
     },
   ],
@@ -53,7 +53,7 @@ export const meta = {
       properties: [
         {
           name: 'rowDimensionValue',
-          label: 'Clicked Row Dimension Value',
+          label: 'Clicked row dimension value',
           type: 'string',
         },
       ],

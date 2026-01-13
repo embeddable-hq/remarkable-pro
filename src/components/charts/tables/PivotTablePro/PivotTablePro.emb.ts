@@ -12,23 +12,23 @@ export const meta = {
     inputs.dataset,
     {
       ...inputs.measures,
-      label: 'Measures To Display',
+      label: 'Measures to display',
       inputs: [
         ...inputs.measures.inputs,
         {
           ...subInputs.boolean,
           name: 'showColumnTotal',
-          label: 'Show Column Total',
+          label: 'Show column total',
         },
         {
           ...subInputs.boolean,
           name: 'showRowTotal',
-          label: 'Show Row Total',
+          label: 'Show row total',
         },
         {
           ...subInputs.boolean,
           name: 'showAsPercentage',
-          label: 'Show As Percentage',
+          label: 'Show as percentage',
           description: 'If turned on, other measures may be ignored',
           defaultValue: false,
         },
@@ -36,12 +36,12 @@ export const meta = {
     },
     {
       ...inputs.dimensionWithDateBounds,
-      label: 'Row Dimension',
+      label: 'Row dimension',
       name: 'rowDimension',
     },
     {
       ...inputs.dimensionWithDateBounds,
-      label: 'Column Dimension',
+      label: 'Column dimension',
       name: 'columnDimension',
     },
     inputs.title,
@@ -50,14 +50,14 @@ export const meta = {
     {
       ...inputs.number,
       name: 'firstColumnWidth',
-      label: 'First Column Width',
+      label: 'First column width',
       description: 'Set the width in px (e.g. 200)',
       category: 'Component Settings',
     },
     {
       ...inputs.number,
       name: 'columnWidth',
-      label: 'Column Width',
+      label: 'Column width',
       description: 'Set the width in px (e.g. 200)',
       category: 'Component Settings',
     },

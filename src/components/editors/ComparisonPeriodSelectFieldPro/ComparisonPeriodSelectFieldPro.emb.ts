@@ -23,7 +23,7 @@ export const meta = {
     },
     {
       ...inputs.comparisonPeriod,
-      label: 'Selected Comparison Period',
+      label: 'Selected comparison period',
       category: 'Pre-configured variables',
     },
   ],

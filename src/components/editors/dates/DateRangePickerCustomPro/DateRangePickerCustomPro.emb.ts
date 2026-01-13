@@ -17,7 +17,7 @@ export const meta = {
     {
       ...inputs.timeRange,
       name: 'selectedValue',
-      label: 'Selected Value',
+      label: 'Selected value',
       category: 'Pre-configured variables',
     },
     {

@@ -25,7 +25,7 @@ export const meta = {
     {
       ...inputs.string,
       name: 'selectedValue',
-      label: 'Selected Value',
+      label: 'Selected value',
       category: 'Pre-configured Variables',
     },
     {
