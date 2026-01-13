@@ -19,13 +19,14 @@ type DateRangePickerPresetsProps = {
   title?: string;
   granularity?: string;
   granularities?: string[];
+  clearable?: boolean;
 };
 
 const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { granularity, granularities, onChange } = props;
+  const { granularity, granularities, clearable, onChange } = props;
   const { description, placeholder, title, primaryTimeRange } = resolveI18nProps(props);
 
   const granularitySelectFieldOptions = getGranularitySelectFieldOptions();
@@ -56,7 +57,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   return (
     <EditorCard title={title} subtitle={description}>
       <SingleSelectField
-        clearable
+        clearable={clearable}
         placeholder={placeholder}
         value={safeValue}
         options={availableOptions}
