@@ -72,30 +72,23 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
 
     return (
       <Card className={styles.chartCard}>
-        <CardHeader
-          title={title}
-          subtitle={subtitle}
-          rightContent={
-            <div className={styles.chartCardRightContent}>
-              <div
-                className={clsx(styles.fixedContent, isLoading ? styles.loading : styles.hidden)}
-              >
-                <ChartCardLoading />
-              </div>
-              <div
-                className={clsx(styles.fixedContent, isLoading ? styles.hidden : styles.visible)}
-              >
-                <ChartCardMenuPro
-                  title={title}
-                  containerRef={chartRef}
-                  data={data?.data}
-                  dimensionsAndMeasures={dimensionsAndMeasures}
-                  onCustomDownload={onCustomDownload}
-                />
-              </div>
+        <div className={styles.chartCardHeader}>
+          <CardHeader title={title} subtitle={subtitle} />
+          <div className={styles.chartCardRightContent}>
+            <div className={clsx(!isLoading && styles.hidden)}>
+              <ChartCardLoading />
             </div>
-          }
-        />
+            <div className={clsx(isLoading && styles.hidden)}>
+              <ChartCardMenuPro
+                title={title}
+                containerRef={chartRef}
+                data={data?.data}
+                dimensionsAndMeasures={dimensionsAndMeasures}
+                onCustomDownload={onCustomDownload}
+              />
+            </div>
+          </div>
+        </div>
 
         <CardContent ref={onCustomDownload ? ref : chartRef}>{getDisplay()}</CardContent>
       </Card>
