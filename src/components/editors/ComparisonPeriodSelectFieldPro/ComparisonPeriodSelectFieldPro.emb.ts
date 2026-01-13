@@ -17,7 +17,7 @@ export const meta = {
     {
       ...inputs.timeRange,
       name: 'primaryDateRange',
-      label: 'Primary Date Range',
+      label: 'Primary date-range',
       category: 'Pre-configured variables',
       description: 'Pick the main time period. The comparison range is based on this selection.',
     },

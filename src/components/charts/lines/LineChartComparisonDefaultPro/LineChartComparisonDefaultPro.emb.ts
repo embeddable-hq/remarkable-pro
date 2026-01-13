@@ -52,7 +52,7 @@ export const meta = {
     {
       ...inputs.timeRange,
       name: 'primaryDateRange',
-      label: 'Primary Date Range',
+      label: 'Primary date-range',
       description: 'You can also connect this to a date range selector using its variable',
       category: 'Component Data',
     },

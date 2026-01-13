@@ -28,9 +28,12 @@ export const meta = {
     {
       ...inputs.timeRange,
       name: 'primaryTimeRange',
-      label: 'Primary time range',
+      label: 'Primary date-range',
+      description:
+        'Connect your primary date-range variable to enable automatic selection of the most appropriate granularity',
       category: 'Pre-configured variables',
     },
+    { ...inputs.clearable, defaultValue: false },
   ],
   events: [
     {
