@@ -1,21 +1,18 @@
 import { SelectListOptionProps } from '@embeddable.com/remarkable-ui';
 import { TimeRange } from '@embeddable.com/core';
+import { defaultGranularitySelectFieldOptions } from '../../../theme/defaults/defaults.GranularityOptions.constants';
+import { resolveI18nString } from '../../component.utils';
 
 type Granularity = 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'quarter' | 'year';
 
-export const granularitySelectFieldOptions: SelectListOptionProps[] = [
-  { value: 'second', label: 'Second' },
-  { value: 'minute', label: 'Minute' },
-  { value: 'hour', label: 'Hour' },
-  { value: 'day', label: 'Day' },
-  { value: 'week', label: 'Week' },
-  { value: 'month', label: 'Month' },
-  { value: 'quarter', label: 'Quarter' },
-  { value: 'year', label: 'Year' },
-];
-
 const DEFAULT_MIN_BUCKETS = 1;
 const DEFAULT_MAX_BUCKETS = 100;
+
+export const getGranularitySelectFieldOptions = () =>
+  defaultGranularitySelectFieldOptions.map((opt) => ({
+    ...opt,
+    label: resolveI18nString(opt.label),
+  }));
 
 // Convert possibly-string timestamps to Date safely.
 const toDate = (d: unknown): Date | null => {

@@ -8,7 +8,7 @@ import { resolveI18nProps } from '../../component.utils';
 import { EditorCard } from '../shared/EditorCard/EditorCard';
 import {
   getAvailableGranularityOptionsFromTimeRange,
-  granularitySelectFieldOptions,
+  getGranularitySelectFieldOptions,
 } from './GranularitySelectField.utils';
 
 type DateRangePickerPresetsProps = {
@@ -27,6 +27,8 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
 
   const { granularity, granularities, onChange } = props;
   const { description, placeholder, title, primaryTimeRange } = resolveI18nProps(props);
+
+  const granularitySelectFieldOptions = getGranularitySelectFieldOptions();
 
   const availableOptions = useMemo(() => {
     return getAvailableGranularityOptionsFromTimeRange(
