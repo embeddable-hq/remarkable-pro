@@ -1,5 +1,6 @@
 // Utils
 export { getObjectStableKey } from './utils.ts/object.utils';
+export { setColorAlpha, isColorValid } from './utils.ts/color.utils';
 
 // Types
 export { type DeepPartial } from './types/deep-partial';
@@ -19,6 +20,10 @@ export type {
   ThemeFormatter,
 } from './theme/formatter/formatter.types';
 export { getThemeFormatter } from './theme/formatter/formatter.utils';
+
+// Component inputs
+export { inputs } from './components/component.inputs.constants';
+export { subInputs } from './components/component.subinputs.constants';
 
 // Components utils
 export { resolveI18nProps } from './components/component.utils';
@@ -66,8 +71,5 @@ export * as MultiSelectFieldPro from './components/editors/MultiSelectFieldPro';
 export * as SingleSelectFieldPro from './components/editors/SingleSelectFieldPro';
 export { EditorCard } from './components/editors/shared/EditorCard/EditorCard';
 
-// Custom Types
+// Custom types
 export { default as ComparisonPeriodType } from './components/types/ComparisonPeriod.type.emb';
-
-// Utils
-export { setColorAlpha, isColorValid } from './utils.ts/color.utils';
