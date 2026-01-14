@@ -11,11 +11,11 @@ export const meta = {
     inputs.dataset,
     inputs.measure,
     inputs.dimension,
-    { ...inputs.measure, name: 'innerLabelMeasure', label: 'Inner Label Measure' },
+    { ...inputs.measure, name: 'innerLabelMeasure', label: 'Inner label measure' },
     {
       ...inputs.string,
       name: 'innerLabelText',
-      label: 'Inner Label Text',
+      label: 'Inner label text',
       description: 'Text to display inside the donut chart',
       category: 'Component Data',
     },
@@ -33,7 +33,7 @@ export const meta = {
       properties: [
         {
           name: 'dimensionValue',
-          label: 'Clicked Dimension',
+          label: 'Clicked dimension',
           type: 'string',
         },
       ],

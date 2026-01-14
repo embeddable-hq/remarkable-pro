@@ -52,6 +52,16 @@ export const de: ResourceLanguage = {
       },
     },
     defaults: {
+      granularityOptions: {
+        second: 'Sekunde',
+        minute: 'Minute',
+        hour: 'Stunde',
+        day: 'Tag',
+        week: 'Woche',
+        month: 'Monat',
+        quarter: 'Quartal',
+        year: 'Jahr',
+      },
       comparisonPeriodOptions: {
         previousPeriod: 'Vorheriger Zeitraum',
         previousWeek: 'Vorherige Woche',

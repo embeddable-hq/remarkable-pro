@@ -26,7 +26,7 @@ export const meta = {
       ...inputs.string,
       name: 'selectedValues',
       array: true,
-      label: 'Selected Values',
+      label: 'Selected values',
       category: 'Pre-configured Variables',
     },
     {
@@ -41,11 +41,11 @@ export const meta = {
   events: [
     {
       name: 'onChange',
-      label: 'selected values updated',
+      label: 'Selected values updated',
       properties: [
         {
           name: 'value',
-          label: 'selected values',
+          label: 'Selected values',
           type: 'string',
           array: true,
         },

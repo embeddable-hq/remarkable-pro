@@ -6,7 +6,7 @@ import Component from './index';
 
 export const meta = {
   name: 'ColorEditor',
-  label: 'Color Editor',
+  label: 'Color editor',
   type: ColorType,
 };
 

@@ -28,7 +28,7 @@ const boolean = {
 const timeRange = {
   name: 'timeRange',
   type: 'timeRange',
-  label: 'Time Range',
+  label: 'Time range',
 } as const;
 
 /* ------------------ */
@@ -87,7 +87,7 @@ const abbreviateLargeNumber = {
 const dateBounds = {
   name: 'dateBounds',
   type: 'timeRange',
-  label: 'Date Bounds',
+  label: 'Date bounds',
   description: 'Set the date range for the axis',
   supportedTypes: ['time'],
 } as const;

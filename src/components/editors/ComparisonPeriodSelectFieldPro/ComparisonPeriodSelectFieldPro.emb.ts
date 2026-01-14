@@ -17,24 +17,24 @@ export const meta = {
     {
       ...inputs.timeRange,
       name: 'primaryDateRange',
-      label: 'Primary Date Range',
+      label: 'Primary date-range',
       category: 'Pre-configured variables',
       description: 'Pick the main time period. The comparison range is based on this selection.',
     },
     {
       ...inputs.comparisonPeriod,
-      label: 'Selected Comparison Period',
+      label: 'Selected comparison period',
       category: 'Pre-configured variables',
     },
   ],
   events: [
     {
       name: 'onChange',
-      label: 'selected comparison-period updated',
+      label: 'Selected comparison-period updated',
       properties: [
         {
           name: 'value',
-          label: 'selected comparison-period',
+          label: 'Selected comparison-period',
           type: ComparisonPeriodType,
         },
       ],
