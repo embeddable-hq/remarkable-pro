@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.20
+
+### Patch Changes
+
+- 903df7a: Improve getBarStackedChartProData function
+
 ## 0.0.19
 
 ### Patch Changes
