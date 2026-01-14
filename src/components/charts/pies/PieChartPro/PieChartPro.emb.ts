@@ -1,7 +1,19 @@
-import { Value, loadData } from '@embeddable.com/core';
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  Value,
+  loadData,
+  mockDataResponse,
+  mockDimension,
+  mockMeasure,
+} from '@embeddable.com/core';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import PieChartPro from './index';
 import { inputs } from '../../../component.inputs.constants';
+import { previewDimension, previewMeasure, previewResults } from '../../../preview.data.constants';
 
 export const meta = {
   name: 'PieChartPro',
@@ -32,6 +44,13 @@ export const meta = {
     },
   ],
 } as const satisfies EmbeddedComponentMeta;
+
+export const preview = definePreview(PieChartPro, {
+  dimension: previewDimension,
+  measure: previewMeasure,
+  results: previewResults,
+  showValueLabels: false,
+});
 
 export default defineComponent(PieChartPro, meta, {
   props: (inputs: Inputs<typeof meta>) => {

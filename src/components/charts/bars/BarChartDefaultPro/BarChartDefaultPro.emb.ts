@@ -50,35 +50,6 @@ export const meta = {
   ],
 } as const satisfies EmbeddedComponentMeta;
 
-export const preview = definePreview(BarChartDefaultPro, {
-  title: 'Example monthly sales',
-  dimension: mockDimension('month', 'string', { title: 'Month' }),
-  measures: [mockMeasure('total_sales', 'sum', { title: 'Total Sales' })],
-  results: mockDataResponse(
-    ['month', 'total_sales'],
-    [
-      ['January', 45000],
-      ['February', 52000],
-      ['March', 48000],
-      ['April', 61000],
-      ['May', 55000],
-      ['June', 67000],
-    ],
-  ),
-  showLegend: true,
-  description: '',
-  reverseXAxis: false,
-  showLogarithmicScale: false,
-  showTooltips: false,
-  showValueLabels: false,
-  xAxisLabel: 'Months',
-  yAxisLabel: 'Total sales',
-  xAxisMaxItems: 0,
-  onBarClicked: function (): void {
-    throw new Error('Function not implemented.');
-  },
-});
-
 export default defineComponent(BarChartDefaultPro, meta, {
   props: (inputs: Inputs<typeof meta>) => {
     return {

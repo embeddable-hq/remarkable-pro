@@ -12,7 +12,7 @@ import { resolveI18nProps } from '../../../component.utils';
 
 type DonutLabelChartProProps = DefaultPieChartProps & {
   innerLabelMeasure: Measure;
-  innerLabelText: string;
+  innerLabelText?: string;
   resultsInnerLabel: DataResponse;
 };
 
@@ -43,7 +43,7 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
   );
 
   const handleSegmentClick = (index: number | undefined) => {
-    onSegmentClick({
+    onSegmentClick?.({
       dimensionValue: index === undefined ? undefined : results.data?.[index]?.[dimension.name],
     });
   };

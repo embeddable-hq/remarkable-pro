@@ -18,7 +18,7 @@ import clsx from 'clsx';
 import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
 
 type ChartCardProps = {
-  title: string;
+  title?: string;
   subtitle?: string;
   children: React.ReactNode;
   data: DataResponse;
@@ -72,21 +72,23 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
 
     return (
       <Card className={styles.chartCard}>
-        <div className={styles.chartCardHeader}>
-          <CardHeader title={title} subtitle={subtitle} />
-          <div className={styles.chartCardRightContent}>
-            <div className={clsx(!isLoading && styles.hidden)}>
-              <ChartCardLoading />
-            </div>
-            <div className={clsx(isLoading && styles.hidden)}>
-              <ChartCardMenuPro
-                title={title}
-                containerRef={chartRef}
-                data={data?.data}
-                dimensionsAndMeasures={dimensionsAndMeasures}
-                onCustomDownload={onCustomDownload}
-              />
-            </div>
+        {(title || subtitle) && (
+          <div className={styles.chartCardHeader}>
+            <CardHeader title={title} subtitle={subtitle} />
+          </div>
+        )}
+        <div className={styles.chartCardRightContent}>
+          <div className={clsx(!isLoading && styles.hidden)}>
+            <ChartCardLoading />
+          </div>
+          <div className={clsx(isLoading && styles.hidden)}>
+            <ChartCardMenuPro
+              title={title}
+              containerRef={chartRef}
+              data={data?.data}
+              dimensionsAndMeasures={dimensionsAndMeasures}
+              onCustomDownload={onCustomDownload}
+            />
           </div>
         </div>
 

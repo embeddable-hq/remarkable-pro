@@ -38,7 +38,7 @@ const PieChartPro = (props: PieChartProProps) => {
   );
 
   const handleSegmentClick = (index: number | undefined) => {
-    onSegmentClick({
+    onSegmentClick?.({
       dimensionValue: index === undefined ? undefined : results.data?.[index]?.[dimension.name],
     });
   };
