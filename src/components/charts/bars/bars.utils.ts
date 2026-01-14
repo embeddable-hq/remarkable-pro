@@ -1,4 +1,4 @@
-import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { CUBE_DIMENSION_TYPE_TIME, DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
 import { ChartData, ChartOptions } from 'chart.js';
@@ -22,7 +22,7 @@ export const getBarStackedChartProData = (
   const { data = [], dimension, groupDimension, measure } = props;
 
   const axis = [...new Set(data.map((d) => d[dimension.name]).filter((d) => d != null))].sort();
-  const groupDimensionName = `${groupDimension.name}${groupDimension.inputs?.granularity ? `.${groupDimension.inputs.granularity}` : ''}`;
+  const groupDimensionName = `${groupDimension.name}${groupDimension.nativeType === CUBE_DIMENSION_TYPE_TIME && groupDimension.inputs?.granularity ? `.${groupDimension.inputs.granularity}` : ''}`;
   const groupBy = [...new Set(data.map((d) => d[groupDimensionName]))].filter((d) => d != null);
 
   const themeKey = getObjectStableKey(theme);

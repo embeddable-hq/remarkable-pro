@@ -1,5 +1,18 @@
 # @embeddable/remarkable-ui
 
+## 0.0.20
+
+### Patch Changes
+
+- 903df7a: Improve getBarStackedChartProData function
+
+## 0.0.19
+
+### Patch Changes
+
+- 7d60d94: GranularitySelectField
+- 64ab1a2: Sync dependencies
+
 ## 0.0.18
 
 ### Patch Changes
