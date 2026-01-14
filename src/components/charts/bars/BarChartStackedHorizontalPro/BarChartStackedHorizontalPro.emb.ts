@@ -33,12 +33,12 @@ export const meta = {
       properties: [
         {
           name: 'axisDimensionValue',
-          label: 'Clicked Axis Dimension Value',
+          label: 'Clicked axis dimension value',
           type: 'string',
         },
         {
           name: 'groupingDimensionValue',
-          label: 'Clicked Grouping Dimension Value',
+          label: 'Clicked grouping dimension value',
           type: 'string',
         },
       ],

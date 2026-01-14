@@ -25,7 +25,7 @@ export const meta = {
       properties: [
         {
           name: 'dimensionValue',
-          label: 'Clicked Dimension',
+          label: 'Clicked dimension',
           type: 'string',
         },
       ],

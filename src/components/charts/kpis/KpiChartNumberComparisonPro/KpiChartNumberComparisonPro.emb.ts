@@ -10,17 +10,16 @@ export const meta = {
   inputs: [
     inputs.dataset,
     inputs.measure,
-    { ...inputs.dimensionTime, name: 'timeProperty', label: 'Time Property' },
+    { ...inputs.dimensionTime, name: 'timeProperty', label: 'Time property' },
     {
       ...inputs.timeRange,
       name: 'primaryDateRange',
-      label: 'Primary Date Range',
+      label: 'Primary date-range',
       description: 'You can also connect this to a date range selector using its variable',
       category: 'Component Data',
     },
     {
       ...inputs.comparisonPeriod,
-      label: 'Comparison Period',
       description: 'You can also connect this to a comparison period selector using its variable',
       category: 'Component Data',
     },
@@ -29,21 +28,21 @@ export const meta = {
     {
       ...inputs.boolean,
       name: 'displayChangeAsPercentage',
-      label: 'Display Change as %',
+      label: 'Display change as %',
       defaultValue: false,
       category: 'Component Settings',
     },
     {
       ...inputs.number,
       name: 'percentageDecimalPlaces',
-      label: 'Percentage Decimal Places',
+      label: 'Percentage decimal places',
       defaultValue: 1,
       category: 'Component Settings',
     },
     {
       ...inputs.boolean,
       name: 'reversePositiveNegativeColors',
-      label: 'Reverse Positive/Negative Colors',
+      label: 'Reverse positive/negative colors',
       defaultValue: false,
       category: 'Component Settings',
     },
@@ -51,7 +50,7 @@ export const meta = {
     {
       ...inputs.fontSize,
       name: 'changeFontSize',
-      label: 'Trend Font Size',
+      label: 'Trend font-size',
     },
   ],
 } as const satisfies EmbeddedComponentMeta;

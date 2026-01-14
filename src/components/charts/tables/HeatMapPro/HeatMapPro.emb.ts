@@ -13,12 +13,12 @@ export const meta = {
     inputs.measure,
     {
       ...inputs.dimensionWithDateBounds,
-      label: 'Row Dimension',
+      label: 'Row dimension',
       name: 'rowDimension',
     },
     {
       ...inputs.dimensionWithDateBounds,
-      label: 'Column Dimension',
+      label: 'Column dimension',
       name: 'columnDimension',
     },
     inputs.title,

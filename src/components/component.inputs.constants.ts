@@ -15,7 +15,7 @@ const boolean = {
 const timeRange = {
   name: 'timeRange',
   type: 'timeRange',
-  label: 'Time Range',
+  label: 'Time range',
 } as const;
 
 const number = {
@@ -59,7 +59,7 @@ const dataset = {
 const maxLegendItems = {
   name: 'maxLegendItems',
   type: 'number',
-  label: 'Max Legend Items',
+  label: 'Max legend items',
   defaultValue: 10,
   category: 'Component Data',
 } as const;
@@ -79,7 +79,20 @@ const dimension = {
 const groupBy = {
   ...dimension,
   name: 'groupBy',
-  label: 'Group By',
+  label: 'Group by',
+} as const;
+
+const granularity = {
+  name: 'granularity',
+  type: 'granularity',
+  label: 'Granularity',
+} as const;
+
+const granularities = {
+  name: 'granularities',
+  type: 'granularity',
+  label: 'Granularities',
+  array: true,
 } as const;
 
 const dimensionSimple = {
@@ -97,7 +110,7 @@ const dimensionSimple = {
 const dimensionTime = {
   name: 'dimensionTime',
   type: 'dimension',
-  label: 'Dimension Time',
+  label: 'Dimension time',
   config: {
     dataset: 'dataset',
     supportedTypes: ['time'],
@@ -134,7 +147,7 @@ const dimensions = {
 const dimensionOrMeasure = {
   name: 'dimensionOrMeasure',
   type: 'dimensionOrMeasure',
-  label: 'Dimension or Measure',
+  label: 'Dimension or measure',
   config: {
     dataset: 'dataset',
   },
@@ -145,7 +158,7 @@ const dimensionOrMeasure = {
 const dimensionsAndMeasures = {
   name: 'dimensionsAndMeasures',
   type: 'dimensionOrMeasure',
-  label: 'Dimensions and Measures',
+  label: 'Dimensions and measures',
   array: true,
   required: true,
   config: {
@@ -183,7 +196,7 @@ const measures = {
 const comparisonPeriod = {
   name: 'comparisonPeriod',
   type: ComparisonPeriodType,
-  label: 'Comparison Period',
+  label: 'Comparison period',
   category: 'Component data',
 };
 
@@ -205,7 +218,7 @@ const placeholder = {
 const showLegend = {
   name: 'showLegend',
   type: 'boolean',
-  label: 'Show Legend',
+  label: 'Show legend',
   defaultValue: true,
   category: 'Component Settings',
 } as const;
@@ -213,7 +226,7 @@ const showLegend = {
 const showTooltips = {
   name: 'showTooltips',
   type: 'boolean',
-  label: 'Show Tooltips',
+  label: 'Show tooltips',
   defaultValue: true,
   category: 'Component Settings',
 } as const;
@@ -221,7 +234,7 @@ const showTooltips = {
 const showValueLabels = {
   name: 'showValueLabels',
   type: 'boolean',
-  label: 'Show Value Labels',
+  label: 'Show value labels',
   defaultValue: true,
   category: 'Component Settings',
 } as const;
@@ -229,7 +242,7 @@ const showValueLabels = {
 const showTotalLabels = {
   name: 'showTotalLabels',
   type: 'boolean',
-  label: 'Show Total Labels',
+  label: 'Show total labels',
   defaultValue: false,
   category: 'Component Settings',
 } as const;
@@ -237,7 +250,7 @@ const showTotalLabels = {
 const showLogarithmicScale = {
   name: 'showLogarithmicScale',
   type: 'boolean',
-  label: 'Show Logarithmic Scale',
+  label: 'Show logarithmic scale',
   defaultValue: false,
   category: 'Component Settings',
 } as const;
@@ -245,7 +258,7 @@ const showLogarithmicScale = {
 const displayPercentages = {
   name: 'displayPercentages',
   type: 'boolean',
-  label: 'Display Percentages',
+  label: 'Display percentages',
   defaultValue: false,
   category: 'Component Settings',
 } as const;
@@ -260,7 +273,7 @@ const color = {
 const fontSize = {
   type: 'number',
   name: 'fontSize',
-  label: 'Font Size',
+  label: 'Font size',
   category: 'Component Settings',
 } as const;
 
@@ -289,14 +302,14 @@ const xAxisLabel = {
 const yAxisLabel = {
   name: 'yAxisLabel',
   type: 'string',
-  label: 'Y-axis Label',
+  label: 'Y-axis label',
   category: 'Axes Settings',
 } as const;
 
 const reverseXAxis = {
   name: 'reverseXAxis',
   type: 'boolean',
-  label: 'Reverse X-axis',
+  label: 'Reverse x-axis',
   defaultValue: false,
   category: 'Axes Settings',
 } as const;
@@ -304,7 +317,7 @@ const reverseXAxis = {
 const reverseYAxis = {
   name: 'reverseYAxis',
   type: 'boolean',
-  label: 'Reverse Y-axis',
+  label: 'Reverse y-axis',
   defaultValue: false,
   category: 'Axes Settings',
 } as const;
@@ -312,42 +325,42 @@ const reverseYAxis = {
 const yAxisRangeMin = {
   name: 'yAxisRangeMin',
   type: 'number',
-  label: 'Y-axis Range Min',
+  label: 'Y-axis range min',
   category: 'Axes Settings',
 } as const;
 
 const yAxisRangeMax = {
   name: 'yAxisRangeMax',
   type: 'number',
-  label: 'Y-axis Range Max',
+  label: 'Y-axis range max',
   category: 'Axes Settings',
 } as const;
 
 const xAxisRangeMin = {
   name: 'xAxisRangeMin',
   type: 'number',
-  label: 'X-axis Range Min',
+  label: 'X-axis range min',
   category: 'Axes Settings',
 } as const;
 
 const xAxisRangeMax = {
   name: 'xAxisRangeMax',
   type: 'number',
-  label: 'X-axis Range Max',
+  label: 'X-axis range max',
   category: 'Axes Settings',
 } as const;
 
 const xAxisMaxItems = {
   name: 'xAxisMaxItems',
   type: 'number',
-  label: 'Max X-axis Items',
+  label: 'Max x-axis items',
   category: 'Axes Settings',
 } as const;
 
 const yAxisMaxItems = {
   name: 'yAxisMaxItems',
   type: 'number',
-  label: 'Max Y-axis Items',
+  label: 'Max y-axis items',
   category: 'Axes Settings',
 } as const;
 
@@ -393,4 +406,6 @@ export const inputs = {
   xAxisRangeMax,
   xAxisMaxItems,
   yAxisMaxItems,
+  granularity,
+  granularities,
 } as const;

@@ -1,7 +1,7 @@
 import { defineOption, defineType } from '@embeddable.com/core';
 
 const ComparisonPeriodType = defineType('comparisonPeriod', {
-  label: 'Comparison Period',
+  label: 'Comparison period',
   optionLabel: (value: string) => value,
 });
 

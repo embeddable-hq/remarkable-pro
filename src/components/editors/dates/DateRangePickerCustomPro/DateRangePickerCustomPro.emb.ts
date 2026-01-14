@@ -17,7 +17,7 @@ export const meta = {
     {
       ...inputs.timeRange,
       name: 'selectedValue',
-      label: 'Selected Value',
+      label: 'Selected value',
       category: 'Pre-configured variables',
     },
     {
@@ -31,11 +31,11 @@ export const meta = {
   events: [
     {
       name: 'onChange',
-      label: 'selected date-range updated',
+      label: 'Selected date-range updated',
       properties: [
         {
           name: 'value',
-          label: 'selected date-range',
+          label: 'Selected date-range',
           type: 'timeRange',
         },
       ],
