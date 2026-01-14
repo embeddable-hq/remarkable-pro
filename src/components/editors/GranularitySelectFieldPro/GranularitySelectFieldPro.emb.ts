@@ -2,6 +2,7 @@ import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/
 import { Value } from '@embeddable.com/core';
 import DateTimeSelectFieldPro from './index';
 import { inputs } from '../../component.inputs.constants';
+import { Granularity } from '../../../theme/defaults/defaults.GranularityOptions.constants';
 
 export const meta = {
   name: 'GranularitySelectFieldPro',
@@ -18,7 +19,14 @@ export const meta = {
       label: 'Available granularities',
       category: 'Pre-configured variables',
       // Ignore seconds and minutes
-      defaultValue: ['hour', 'day', 'week', 'month', 'quarter', 'year'],
+      defaultValue: [
+        Granularity.hour,
+        Granularity.day,
+        Granularity.week,
+        Granularity.month,
+        Granularity.quarter,
+        Granularity.year,
+      ],
     },
     {
       ...inputs.granularity,
