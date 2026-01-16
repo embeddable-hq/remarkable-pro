@@ -3,25 +3,19 @@
   width: 100%;
 }
 
-.fixedContent {
-  z-index: 3;
-  background: inherit;
-  position: absolute;
-  right: 0;
+.chartCardHeader {
+  width: calc(100% - var(--em-card-padding, 2rem));
 }
 
-.fixedContent.loading {
-  z-index: 4;
-  display: block;
-}
-
-.fixedContent.hidden {
+.hidden {
   display: none;
 }
 
 .chartCardRightContent {
-  width: 2rem;
-  height: 2rem;
-  position: relative;
-  align-self: flex-start;
+  position: absolute;
+  display: flex;
+  justify-content: end;
+  z-index: 2;
+  top: calc(var(--em-card-padding, 2rem));
+  right: calc(var(--em-card-padding, 2rem));
 }
