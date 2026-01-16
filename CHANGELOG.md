@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.21
+
+### Patch Changes
+
+- 6268be8: Improve GranularitySelectField
+
 ## 0.0.20
 
 ### Patch Changes
