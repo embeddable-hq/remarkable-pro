@@ -17,20 +17,33 @@ import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import clsx from 'clsx';
 import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
 
-type ChartCardProps = {
-  title: string;
+export type ChartCardHeaderProps = {
+  title?: string;
   subtitle?: string;
+  hideMenu?: boolean;
+};
+
+type ChartCardProps = {
   children: React.ReactNode;
   data: DataResponse;
   errorMessage?: string;
   style?: CSSProperties;
   dimensionsAndMeasures?: (Dimension | Measure)[];
   onCustomDownload?: (props: (props: ChartCardMenuOptionOnClickProps) => void) => void;
-};
+} & ChartCardHeaderProps;
 
 export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
   (
-    { title, subtitle, children, data, errorMessage, dimensionsAndMeasures = [], onCustomDownload },
+    {
+      title,
+      subtitle,
+      children,
+      data,
+      errorMessage,
+      dimensionsAndMeasures = [],
+      hideMenu = false,
+      onCustomDownload,
+    },
     ref,
   ) => {
     const theme: Theme = useTheme() as Theme;
@@ -72,19 +85,16 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
 
     return (
       <Card className={styles.chartCard}>
-        <CardHeader
-          title={title}
-          subtitle={subtitle}
-          rightContent={
+        {hideMenu ? null : (
+          <>
+            <div className={styles.chartCardHeader}>
+              <CardHeader title={title} subtitle={subtitle} />
+            </div>
             <div className={styles.chartCardRightContent}>
-              <div
-                className={clsx(styles.fixedContent, isLoading ? styles.loading : styles.hidden)}
-              >
+              <div className={clsx(!isLoading && styles.hidden)}>
                 <ChartCardLoading />
               </div>
-              <div
-                className={clsx(styles.fixedContent, isLoading ? styles.hidden : styles.visible)}
-              >
+              <div className={clsx(isLoading && styles.hidden)}>
                 <ChartCardMenuPro
                   title={title}
                   containerRef={chartRef}
@@ -94,8 +104,8 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
                 />
               </div>
             </div>
-          }
-        />
+          </>
+        )}
 
         <CardContent ref={onCustomDownload ? ref : chartRef}>{getDisplay()}</CardContent>
       </Card>
