@@ -1,8 +1,14 @@
 import { loadData } from '@embeddable.com/core';
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import HeatMapPro from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { getStyle } from '@embeddable.com/remarkable-ui';
+import { previewData } from '../../../preview.data.constants';
 
 export const meta = {
   name: 'HeatMapPro',
@@ -80,6 +86,14 @@ export const meta = {
     inputs.maxResults,
   ],
 } as const satisfies EmbeddedComponentMeta;
+
+export const preview = definePreview(HeatMapPro, {
+  rowDimension: previewData.dimension,
+  columnDimension: previewData.dimensionGroup,
+  measure: previewData.measure,
+  results: previewData.results1Measure2Dimensions,
+  hideMenu: true,
+});
 
 export default defineComponent(HeatMapPro, meta, {
   /* @ts-expect-error - to be fixed in @embeddable.com/react */

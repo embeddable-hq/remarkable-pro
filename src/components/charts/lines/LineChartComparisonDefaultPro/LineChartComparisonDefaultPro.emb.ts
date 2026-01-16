@@ -1,9 +1,15 @@
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import LineChartComparisonDefaultPro from './index';
 import { loadData, OrderBy, TimeRange, Value } from '@embeddable.com/core';
 import { LineChartProOptionsClickArg } from '../lines.utils';
 import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
+import { previewData } from '../../../preview.data.constants';
 
 export const meta = {
   name: 'LineChartComparisonDefaultPro',
@@ -104,6 +110,24 @@ export const meta = {
     },
   ],
 } as const satisfies EmbeddedComponentMeta;
+
+export const preview = definePreview(LineChartComparisonDefaultPro, {
+  xAxis: previewData.dimension,
+  measures: [
+    {
+      ...previewData.measure,
+      inputs: {
+        previousLineDashed: true,
+      },
+    },
+  ],
+  results: previewData.results1Measure2Dimensions,
+  resultsComparison: previewData.results1Measure2DimensionsVariant,
+  comparisonPeriod: 'Previous period',
+  comparisonDateRange: { relativeTimeString: 'Previous period', from: undefined, to: undefined },
+  primaryDateRange: { relativeTimeString: 'This week', from: undefined, to: undefined },
+  hideMenu: true,
+});
 
 type LineChartComparisonDefaultProState = {
   comparisonDateRange: TimeRange;

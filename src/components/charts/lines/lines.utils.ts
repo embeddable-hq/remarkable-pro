@@ -11,9 +11,12 @@ type LineDataset = ChartDataset<'line'> & {
 };
 
 export const getLineChartProOptions = (props: {
-  onLineClicked: LineChartProOptionsClick;
+  onLineClicked?: LineChartProOptionsClick;
 }): ChartOptions<'line'> => {
   const { onLineClicked } = props;
+
+  if (!onLineClicked) return {};
+
   return {
     onClick: (event, _elements, chart) => {
       const native = (event as unknown as { native?: Event }).native ?? (event as unknown as Event);

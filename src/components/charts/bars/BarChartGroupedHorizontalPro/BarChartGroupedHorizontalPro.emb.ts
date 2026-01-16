@@ -1,7 +1,13 @@
 import { Value, loadData } from '@embeddable.com/core';
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import BarChartGroupedHorizontalPro from './index';
 import { inputs } from '../../../component.inputs.constants';
+import { previewData } from '../../../preview.data.constants';
 
 export const meta = {
   name: 'BarChartGroupedHorizontalPro',
@@ -44,6 +50,14 @@ export const meta = {
     },
   ],
 } as const satisfies EmbeddedComponentMeta;
+
+export const preview = definePreview(BarChartGroupedHorizontalPro, {
+  yAxis: previewData.dimension,
+  groupBy: previewData.dimensionGroup,
+  measure: previewData.measure,
+  results: previewData.results1Measure2Dimensions,
+  hideMenu: true,
+});
 
 export default defineComponent(BarChartGroupedHorizontalPro, meta, {
   props: (inputs: Inputs<typeof meta>) => {

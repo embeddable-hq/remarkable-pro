@@ -27,17 +27,17 @@ import {
   getTimeRangeFromPresets,
   getTimeRangeLabel,
 } from '../dates.utils';
+import { ChartCardHeaderProps } from '../../../charts/shared/ChartCard/ChartCard';
 
 type DateRangePickerPresetsProps = {
-  description?: string;
   onChange: (newDateRange: TimeRange) => void;
   placeholder?: string;
-  selectedValue: TimeRange;
-  title?: string;
+  selectedValue?: TimeRange;
+
   clearable?: boolean;
   showCustomRangeOptions?: boolean;
   showTwoMonths?: boolean;
-};
+} & ChartCardHeaderProps;
 
 const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const theme: Theme = useTheme() as Theme;

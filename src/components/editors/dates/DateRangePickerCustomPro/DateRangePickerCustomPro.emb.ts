@@ -1,4 +1,9 @@
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import { Value } from '@embeddable.com/core';
 import DateTimeSelectFieldPro from './index';
 import { inputs } from '../../../component.inputs.constants';
@@ -51,6 +56,10 @@ export const meta = {
     },
   ],
 } as const satisfies EmbeddedComponentMeta;
+
+export const preview = definePreview(DateTimeSelectFieldPro, {
+  onChange: () => null,
+});
 
 export default defineComponent(DateTimeSelectFieldPro, meta, {
   props: (inputs: Inputs<typeof meta>) => {

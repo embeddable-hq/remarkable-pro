@@ -6,21 +6,20 @@ import { EditorCard } from '../shared/EditorCard/EditorCard';
 import { resolveI18nProps } from '../../component.utils';
 import { i18n } from '../../../theme/i18n/i18n';
 import { MultiSelectField } from '@embeddable.com/remarkable-ui';
+import { ChartCardHeaderProps } from '../../charts/shared/ChartCard/ChartCard';
 
 export const MAX_OPTIONS = 200;
 
 type MultiSelectFieldProProps = {
-  title?: string;
-  description?: string;
   dimension: Dimension;
   optionalSecondDimension?: Dimension;
   placeholder?: string;
   results: DataResponse;
-  selectedValues: string[];
+  selectedValues?: string[];
   maxOptions?: number;
-  setSearchValue: (search: string) => void;
+  setSearchValue?: (search: string) => void;
   onChange?: (newValues: string[]) => void;
-};
+} & ChartCardHeaderProps;
 
 const MultiSelectFieldPro = (props: MultiSelectFieldProProps) => {
   const theme: Theme = useTheme() as Theme;

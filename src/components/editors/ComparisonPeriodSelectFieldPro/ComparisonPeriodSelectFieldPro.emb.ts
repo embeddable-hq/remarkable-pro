@@ -1,4 +1,9 @@
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import { Value } from '@embeddable.com/core';
 import ComparisonPeriodSelectFieldPro from './index';
 import ComparisonPeriodType from '../../types/ComparisonPeriod.type.emb';
@@ -50,6 +55,10 @@ export const meta = {
     },
   ],
 } as const satisfies EmbeddedComponentMeta;
+
+export const preview = definePreview(ComparisonPeriodSelectFieldPro, {
+  onChange: () => null,
+});
 
 export default defineComponent(ComparisonPeriodSelectFieldPro, meta, {
   props: (inputs: Inputs<typeof meta>) => inputs,

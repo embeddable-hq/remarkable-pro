@@ -1,7 +1,13 @@
-import DonutChartPro from './index';
+import DonutLabelChartPro from './index';
 import { Value, loadData } from '@embeddable.com/core';
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import { inputs } from '../../../component.inputs.constants';
+import { previewData } from '../../../preview.data.constants';
 
 export const meta = {
   name: 'DonutLabelChartPro',
@@ -41,7 +47,27 @@ export const meta = {
   ],
 } as const satisfies EmbeddedComponentMeta;
 
-export default defineComponent(DonutChartPro, meta, {
+export const preview = definePreview(DonutLabelChartPro, {
+  dimension: previewData.dimension,
+  measure: previewData.measure,
+  results: previewData.results1Measure1Dimension,
+  innerLabelText: 'Total',
+  resultsInnerLabel: {
+    isLoading: false,
+    error: undefined,
+    data: [{ users: 500 }],
+  },
+  innerLabelMeasure: {
+    name: 'users',
+    title: 'Users',
+    nativeType: 'number',
+    __type__: 'measure',
+  },
+  showValueLabels: false,
+  hideMenu: true,
+});
+
+export default defineComponent(DonutLabelChartPro, meta, {
   props: (inputs: Inputs<typeof meta>) => {
     return {
       ...inputs,

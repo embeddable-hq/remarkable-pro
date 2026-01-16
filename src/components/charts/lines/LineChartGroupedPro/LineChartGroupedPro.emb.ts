@@ -1,8 +1,14 @@
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import LineChartGroupedPro from './index';
 import { loadData, Value } from '@embeddable.com/core';
 import { LineChartProOptionsClickArg } from '../lines.utils';
 import { inputs } from '../../../component.inputs.constants';
+import { previewData } from '../../../preview.data.constants';
 
 export const meta = {
   name: 'LineChartGroupedPro',
@@ -63,6 +69,14 @@ export const meta = {
     },
   ],
 } as const satisfies EmbeddedComponentMeta;
+
+export const preview = definePreview(LineChartGroupedPro, {
+  xAxis: previewData.dimension,
+  groupBy: previewData.dimensionGroup,
+  measure: previewData.measure,
+  results: previewData.results1Measure2Dimensions,
+  hideMenu: true,
+});
 
 export default defineComponent(LineChartGroupedPro, meta, {
   props: (inputs: Inputs<typeof meta>) => {

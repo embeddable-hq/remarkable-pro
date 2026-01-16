@@ -82,7 +82,7 @@ export const getLineChartProOptions = (
     dimension: Dimension;
     measures: Measure[];
     data: ChartData<'line'>;
-    onLineClicked: LineChartProOptionsClick;
+    onLineClicked?: LineChartProOptionsClick;
   },
   theme: Theme,
 ): ChartOptions<'line'> => {
@@ -135,6 +135,8 @@ export const getLineChartProOptions = (
       },
     },
     onClick: (_event, elements, chart) => {
+      if (!onLineClicked) return;
+
       const element = elements[0];
       const dimensionValue = (element ? chart.data.labels![element.index] : null) as string | null;
 

@@ -27,6 +27,8 @@ const PieChartPro = (props: PieChartProProps) => {
     onSegmentClick,
   } = resolveI18nProps(props);
 
+  const { hideMenu } = props;
+
   const data = getPieChartProData(
     { data: results.data, dimension, measure, maxLegendItems },
     theme,
@@ -38,6 +40,8 @@ const PieChartPro = (props: PieChartProProps) => {
   );
 
   const handleSegmentClick = (index: number | undefined) => {
+    if (!onSegmentClick) return;
+
     onSegmentClick({
       dimensionValue: index === undefined ? undefined : results.data?.[index]?.[dimension.name],
     });
@@ -48,8 +52,9 @@ const PieChartPro = (props: PieChartProProps) => {
       data={results}
       dimensionsAndMeasures={[dimension, measure]}
       errorMessage={results.error}
-      subtitle={description}
+      description={description}
       title={title}
+      hideMenu={hideMenu}
     >
       <PieChart
         data={data}

@@ -11,17 +11,17 @@ import {
   getGranularitySelectFieldOptions,
   getSafeSelection,
 } from './GranularitySelectFieldPro.utils';
+import { TGranularityValue } from '../../../theme/defaults/defaults.GranularityOptions.constants';
+import { ChartCardHeaderProps } from '../../charts/shared/ChartCard/ChartCard';
 
 type GranularitySelectFieldProProps = {
-  description?: string;
   onChange: (newGranularity: string) => void;
   placeholder?: string;
-  primaryTimeRange: TimeRange;
-  title?: string;
-  granularity?: string;
-  granularities?: string[];
+  primaryTimeRange?: TimeRange;
+  granularity?: TGranularityValue;
+  granularities?: TGranularityValue[];
   clearable?: boolean;
-};
+} & ChartCardHeaderProps;
 
 const GranularitySelectFieldPro = (props: GranularitySelectFieldProProps) => {
   const theme: Theme = useTheme() as Theme;
@@ -35,7 +35,9 @@ const GranularitySelectFieldPro = (props: GranularitySelectFieldProProps) => {
   const availableOptions = useMemo(() => {
     return getAvailableGranularityOptionsFromTimeRange(
       primaryTimeRange,
-      granularitySelectFieldOptions.filter((opt) => granularities?.includes(opt.value as string)),
+      granularitySelectFieldOptions.filter((opt) =>
+        granularities?.includes(opt.value as TGranularityValue),
+      ),
     );
   }, [primaryTimeRange, granularities]);
 

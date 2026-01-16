@@ -19,7 +19,7 @@ import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defa
 
 export type ChartCardHeaderProps = {
   title?: string;
-  subtitle?: string;
+  description?: string;
   hideMenu?: boolean;
 };
 
@@ -36,7 +36,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
   (
     {
       title,
-      subtitle,
+      description,
       children,
       data,
       errorMessage,
@@ -88,7 +88,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
         {hideMenu ? null : (
           <>
             <div className={styles.chartCardHeader}>
-              <CardHeader title={title} subtitle={subtitle} />
+              <CardHeader title={title} subtitle={description} />
             </div>
             <div className={styles.chartCardRightContent}>
               <div className={clsx(!isLoading && styles.hidden)}>

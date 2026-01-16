@@ -3,7 +3,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { DataResponse, Measure, TimeRange } from '@embeddable.com/core';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { KpiChart } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { useEffect } from 'react';
@@ -13,21 +13,21 @@ import {
 } from '../../../utils/timeRange.utils';
 
 type KpiChartNumberComparisonProProp = {
-  changeFontSize: number;
+  changeFontSize?: number;
   comparisonPeriod?: string;
-  description: string;
+
   displayChangeAsPercentage?: boolean;
-  fontSize: number;
+  fontSize?: number;
   measure: Measure;
   primaryDateRange: TimeRange;
   results: DataResponse;
   resultsComparison: DataResponse | undefined;
   reversePositiveNegativeColors?: boolean;
-  title: string;
-  percentageDecimalPlaces: number;
+
+  percentageDecimalPlaces?: number;
   comparisonDateRange: TimeRange;
-  setComparisonDateRange: (dateRange: TimeRange) => void;
-};
+  setComparisonDateRange?: (dateRange: TimeRange) => void;
+} & ChartCardHeaderProps;
 
 const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => {
   const theme: Theme = useTheme() as Theme;
@@ -35,6 +35,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
 
   const { title, description } = resolveI18nProps(props);
   const {
+    hideMenu,
     changeFontSize,
     comparisonPeriod,
     comparisonDateRange,
@@ -50,6 +51,8 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
   } = props;
 
   useEffect(() => {
+    if (!setComparisonDateRange) return;
+
     const newComparisonDateRange = getComparisonPeriodDateRange(
       primaryDateRange,
       comparisonPeriod,
@@ -96,8 +99,9 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
         measure,
       ]}
       errorMessage={results.error}
-      subtitle={description}
+      description={description}
       title={title}
+      hideMenu={hideMenu}
     >
       <KpiChart
         value={value}

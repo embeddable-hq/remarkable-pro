@@ -79,6 +79,8 @@ export const getAvailableGranularityOptionsFromTimeRange = (
   timeRange: TimeRange,
   allOptions: SelectListOptionProps[],
 ): SelectListOptionProps[] => {
+  if (!timeRange) return allOptions;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const from = toDate((timeRange as any)?.from);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,7 +1,7 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, DimensionOrMeasure, OrderDirection } from '@embeddable.com/core';
 import {
@@ -36,18 +36,17 @@ export type TableChartPaginatedProState = {
 type TableChartPaginatedProProps = {
   allResults?: DataResponse;
   clickDimension?: Dimension;
-  description: string;
+
   dimensionsAndMeasures: DimensionOrMeasure[];
   displayNullAs?: string;
-  embeddableState: TableChartPaginatedProState;
   results: DataResponse;
-  showIndex: boolean;
-  state: TableChartPaginatedProState;
-  title: string;
+  showIndex?: boolean;
+  state?: TableChartPaginatedProState;
+
   totalResults?: DataResponse;
-  onRowClicked: (rowDimensionValue: TableChartPaginatedProOnRowClickArg) => void;
-  setState: React.Dispatch<React.SetStateAction<TableChartPaginatedProState>>;
-};
+  onRowClicked?: (rowDimensionValue: TableChartPaginatedProOnRowClickArg) => void;
+  setState?: React.Dispatch<React.SetStateAction<TableChartPaginatedProState>>;
+} & ChartCardHeaderProps;
 
 const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
   const theme = useTheme() as Theme;
@@ -57,6 +56,7 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
 
   const { description, title } = resolveI18nProps(props);
   const {
+    hideMenu,
     totalResults,
     results,
     allResults,
@@ -84,7 +84,7 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
   // Stable updater for embeddable state
   const handleUpdateEmbeddableState = useCallback(
     (newState: Partial<TableChartPaginatedProState>) => {
-      setState((prevState) => ({
+      setState?.((prevState) => ({
         ...prevState,
         ...newState,
       }));
@@ -107,7 +107,7 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
   };
 
   const handleRowIndexClick = (rowIndex: number) => {
-    if (!clickDimension) return;
+    if (!onRowClicked || !clickDimension) return;
 
     const rowDimensionValue = rows[rowIndex]?.[clickDimension.name];
     onRowClicked(rowDimensionValue);
@@ -122,7 +122,7 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
 
   // Sync total from results
   useEffect(() => {
-    setState((prevState) => ({
+    setState?.((prevState) => ({
       ...prevState,
       hasTotalResults: false,
     }));
@@ -130,7 +130,7 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
 
   useEffect(() => {
     if (totalResults?.total) {
-      setState((prevState) => ({
+      setState?.((prevState) => ({
         ...prevState,
         hasTotalResults: true,
       }));
@@ -155,29 +155,31 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
     handleUpdateEmbeddableState({ sort: newSort as TableChartPaginatedProState['sort'] });
   };
 
+  const currentPage = state?.page ?? 0;
   return (
     <ChartCard
       ref={cardContentRef}
       title={title}
-      subtitle={description}
+      description={description}
       data={results}
       dimensionsAndMeasures={dimensionsAndMeasures}
       errorMessage={results?.error}
       onCustomDownload={handleCustomDownload}
+      hideMenu={hideMenu}
     >
       <TablePaginated
         onRowIndexClick={handleRowIndexClick}
         headers={headers}
         rows={tableRows}
         showIndex={showIndex}
-        page={state.page}
+        page={currentPage}
         pageSize={pageSize}
         paginationLabel={i18n.t('charts.tablePaginated.pagination', {
-          page: state.page + 1,
+          page: currentPage + 1,
           totalPages: getTableTotalPages(totalResults?.total, pageSize) ?? '?',
         })}
         total={totalResults?.total}
-        sort={state.sort}
+        sort={state?.sort}
         onSortChange={handleSortChange}
         onPageChange={(newPage) => handleUpdateEmbeddableState({ page: newPage })}
       />

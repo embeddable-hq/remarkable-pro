@@ -3,7 +3,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { DataResponse, Dimension, Measure, TimeRange } from '@embeddable.com/core';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { useEffect } from 'react';
 import { getComparisonPeriodDateRange } from '../../../utils/timeRange.utils';
 import {
@@ -15,28 +15,26 @@ import { LineChartProOptionsClick } from '../lines.utils';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 
 type LineChartComparisonDefaultProProps = {
-  description: string;
   xAxis: Dimension;
   measures: Measure[];
   results: DataResponse;
   resultsComparison: DataResponse | undefined;
-  reverseXAxis: boolean;
-  showLegend: boolean;
-  showLogarithmicScale: boolean;
-  showTooltips: boolean;
-  showValueLabels: boolean;
-  title: string;
-  xAxisLabel: string;
-  yAxisLabel: string;
+  reverseXAxis?: boolean;
+  showLegend?: boolean;
+  showLogarithmicScale?: boolean;
+  showTooltips?: boolean;
+  showValueLabels?: boolean;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
   comparisonPeriod?: string;
   comparisonDateRange: TimeRange;
-  showComparisonAxis: boolean;
+  showComparisonAxis?: boolean;
   primaryDateRange: TimeRange;
-  setComparisonDateRange: (dateRange: TimeRange) => void;
-  onLineClicked: LineChartProOptionsClick;
-};
+  setComparisonDateRange?: (dateRange: TimeRange) => void;
+  onLineClicked?: LineChartProOptionsClick;
+} & ChartCardHeaderProps;
 
 const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps) => {
   const theme: Theme = useTheme() as Theme;
@@ -44,6 +42,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
 
   const { title, description, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
   const {
+    hideMenu,
     comparisonPeriod,
     measures,
     xAxis,
@@ -67,7 +66,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
       comparisonPeriod,
       theme,
     );
-    setComparisonDateRange(newComparisonDateRange);
+    setComparisonDateRange?.(newComparisonDateRange);
   }, [comparisonPeriod, JSON.stringify(primaryDateRange), theme]);
 
   const results = useFillGaps({
@@ -120,8 +119,9 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
       data={resultsCombined}
       dimensionsAndMeasures={[...measures, xAxis]}
       errorMessage={results.error || resultsComparison?.error}
-      subtitle={description}
+      description={description}
       title={title}
+      hideMenu={hideMenu}
     >
       <LineChart
         data={data}

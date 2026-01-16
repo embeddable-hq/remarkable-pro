@@ -1,7 +1,7 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarChartProOptions, getBarStackedChartProData } from '../bars.utils';
@@ -10,27 +10,25 @@ import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 
 type BarChartHorizontalStackedProProps = {
-  description: string;
   groupBy: Dimension;
   measure: Measure;
   results: DataResponse;
-  reverseYAxis: boolean;
-  showLegend: boolean;
-  showLogarithmicScale: boolean;
-  showTooltips: boolean;
+  reverseYAxis?: boolean;
+  showLegend?: boolean;
+  showLogarithmicScale?: boolean;
+  showTooltips?: boolean;
   showTotalLabels?: boolean;
-  showValueLabels: boolean;
-  title: string;
+  showValueLabels?: boolean;
   yAxis: Dimension;
-  xAxisLabel: string;
-  yAxisLabel: string;
+  xAxisLabel?: string;
+  yAxisLabel?: string;
   xAxisRangeMax?: number;
   xAxisRangeMin?: number;
-  onBarClicked: (args: {
+  onBarClicked?: (args: {
     axisDimensionValue: string | null;
     groupingDimensionValue: string | null;
   }) => void;
-};
+} & ChartCardHeaderProps;
 
 const BarChartHorizontalStackedPro = (props: BarChartHorizontalStackedProProps) => {
   const theme = useTheme() as Theme;
@@ -54,6 +52,8 @@ const BarChartHorizontalStackedPro = (props: BarChartHorizontalStackedProProps) 
     xAxisRangeMin,
     onBarClicked,
   } = resolveI18nProps(props);
+
+  const { hideMenu } = props;
 
   const results = useFillGaps({
     results: props.results,
@@ -83,8 +83,9 @@ const BarChartHorizontalStackedPro = (props: BarChartHorizontalStackedProProps) 
       data={results}
       dimensionsAndMeasures={[measure, yAxis, groupBy]}
       errorMessage={results.error}
-      subtitle={description}
+      description={description}
       title={title}
+      hideMenu={hideMenu}
     >
       <BarChart
         data={data}

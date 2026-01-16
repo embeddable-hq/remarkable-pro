@@ -3,7 +3,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import {
   getLineChartGroupedProData,
   getLineChartGroupedProOptions,
@@ -18,23 +18,22 @@ export type LineChartGroupedProPropsOnLineClicked = {
 };
 
 type LineChartGroupedProProp = {
-  description: string;
   xAxis: Dimension;
   groupBy: Dimension;
   measure: Measure;
   results: DataResponse;
-  reverseXAxis: boolean;
-  showLegend: boolean;
-  showLogarithmicScale: boolean;
-  showTooltips: boolean;
-  showValueLabels: boolean;
-  title: string;
-  xAxisLabel: string;
-  yAxisLabel: string;
+  reverseXAxis?: boolean;
+  showLegend?: boolean;
+  showLogarithmicScale?: boolean;
+  showTooltips?: boolean;
+  showValueLabels?: boolean;
+
+  xAxisLabel?: string;
+  yAxisLabel?: string;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
-  onLineClicked: LineChartProOptionsClick;
-};
+  onLineClicked?: LineChartProOptionsClick;
+} & ChartCardHeaderProps;
 
 const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
   const theme: Theme = useTheme() as Theme;
@@ -42,6 +41,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
 
   const { title, description, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
   const {
+    hideMenu,
     measure,
     xAxis,
     groupBy,
@@ -81,8 +81,9 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
       data={results}
       dimensionsAndMeasures={[measure, xAxis, groupBy]}
       errorMessage={results.error}
-      subtitle={description}
+      description={description}
       title={title}
+      hideMenu={hideMenu}
     >
       <LineChart
         data={data}

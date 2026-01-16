@@ -1,5 +1,10 @@
 import { loadData, OrderBy, Value } from '@embeddable.com/core';
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import TablePaginatedChart, {
   TableChartPaginatedProOnRowClickArg,
   TableChartPaginatedProState,
@@ -7,6 +12,7 @@ import TablePaginatedChart, {
 import { mergician } from 'mergician';
 import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
+import { previewData } from '../../../preview.data.constants';
 
 export const meta = {
   name: 'TableChartPaginated',
@@ -59,12 +65,30 @@ export const meta = {
   ],
 } as const satisfies EmbeddedComponentMeta;
 
+const previewMaxResults = 3;
+export const preview = definePreview(TablePaginatedChart, {
+  dimensionsAndMeasures: [previewData.dimension, previewData.dimensionGroup, previewData.measure],
+  results: {
+    ...previewData.results1Measure2Dimensions,
+    data: previewData.results1Measure2Dimensions.data?.slice(0, previewMaxResults),
+  },
+  totalResults: { data: [], total: previewMaxResults, isLoading: false },
+  state: {
+    page: 0,
+    pageSize: previewMaxResults,
+    isLoadingDownloadData: false,
+    hasTotalResults: true,
+    hideMenu: true,
+  },
+  hideMenu: true,
+});
+
 const defaultState: TableChartPaginatedProState = {
   page: 0,
   pageSize: undefined,
   sort: undefined,
   isLoadingDownloadData: false,
-  hasTotalResults: false,
+  hasTotalResults: true,
 };
 
 export default defineComponent(TablePaginatedChart, meta, {

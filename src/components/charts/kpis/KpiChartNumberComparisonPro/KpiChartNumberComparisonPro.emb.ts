@@ -1,7 +1,13 @@
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import KpiChartNumberComparisonPro from './index';
 import { loadData, TimeRange } from '@embeddable.com/core';
 import { inputs } from '../../../component.inputs.constants';
+import { previewData } from '../../../preview.data.constants';
 
 export const meta = {
   name: 'KpiChartNumberComparisonPro',
@@ -54,6 +60,17 @@ export const meta = {
     },
   ],
 } as const satisfies EmbeddedComponentMeta;
+
+export const preview = definePreview(KpiChartNumberComparisonPro, {
+  measure: { ...previewData.measure },
+  results: previewData.results1Measure,
+  resultsComparison: previewData.results1MeasureVariant,
+  primaryDateRange: undefined,
+  comparisonPeriod: 'Previous period',
+  comparisonDateRange: { relativeTimeString: 'Today', from: undefined, to: undefined },
+  fontSize: 100,
+  hideMenu: true,
+});
 
 type KpiChartNumberComparisonProState = {
   comparisonDateRange: TimeRange;

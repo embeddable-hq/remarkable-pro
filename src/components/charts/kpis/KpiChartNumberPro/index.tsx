@@ -3,23 +3,22 @@ import { Theme } from '../../../../theme/theme.types';
 import { DataResponse, Measure } from '@embeddable.com/core';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { KpiChart } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 
 type KpiChartNumberProProp = {
-  title: string;
-  description: string;
   results: DataResponse;
   measure: Measure;
-  fontSize: number;
-};
+  fontSize?: number;
+} & ChartCardHeaderProps;
 
 const KpiChartNumberPro = (props: KpiChartNumberProProp) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
   const { title, description, results, measure, fontSize } = resolveI18nProps(props);
+  const { hideMenu } = props;
 
   const value = results.data?.[0]?.[measure.name];
 
@@ -31,8 +30,9 @@ const KpiChartNumberPro = (props: KpiChartNumberProProp) => {
       data={results}
       dimensionsAndMeasures={[measure]}
       errorMessage={results.error}
-      subtitle={description}
+      description={description}
       title={title}
+      hideMenu={hideMenu}
     >
       <KpiChart value={value} valueFormatter={valueFormatter} valueFontSize={fontSize} />
     </ChartCard>
