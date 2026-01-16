@@ -18,5 +18,4 @@
   z-index: 2;
   top: calc(var(--em-card-padding, 2rem));
   right: calc(var(--em-card-padding, 2rem));
-  /* padding: var(--em-card-loader-padding, 0.25rem); */
 }
