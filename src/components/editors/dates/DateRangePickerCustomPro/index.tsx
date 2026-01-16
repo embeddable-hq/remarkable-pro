@@ -11,16 +11,16 @@ import {
   getTimeRangeFromDateRange,
   getTimeRangeLabel,
 } from '../dates.utils';
+import { IconCalendarFilled } from '@tabler/icons-react';
+import { ChartCardHeaderProps } from '../../../charts/shared/ChartCard/ChartCard';
 
 type DateRangePickerPresetsProps = {
-  description?: string;
   onChange: (newDateRange: TimeRange) => void;
   placeholder?: string;
-  selectedValue: TimeRange;
-  title?: string;
+  selectedValue?: TimeRange;
   clearable?: boolean;
   showTwoMonths?: boolean;
-};
+} & ChartCardHeaderProps;
 
 const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const theme: Theme = useTheme() as Theme;
@@ -49,6 +49,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   return (
     <EditorCard title={title} subtitle={description}>
       <DateRangePickerField
+        startIcon={IconCalendarFilled}
         locale={locale}
         clearable={clearable}
         placeholder={placeholder}

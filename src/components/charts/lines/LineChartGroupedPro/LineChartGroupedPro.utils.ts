@@ -72,7 +72,7 @@ export const getLineChartGroupedProOptions = (
     dimension: Dimension;
     measure: Measure;
     data: ChartData<'line'>;
-    onLineClicked: LineChartProOptionsClick;
+    onLineClicked?: LineChartProOptionsClick;
   },
   theme: Theme,
 ): ChartOptions<'line'> => {

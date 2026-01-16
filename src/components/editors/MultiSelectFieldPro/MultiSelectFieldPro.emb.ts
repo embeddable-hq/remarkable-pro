@@ -1,7 +1,13 @@
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import { Value, loadData } from '@embeddable.com/core';
 import MultiSelectFieldPro, { MAX_OPTIONS } from '.';
 import { inputs } from '../../component.inputs.constants';
+import { previewData } from '../../preview.data.constants';
 
 export const meta = {
   name: 'MultiSelectFieldPro',
@@ -67,6 +73,12 @@ export const meta = {
 type MultiSelectDropdownState = {
   searchValue?: string;
 };
+
+export const preview = definePreview(MultiSelectFieldPro, {
+  dimension: previewData.dimension,
+  results: previewData.results1Measure1Dimension,
+  onChange: () => null,
+});
 
 export default defineComponent(MultiSelectFieldPro, meta, {
   props: (

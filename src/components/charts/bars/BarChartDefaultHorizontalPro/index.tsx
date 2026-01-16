@@ -1,7 +1,7 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarChartProData, getBarChartProOptions } from '../bars.utils';
@@ -10,29 +10,28 @@ import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 
 type BarChartDefaultHorizontalProProps = {
-  description: string;
   dimension: Dimension;
   measures: Measure[];
   results: DataResponse;
-  reverseYAxis: boolean;
-  showLegend: boolean;
-  showLogarithmicScale: boolean;
-  showTooltips: boolean;
-  showValueLabels: boolean;
-  title: string;
-  xAxisLabel: string;
+  reverseYAxis?: boolean;
+  showLegend?: boolean;
+  showLogarithmicScale?: boolean;
+  showTooltips?: boolean;
+  showValueLabels?: boolean;
+  xAxisLabel?: string;
   xAxisRangeMax?: number;
   xAxisRangeMin?: number;
-  yAxisLabel: string;
-  yAxisMaxItems: number;
-  onBarClicked: (args: { axisDimensionValue: string | null }) => void;
-};
+  yAxisLabel?: string;
+  yAxisMaxItems?: number;
+  onBarClicked?: (args: { axisDimensionValue: string | null }) => void;
+} & ChartCardHeaderProps;
 
 const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
   const {
+    hideMenu,
     description,
     dimension,
     measures,
@@ -70,8 +69,9 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
       data={results}
       dimensionsAndMeasures={[dimension, ...measures]}
       errorMessage={results.error}
-      subtitle={description}
+      description={description}
       title={title}
+      hideMenu={hideMenu}
     >
       <BarChart
         horizontal

@@ -1,8 +1,13 @@
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import { Value } from '@embeddable.com/core';
-import DateTimeSelectFieldPro from './index';
 import { inputs } from '../../component.inputs.constants';
 import { Granularity } from '../../../theme/defaults/defaults.GranularityOptions.constants';
+import GranularitySelectFieldPro from './index';
 
 export const meta = {
   name: 'GranularitySelectFieldPro',
@@ -67,7 +72,21 @@ export const meta = {
   ],
 } as const satisfies EmbeddedComponentMeta;
 
-export default defineComponent(DateTimeSelectFieldPro, meta, {
+export const preview = definePreview(GranularitySelectFieldPro, {
+  granularities: [
+    Granularity.second,
+    Granularity.minute,
+    Granularity.hour,
+    Granularity.day,
+    Granularity.week,
+    Granularity.month,
+    Granularity.quarter,
+    Granularity.year,
+  ],
+  onChange: () => null,
+});
+
+export default defineComponent(GranularitySelectFieldPro, meta, {
   props: (inputs: Inputs<typeof meta>) => {
     return {
       ...inputs,

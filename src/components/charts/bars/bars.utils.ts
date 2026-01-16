@@ -129,7 +129,7 @@ const getBarChartProDatalabelTotalFormatter = (
 
 export const getBarChartProOptions = (
   options: {
-    onBarClicked: (args: {
+    onBarClicked?: (args: {
       axisDimensionValue: string | null;
       groupingDimensionValue: string | null;
     }) => void;
@@ -206,6 +206,8 @@ export const getBarChartProOptions = (
       },
     },
     onClick: (_event, elements, chart) => {
+      if (!onBarClicked) return;
+
       const element = elements[0];
       const axisDimensionValue = (element ? chart.data.labels![element.index] : null) as
         | string

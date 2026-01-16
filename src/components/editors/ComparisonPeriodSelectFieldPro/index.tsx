@@ -13,15 +13,14 @@ import {
 } from './ComparisonPeriodSelectFieldPro.utils';
 import { useEffect, useMemo } from 'react';
 import { getTimeRangeFromPresets } from '../dates/dates.utils';
+import { ChartCardHeaderProps } from '../../charts/shared/ChartCard/ChartCard';
 
 type DateComparisonSelectFieldPro = {
-  title?: string;
-  description?: string;
   placeholder?: string;
   primaryDateRange?: TimeRange;
   comparisonPeriod?: string;
   onChange: (newComparisonPeriod?: string) => void;
-};
+} & ChartCardHeaderProps;
 
 const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
   const theme: Theme = useTheme() as Theme;

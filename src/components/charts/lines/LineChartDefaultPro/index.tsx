@@ -3,7 +3,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { getLineChartProData, getLineChartProOptions } from './LineChartDefaultPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartProOptionsClick } from '../lines.utils';
@@ -12,22 +12,21 @@ import { LineChart } from '@embeddable.com/remarkable-ui';
 export type LineChartProPropsOnLineClicked = { axisDimensionValue: string | null };
 
 type LineChartProProp = {
-  description: string;
   xAxis: Dimension;
   measures: Measure[];
   results: DataResponse;
-  reverseXAxis: boolean;
-  showLegend: boolean;
-  showLogarithmicScale: boolean;
-  showTooltips: boolean;
-  showValueLabels: boolean;
-  title: string;
-  xAxisLabel: string;
-  yAxisLabel: string;
+  reverseXAxis?: boolean;
+  showLegend?: boolean;
+  showLogarithmicScale?: boolean;
+  showTooltips?: boolean;
+  showValueLabels?: boolean;
+
+  xAxisLabel?: string;
+  yAxisLabel?: string;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
-  onLineClicked: LineChartProOptionsClick;
-};
+  onLineClicked?: LineChartProOptionsClick;
+} & ChartCardHeaderProps;
 
 const LineChartPro = (props: LineChartProProp) => {
   const theme: Theme = useTheme() as Theme;
@@ -35,6 +34,7 @@ const LineChartPro = (props: LineChartProProp) => {
 
   const { title, description, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
   const {
+    hideMenu,
     measures,
     xAxis,
     reverseXAxis,
@@ -71,8 +71,9 @@ const LineChartPro = (props: LineChartProProp) => {
       data={results}
       dimensionsAndMeasures={[...measures, xAxis]}
       errorMessage={results.error}
-      subtitle={description}
+      description={description}
       title={title}
+      hideMenu={hideMenu}
     >
       <LineChart
         data={data}

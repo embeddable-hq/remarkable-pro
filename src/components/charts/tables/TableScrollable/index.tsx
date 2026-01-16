@@ -1,7 +1,7 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import {
   DataResponse,
@@ -32,17 +32,16 @@ type TableScrollableProProps = {
   dataset: Dataset;
   allResults?: DataResponse;
   clickDimension?: Dimension;
-  description: string;
+
   dimensionsAndMeasures: DimensionOrMeasure[];
   displayNullAs?: string;
-  embeddableState: TableScrollableProState;
   results: DataResponse;
-  showIndex: boolean;
-  state: TableScrollableProState;
-  title: string;
-  onRowClicked: (rowDimensionValue: TableScrollableProOnRowClickArg) => void;
-  setState: React.Dispatch<React.SetStateAction<TableScrollableProState>>;
-};
+  showIndex?: boolean;
+  state?: TableScrollableProState;
+
+  onRowClicked?: (rowDimensionValue: TableScrollableProOnRowClickArg) => void;
+  setState?: React.Dispatch<React.SetStateAction<TableScrollableProState>>;
+} & ChartCardHeaderProps;
 
 const TableScrollablePro = (props: TableScrollableProProps) => {
   const theme = useTheme() as Theme;
@@ -53,6 +52,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
 
   const { description, title } = resolveI18nProps(props);
   const {
+    hideMenu,
     dataset,
     results,
     allResults,
@@ -81,7 +81,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     // Reset to first page when dataset variable values change
     firstLoadPending.current = true;
     lastDatasetVariableRef.current = dataset.variableValues;
-    setState((prevState) => ({
+    setState?.((prevState) => ({
       ...prevState,
       page: 0,
     }));
@@ -105,7 +105,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   // Stable updater for embeddable state
   const handleUpdateEmbeddableState = useCallback(
     (newState: Partial<TableScrollableProState>) => {
-      setState((prevState) => ({
+      setState?.((prevState) => ({
         ...prevState,
         ...newState,
       }));
@@ -131,7 +131,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     if (!clickDimension) return;
 
     const rowDimensionValue = rowsToDisplay[rowIndex]?.[clickDimension.name];
-    onRowClicked(rowDimensionValue);
+    onRowClicked?.(rowDimensionValue);
   };
 
   // Handle data download when allResults is ready
@@ -150,7 +150,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
 
   const handleNextPage = () => {
     if (results.isLoading) return;
-    handleUpdateEmbeddableState({ page: state.page + 1 });
+    handleUpdateEmbeddableState({ page: (state?.page ?? 0) + 1 });
   };
 
   const handleSortChange = (newSort: TableSort<any> | undefined) => {
@@ -166,7 +166,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     <ChartCard
       ref={cardContentRef}
       title={title}
-      subtitle={description}
+      description={description}
       data={{
         isLoading,
         data: rowsToDisplay,
@@ -174,6 +174,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
       dimensionsAndMeasures={dimensionsAndMeasures}
       errorMessage={results?.error}
       onCustomDownload={handleCustomDownload}
+      hideMenu={hideMenu}
     >
       <TableScrollable
         ref={tableRef}
@@ -182,7 +183,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
         headers={headers}
         rows={getTableRows({ rows: rowsToDisplay, clickDimension })}
         showIndex={showIndex}
-        sort={state.sort}
+        sort={state?.sort}
         isLoading={isLoadingTable}
         loadingLabel={i18n.t('common.loading')}
         onNextPage={handleNextPage}

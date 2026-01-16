@@ -1,7 +1,7 @@
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { ChartCardHeaderProps } from '../shared/ChartCard/ChartCard';
 
 export type DefaultPieChartProps = {
-  description?: string;
   dimension: Dimension;
   maxLegendItems?: number;
   measure: Measure;
@@ -9,6 +9,6 @@ export type DefaultPieChartProps = {
   showLegend?: boolean;
   showTooltips?: boolean;
   showValueLabels?: boolean;
-  title?: string;
+
   onSegmentClick?: (args: { dimensionValue: string | null }) => void;
-};
+} & ChartCardHeaderProps;

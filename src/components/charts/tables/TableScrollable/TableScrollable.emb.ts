@@ -1,6 +1,11 @@
 import { loadData, OrderBy, Value } from '@embeddable.com/core';
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
-import TablePaginatedChart, {
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
+import TableScrollableChart, {
   TableScrollableProOnRowClickArg,
   TableScrollableProState,
 } from './index';
@@ -8,6 +13,7 @@ import { mergician } from 'mergician';
 import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
 import { TABLE_SCROLLABLE_SIZE } from './TableScrollable.utils';
+import { previewData } from '../../../preview.data.constants';
 
 export const meta = {
   name: 'TableScrollable',
@@ -61,13 +67,20 @@ export const meta = {
   ],
 } as const satisfies EmbeddedComponentMeta;
 
+export const preview = definePreview(TableScrollableChart, {
+  dimensionsAndMeasures: [previewData.dimension, previewData.dimensionGroup, previewData.measure],
+  results: previewData.results1Measure2Dimensions,
+  dataset: previewData.dataset,
+  hideMenu: true,
+});
+
 const defaultState: TableScrollableProState = {
   page: 0,
   sort: undefined,
   isLoadingDownloadData: false,
 };
 
-export default defineComponent(TablePaginatedChart, meta, {
+export default defineComponent(TableScrollableChart, meta, {
   /* @ts-expect-error - to be fixed in @embeddable.com/react */
   props: (
     inputs: Inputs<typeof meta>,

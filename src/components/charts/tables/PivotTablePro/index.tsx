@@ -1,7 +1,7 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { PivotTable } from '@embeddable.com/remarkable-ui';
@@ -18,8 +18,6 @@ import { useGetTableSortedResults } from '../tables.hooks';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 type PivotTableProProps = {
-  title: string;
-  description: string;
   results: DataResponse;
   measures: Measure[];
   rowDimension: Dimension;
@@ -27,15 +25,22 @@ type PivotTableProProps = {
   displayNullAs?: string;
   columnWidth?: number;
   firstColumnWidth?: number;
-};
+} & ChartCardHeaderProps;
 
 const PivotTablePro = (props: PivotTableProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
   const { description, title } = resolveI18nProps(props);
-  const { measures, rowDimension, columnDimension, displayNullAs, columnWidth, firstColumnWidth } =
-    props;
+  const {
+    measures,
+    rowDimension,
+    columnDimension,
+    displayNullAs,
+    columnWidth,
+    firstColumnWidth,
+    hideMenu,
+  } = props;
 
   const columnOrder = Array.from(
     new Set((props.results.data ?? []).filter(Boolean).map((d) => d[columnDimension.name])),
@@ -77,10 +82,11 @@ const PivotTablePro = (props: PivotTableProProps) => {
     <ChartCard
       ref={cardContentRef}
       title={title}
-      subtitle={description}
+      description={description}
       data={props.results}
       dimensionsAndMeasures={[rowDimension, columnDimension, ...measures]}
       errorMessage={props.results?.error}
+      hideMenu={hideMenu}
     >
       <PivotTable
         firstColumnWidth={firstColumnWidth}

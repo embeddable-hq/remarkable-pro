@@ -1,9 +1,15 @@
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import LineChartDefaultPro from './index';
 import { loadData, Value } from '@embeddable.com/core';
 import { LineChartProOptionsClickArg } from '../lines.utils';
 import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
+import { previewData } from '../../../preview.data.constants';
 
 export const meta = {
   name: 'LineChartDefaultPro',
@@ -63,6 +69,13 @@ export const meta = {
     },
   ],
 } as const satisfies EmbeddedComponentMeta;
+
+export const preview = definePreview(LineChartDefaultPro, {
+  xAxis: previewData.dimension,
+  measures: [previewData.measure],
+  results: previewData.results1Measure1Dimension,
+  hideMenu: true,
+});
 
 export default defineComponent(LineChartDefaultPro, meta, {
   props: (inputs: Inputs<typeof meta>) => {

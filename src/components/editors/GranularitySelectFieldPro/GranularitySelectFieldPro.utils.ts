@@ -11,12 +11,6 @@ import { resolveI18nString } from '../../component.utils';
 const DEFAULT_MIN_BUCKETS = 1;
 const DEFAULT_MAX_BUCKETS = 100;
 
-export const getGranularitySelectFieldOptions = () =>
-  defaultGranularitySelectFieldOptions.map((opt) => ({
-    ...opt,
-    label: resolveI18nString(opt.label),
-  }));
-
 // Convert possibly-string timestamps to Date safely.
 const toDate = (d: unknown): Date | null => {
   if (d instanceof Date) return isNaN(d.getTime()) ? null : d;
@@ -78,6 +72,8 @@ export const getAvailableGranularityOptionsFromTimeRange = (
   timeRange: TimeRange,
   allOptions: SelectListOptionProps[],
 ): SelectListOptionProps[] => {
+  if (!timeRange) return allOptions;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const from = toDate((timeRange as any)?.from);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -97,4 +93,11 @@ export const getAvailableGranularityOptionsFromTimeRange = (
 
   // preserve original UI ordering
   return allOptions.filter((opt) => validSet.has(opt.value as TGranularityValue));
+};
+
+export const getGranularitySelectFieldOptions = (): SelectListOptionProps[] => {
+  return defaultGranularitySelectFieldOptions.map((opt) => ({
+    ...opt,
+    label: resolveI18nString(opt.label),
+  }));
 };

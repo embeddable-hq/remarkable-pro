@@ -1,6 +1,11 @@
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import { Value } from '@embeddable.com/core';
-import DateTimeSelectFieldPro from './index';
+import DateRangeSelectFieldPro from './index';
 import { inputs } from '../../../component.inputs.constants';
 
 export const meta = {
@@ -59,7 +64,12 @@ export const meta = {
   ],
 } as const satisfies EmbeddedComponentMeta;
 
-export default defineComponent(DateTimeSelectFieldPro, meta, {
+export const preview = definePreview(DateRangeSelectFieldPro, {
+  showCustomRangeOptions: true,
+  onChange: () => null,
+});
+
+export default defineComponent(DateRangeSelectFieldPro, meta, {
   props: (inputs: Inputs<typeof meta>) => {
     return {
       ...inputs,

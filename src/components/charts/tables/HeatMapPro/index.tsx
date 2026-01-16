@@ -1,7 +1,7 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { HeatMap, HeatMapPropsDimension, HeatMapPropsMeasure } from '@embeddable.com/remarkable-ui';
@@ -12,20 +12,19 @@ import { useGetTableSortedResults } from '../tables.hooks';
 type HeatMapProProps = {
   columnDimension: Dimension;
   columnWidth?: number;
-  description: string;
+
   displayNullAs?: string;
   firstColumnWidth?: number;
   maxColor?: string;
   maxThreshold?: string;
   measure: Measure;
-  midColor: string;
+  midColor?: string;
   minColor?: string;
   minThreshold?: string;
   results: DataResponse;
   rowDimension: Dimension;
   showValues?: boolean;
-  title: string;
-};
+} & ChartCardHeaderProps;
 
 export const getHeatMeasure = (
   props: { measure: Measure },
@@ -63,6 +62,7 @@ const HeatMapPro = (props: HeatMapProProps) => {
 
   const { description, title } = resolveI18nProps(props);
   const {
+    hideMenu,
     measure,
     rowDimension,
     columnDimension,
@@ -113,10 +113,11 @@ const HeatMapPro = (props: HeatMapProProps) => {
   return (
     <ChartCard
       title={title}
-      subtitle={description}
+      description={description}
       data={props.results}
       dimensionsAndMeasures={[rowDimension, columnDimension, measure]}
       errorMessage={props.results?.error}
+      hideMenu={hideMenu}
     >
       <HeatMap
         data={results}

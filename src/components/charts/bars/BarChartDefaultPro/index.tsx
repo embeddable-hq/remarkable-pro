@@ -1,7 +1,7 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarChartProData, getBarChartProOptions } from '../bars.utils';
@@ -10,23 +10,21 @@ import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 
 type BarChartDefaultProProps = {
-  description: string;
   dimension: Dimension;
   measures: Measure[];
   results: DataResponse;
-  title: string;
-  xAxisLabel: string;
-  xAxisMaxItems: number;
-  yAxisLabel: string;
+  xAxisLabel?: string;
+  xAxisMaxItems?: number;
+  yAxisLabel?: string;
   yAxisRangeMin?: number;
   yAxisRangeMax?: number;
-  showLegend: boolean;
-  showLogarithmicScale: boolean;
-  showTooltips: boolean;
-  showValueLabels: boolean;
-  reverseXAxis: boolean;
-  onBarClicked: (args: { axisDimensionValue: string | null }) => void;
-};
+  showLegend?: boolean;
+  showLogarithmicScale?: boolean;
+  showTooltips?: boolean;
+  showValueLabels?: boolean;
+  reverseXAxis?: boolean;
+  onBarClicked?: (args: { axisDimensionValue: string | null }) => void;
+} & ChartCardHeaderProps;
 
 const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
   const theme = useTheme() as Theme;
@@ -50,6 +48,8 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     onBarClicked,
   } = resolveI18nProps(props);
 
+  const { hideMenu } = props;
+
   const results = useFillGaps({
     results: props.results,
     dimension,
@@ -70,8 +70,9 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
       data={results}
       dimensionsAndMeasures={[dimension, ...measures]}
       errorMessage={results.error}
-      subtitle={description}
+      description={description}
       title={title}
+      hideMenu={hideMenu}
     >
       <BarChart
         data={data}

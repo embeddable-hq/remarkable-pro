@@ -6,21 +6,20 @@ import { EditorCard } from '../shared/EditorCard/EditorCard';
 import { resolveI18nProps } from '../../component.utils';
 import { i18n } from '../../../theme/i18n/i18n';
 import { SingleSelectField } from '@embeddable.com/remarkable-ui';
+import { ChartCardHeaderProps } from '../../charts/shared/ChartCard/ChartCard';
 
 export const MAX_OPTIONS = 200;
 
 type SingleSelectFieldProProps = {
-  title?: string;
-  description?: string;
   dimension: Dimension;
   optionalSecondDimension?: Dimension;
   placeholder?: string;
   results: DataResponse;
-  selectedValue: string;
+  selectedValue?: string;
   maxOptions?: number;
-  setSearchValue: (search: string) => void;
+  setSearchValue?: (search: string) => void;
   onChange?: (selectedValue: string) => void;
-};
+} & ChartCardHeaderProps;
 
 const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
   const theme: Theme = useTheme() as Theme;

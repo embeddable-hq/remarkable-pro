@@ -7,7 +7,7 @@ import {
 } from '@embeddable.com/react';
 import DonutChartPro from './index';
 import { inputs } from '../../../component.inputs.constants';
-import { previewDimension, previewMeasure, previewResults } from '../../../preview.data.constants';
+import { previewData } from '../../../preview.data.constants';
 
 export const meta = {
   name: 'DonutChartPro',
@@ -40,10 +40,11 @@ export const meta = {
 } as const satisfies EmbeddedComponentMeta;
 
 export const preview = definePreview(DonutChartPro, {
-  dimension: previewDimension,
-  measure: previewMeasure,
-  results: previewResults,
+  dimension: previewData.dimension,
+  measure: previewData.measure,
+  results: previewData.results1Measure1Dimension,
   showValueLabels: false,
+  hideMenu: true,
 });
 
 export default defineComponent(DonutChartPro, meta, {

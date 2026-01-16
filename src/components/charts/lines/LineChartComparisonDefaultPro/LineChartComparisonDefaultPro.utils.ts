@@ -158,9 +158,9 @@ type LineChartComparisonProOptionsProps = {
   measures: Measure[];
   data: ChartData<'line'>;
   xAxisLabel?: string;
-  showComparisonAxis: boolean;
-  showDataComparison: boolean;
-  onLineClicked: LineChartProOptionsClick;
+  showComparisonAxis?: boolean;
+  showDataComparison?: boolean;
+  onLineClicked?: LineChartProOptionsClick;
 };
 
 const getLineChartComparisonNonTimeOptions = (

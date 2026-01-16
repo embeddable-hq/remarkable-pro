@@ -1,8 +1,14 @@
 import { loadData } from '@embeddable.com/core';
-import { defineComponent, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import {
+  defineComponent,
+  definePreview,
+  EmbeddedComponentMeta,
+  Inputs,
+} from '@embeddable.com/react';
 import PivotTablePro from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
+import { previewData } from '../../../preview.data.constants';
 
 export const meta = {
   name: 'PivotTablePro',
@@ -64,6 +70,14 @@ export const meta = {
     inputs.maxResults,
   ],
 } as const satisfies EmbeddedComponentMeta;
+
+export const preview = definePreview(PivotTablePro, {
+  measures: [{ ...previewData.measure, inputs: { showRowTotal: true, showColumnTotal: true } }],
+  rowDimension: previewData.dimension,
+  columnDimension: previewData.dimensionGroup,
+  results: previewData.results1Measure2Dimensions,
+  hideMenu: true,
+});
 
 export default defineComponent(PivotTablePro, meta, {
   props: (inputs: Inputs<typeof meta>) => {
