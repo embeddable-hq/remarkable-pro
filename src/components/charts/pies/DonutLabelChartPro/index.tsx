@@ -45,7 +45,9 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
   );
 
   const handleSegmentClick = (index: number | undefined) => {
-    onSegmentClick?.({
+    if (!onSegmentClick) return;
+
+    onSegmentClick({
       dimensionValue: index === undefined ? undefined : results.data?.[index]?.[dimension.name],
     });
   };
