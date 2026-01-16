@@ -9,6 +9,7 @@ import { EditorCard } from '../shared/EditorCard/EditorCard';
 import {
   getAvailableGranularityOptionsFromTimeRange,
   getGranularitySelectFieldOptions,
+  getSafeSelection,
 } from './GranularitySelectFieldPro.utils';
 
 type GranularitySelectFieldProProps = {
@@ -40,9 +41,11 @@ const GranularitySelectFieldPro = (props: GranularitySelectFieldProProps) => {
 
   useEffect(() => {
     if (granularity) {
-      // Selected granularity is not available - select 2nd or 1st available (if 2nd is not available)
+      // Selected granularity is not available
+      // Select 1st available option when number of options is =< 2
+      // Select 2nd option to avoid when number of options > 2
       if (!availableOptions.some((opt) => opt.value === granularity)) {
-        const newGranularity = (availableOptions[1] ?? availableOptions[0])?.value as string;
+        const newGranularity = getSafeSelection(availableOptions, granularity);
         if (newGranularity) {
           onChange(newGranularity);
         }
@@ -50,9 +53,7 @@ const GranularitySelectFieldPro = (props: GranularitySelectFieldProProps) => {
     }
   }, [availableOptions, granularity, onChange]);
 
-  const safeValue = availableOptions.some((opt) => opt.value === granularity)
-    ? granularity
-    : undefined;
+  const safeValue = getSafeSelection(availableOptions, granularity);
 
   return (
     <EditorCard title={title} subtitle={description}>
