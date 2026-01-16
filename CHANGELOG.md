@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.22
+
+### Patch Changes
+
+- 6e51c28: Create previews
+
 ## 0.0.21
 
 ### Patch Changes
