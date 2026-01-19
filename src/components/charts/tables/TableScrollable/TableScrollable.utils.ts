@@ -1,1 +1,1 @@
-export const TABLE_SCROLLABLE_SIZE = 25;
+export const TABLE_SCROLLABLE_SIZE = 50;
