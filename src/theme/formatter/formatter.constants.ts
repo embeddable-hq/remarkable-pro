@@ -58,8 +58,8 @@ const numberFormatter = (
 };
 
 const dataNumberFormatter = (theme: Theme, key: DimensionOrMeasure): NumberFormatter => {
-  const currency = key.inputs?.currency;
-  const decimalPlaces = key.inputs?.decimalPlaces;
+  const currency = key.inputs?.currency ?? key.meta?.currency;
+  const decimalPlaces = key.inputs?.decimalPlaces ?? key.meta?.decimalPlaces;
   const hasDecimalPlaces = decimalPlaces != null;
 
   const fixedFractionDigits = hasDecimalPlaces ? decimalPlaces : undefined;
@@ -67,7 +67,10 @@ const dataNumberFormatter = (theme: Theme, key: DimensionOrMeasure): NumberForma
   const options: Intl.NumberFormatOptions = {
     style: currency ? 'currency' : undefined,
     currency: currency ? currency : undefined,
-    notation: key.inputs?.abbreviateLargeNumber ? 'compact' : undefined,
+    notation:
+      (key.inputs?.abbreviateLargeNumber ?? key.meta?.abbreviateLargeNumber ?? false)
+        ? 'compact'
+        : undefined,
     minimumFractionDigits: fixedFractionDigits,
     maximumFractionDigits: fixedFractionDigits,
   };
