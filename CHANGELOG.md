@@ -1,5 +1,13 @@
 # @embeddable/remarkable-ui
 
+## 0.0.23
+
+### Patch Changes
+
+- 4f343f1: Check model meta for number formatting
+- 6e3ce2b: Fix type Meta
+- 5d70636: Fix meta type
+
 ## 0.0.22
 
 ### Patch Changes
