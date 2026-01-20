@@ -59,6 +59,7 @@ const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
         noOptionsMessage={showNoOptionsMessage ? i18n.t('common.noOptionsFound') : undefined}
         onChange={(newValue: string) => onChange?.(newValue)}
         onSearch={setSearchValue}
+        avoidCollisions={false}
       />
     </EditorCard>
   );

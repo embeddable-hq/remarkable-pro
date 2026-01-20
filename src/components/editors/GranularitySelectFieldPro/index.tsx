@@ -65,6 +65,7 @@ const GranularitySelectFieldPro = (props: GranularitySelectFieldProProps) => {
         value={safeValue}
         options={availableOptions}
         onChange={onChange}
+        avoidCollisions={false}
       />
     </EditorCard>
   );
