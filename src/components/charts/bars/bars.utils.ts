@@ -4,9 +4,8 @@ import { remarkableTheme } from '../../../theme/theme.constants';
 import { ChartData, ChartOptions } from 'chart.js';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { groupTailAsOther } from '../charts.utils';
-import { getColor } from '../../../theme/styles/styles.utils';
-import { getChartColors, getChartContrastColors } from '@embeddable.com/remarkable-ui';
-import { getObjectStableKey } from '../../../utils.ts/object.utils';
+import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
+import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { Context } from 'chartjs-plugin-datalabels';
 
 export const getBarStackedChartProData = (
@@ -25,22 +24,25 @@ export const getBarStackedChartProData = (
   const groupDimensionName = `${groupDimension.name}${groupDimension.nativeType === CUBE_DIMENSION_TYPE_TIME && groupDimension.inputs?.granularity ? `.${groupDimension.inputs.granularity}` : ''}`;
   const groupBy = [...new Set(data.map((d) => d[groupDimensionName]))].filter((d) => d != null);
 
-  const themeKey = getObjectStableKey(theme);
-  const chartContrastColors = getChartContrastColors();
+  const chartColors = getChartColors();
   const datasets = groupBy.map((groupByItem, index) => {
-    const backgroundColor = getColor(
-      `${themeKey}.charts.backgroundColors`,
-      `${groupDimension.name}.${groupByItem}`,
-      theme.charts.backgroundColors ?? chartContrastColors,
+    const backgroundColor = getDimensionMeasureColor({
+      dimensionOrMeasure: groupDimension,
+      theme,
+      color: 'background',
+      value: `${groupDimension.name}.${groupByItem}`,
       index,
-    );
+      chartColors,
+    });
 
-    const borderColor = getColor(
-      `${themeKey}.charts.borderColors`,
-      `${groupDimension.name}.${groupByItem}`,
-      theme.charts.borderColors ?? chartContrastColors,
+    const borderColor = getDimensionMeasureColor({
+      dimensionOrMeasure: groupDimension,
+      theme,
+      color: 'border',
+      value: `${groupDimension.name}.${groupByItem}`,
       index,
-    );
+      chartColors,
+    });
 
     return {
       label: themeFormatter.data(groupDimension, groupByItem),
@@ -79,7 +81,6 @@ export const getBarChartProData = (
   }
 
   const themeFormatter = getThemeFormatter(theme);
-  const themeKey = getObjectStableKey(theme);
   const groupedData = groupTailAsOther(props.data, props.dimension, props.measures, props.maxItems);
   const chartColors = getChartColors();
 
@@ -88,19 +89,23 @@ export const getBarChartProData = (
       return item[props.dimension.name];
     }),
     datasets: props.measures.map((measure, index) => {
-      const backgroundColor = getColor(
-        `${themeKey}.charts.backgroundColors`,
-        measure.name,
-        theme.charts.backgroundColors ?? chartColors,
+      const backgroundColor = getDimensionMeasureColor({
+        dimensionOrMeasure: measure,
+        theme,
+        color: 'background',
+        value: measure.name,
         index,
-      );
+        chartColors,
+      });
 
-      const borderColor = getColor(
-        `${themeKey}.charts.borderColors`,
-        measure.name,
-        theme.charts.borderColors ?? chartColors,
+      const borderColor = getDimensionMeasureColor({
+        dimensionOrMeasure: measure,
+        theme,
+        color: 'border',
+        value: measure.name,
         index,
-      );
+        chartColors,
+      });
 
       return {
         label: themeFormatter.dimensionOrMeasureTitle(measure),

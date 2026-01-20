@@ -4,10 +4,9 @@ import { groupTailAsOther } from '../charts.utils';
 import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { getColor } from '../../../theme/styles/styles.utils';
+import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { i18n } from '../../../theme/i18n/i18n';
-import { getObjectStableKey } from '../../../utils.ts/object.utils';
 
 export const getPieChartProData = (
   props: {
@@ -33,24 +32,27 @@ export const getPieChartProData = (
     props.maxLegendItems,
   );
 
-  const themeKey = getObjectStableKey(theme);
   const chartColors = getChartColors();
-  const backgroundColor = groupedData.map((item, i) =>
-    getColor(
-      `${themeKey}.charts.backgroundColors`,
-      `${props.dimension.name}.${item[props.dimension.name]}`,
-      theme.charts.backgroundColors ?? chartColors,
-      i,
-    ),
+  const backgroundColor = groupedData.map((item, index) =>
+    getDimensionMeasureColor({
+      dimensionOrMeasure: props.dimension,
+      theme,
+      color: 'background',
+      value: `${props.dimension.name}.${item[props.dimension.name]}`,
+      chartColors,
+      index,
+    }),
   );
 
-  const borderColor = groupedData.map((item, i) =>
-    getColor(
-      `${themeKey}.charts.borderColors`,
-      `${props.dimension.name}.${item[props.dimension.name]}`,
-      theme.charts.borderColors ?? chartColors,
-      i,
-    ),
+  const borderColor = groupedData.map((item, index) =>
+    getDimensionMeasureColor({
+      dimensionOrMeasure: props.dimension,
+      theme,
+      color: 'border',
+      value: `${props.dimension.name}.${item[props.dimension.name]}`,
+      chartColors,
+      index,
+    }),
   );
 
   return {

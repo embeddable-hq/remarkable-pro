@@ -1,3 +1,7 @@
+import { Dimension, Measure } from '@embeddable.com/core';
+import { Theme } from '../theme.types';
+import { getObjectStableKey } from '../../utils.ts/object.utils';
+
 const generateCssVariables = (variables: Record<string, string>) => {
   let textContent = '';
   Object.keys(variables).forEach((key) => {
@@ -84,4 +88,51 @@ export const getColor = (key: string, value: string, palette: string[], idx: num
   saveColorsMap();
 
   return color;
+};
+
+type GetDimensionMeasureColorProps = {
+  dimensionOrMeasure: Dimension | Measure;
+  theme: Theme;
+  value: string;
+  color: 'background' | 'border';
+  index: number;
+  chartColors: string[];
+};
+
+export const getDimensionMeasureColor = ({
+  dimensionOrMeasure,
+  theme,
+  color,
+  value,
+  index,
+  chartColors,
+}: GetDimensionMeasureColorProps) => {
+  // 1) Color from inputs
+  const inputColor = dimensionOrMeasure.inputs?.color;
+  if (inputColor) return inputColor;
+
+  // 2) Color from theme (entity-specific)
+  const entity = dimensionOrMeasure.__type__ === 'measure' ? 'measure' : 'dimensionValue';
+  const backgroundColor = theme.charts['backgroundColorMap']?.[entity]?.[value];
+  const borderColor = theme.charts['borderColorMap']?.[entity]?.[value];
+
+  if (color === 'background') {
+    if (backgroundColor) return backgroundColor;
+    if (borderColor) return borderColor; // fallback to border
+  }
+
+  if (color === 'border') {
+    if (borderColor) return borderColor;
+    if (backgroundColor) return backgroundColor; // fallback to background
+  }
+
+  // 3) Palette fallback (theme palette -> provided palette)
+  const themeKey = getObjectStableKey(theme);
+  const paletteKey = color === 'background' ? 'backgroundColors' : 'borderColors';
+  const key = `${themeKey}.charts.${paletteKey}`;
+
+  // Fallback to chartColors
+  const palette = theme.charts?.[paletteKey] ?? theme.charts.backgroundColors ?? chartColors;
+
+  return getColor(key, value, palette, index);
 };

@@ -15,7 +15,7 @@ export const meta = {
   category: 'Bar Charts',
   inputs: [
     inputs.dataset,
-    inputs.measures,
+    { ...inputs.measures, inputs: [...inputs.measures.inputs, inputs.color] },
     { ...inputs.dimensionWithDateBounds, label: 'X-axis' },
     inputs.title,
     inputs.description,
