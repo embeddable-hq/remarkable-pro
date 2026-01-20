@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.24
+
+### Patch Changes
+
+- 72a8200: Introduce dropdown collisions
+
 ## 0.0.23
 
 ### Patch Changes
