@@ -5,8 +5,10 @@ import {
   StringFormatter,
 } from './formatter.types';
 import { Theme } from '../theme.types';
-import { DimensionOrMeasure, isDimension, Meta } from '@embeddable.com/core';
+import { DimensionOrMeasure, isDimension } from '@embeddable.com/core';
 import { i18n, i18nSetup } from '../i18n/i18n';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 const getLocale = (locale: string) => {
   try {
@@ -58,8 +60,8 @@ const numberFormatter = (
 };
 
 const dataNumberFormatter = (theme: Theme, key: DimensionOrMeasure): NumberFormatter => {
-  const currency = key.inputs?.currency ?? (key.meta as Meta)?.currency;
-  const decimalPlaces = key.inputs?.decimalPlaces ?? (key.meta as Meta)?.decimalPlaces;
+  const currency = key.inputs?.currency ?? (key.meta as any)?.currency;
+  const decimalPlaces = key.inputs?.decimalPlaces ?? (key.meta as any)?.decimalPlaces;
   const hasDecimalPlaces = decimalPlaces != null;
 
   const fixedFractionDigits = hasDecimalPlaces ? decimalPlaces : undefined;
@@ -68,7 +70,7 @@ const dataNumberFormatter = (theme: Theme, key: DimensionOrMeasure): NumberForma
     style: currency ? 'currency' : undefined,
     currency: currency ? currency : undefined,
     notation:
-      (key.inputs?.abbreviateLargeNumber ?? (key.meta as Meta)?.abbreviateLargeNumber ?? false)
+      (key.inputs?.abbreviateLargeNumber ?? (key.meta as any)?.abbreviateLargeNumber ?? false)
         ? 'compact'
         : undefined,
     minimumFractionDigits: fixedFractionDigits,
