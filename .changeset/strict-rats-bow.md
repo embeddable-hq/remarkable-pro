@@ -2,4 +2,4 @@
 '@embeddable.com/remarkable-pro': patch
 ---
 
-Introduce drodown collisions
+Introduce dropdown collisions
