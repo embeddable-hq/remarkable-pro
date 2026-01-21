@@ -11,7 +11,21 @@ export type ThemeI18n = { language: string; translations: Resource };
 
 export type ThemeChartsLegendPosition = 'top' | 'right' | 'bottom' | 'left';
 
+export type ThemeChartsColors = {
+  borderColor: string;
+  backgroundColor: string;
+};
+
+export type ThemeChartsColorMap = {
+  dimensionValue?: Record<string, string>;
+  measure?: Record<string, string>;
+};
+
 export type ThemeCharts = {
+  // Color mapping
+  backgroundColorMap?: ThemeChartsColorMap;
+  borderColorMap?: ThemeChartsColorMap;
+
   backgroundColors?: string[];
   borderColors?: string[];
   legendPosition: ThemeChartsLegendPosition;

@@ -1,7 +1,6 @@
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { ChartData, ChartOptions } from 'chart.js';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
-import { getObjectStableKey } from '../../../../utils.ts/object.utils';
 import {
   getChartColors,
   getChartjsAxisOptionsScalesTicksDefault,
@@ -9,7 +8,7 @@ import {
   getStyleNumber,
 } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../../theme/theme.types';
-import { getColor } from '../../../../theme/styles/styles.utils';
+import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import { i18n } from '../../../../theme/i18n/i18n';
 import { mergician } from 'mergician';
 import { isColorValid, setColorAlpha } from '../../../../utils.ts/color.utils';
@@ -43,7 +42,6 @@ const getLineChartComparisonDataset = (
     : data?.map((item) => item[measure.name] ?? (zeroFill ? 0 : null));
 
   const themeFormatter = getThemeFormatter(theme);
-  const themeKey = getObjectStableKey(theme);
 
   const isLineDashed = Boolean(
     measure.inputs?.[isPreviousPeriod ? 'previousLineDashed' : 'lineDashed'],
@@ -52,12 +50,14 @@ const getLineChartComparisonDataset = (
   const lineColorTemp = measure.inputs?.[isPreviousPeriod ? 'previousLineColor' : 'lineColor'];
   const lineColor = isColorValid(lineColorTemp)
     ? lineColorTemp
-    : getColor(
-        `${themeKey}.charts.backgroundColors`,
-        measure.name,
-        theme.charts.backgroundColors ?? chartColors,
+    : getDimensionMeasureColor({
+        dimensionOrMeasure: measure,
+        theme,
+        color: 'background',
+        value: measure.name,
+        chartColors,
         index,
-      );
+      });
 
   const rawLabel = themeFormatter.dimensionOrMeasureTitle(measure);
 

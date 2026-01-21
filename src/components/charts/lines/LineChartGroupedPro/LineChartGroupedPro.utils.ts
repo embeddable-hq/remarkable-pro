@@ -3,8 +3,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { ChartData, ChartOptions } from 'chart.js';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { mergician } from 'mergician';
-import { getObjectStableKey } from '../../../../utils.ts/object.utils';
-import { getColor } from '../../../../theme/styles/styles.utils';
+import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import { setColorAlpha } from '../../../../utils.ts/color.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { getLineChartProOptions, LineChartProOptionsClick } from '../lines.utils';
@@ -25,22 +24,25 @@ export const getLineChartGroupedProData = (
   const axis = [...new Set(data.map((d) => d[dimension.name]).filter((d) => d != null))].sort();
   const groupBy = [...new Set(data.map((d) => d[groupDimension.name]))].filter((d) => d != null);
 
-  const themeKey = getObjectStableKey(theme);
   const chartColors = getChartColors();
   const datasets: ChartData<'line'>['datasets'] = groupBy.map((groupByItem, index) => {
-    const backgroundColor = getColor(
-      `${themeKey}.charts.backgroundColors`,
-      `${groupDimension.name}.${groupByItem}`,
-      theme.charts.backgroundColors ?? chartColors,
+    const backgroundColor = getDimensionMeasureColor({
+      dimensionOrMeasure: groupDimension,
+      theme,
+      color: 'background',
+      value: `${groupDimension.name}.${groupByItem}`,
+      chartColors,
       index,
-    );
+    });
 
-    const borderColor = getColor(
-      `${themeKey}.charts.borderColors`,
-      `${groupDimension.name}.${groupByItem}`,
-      theme.charts.borderColors ?? chartColors,
+    const borderColor = getDimensionMeasureColor({
+      dimensionOrMeasure: groupDimension,
+      theme,
+      color: 'border',
+      value: `${groupDimension.name}.${groupByItem}`,
+      chartColors,
       index,
-    );
+    });
 
     const dataset = {
       clip: hasMinMaxYAxisRange,

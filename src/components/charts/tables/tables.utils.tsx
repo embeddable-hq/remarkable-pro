@@ -22,6 +22,7 @@ export const getTableHeaderAlign = (dimOrMeas: DimensionOrMeasure): TableHeaderI
   switch (dimOrMeas.nativeType) {
     case 'boolean':
     case 'time':
+    case 'number':
       return TableHeaderAlign.RIGHT;
     default:
       return TableHeaderAlign.LEFT;
