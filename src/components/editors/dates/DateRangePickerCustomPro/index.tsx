@@ -58,6 +58,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
         value={getDateRangeFromTimeRange(selectedValue, dateRangeOptions)}
         onChange={handleChange}
         submitLabel={i18n.t('editors.dateRangePicker.apply')}
+        avoidCollisions={false}
       />
     </EditorCard>
   );

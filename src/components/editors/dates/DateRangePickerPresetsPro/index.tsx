@@ -120,6 +120,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
       <Dropdown
         open={isOpen}
         onOpenChange={setIsOpen}
+        avoidCollisions={false}
         triggerComponent={
           <SelectFieldTrigger
             startIcon={IconCalendarFilled}

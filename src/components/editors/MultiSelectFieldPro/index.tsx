@@ -58,6 +58,7 @@ const MultiSelectFieldPro = (props: MultiSelectFieldProProps) => {
         noOptionsMessage={showNoOptionsMessage ? i18n.t('common.noOptionsFound') : undefined}
         onChange={(newValues) => onChange?.(newValues)}
         onSearch={setSearchValue}
+        avoidCollisions={false}
       />
     </EditorCard>
   );

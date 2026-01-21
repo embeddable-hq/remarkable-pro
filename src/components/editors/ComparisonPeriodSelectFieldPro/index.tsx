@@ -69,6 +69,7 @@ const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
         onChange={onChange}
         options={options}
         noOptionsMessage={i18n.t('common.noOptionsAvailable')}
+        avoidCollisions={false}
       />
     </EditorCard>
   );
