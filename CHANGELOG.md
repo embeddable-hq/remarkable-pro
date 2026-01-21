@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.25
+
+### Patch Changes
+
+- 1de7c20: Add color input for measures on single dimensions BarCharts + Introduce theme backgroundbackgroundColorMap and borderColorMap
+
 ## 0.0.24
 
 ### Patch Changes
