@@ -15,7 +15,7 @@ import { TGranularityValue } from '../../../theme/defaults/defaults.GranularityO
 import { ChartCardHeaderProps } from '../../charts/shared/ChartCard/ChartCard';
 
 type GranularitySelectFieldProProps = {
-  onChange: (newGranularity: string) => void;
+  onChange: (newGranularity: string | boolean | number | undefined) => void; // TODO: improve after hotfix on remarkable-ui
   placeholder?: string;
   primaryTimeRange?: TimeRange;
   granularity?: TGranularityValue;

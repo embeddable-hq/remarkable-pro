@@ -60,7 +60,7 @@ export default defineComponent(DonutChartPro, meta, {
   events: {
     onSegmentClick: (value) => {
       return {
-        dimensionValue: value.dimensionValue || Value.noFilter(),
+        dimensionValue: value.dimensionValue ?? Value.noFilter(),
       };
     },
   },

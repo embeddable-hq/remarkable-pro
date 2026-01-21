@@ -18,7 +18,7 @@ type MultiSelectFieldProProps = {
   selectedValues?: string[];
   maxOptions?: number;
   setSearchValue?: (search: string) => void;
-  onChange?: (newValues: string[]) => void;
+  onChange?: (newValues: (string | number | boolean | undefined)[]) => void;
 } & ChartCardHeaderProps;
 
 const MultiSelectFieldPro = (props: MultiSelectFieldProProps) => {

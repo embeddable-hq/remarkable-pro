@@ -107,9 +107,9 @@ export default defineComponent(SingleSelectFieldPro, meta, {
     };
   },
   events: {
-    onChange: (selectedValue: string) => {
+    onChange: (selectedValue: number | string | boolean | undefined) => {
       return {
-        value: selectedValue || Value.noFilter(),
+        value: selectedValue ?? Value.noFilter(),
       };
     },
   },

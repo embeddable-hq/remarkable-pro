@@ -65,7 +65,7 @@ export default defineComponent(BarChartDefaultPro, meta, {
   events: {
     onBarClicked: (value) => {
       return {
-        axisDimensionValue: value.axisDimensionValue || Value.noFilter(),
+        axisDimensionValue: value.axisDimensionValue ?? Value.noFilter(),
       };
     },
   },

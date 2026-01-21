@@ -65,7 +65,7 @@ export default defineComponent(ComparisonPeriodSelectFieldPro, meta, {
   events: {
     onChange: (value) => {
       return {
-        value: value || Value.noFilter(),
+        value: value ?? Value.noFilter(),
       };
     },
   },

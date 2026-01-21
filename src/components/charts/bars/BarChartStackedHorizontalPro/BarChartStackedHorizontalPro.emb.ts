@@ -74,8 +74,8 @@ export default defineComponent(BarChartStackedHorizontalPro, meta, {
   events: {
     onBarClicked: (value) => {
       return {
-        axisDimensionValue: value.axisDimensionValue || Value.noFilter(),
-        groupingDimensionValue: value.groupingDimensionValue || Value.noFilter(),
+        axisDimensionValue: value.axisDimensionValue ?? Value.noFilter(),
+        groupingDimensionValue: value.groupingDimensionValue ?? Value.noFilter(),
       };
     },
   },

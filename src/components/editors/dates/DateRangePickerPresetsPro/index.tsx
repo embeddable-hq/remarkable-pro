@@ -74,7 +74,8 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
 
   const options = getDateRangeSelectFieldProOptions(dateRangeOptions);
 
-  const handleOptionChange = (newValue: string | undefined) => {
+  // TODO: To improve after hotfix in remarkable-ui
+  const handleOptionChange = (newValue: string | number | boolean | undefined) => {
     const newTimeRange = getTimeRangeFromPresets(
       { relativeTimeString: newValue } as TimeRange,
       dateRangeOptions,
@@ -171,7 +172,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
               />
               {options.map((option) => (
                 <SelectListOption
-                  key={option.value}
+                  key={option.value?.toString()}
                   {...option}
                   isSelected={selectedValue?.relativeTimeString === option.value}
                   onClick={() => handleOptionChange(option.value)}

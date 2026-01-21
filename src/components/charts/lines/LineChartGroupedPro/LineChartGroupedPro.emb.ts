@@ -92,8 +92,8 @@ export default defineComponent(LineChartGroupedPro, meta, {
   events: {
     onLineClicked: (value: LineChartProOptionsClickArg) => {
       return {
-        axisDimensionValue: value.dimensionValue || Value.noFilter(),
-        groupingDimensionValue: value.groupingDimensionValue || Value.noFilter(),
+        axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
+        groupingDimensionValue: value.groupingDimensionValue ?? Value.noFilter(),
       };
     },
   },

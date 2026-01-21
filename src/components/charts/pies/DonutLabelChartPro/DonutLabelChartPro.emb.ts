@@ -84,7 +84,7 @@ export default defineComponent(DonutLabelChartPro, meta, {
   events: {
     onSegmentClick: (value) => {
       return {
-        dimensionValue: value.dimensionValue || Value.noFilter(),
+        dimensionValue: value.dimensionValue ?? Value.noFilter(),
       };
     },
   },
