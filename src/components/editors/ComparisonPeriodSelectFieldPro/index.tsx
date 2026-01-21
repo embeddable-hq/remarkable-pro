@@ -19,7 +19,7 @@ type DateComparisonSelectFieldPro = {
   placeholder?: string;
   primaryDateRange?: TimeRange;
   comparisonPeriod?: string;
-  onChange: (newComparisonPeriod?: string) => void;
+  onChange: (newComparisonPeriod?: string | boolean | number | undefined) => void; // TODO: improve after hotfix on remarkable-ui
 } & ChartCardHeaderProps;
 
 const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {

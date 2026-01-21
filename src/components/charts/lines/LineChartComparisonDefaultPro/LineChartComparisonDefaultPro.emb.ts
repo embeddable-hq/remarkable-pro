@@ -192,7 +192,7 @@ export default defineComponent(LineChartComparisonDefaultPro, meta, {
   events: {
     onLineClicked: (value: LineChartProOptionsClickArg) => {
       return {
-        axisDimensionValue: value.dimensionValue || Value.noFilter(),
+        axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
       };
     },
   },

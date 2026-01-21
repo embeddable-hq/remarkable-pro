@@ -18,7 +18,7 @@ type SingleSelectFieldProProps = {
   selectedValue?: string;
   maxOptions?: number;
   setSearchValue?: (search: string) => void;
-  onChange?: (selectedValue: string) => void;
+  onChange?: (selectedValue: string | boolean | number | undefined) => void;
 } & ChartCardHeaderProps;
 
 const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
@@ -41,11 +41,29 @@ const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
     results.data?.map((data) => {
       return {
         value: optionalSecondDimension ? data[optionalSecondDimension.name] : data[dimension.name],
-        label: themeFormatter.data(dimension, data[dimension.name]),
+        label: themeFormatter.data(
+          dimension,
+          data[optionalSecondDimension ? optionalSecondDimension.name : dimension.name],
+        ),
       };
     }) ?? [];
 
   const showNoOptionsMessage = Boolean(!results.isLoading && (results.data?.length ?? 0) === 0);
+
+  const selectedValueIsBoolean = optionalSecondDimension
+    ? optionalSecondDimension.nativeType === 'boolean'
+    : dimension.nativeType === 'boolean';
+
+  const safeValue = options.find((option) => {
+    let value: string | boolean | undefined = selectedValue;
+    if (selectedValueIsBoolean) {
+      value = selectedValue === 'true' ? true : selectedValue === 'false' ? false : undefined;
+    }
+
+    return option.value === value;
+  })?.value;
+
+  console.log('selectedValue', selectedValue, safeValue);
 
   return (
     <EditorCard title={title} subtitle={description}>
@@ -53,11 +71,11 @@ const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
         clearable
         searchable
         isLoading={results.isLoading}
-        value={selectedValue}
+        value={safeValue}
         options={options}
         placeholder={placeholder}
         noOptionsMessage={showNoOptionsMessage ? i18n.t('common.noOptionsFound') : undefined}
-        onChange={(newValue: string) => onChange?.(newValue)}
+        onChange={(newValue) => onChange?.(newValue)}
         onSearch={setSearchValue}
         avoidCollisions={false}
       />
