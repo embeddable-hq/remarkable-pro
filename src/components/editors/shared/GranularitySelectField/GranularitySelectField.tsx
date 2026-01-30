@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useTheme } from '@embeddable.com/react';
-import { SingleSelectField } from '@embeddable.com/remarkable-ui';
+import { SingleSelectField, SingleSelectFieldProps } from '@embeddable.com/remarkable-ui';
 import { Granularity, TimeRange } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
@@ -11,7 +11,6 @@ import {
 } from './GranularitySelectField.utils';
 import { TGranularityValue } from '../../../../theme/defaults/defaults.GranularityOptions.constants';
 import { ChartCardHeaderProps } from '../../../charts/shared/ChartCard/ChartCard';
-import { SingleSelectFieldProps } from '@embeddable.com/remarkable-ui';
 
 export type GranularitySelectFieldProps = {
   onChange: (newGranularity: Granularity) => void;

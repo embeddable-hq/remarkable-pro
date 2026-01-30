@@ -18,10 +18,10 @@ export const getGranularitySelectFieldOptions = (): SelectListOptionProps[] => {
 
 // Convert possibly-string timestamps to Date safely.
 const toDate = (d: unknown): Date | null => {
-  if (d instanceof Date) return isNaN(d.getTime()) ? null : d;
+  if (d instanceof Date) return Number.isNaN(d.getTime()) ? null : d;
   if (typeof d === 'string' || typeof d === 'number') {
     const parsed = new Date(d);
-    return isNaN(parsed.getTime()) ? null : parsed;
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
   }
   return null;
 };
