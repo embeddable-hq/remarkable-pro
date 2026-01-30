@@ -6,8 +6,9 @@ import { resolveI18nProps } from '../../../component.utils';
 import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarChartProOptions, getBarStackedChartProData } from '../bars.utils';
 import { mergician } from 'mergician';
-import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
+import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 
 type BarChartStackedProProps = {
   groupBy: Dimension;
@@ -20,12 +21,12 @@ type BarChartStackedProProps = {
   showTotalLabels?: boolean;
   showTooltips?: boolean;
   showValueLabels?: boolean;
-
   xAxis: Dimension;
   xAxisLabel?: string;
   yAxisLabel?: string;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
+  setGranularity: (granularity: Granularity) => void;
   onBarClicked?: (args: {
     axisDimensionValue: string | null;
     groupingDimensionValue: string | null;
@@ -35,8 +36,9 @@ type BarChartStackedProProps = {
 const BarChartStackedPro = (props: BarChartStackedProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
+  const { description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+
   const {
-    description,
     groupBy,
     measure,
     reverseXAxis,
@@ -45,14 +47,12 @@ const BarChartStackedPro = (props: BarChartStackedProProps) => {
     showTooltips,
     showTotalLabels,
     showValueLabels,
-    title,
     xAxis,
-    xAxisLabel,
-    yAxisLabel,
     yAxisRangeMax,
     yAxisRangeMin,
+    setGranularity,
     onBarClicked,
-  } = resolveI18nProps(props);
+  } = props;
 
   const { hideMenu } = props;
 
@@ -88,6 +88,11 @@ const BarChartStackedPro = (props: BarChartStackedProProps) => {
       title={title}
       hideMenu={hideMenu}
     >
+      <ChartGranularitySelectField
+        hasMarginTop={!title && !description}
+        dimension={xAxis}
+        onChange={setGranularity}
+      />
       <BarChart
         data={data}
         showLegend={showLegend}

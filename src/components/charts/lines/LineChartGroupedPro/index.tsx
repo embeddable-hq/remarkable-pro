@@ -1,6 +1,6 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
-import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
@@ -11,6 +11,7 @@ import {
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartProOptionsClick } from '../lines.utils';
 import { LineChart } from '@embeddable.com/remarkable-ui';
+import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 
 export type LineChartGroupedProPropsOnLineClicked = {
   axisDimensionValue: string | null;
@@ -27,11 +28,11 @@ type LineChartGroupedProProp = {
   showLogarithmicScale?: boolean;
   showTooltips?: boolean;
   showValueLabels?: boolean;
-
   xAxisLabel?: string;
   yAxisLabel?: string;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
+  setGranularity: (granularity: Granularity) => void;
   onLineClicked?: LineChartProOptionsClick;
 } & ChartCardHeaderProps;
 
@@ -52,6 +53,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
     showValueLabels,
     yAxisRangeMax,
     yAxisRangeMin,
+    setGranularity,
     onLineClicked,
   } = props;
 
@@ -68,7 +70,6 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
       measure,
       hasMinMaxYAxisRange: Boolean(yAxisRangeMin != null || yAxisRangeMax != null),
     },
-
     theme,
   );
   const options = getLineChartGroupedProOptions(
@@ -85,6 +86,11 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
       title={title}
       hideMenu={hideMenu}
     >
+      <ChartGranularitySelectField
+        hasMarginTop={!title && !description}
+        dimension={xAxis}
+        onChange={setGranularity}
+      />
       <LineChart
         data={data}
         reverseXAxis={reverseXAxis}

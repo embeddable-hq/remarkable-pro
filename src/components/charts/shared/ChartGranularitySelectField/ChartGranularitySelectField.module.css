@@ -1,0 +1,9 @@
+.chartGranularitySelectFieldContainer {
+  display: flex;
+  justify-content: end;
+  margin-bottom: var(--em-chart-selectfield-padding-bottom, 1rem);
+}
+
+.marginTop {
+  margin-top: var(--em-chart-selectfield-padding-bottom, 1rem);
+}

@@ -5,11 +5,12 @@ import {
   Inputs,
 } from '@embeddable.com/react';
 import LineChartDefaultPro from './index';
-import { loadData, Value } from '@embeddable.com/core';
+import { Granularity, loadData, Value } from '@embeddable.com/core';
 import { LineChartProOptionsClickArg } from '../lines.utils';
 import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
+import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 
 export const meta = {
   name: 'LineChartDefaultPro',
@@ -41,7 +42,7 @@ export const meta = {
         },
       ],
     },
-    { ...inputs.dimensionWithDateBounds, label: 'X-axis', name: 'xAxis' },
+    { ...inputs.dimensionWithGranularitySelectField, label: 'X-axis', name: 'xAxis' },
     inputs.title,
     inputs.description,
     inputs.showLegend,
@@ -75,23 +76,35 @@ export const preview = definePreview(LineChartDefaultPro, {
   measures: [previewData.measure],
   results: previewData.results1Measure1Dimension,
   hideMenu: true,
+  setGranularity: () => {},
 });
 
+type LineChartDefaultProState = {
+  granularity?: Granularity;
+};
+
 export default defineComponent(LineChartDefaultPro, meta, {
-  props: (inputs: Inputs<typeof meta>) => {
+  props: (
+    inputs: Inputs<typeof meta>,
+    [state, setState]: [LineChartDefaultProState, (state: LineChartDefaultProState) => void],
+  ) => {
+    const xAxisWithGranularity = getDimensionWithGranularity(inputs.xAxis, state?.granularity);
+
     return {
       ...inputs,
+      xAxis: xAxisWithGranularity,
+      setGranularity: (granularity) => setState({ granularity }),
       results: loadData({
         limit: inputs.maxResults,
         from: inputs.dataset,
-        select: [...inputs.measures, inputs.xAxis],
+        select: [...inputs.measures, xAxisWithGranularity],
       }),
     };
   },
   events: {
     onLineClicked: (value: LineChartProOptionsClickArg) => {
       return {
-        axisDimensionValue: value.dimensionValue || Value.noFilter(),
+        axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
       };
     },
   },

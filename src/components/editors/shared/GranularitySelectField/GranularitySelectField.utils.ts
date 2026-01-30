@@ -1,12 +1,10 @@
 import { SelectListOptionProps } from '@embeddable.com/remarkable-ui';
-import { TimeRange } from '@embeddable.com/core';
+import { Granularity, TimeRange } from '@embeddable.com/core';
 import {
   defaultGranularitySelectFieldOptions,
-  Granularity,
-  TGranularity,
   TGranularityValue,
-} from '../../../theme/defaults/defaults.GranularityOptions.constants';
-import { resolveI18nString } from '../../component.utils';
+} from '../../../../theme/defaults/defaults.GranularityOptions.constants';
+import { resolveI18nString } from '../../../component.utils';
 
 const DEFAULT_MIN_BUCKETS = 1;
 const DEFAULT_MAX_BUCKETS = 100;
@@ -36,32 +34,32 @@ const bucketCountByUnit = (start: Date, endExclusive: Date, unitMs: number): num
 };
 
 // Bucket counting (treat end as INCLUSIVE)
-function bucketCount(start: Date, endInclusive: Date, granularity: TGranularity): number {
+function bucketCount(start: Date, endInclusive: Date, granularity: Granularity): number {
   if (start > endInclusive) return 0;
 
   switch (granularity) {
-    case Granularity.second:
+    case 'second':
       return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 1000);
 
-    case Granularity.minute:
+    case 'minute':
       return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 60 * 1000);
 
-    case Granularity.hour:
+    case 'hour':
       return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 60 * 60 * 1000);
 
-    case Granularity.day:
+    case 'day':
       return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 24 * 60 * 60 * 1000);
 
-    case Granularity.week:
+    case 'week':
       return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 7 * 24 * 60 * 60 * 1000);
 
-    case Granularity.month:
+    case 'month':
       return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 28 * 24 * 60 * 60 * 1000); // shortest month
 
-    case Granularity.quarter:
+    case 'quarter':
       return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 90 * 24 * 60 * 60 * 1000); // shortest quarter
 
-    case Granularity.year:
+    case 'year':
       return bucketCountByUnit(start, toExclusiveEnd(endInclusive), 365 * 24 * 60 * 60 * 1000); // shortest year
   }
 }
@@ -104,8 +102,8 @@ export const getAvailableGranularityOptionsFromTimeRange = (
 
 export const getSafeSelection = (
   availableOptions: SelectListOptionProps[],
-  granularity?: string,
-): string | undefined => {
+  granularity?: Granularity,
+): Granularity | undefined => {
   if (!granularity) {
     return undefined;
   }
@@ -116,5 +114,5 @@ export const getSafeSelection = (
 
   const optionToSelect = availableOptions.length > 2 ? 1 : 0;
 
-  return availableOptions[optionToSelect]?.value as string;
+  return availableOptions[optionToSelect]?.value as Granularity;
 };

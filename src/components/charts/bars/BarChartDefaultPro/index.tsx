@@ -6,8 +6,9 @@ import { resolveI18nProps } from '../../../component.utils';
 import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarChartProData, getBarChartProOptions } from '../bars.utils';
 import { mergician } from 'mergician';
-import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
+import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 
 type BarChartDefaultProProps = {
   dimension: Dimension;
@@ -23,6 +24,7 @@ type BarChartDefaultProProps = {
   showTooltips?: boolean;
   showValueLabels?: boolean;
   reverseXAxis?: boolean;
+  setGranularity: (granularity: Granularity) => void;
   onBarClicked?: (args: { axisDimensionValue: string | null }) => void;
 } & ChartCardHeaderProps;
 
@@ -31,24 +33,22 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
   i18nSetup(theme);
 
   const {
-    description,
-    dimension,
     measures,
-    title,
-    xAxisLabel,
-    xAxisMaxItems,
-    yAxisLabel,
     yAxisRangeMin,
+    xAxisMaxItems,
     yAxisRangeMax,
     showLegend,
-    showLogarithmicScale,
     showTooltips,
+    showLogarithmicScale,
     showValueLabels,
     reverseXAxis,
+    hideMenu,
+    dimension,
+    setGranularity,
     onBarClicked,
-  } = resolveI18nProps(props);
+  } = props;
 
-  const { hideMenu } = props;
+  const { description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
 
   const results = useFillGaps({
     results: props.results,
@@ -74,6 +74,11 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
       title={title}
       hideMenu={hideMenu}
     >
+      <ChartGranularitySelectField
+        hasMarginTop={!title && !description}
+        dimension={dimension}
+        onChange={setGranularity}
+      />
       <BarChart
         data={data}
         showLegend={showLegend}

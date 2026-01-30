@@ -1,6 +1,6 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
-import { DataResponse, Dimension, Measure, TimeRange } from '@embeddable.com/core';
+import { DataResponse, Dimension, Granularity, Measure, TimeRange } from '@embeddable.com/core';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
@@ -13,6 +13,7 @@ import {
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartProOptionsClick } from '../lines.utils';
 import { LineChart } from '@embeddable.com/remarkable-ui';
+import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 
 type LineChartComparisonDefaultProProps = {
   xAxis: Dimension;
@@ -32,6 +33,7 @@ type LineChartComparisonDefaultProProps = {
   comparisonDateRange: TimeRange;
   showComparisonAxis?: boolean;
   primaryDateRange: TimeRange;
+  setGranularity: (granularity: Granularity) => void;
   setComparisonDateRange?: (dateRange: TimeRange) => void;
   onLineClicked?: LineChartProOptionsClick;
 } & ChartCardHeaderProps;
@@ -56,6 +58,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
     primaryDateRange,
     comparisonDateRange,
     showComparisonAxis,
+    setGranularity,
     setComparisonDateRange,
     onLineClicked,
   } = props;
@@ -123,6 +126,11 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
       title={title}
       hideMenu={hideMenu}
     >
+      <ChartGranularitySelectField
+        hasMarginTop={!title && !description}
+        dimension={xAxis}
+        onChange={setGranularity}
+      />
       <LineChart
         data={data}
         reverseXAxis={reverseXAxis}

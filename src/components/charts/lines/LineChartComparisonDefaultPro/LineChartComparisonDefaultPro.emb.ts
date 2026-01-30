@@ -5,11 +5,12 @@ import {
   Inputs,
 } from '@embeddable.com/react';
 import LineChartComparisonDefaultPro from './index';
-import { loadData, OrderBy, TimeRange, Value } from '@embeddable.com/core';
+import { Granularity, loadData, OrderBy, TimeRange, Value } from '@embeddable.com/core';
 import { LineChartProOptionsClickArg } from '../lines.utils';
 import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
+import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 
 export const meta = {
   name: 'LineChartComparisonDefaultPro',
@@ -54,7 +55,7 @@ export const meta = {
         },
       ],
     },
-    { ...inputs.dimension, label: 'X-axis', name: 'xAxis' },
+    { ...inputs.dimensionWithGranularitySelectField, label: 'X-axis', name: 'xAxis' },
     {
       ...inputs.timeRange,
       name: 'primaryDateRange',
@@ -127,10 +128,12 @@ export const preview = definePreview(LineChartComparisonDefaultPro, {
   comparisonDateRange: { relativeTimeString: 'Previous period', from: undefined, to: undefined },
   primaryDateRange: { relativeTimeString: 'This week', from: undefined, to: undefined },
   hideMenu: true,
+  setGranularity: () => {},
 });
 
 type LineChartComparisonDefaultProState = {
   comparisonDateRange: TimeRange;
+  granularity?: Granularity;
 };
 
 export default defineComponent(LineChartComparisonDefaultPro, meta, {
@@ -141,24 +144,31 @@ export default defineComponent(LineChartComparisonDefaultPro, meta, {
       (state: LineChartComparisonDefaultProState) => void,
     ],
   ) => {
+    const xAxisWithGranularity = getDimensionWithGranularity(inputs.xAxis, state?.granularity);
+
     const orderBy: OrderBy[] = [
       {
-        property: inputs.xAxis,
+        property: xAxisWithGranularity,
         direction: 'asc',
       },
     ];
 
     const timeProperty =
-      inputs.xAxis.nativeType === 'time' ? inputs.xAxis : inputs.timePropertyForNonTimeDimensions;
+      xAxisWithGranularity.nativeType === 'time'
+        ? xAxisWithGranularity
+        : inputs.timePropertyForNonTimeDimensions;
 
     return {
       ...inputs,
+      xAxis: xAxisWithGranularity,
+      setGranularity: (granularity) => setState({ ...state, granularity }),
       comparisonDateRange: state?.comparisonDateRange,
-      setComparisonDateRange: (comparisonDateRange: TimeRange) => setState({ comparisonDateRange }),
+      setComparisonDateRange: (comparisonDateRange: TimeRange) =>
+        setState({ ...state, comparisonDateRange }),
       results: loadData({
         limit: inputs.maxResults,
         from: inputs.dataset,
-        select: [...inputs.measures, inputs.xAxis],
+        select: [...inputs.measures, xAxisWithGranularity],
         orderBy,
         filters:
           inputs.primaryDateRange && timeProperty
@@ -176,7 +186,7 @@ export default defineComponent(LineChartComparisonDefaultPro, meta, {
           ? loadData({
               limit: inputs.maxResults,
               from: inputs.dataset,
-              select: [...inputs.measures, inputs.xAxis],
+              select: [...inputs.measures, xAxisWithGranularity],
               orderBy,
               filters: [
                 {
@@ -192,7 +202,7 @@ export default defineComponent(LineChartComparisonDefaultPro, meta, {
   events: {
     onLineClicked: (value: LineChartProOptionsClickArg) => {
       return {
-        axisDimensionValue: value.dimensionValue || Value.noFilter(),
+        axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
       };
     },
   },

@@ -23,15 +23,6 @@ export const meta = {
       ...inputs.granularities,
       label: 'Available granularities',
       category: 'Pre-configured variables',
-      // Ignore seconds and minutes
-      defaultValue: [
-        Granularity.hour,
-        Granularity.day,
-        Granularity.week,
-        Granularity.month,
-        Granularity.quarter,
-        Granularity.year,
-      ],
     },
     {
       ...inputs.granularity,
