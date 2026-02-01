@@ -1,6 +1,6 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
-import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
@@ -8,6 +8,7 @@ import { getLineChartProData, getLineChartProOptions } from './LineChartDefaultP
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartProOptionsClick } from '../lines.utils';
 import { LineChart } from '@embeddable.com/remarkable-ui';
+import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 
 export type LineChartProPropsOnLineClicked = { axisDimensionValue: string | null };
 
@@ -20,11 +21,11 @@ type LineChartProProp = {
   showLogarithmicScale?: boolean;
   showTooltips?: boolean;
   showValueLabels?: boolean;
-
   xAxisLabel?: string;
   yAxisLabel?: string;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
+  setGranularity: (granularity: Granularity) => void;
   onLineClicked?: LineChartProOptionsClick;
 } & ChartCardHeaderProps;
 
@@ -33,6 +34,7 @@ const LineChartPro = (props: LineChartProProp) => {
   i18nSetup(theme);
 
   const { title, description, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+
   const {
     hideMenu,
     measures,
@@ -44,6 +46,7 @@ const LineChartPro = (props: LineChartProProp) => {
     showValueLabels,
     yAxisRangeMax,
     yAxisRangeMin,
+    setGranularity,
     onLineClicked,
   } = props;
 
@@ -75,6 +78,11 @@ const LineChartPro = (props: LineChartProProp) => {
       title={title}
       hideMenu={hideMenu}
     >
+      <ChartGranularitySelectField
+        hasMarginTop={!title && !description}
+        dimension={xAxis}
+        onChange={setGranularity}
+      />
       <LineChart
         data={data}
         reverseXAxis={reverseXAxis}

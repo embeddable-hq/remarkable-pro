@@ -1,5 +1,10 @@
 import ColorType from '../editors/ColorEditor/Color.type.emb';
-import { dimensionMeasureSubInputs, timeDimensionSubInputs } from './component.subinputs.constants';
+import { Granularity } from '../theme/defaults/defaults.GranularityOptions.constants';
+import {
+  dimensionMeasureSubInputs,
+  timeDimensionSubInputs,
+  timeDimensionWithGranularitySelectFieldSubInputs,
+} from './component.subinputs.constants';
 import ComparisonPeriodType from './types/ComparisonPeriod.type.emb';
 
 /* -------------------- */
@@ -93,6 +98,15 @@ const granularities = {
   type: 'granularity',
   label: 'Granularities',
   array: true,
+  // Ignore seconds and minutes
+  defaultValue: [
+    Granularity.hour,
+    Granularity.day,
+    Granularity.week,
+    Granularity.month,
+    Granularity.quarter,
+    Granularity.year,
+  ],
 } as const;
 
 const dimensionSimple = {
@@ -130,6 +144,18 @@ const dimensionWithDateBounds = {
   required: true,
   category: 'Component Data',
   inputs: timeDimensionSubInputs,
+} as const;
+
+const dimensionWithGranularitySelectField = {
+  name: 'dimension',
+  type: 'dimension',
+  label: 'Dimension',
+  config: {
+    dataset: 'dataset',
+  },
+  required: true,
+  category: 'Component Data',
+  inputs: timeDimensionWithGranularitySelectFieldSubInputs,
 } as const;
 
 const dimensions = {
@@ -378,6 +404,7 @@ export const inputs = {
   dimensionSimple,
   dimensionTime,
   dimensionWithDateBounds,
+  dimensionWithGranularitySelectField,
   dimensions,
   dimensionOrMeasure,
   dimensionsAndMeasures,

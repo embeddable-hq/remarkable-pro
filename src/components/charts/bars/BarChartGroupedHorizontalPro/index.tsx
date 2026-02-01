@@ -6,8 +6,9 @@ import { resolveI18nProps } from '../../../component.utils';
 import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarChartProOptions, getBarStackedChartProData } from '../bars.utils';
 import { mergician } from 'mergician';
-import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
+import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 
 type BarChartGroupedHorizontalProProps = {
   groupBy: Dimension;
@@ -19,12 +20,12 @@ type BarChartGroupedHorizontalProProps = {
   showTooltips?: boolean;
   showTotalLabels?: boolean;
   showValueLabels?: boolean;
-
   yAxis: Dimension;
   xAxisLabel?: string;
   yAxisLabel?: string;
   xAxisRangeMax?: number;
   xAxisRangeMin?: number;
+  setGranularity: (granularity: Granularity) => void;
   onBarClicked?: (args: {
     axisDimensionValue: string | null;
     groupingDimensionValue: string | null;
@@ -35,8 +36,11 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
+  const { description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+
   const {
-    description,
+    yAxis,
+    hideMenu,
     groupBy,
     measure,
     reverseYAxis,
@@ -45,20 +49,15 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
     showTooltips,
     showTotalLabels,
     showValueLabels,
-    title,
-    yAxis,
-    xAxisLabel,
-    yAxisLabel,
     xAxisRangeMax,
     xAxisRangeMin,
+    setGranularity,
     onBarClicked,
-  } = resolveI18nProps(props);
-
-  const { hideMenu } = props;
+  } = props;
 
   const results = useFillGaps({
     results: props.results,
-    dimension: props.yAxis,
+    dimension: yAxis,
   });
 
   const data = getBarStackedChartProData(
@@ -88,6 +87,11 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
       title={title}
       hideMenu={hideMenu}
     >
+      <ChartGranularitySelectField
+        hasMarginTop={!title && !description}
+        dimension={yAxis}
+        onChange={setGranularity}
+      />
       <BarChart
         data={data}
         showLegend={showLegend}

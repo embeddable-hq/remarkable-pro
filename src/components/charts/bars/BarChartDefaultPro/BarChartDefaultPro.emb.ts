@@ -1,4 +1,4 @@
-import { Value, loadData } from '@embeddable.com/core';
+import { Granularity, Value, loadData } from '@embeddable.com/core';
 import {
   defineComponent,
   definePreview,
@@ -8,6 +8,7 @@ import {
 import BarChartDefaultPro from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
+import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 
 export const meta = {
   name: 'BarChartDefaultPro',
@@ -16,7 +17,10 @@ export const meta = {
   inputs: [
     inputs.dataset,
     { ...inputs.measures, inputs: [...inputs.measures.inputs, inputs.color] },
-    { ...inputs.dimensionWithDateBounds, label: 'X-axis' },
+    {
+      ...inputs.dimensionWithGranularitySelectField,
+      label: 'X-axis',
+    },
     inputs.title,
     inputs.description,
     inputs.showLegend,
@@ -29,6 +33,7 @@ export const meta = {
     inputs.yAxisRangeMin,
     inputs.yAxisRangeMax,
     inputs.xAxisMaxItems,
+    inputs.maxResults,
   ],
   events: [
     {
@@ -50,22 +55,38 @@ export const preview = definePreview(BarChartDefaultPro, {
   measures: [previewData.measure],
   results: previewData.results1Measure1Dimension,
   hideMenu: true,
+  setGranularity: () => {},
 });
 
+type BarChartDefaultProState = {
+  granularity?: Granularity;
+};
+
 export default defineComponent(BarChartDefaultPro, meta, {
-  props: (inputs: Inputs<typeof meta>) => {
+  props: (
+    inputs: Inputs<typeof meta>,
+    [state, setState]: [BarChartDefaultProState, (state: BarChartDefaultProState) => void],
+  ) => {
+    const dimensionWithGranularity = getDimensionWithGranularity(
+      inputs.dimension,
+      state?.granularity,
+    );
+
     return {
       ...inputs,
+      dimension: dimensionWithGranularity,
+      setGranularity: (granularity) => setState({ granularity }),
       results: loadData({
+        limit: inputs.maxResults,
         from: inputs.dataset,
-        select: [...inputs.measures, inputs.dimension],
+        select: [...inputs.measures, dimensionWithGranularity],
       }),
     };
   },
   events: {
     onBarClicked: (value) => {
       return {
-        axisDimensionValue: value.axisDimensionValue || Value.noFilter(),
+        axisDimensionValue: value.axisDimensionValue ?? Value.noFilter(),
       };
     },
   },

@@ -1,4 +1,4 @@
-import { Value, loadData } from '@embeddable.com/core';
+import { Granularity, Value, loadData } from '@embeddable.com/core';
 import {
   defineComponent,
   definePreview,
@@ -8,6 +8,7 @@ import {
 import BarChartStackedPro from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
+import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 
 export const meta = {
   name: 'BarChartStackedPro',
@@ -16,7 +17,7 @@ export const meta = {
   inputs: [
     inputs.dataset,
     inputs.measure,
-    { ...inputs.dimensionWithDateBounds, name: 'xAxis', label: 'X-axis' },
+    { ...inputs.dimensionWithGranularitySelectField, name: 'xAxis', label: 'X-axis' },
     inputs.groupBy,
     inputs.title,
     inputs.description,
@@ -58,24 +59,36 @@ export const preview = definePreview(BarChartStackedPro, {
   measure: previewData.measure,
   results: previewData.results1Measure2Dimensions,
   hideMenu: true,
+  setGranularity: () => {},
 });
 
+type BarChartStackedProState = {
+  granularity?: Granularity;
+};
+
 export default defineComponent(BarChartStackedPro, meta, {
-  props: (inputs: Inputs<typeof meta>) => {
+  props: (
+    inputs: Inputs<typeof meta>,
+    [state, setState]: [BarChartStackedProState, (state: BarChartStackedProState) => void],
+  ) => {
+    const xAxisWithGranularity = getDimensionWithGranularity(inputs.xAxis, state?.granularity);
+
     return {
       ...inputs,
+      xAxis: xAxisWithGranularity,
+      setGranularity: (granularity) => setState({ granularity }),
       results: loadData({
         limit: inputs.maxResults,
         from: inputs.dataset,
-        select: [inputs.xAxis, inputs.groupBy, inputs.measure],
+        select: [xAxisWithGranularity, inputs.groupBy, inputs.measure],
       }),
     };
   },
   events: {
     onBarClicked: (value) => {
       return {
-        axisDimensionValue: value.axisDimensionValue || Value.noFilter(),
-        groupingDimensionValue: value.groupingDimensionValue || Value.noFilter(),
+        axisDimensionValue: value.axisDimensionValue ?? Value.noFilter(),
+        groupingDimensionValue: value.groupingDimensionValue ?? Value.noFilter(),
       };
     },
   },

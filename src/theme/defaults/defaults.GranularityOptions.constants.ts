@@ -24,3 +24,5 @@ export const defaultGranularitySelectFieldOptions: SelectListOptionProps[] = [
   { value: Granularity.quarter, label: 'defaults.granularityOptions.quarter|Quarter' },
   { value: Granularity.year, label: 'defaults.granularityOptions.year|Year' },
 ];
+
+export const granularities = Object.values(Granularity);

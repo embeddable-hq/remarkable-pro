@@ -1,4 +1,5 @@
 import ColorType from '../editors/ColorEditor/Color.type.emb';
+import { Granularity } from '../theme/defaults/defaults.GranularityOptions.constants';
 import AlignType from './types/Align.type.emb';
 import DisplayFormatType from './types/DisplayFormat.type.emb';
 import TableCellStyleType from './types/TableCellStyle.type.emb';
@@ -97,12 +98,30 @@ const granularity = {
   type: 'granularity',
   label: 'Granularity',
   supportedTypes: ['time'],
+  defaultValue: Granularity.day,
 } as const;
 
 const color = {
   type: ColorType,
   name: 'color',
   label: 'Color',
+} as const;
+
+const granularities = {
+  name: 'granularities',
+  type: 'granularity',
+  label: 'Granularities',
+  supportedTypes: ['time'],
+  array: true,
+  // Ignore seconds and minutes
+  defaultValue: [
+    Granularity.hour,
+    Granularity.day,
+    Granularity.week,
+    Granularity.month,
+    Granularity.quarter,
+    Granularity.year,
+  ],
 } as const;
 
 const displayFormat = {
@@ -115,6 +134,16 @@ const tableCellStyle = {
   type: TableCellStyleType,
   name: 'tableCellStyle',
   label: 'Table cell style',
+} as const;
+
+const showGranularityDropdown = {
+  type: 'boolean',
+  name: 'showGranularityDropdown',
+  label: 'Show granularity dropdown',
+  description:
+    'Display a granularity selector inside the chart. The Granularity input above is used only as the default when this option is enabled.',
+  supportedTypes: ['time'],
+  defaultValue: false,
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -141,6 +170,26 @@ export const timeDimensionSubInputs: any[] = [
   dateBounds,
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const timeDimensionWithGranularitySelectFieldSubInputs: any[] = [
+  prefix,
+  suffix,
+  displayName,
+  maxCharacters,
+  decimalPlaces,
+  currency,
+  abbreviateLargeNumber,
+  granularity,
+  showGranularityDropdown,
+  // Not required for now - defaults to day, week, month, quarter, year
+  // granularities,
+  {
+    ...dateBounds,
+    description:
+      'Set a date range or connect your primary date-range variable to define the x-axis min and max. If “Show granularity dropdown” is enabled, this also enables auto-selection of the most appropriate granularity',
+  },
+];
+
 export const subInputs = {
   boolean,
   timeRange,
@@ -157,7 +206,9 @@ export const subInputs = {
   abbreviateLargeNumber,
   dateBounds,
   granularity,
+  granularities,
   color,
   displayFormat,
   tableCellStyle,
+  showGranularityDropdown,
 };

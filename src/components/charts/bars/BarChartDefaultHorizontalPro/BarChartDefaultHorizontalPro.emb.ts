@@ -1,4 +1,4 @@
-import { Value, loadData } from '@embeddable.com/core';
+import { Granularity, Value, loadData } from '@embeddable.com/core';
 import {
   defineComponent,
   definePreview,
@@ -8,6 +8,7 @@ import {
 import BarChartDefaultHorizontalPro from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
+import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 
 export const meta = {
   name: 'BarChartDefaultHorizontalPro',
@@ -16,7 +17,7 @@ export const meta = {
   inputs: [
     inputs.dataset,
     { ...inputs.measures, inputs: [...inputs.measures.inputs, inputs.color] },
-    { ...inputs.dimensionWithDateBounds, label: 'Y-axis' },
+    { ...inputs.dimensionWithGranularitySelectField, label: 'Y-axis' },
     inputs.title,
     inputs.description,
     inputs.showLegend,
@@ -50,15 +51,30 @@ export const preview = definePreview(BarChartDefaultHorizontalPro, {
   measures: [previewData.measure],
   results: previewData.results1Measure1Dimension,
   hideMenu: true,
+  setGranularity: () => {},
 });
 
+type BarChartDefaultProState = {
+  granularity?: Granularity;
+};
+
 export default defineComponent(BarChartDefaultHorizontalPro, meta, {
-  props: (inputs: Inputs<typeof meta>) => {
+  props: (
+    inputs: Inputs<typeof meta>,
+    [state, setState]: [BarChartDefaultProState, (state: BarChartDefaultProState) => void],
+  ) => {
+    const dimensionWithGranularity = getDimensionWithGranularity(
+      inputs.dimension,
+      state?.granularity,
+    );
+
     return {
       ...inputs,
+      dimension: dimensionWithGranularity,
+      setGranularity: (granularity) => setState({ granularity }),
       results: loadData({
         from: inputs.dataset,
-        select: [...inputs.measures, inputs.dimension],
+        select: [...inputs.measures, dimensionWithGranularity],
       }),
     };
   },
