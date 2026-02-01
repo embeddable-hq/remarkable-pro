@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.26
+
+### Patch Changes
+
+- d2acebc: Introduce built in granularity selector for bar and line charts
+
 ## 0.0.25
 
 ### Patch Changes
