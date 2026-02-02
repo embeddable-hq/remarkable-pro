@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.0.27
+
+### Patch Changes
+
+- 329a38f: New MeasureSingleSelectField and DimensionSingleSelectField
+
 ## 0.0.26
 
 ### Patch Changes
