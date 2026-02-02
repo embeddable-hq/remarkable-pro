@@ -64,12 +64,6 @@ export const preview = definePreview(DimensionSingleSelectFieldPro, {
 
 export default defineComponent(DimensionSingleSelectFieldPro, meta, {
   props: (inputs: Inputs<typeof meta>) => {
-    if (!inputs.dataset)
-      return {
-        ...inputs,
-        dimensionOptions: [],
-      };
-
     return {
       ...inputs,
       dimensionOptions: inputs.dimensionOptions ?? [],

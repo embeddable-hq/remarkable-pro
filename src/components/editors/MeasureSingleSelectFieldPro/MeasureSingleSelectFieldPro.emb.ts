@@ -64,12 +64,6 @@ export const preview = definePreview(MeasureSingleSelectFieldPro, {
 
 export default defineComponent(MeasureSingleSelectFieldPro, meta, {
   props: (inputs: Inputs<typeof meta>) => {
-    if (!inputs.dataset)
-      return {
-        ...inputs,
-        measureOptions: [],
-      };
-
     return {
       ...inputs,
       measureOptions: inputs.measureOptions ?? [],

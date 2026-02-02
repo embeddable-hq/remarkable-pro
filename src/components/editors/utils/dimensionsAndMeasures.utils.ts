@@ -18,6 +18,7 @@ export const getDimensionAndMeasureOptions = ({
     .filter((dimensionOrMeasure) => {
       return themeFormatter
         .dimensionOrMeasureTitle(dimensionOrMeasure)
+        .toLowerCase()
         .includes(searchValue.toLowerCase());
     })
     .map((dimensionOrMeasure) => {

@@ -38,7 +38,7 @@ export const DimensionAndMeasureSingleSelectField = <T extends Dimension | Measu
     if (firstDimension) {
       onChange(firstDimension);
     }
-  }, [clearable, selectedValue, onChange]);
+  }, [clearable, selectedValue, options, onChange]);
 
   return (
     <SingleSelectField
