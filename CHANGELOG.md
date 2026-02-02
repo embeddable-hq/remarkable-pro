@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.0
+
+### Minor Changes
+
+- 25225dd: Update to latest SDK to fix critical vulnerabilities
+
 ## 0.0.27
 
 ### Patch Changes
