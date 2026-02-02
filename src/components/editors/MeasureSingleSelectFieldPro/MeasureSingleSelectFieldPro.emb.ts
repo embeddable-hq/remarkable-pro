@@ -58,7 +58,7 @@ export const meta = {
 } as const satisfies EmbeddedComponentMeta;
 
 export const preview = definePreview(MeasureSingleSelectFieldPro, {
-  measureOptions: [previewData.measure, previewData.measure],
+  measureOptions: [previewData.measure, previewData.measureVariant],
   onChange: () => null,
 });
 

@@ -58,7 +58,7 @@ export const meta = {
 } as const satisfies EmbeddedComponentMeta;
 
 export const preview = definePreview(DimensionSingleSelectFieldPro, {
-  dimensionOptions: [previewData.dimension, previewData.dimension],
+  dimensionOptions: [previewData.dimension, previewData.dimensionGroup],
   onChange: () => null,
 });
 
