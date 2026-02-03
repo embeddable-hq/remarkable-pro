@@ -72,7 +72,7 @@
     "mergician": "^2.0.2",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
-    "xlsx": "^0.18.5"
+    "xlsx": "npm:@e965/xlsx@^0.20.3"
   },
   "devDependencies": {
     "@embeddable.com/sdk-core": "^4.1.8",
