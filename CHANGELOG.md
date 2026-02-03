@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.1
+
+### Patch Changes
+
+- d82bdfa: Fix xlsx high severity vulnerabilities
+
 ## 0.1.0
 
 ### Minor Changes
