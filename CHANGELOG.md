@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.2
+
+### Patch Changes
+
+- 3b1f127: Fix deprecation warning of SDKs
+
 ## 0.1.1
 
 ### Patch Changes
