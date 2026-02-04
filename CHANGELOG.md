@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.3
+
+### Patch Changes
+
+- 252f230: Introduce tooltips
+
 ## 0.1.2
 
 ### Patch Changes
