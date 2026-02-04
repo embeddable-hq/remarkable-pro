@@ -33,8 +33,7 @@ const LineChartPro = (props: LineChartProProp) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { title, description, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
-
+  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
   const {
     hideMenu,
     measures,
@@ -69,6 +68,8 @@ const LineChartPro = (props: LineChartProProp) => {
     theme,
   );
 
+  const granularitySelectorHasMarginTop = !title && !description && !tooltip;
+
   return (
     <ChartCard
       data={results}
@@ -76,10 +77,11 @@ const LineChartPro = (props: LineChartProProp) => {
       errorMessage={results.error}
       description={description}
       title={title}
+      tooltip={tooltip}
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField
-        hasMarginTop={!title && !description}
+        hasMarginTop={granularitySelectorHasMarginTop}
         dimension={xAxis}
         onChange={setGranularity}
       />

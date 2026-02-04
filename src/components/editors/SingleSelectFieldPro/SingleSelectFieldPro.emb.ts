@@ -20,6 +20,7 @@ export const meta = {
     { ...inputs.dimension, label: 'Dimension (to load Dropdown values)' },
     inputs.title,
     inputs.description,
+    inputs.tooltip,
     { ...inputs.placeholder, defaultValue: 'Select value...' },
     {
       ...inputs.number,
@@ -108,6 +109,10 @@ export default defineComponent(SingleSelectFieldPro, meta, {
   },
   events: {
     onChange: (selectedValue: string) => {
+      if (selectedValue === '') {
+        return { value: Value.noFilter() };
+      }
+
       return {
         value: selectedValue ?? Value.noFilter(),
       };

@@ -20,10 +20,10 @@ const MeasureSingleSelectFieldPro = (props: MeasureSingleSelectFieldProProps) =>
   i18nSetup(theme);
 
   const { selectedMeasure, measureOptions, clearable, onChange } = props;
-  const { title, description, placeholder } = resolveI18nProps(props);
+  const { title, description, tooltip, placeholder } = resolveI18nProps(props);
 
   return (
-    <EditorCard title={title} subtitle={description}>
+    <EditorCard title={title} description={description} tooltip={tooltip}>
       <DimensionAndMeasureSingleSelectField<Measure>
         selectedValue={selectedMeasure}
         options={measureOptions}

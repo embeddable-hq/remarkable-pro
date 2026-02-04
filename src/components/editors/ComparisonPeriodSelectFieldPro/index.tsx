@@ -4,7 +4,7 @@ import { Theme } from '../../../theme/theme.types';
 import { useLoadDayjsLocale } from '../../../utils.ts/date.utils';
 import { TimeRange } from '@embeddable.com/core';
 import { resolveI18nProps } from '../../component.utils';
-import { EditorCard } from '../shared/EditorCard/EditorCard';
+import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 import { IconCalendarTime } from '@tabler/icons-react';
 import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
 import {
@@ -13,20 +13,20 @@ import {
 } from './ComparisonPeriodSelectFieldPro.utils';
 import { useEffect, useMemo } from 'react';
 import { getTimeRangeFromPresets } from '../dates/dates.utils';
-import { ChartCardHeaderProps } from '../../charts/shared/ChartCard/ChartCard';
 
 type DateComparisonSelectFieldPro = {
   placeholder?: string;
   primaryDateRange?: TimeRange;
   comparisonPeriod?: string;
   onChange: (newComparisonPeriod?: string) => void;
-} & ChartCardHeaderProps;
+} & EditorCardHeaderProps;
 
 const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { description, placeholder, title, comparisonPeriod, onChange } = resolveI18nProps(props);
+  const { description, placeholder, title, tooltip } = resolveI18nProps(props);
+  const { comparisonPeriod, onChange } = props;
 
   const comparisonPeriodOptions = theme.defaults.comparisonPeriodsOptions;
 
@@ -60,7 +60,7 @@ const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
   );
 
   return (
-    <EditorCard title={title} subtitle={description}>
+    <EditorCard title={title} description={description} tooltip={tooltip}>
       <SingleSelectField
         startIcon={IconCalendarTime}
         clearable

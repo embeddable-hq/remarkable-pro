@@ -54,6 +54,13 @@ const description = {
   category: 'Component Header',
 } as const;
 
+const tooltip = {
+  name: 'tooltip',
+  type: 'string',
+  label: 'Tooltip',
+  category: 'Component Header',
+} as const;
+
 const dataset = {
   name: 'dataset',
   type: 'dataset',
@@ -413,6 +420,7 @@ export const inputs = {
   string,
   title,
   description,
+  tooltip,
   dataset,
   maxLegendItems,
   dimension,

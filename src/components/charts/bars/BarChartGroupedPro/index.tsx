@@ -52,7 +52,7 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
     onBarClicked,
   } = props;
 
-  const { description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
 
   const { hideMenu } = props;
 
@@ -79,6 +79,8 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
     theme.charts?.barChartGroupedPro?.options || {},
   );
 
+  const granularitySelectorHasMarginTop = !title && !description && !tooltip;
+
   return (
     <ChartCard
       data={results}
@@ -86,10 +88,11 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
       errorMessage={results.error}
       description={description}
       title={title}
+      tooltip={tooltip}
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField
-        hasMarginTop={!title && !description}
+        hasMarginTop={granularitySelectorHasMarginTop}
         dimension={xAxis}
         onChange={setGranularity}
       />

@@ -48,7 +48,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     onBarClicked,
   } = props;
 
-  const { description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
 
   const results = useFillGaps({
     results: props.results,
@@ -65,6 +65,8 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     theme.charts?.barChartDefaultPro?.options || {},
   );
 
+  const granularitySelectorHasMarginTop = !title && !description && !tooltip;
+
   return (
     <ChartCard
       data={results}
@@ -72,10 +74,11 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
       errorMessage={results.error}
       description={description}
       title={title}
+      tooltip={tooltip}
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField
-        hasMarginTop={!title && !description}
+        hasMarginTop={granularitySelectorHasMarginTop}
         dimension={dimension}
         onChange={setGranularity}
       />

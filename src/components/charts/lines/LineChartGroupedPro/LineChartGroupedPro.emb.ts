@@ -40,6 +40,7 @@ export const meta = {
     inputs.groupBy,
     inputs.title,
     inputs.description,
+    inputs.tooltip,
     inputs.maxResults,
     inputs.showLegend,
     inputs.showTooltips,

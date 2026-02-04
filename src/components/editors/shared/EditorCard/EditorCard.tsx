@@ -6,16 +6,21 @@ import { Theme } from '../../../../theme/theme.types';
 import { Card, CardContent, CardFeedback, CardHeader } from '@embeddable.com/remarkable-ui';
 import { IconAlertCircle } from '@tabler/icons-react';
 
-type EditorCardProps = {
+export type EditorCardHeaderProps = {
   title?: string;
-  subtitle?: string;
+  description?: string;
+  tooltip?: string;
+};
+
+type EditorCardProps = {
   children: React.ReactNode;
   errorMessage?: string;
-};
+} & EditorCardHeaderProps;
 
 export const EditorCard: FC<EditorCardProps> = ({
   title,
-  subtitle,
+  description,
+  tooltip,
   children,
   errorMessage,
   ...props
@@ -39,8 +44,8 @@ export const EditorCard: FC<EditorCardProps> = ({
   };
 
   return (
-    <Card className={styles.card} {...props}>
-      <CardHeader title={title} subtitle={subtitle} />
+    <Card className={styles.editorCard} {...props}>
+      <CardHeader title={title} subtitle={description} tooltip={tooltip} />
       <CardContent>{getDisplay()}</CardContent>
     </Card>
   );

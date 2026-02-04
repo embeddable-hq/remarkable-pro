@@ -13,7 +13,14 @@ export const meta = {
   name: 'KpiChartNumberPro',
   label: 'Kpi Chart - Number',
   category: 'Kpi Charts',
-  inputs: [inputs.dataset, inputs.measure, inputs.title, inputs.description, inputs.fontSize],
+  inputs: [
+    inputs.dataset,
+    inputs.measure,
+    inputs.title,
+    inputs.description,
+    inputs.tooltip,
+    inputs.fontSize,
+  ],
 } as const satisfies EmbeddedComponentMeta;
 
 export const preview = definePreview(KpiChartNumberPro, {

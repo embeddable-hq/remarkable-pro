@@ -36,7 +36,7 @@ const BarChartHorizontalStackedPro = (props: BarChartHorizontalStackedProProps) 
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
 
   const {
     hideMenu,
@@ -78,6 +78,8 @@ const BarChartHorizontalStackedPro = (props: BarChartHorizontalStackedProProps) 
     theme.charts?.barChartStackedHorizontalPro?.options || {},
   );
 
+  const granularitySelectorHasMarginTop = !title && !description && !tooltip;
+
   return (
     <ChartCard
       data={results}
@@ -85,10 +87,11 @@ const BarChartHorizontalStackedPro = (props: BarChartHorizontalStackedProProps) 
       errorMessage={results.error}
       description={description}
       title={title}
+      tooltip={tooltip}
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField
-        hasMarginTop={!title && !description}
+        hasMarginTop={granularitySelectorHasMarginTop}
         dimension={yAxis}
         onChange={setGranularity}
       />

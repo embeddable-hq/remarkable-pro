@@ -18,6 +18,7 @@ export const meta = {
   inputs: [
     inputs.title,
     inputs.description,
+    inputs.tooltip,
     { ...inputs.placeholder, defaultValue: 'Select a granularity' },
     {
       ...inputs.granularities,

@@ -20,6 +20,7 @@ export const meta = {
     { ...inputs.dimensionWithGranularitySelectField, label: 'Y-axis' },
     inputs.title,
     inputs.description,
+    inputs.tooltip,
     inputs.showLegend,
     inputs.showTooltips,
     inputs.showValueLabels,

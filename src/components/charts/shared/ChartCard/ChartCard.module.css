@@ -5,6 +5,8 @@
 
 .chartCardHeader {
   width: calc(100% - var(--em-card-padding, 2rem));
+  display: flex;
+  gap: 0.5rem;
 }
 
 .hidden {

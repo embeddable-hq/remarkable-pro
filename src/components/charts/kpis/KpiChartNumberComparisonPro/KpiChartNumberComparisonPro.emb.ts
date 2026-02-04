@@ -31,6 +31,7 @@ export const meta = {
     },
     inputs.title,
     inputs.description,
+    inputs.tooltip,
     {
       ...inputs.boolean,
       name: 'displayChangeAsPercentage',

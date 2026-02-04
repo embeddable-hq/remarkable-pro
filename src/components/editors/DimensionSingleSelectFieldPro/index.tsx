@@ -20,10 +20,10 @@ const DimensionSingleSelectFieldPro = (props: DimensionSingleSelectFieldProProps
   i18nSetup(theme);
 
   const { selectedDimension, dimensionOptions, clearable, onChange } = props;
-  const { title, description, placeholder } = resolveI18nProps(props);
+  const { title, description, tooltip, placeholder } = resolveI18nProps(props);
 
   return (
-    <EditorCard title={title} subtitle={description}>
+    <EditorCard title={title} description={description} tooltip={tooltip}>
       <DimensionAndMeasureSingleSelectField<Dimension>
         selectedValue={selectedDimension}
         options={dimensionOptions}
