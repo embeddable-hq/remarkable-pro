@@ -117,6 +117,8 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
         : [...(results.data ?? []), ...(resultsComparison?.data ?? [])],
   };
 
+  const granularitySelectorHasMarginTop = !title && !description && !tooltip;
+
   return (
     <ChartCard
       data={resultsCombined}
@@ -127,7 +129,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField
-        hasMarginTop={!title && !description && !tooltip}
+        hasMarginTop={granularitySelectorHasMarginTop}
         dimension={xAxis}
         onChange={setGranularity}
       />
