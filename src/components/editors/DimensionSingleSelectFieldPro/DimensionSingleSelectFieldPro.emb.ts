@@ -19,6 +19,7 @@ export const meta = {
     inputs.dataset,
     inputs.title,
     inputs.description,
+    inputs.tooltip,
     { ...inputs.placeholder, defaultValue: 'Select value...' },
     inputs.dimensionOptions,
     {
