@@ -76,7 +76,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField
-        hasMarginTop={!title && !description}
+        hasMarginTop={!title && !description && !tooltip}
         dimension={dimension}
         onChange={setGranularity}
       />

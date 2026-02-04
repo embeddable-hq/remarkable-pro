@@ -89,7 +89,7 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField
-        hasMarginTop={!title && !description}
+        hasMarginTop={!title && !description && !tooltip}
         dimension={yAxis}
         onChange={setGranularity}
       />

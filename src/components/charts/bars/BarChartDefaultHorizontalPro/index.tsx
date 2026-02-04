@@ -33,7 +33,6 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
   i18nSetup(theme);
 
   const {
-    tooltip,
     hideMenu,
     dimension,
     measures,
@@ -45,12 +44,11 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
     xAxisRangeMax,
     xAxisRangeMin,
     yAxisMaxItems,
-
     setGranularity,
     onBarClicked,
   } = props;
 
-  const { description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const { description, title, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
 
   const results = useFillGaps({
     results: props.results,
@@ -78,7 +76,7 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField
-        hasMarginTop={!title && !description}
+        hasMarginTop={!title && !description && !tooltip}
         dimension={dimension}
         onChange={setGranularity}
       />

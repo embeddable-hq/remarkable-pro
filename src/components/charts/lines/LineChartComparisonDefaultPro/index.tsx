@@ -42,7 +42,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { title, description, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
   const {
     hideMenu,
     comparisonPeriod,
@@ -127,7 +127,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField
-        hasMarginTop={!title && !description}
+        hasMarginTop={!title && !description && !tooltip}
         dimension={xAxis}
         onChange={setGranularity}
       />

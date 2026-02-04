@@ -90,7 +90,7 @@ const BarChartStackedPro = (props: BarChartStackedProProps) => {
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField
-        hasMarginTop={!title && !description}
+        hasMarginTop={!title && !description && !tooltip}
         dimension={xAxis}
         onChange={setGranularity}
       />
