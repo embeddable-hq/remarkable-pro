@@ -45,9 +45,7 @@ export const EditorCard: FC<EditorCardProps> = ({
 
   return (
     <Card className={styles.editorCard} {...props}>
-      <div className={styles.editorCardHeader}>
-        <CardHeader title={title} subtitle={description} tooltip={tooltip} />
-      </div>
+      <CardHeader title={title} subtitle={description} tooltip={tooltip} />
       <CardContent>{getDisplay()}</CardContent>
     </Card>
   );

@@ -89,7 +89,9 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
       <Card className={styles.chartCard}>
         {hideMenu ? null : (
           <>
-            <CardHeader title={title} subtitle={description} tooltip={tooltip} />
+            <div className={styles.chartCardHeader}>
+              <CardHeader title={title} subtitle={description} tooltip={tooltip} />
+            </div>
             <div className={styles.chartCardRightContent}>
               <div className={clsx(!isLoading && styles.hidden)}>
                 <ChartCardLoading />
