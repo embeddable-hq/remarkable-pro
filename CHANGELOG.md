@@ -1,5 +1,29 @@
 # @embeddable/remarkable-ui
 
+## 0.1.2
+
+### Patch Changes
+
+- 3b1f127: Fix deprecation warning of SDKs
+
+## 0.1.1
+
+### Patch Changes
+
+- d82bdfa: Fix xlsx high severity vulnerabilities
+
+## 0.1.0
+
+### Minor Changes
+
+- 25225dd: Update to latest SDK to fix critical vulnerabilities
+
+## 0.0.27
+
+### Patch Changes
+
+- 329a38f: New MeasureSingleSelectField and DimensionSingleSelectField
+
 ## 0.0.26
 
 ### Patch Changes

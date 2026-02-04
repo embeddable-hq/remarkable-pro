@@ -109,8 +109,12 @@ export default defineComponent(SingleSelectFieldPro, meta, {
   },
   events: {
     onChange: (selectedValue: string) => {
+      if (selectedValue === '') {
+        return { value: Value.noFilter() };
+      }
+
       return {
-        value: selectedValue || Value.noFilter(),
+        value: selectedValue ?? Value.noFilter(),
       };
     },
   },

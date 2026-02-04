@@ -2,10 +2,12 @@ import { mockDataResponse, mockDimension, mockMeasure } from '@embeddable.com/co
 
 const dimensionName = 'country';
 const measureName = 'count';
+const measureVariantName = 'average';
 const dimensionGroupName = 'category';
 
 const dimension = mockDimension(dimensionName, 'string', { title: 'Country' });
 const measure = mockMeasure(measureName, 'number', { title: 'Count' });
+const measureVariant = mockMeasure(measureVariantName, 'number', { title: 'Average' });
 const dimensionGroup = mockDimension(dimensionGroupName, 'string', {
   title: 'Category',
 });
@@ -87,6 +89,7 @@ export const previewData = {
   dimension,
   dimensionGroup,
   measure,
+  measureVariant,
   results1Measure,
   results1MeasureVariant,
   results1Measure1Dimension,
