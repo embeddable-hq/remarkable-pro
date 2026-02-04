@@ -36,7 +36,7 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
 
   const {
     yAxis,
@@ -85,6 +85,7 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
       errorMessage={results.error}
       description={description}
       title={title}
+      tooltip={tooltip}
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField

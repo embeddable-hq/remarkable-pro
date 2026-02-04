@@ -20,6 +20,7 @@ export const meta = {
     { ...inputs.dimension, label: 'Dimension (to load Dropdown values)' },
     inputs.title,
     inputs.description,
+    inputs.tooltip,
     { ...inputs.placeholder, defaultValue: 'Select value...' },
     {
       ...inputs.number,

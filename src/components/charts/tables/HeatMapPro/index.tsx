@@ -60,7 +60,7 @@ const HeatMapPro = (props: HeatMapProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { description, title } = resolveI18nProps(props);
+  const { title, description, tooltip } = resolveI18nProps(props);
   const {
     hideMenu,
     measure,
@@ -114,6 +114,7 @@ const HeatMapPro = (props: HeatMapProProps) => {
     <ChartCard
       title={title}
       description={description}
+      tooltip={tooltip}
       data={props.results}
       dimensionsAndMeasures={[rowDimension, columnDimension, measure]}
       errorMessage={props.results?.error}

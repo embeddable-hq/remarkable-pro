@@ -40,7 +40,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { title, description, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
   const {
     hideMenu,
     measure,
@@ -84,6 +84,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
       errorMessage={results.error}
       description={description}
       title={title}
+      tooltip={tooltip}
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField

@@ -13,5 +13,5 @@ storybook-static
 
 .DS_Store
 
-embeddable.config.js
+embeddable.config.ts
 .cursorindexingignore

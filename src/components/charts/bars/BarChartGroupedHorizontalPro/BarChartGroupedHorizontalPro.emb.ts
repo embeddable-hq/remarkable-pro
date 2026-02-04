@@ -21,6 +21,7 @@ export const meta = {
     { ...inputs.dimension, name: 'groupBy', label: 'Group by' },
     inputs.title,
     inputs.description,
+    inputs.tooltip,
     inputs.maxResults,
     inputs.showLegend,
     inputs.showTooltips,

@@ -4,7 +4,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { useLoadDayjsLocale } from '../../../../utils.ts/date.utils';
 import { TimeRange } from '@embeddable.com/core';
 import { resolveI18nProps } from '../../../component.utils';
-import { EditorCard } from '../../shared/EditorCard/EditorCard';
+import { EditorCard, EditorCardHeaderProps } from '../../shared/EditorCard/EditorCard';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import {
   getDateRangeFromTimeRange,
@@ -12,7 +12,6 @@ import {
   getTimeRangeLabel,
 } from '../dates.utils';
 import { IconCalendarFilled } from '@tabler/icons-react';
-import { ChartCardHeaderProps } from '../../../charts/shared/ChartCard/ChartCard';
 
 type DateRangePickerPresetsProps = {
   onChange: (newDateRange: TimeRange) => void;
@@ -20,7 +19,7 @@ type DateRangePickerPresetsProps = {
   selectedValue?: TimeRange;
   clearable?: boolean;
   showTwoMonths?: boolean;
-} & ChartCardHeaderProps;
+} & EditorCardHeaderProps;
 
 const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const theme: Theme = useTheme() as Theme;
@@ -32,9 +31,8 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
     return null;
   }
 
+  const { description, placeholder, title, tooltip } = resolveI18nProps(props);
   const { onChange, clearable, selectedValue, showTwoMonths } = props;
-
-  const { description, placeholder, title } = resolveI18nProps(props);
 
   const handleChange = (newDateRange: DateRange | undefined) => {
     const timeRange: TimeRange = getTimeRangeFromDateRange(newDateRange);
@@ -47,7 +45,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const locale = theme.i18n.language ?? theme.formatter.locale;
 
   return (
-    <EditorCard title={title} subtitle={description}>
+    <EditorCard title={title} description={description} tooltip={tooltip}>
       <DateRangePickerField
         startIcon={IconCalendarFilled}
         locale={locale}

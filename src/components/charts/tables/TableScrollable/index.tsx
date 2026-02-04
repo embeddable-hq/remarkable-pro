@@ -50,7 +50,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   const [isDownloadingData, setIsDownloadingData] = useState(false);
   const [rowsToDisplay, setRowsToDisplay] = useState<any[]>([]);
 
-  const { description, title } = resolveI18nProps(props);
+  const { title, description, tooltip } = resolveI18nProps(props);
   const {
     hideMenu,
     dataset,
@@ -167,6 +167,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
       ref={cardContentRef}
       title={title}
       description={description}
+      tooltip={tooltip}
       data={{
         isLoading,
         data: rowsToDisplay,

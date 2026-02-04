@@ -27,6 +27,7 @@ export const meta = {
     },
     inputs.title,
     inputs.description,
+    inputs.tooltip,
     inputs.showLegend,
     inputs.maxLegendItems,
     inputs.showTooltips,

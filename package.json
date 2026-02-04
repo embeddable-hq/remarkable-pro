@@ -34,7 +34,8 @@
     "prettier:write": "prettier . --write",
     "release": "npm run embeddable:package && changeset publish",
     "storybook": "storybook dev -p 6006",
-    "types:check": "tsc --noEmit --incremental false"
+    "types:check": "tsc --noEmit --incremental false",
+    "reinstall": "rm -rf node_modules package-lock.json && npm install"
   },
   "keywords": [
     "embeddable",
@@ -59,7 +60,7 @@
     "@changesets/cli": "^2.29.6",
     "@embeddable.com/core": "^2.13.4",
     "@embeddable.com/react": "^2.13.0",
-    "@embeddable.com/remarkable-ui": "^2.0.32",
+    "@embeddable.com/remarkable-ui": "^2.0.33",
     "@tabler/icons-react": "^3.34.1",
     "chart.js": "^4.5.0",
     "chartjs-plugin-datalabels": "^2.2.0",

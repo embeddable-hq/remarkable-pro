@@ -16,7 +16,7 @@ import { useLoadDayjsLocale } from '../../../../utils.ts/date.utils';
 import { getDateRangeSelectFieldProOptions } from './DateRangePickerPresetsPro.utils';
 import { TimeRange } from '@embeddable.com/core';
 import { resolveI18nProps } from '../../../component.utils';
-import { EditorCard } from '../../shared/EditorCard/EditorCard';
+import { EditorCard, EditorCardHeaderProps } from '../../shared/EditorCard/EditorCard';
 import { IconCalendarFilled, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { useEffect, useState } from 'react';
@@ -27,7 +27,6 @@ import {
   getTimeRangeFromPresets,
   getTimeRangeLabel,
 } from '../dates.utils';
-import { ChartCardHeaderProps } from '../../../charts/shared/ChartCard/ChartCard';
 
 type DateRangePickerPresetsProps = {
   onChange: (newDateRange: TimeRange) => void;
@@ -37,7 +36,7 @@ type DateRangePickerPresetsProps = {
   clearable?: boolean;
   showCustomRangeOptions?: boolean;
   showTwoMonths?: boolean;
-} & ChartCardHeaderProps;
+} & EditorCardHeaderProps;
 
 const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const theme: Theme = useTheme() as Theme;
@@ -70,7 +69,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
     return null;
   }
 
-  const { description, placeholder, title } = resolveI18nProps(props);
+  const { description, placeholder, title, tooltip } = resolveI18nProps(props);
 
   const options = getDateRangeSelectFieldProOptions(dateRangeOptions);
 
@@ -116,7 +115,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const numberOfMonths = showTwoMonths ? 2 : 1;
 
   return (
-    <EditorCard title={title} subtitle={description}>
+    <EditorCard title={title} description={description} tooltip={tooltip}>
       <Dropdown
         open={isOpen}
         onOpenChange={setIsOpen}

@@ -15,8 +15,9 @@ export const meta = {
   defaultWidth: 300,
   defaultHeight: 120,
   inputs: [
-    { ...inputs.title },
-    { ...inputs.description },
+    inputs.title,
+    inputs.description,
+    inputs.tooltip,
     { ...inputs.placeholder, defaultValue: 'Select a date-range' },
     {
       ...inputs.boolean,

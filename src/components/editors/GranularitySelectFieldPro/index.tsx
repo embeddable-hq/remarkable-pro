@@ -3,9 +3,8 @@ import { TimeRange } from '@embeddable.com/core';
 import { Theme } from '../../../theme/theme.types';
 import { i18nSetup } from '../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../component.utils';
-import { EditorCard } from '../shared/EditorCard/EditorCard';
+import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 import { TGranularityValue } from '../../../theme/defaults/defaults.GranularityOptions.constants';
-import { ChartCardHeaderProps } from '../../charts/shared/ChartCard/ChartCard';
 import { GranularitySelectField } from '../shared/GranularitySelectField/GranularitySelectField';
 
 type GranularitySelectFieldProProps = {
@@ -15,17 +14,17 @@ type GranularitySelectFieldProProps = {
   granularity?: TGranularityValue;
   granularities?: TGranularityValue[];
   clearable?: boolean;
-} & ChartCardHeaderProps;
+} & EditorCardHeaderProps;
 
 const GranularitySelectFieldPro = (props: GranularitySelectFieldProProps) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
   const { granularity, granularities, clearable, primaryTimeRange, onChange } = props;
-  const { description, placeholder, title } = resolveI18nProps(props);
+  const { description, tooltip, placeholder, title } = resolveI18nProps(props);
 
   return (
-    <EditorCard title={title} subtitle={description}>
+    <EditorCard title={title} description={description} tooltip={tooltip}>
       <GranularitySelectField
         clearable={clearable}
         placeholder={placeholder}

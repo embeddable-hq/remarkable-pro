@@ -31,7 +31,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { description, title } = resolveI18nProps(props);
+  const { title, description, tooltip } = resolveI18nProps(props);
   const {
     measures,
     rowDimension,
@@ -83,6 +83,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
       ref={cardContentRef}
       title={title}
       description={description}
+      tooltip={tooltip}
       data={props.results}
       dimensionsAndMeasures={[rowDimension, columnDimension, ...measures]}
       errorMessage={props.results?.error}

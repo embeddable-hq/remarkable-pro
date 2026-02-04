@@ -1,4 +1,8 @@
-.card {
+.editorCard {
   background: unset;
   padding: unset;
+}
+.editorCardHeader {
+  display: flex;
+  gap: 0.5rem;
 }

@@ -48,7 +48,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     onBarClicked,
   } = props;
 
-  const { description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
 
   const results = useFillGaps({
     results: props.results,
@@ -72,6 +72,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
       errorMessage={results.error}
       description={description}
       title={title}
+      tooltip={tooltip}
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField

@@ -54,7 +54,7 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
 
   const [isDownloadingData, setIsDownloadingData] = useState(false);
 
-  const { description, title } = resolveI18nProps(props);
+  const { title, description, tooltip } = resolveI18nProps(props);
   const {
     hideMenu,
     totalResults,
@@ -161,6 +161,7 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
       ref={cardContentRef}
       title={title}
       description={description}
+      tooltip={tooltip}
       data={results}
       dimensionsAndMeasures={dimensionsAndMeasures}
       errorMessage={results?.error}

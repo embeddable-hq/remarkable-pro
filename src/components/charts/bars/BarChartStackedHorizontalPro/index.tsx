@@ -36,7 +36,7 @@ const BarChartHorizontalStackedPro = (props: BarChartHorizontalStackedProProps) 
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
 
   const {
     hideMenu,
@@ -85,6 +85,7 @@ const BarChartHorizontalStackedPro = (props: BarChartHorizontalStackedProProps) 
       errorMessage={results.error}
       description={description}
       title={title}
+      tooltip={tooltip}
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField

@@ -20,6 +20,7 @@ import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defa
 export type ChartCardHeaderProps = {
   title?: string;
   description?: string;
+  tooltip?: string;
   hideMenu?: boolean;
 };
 
@@ -35,6 +36,7 @@ type ChartCardProps = {
 export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
   (
     {
+      tooltip,
       title,
       description,
       children,
@@ -87,9 +89,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
       <Card className={styles.chartCard}>
         {hideMenu ? null : (
           <>
-            <div className={styles.chartCardHeader}>
-              <CardHeader title={title} subtitle={description} />
-            </div>
+            <CardHeader title={title} subtitle={description} tooltip={tooltip} />
             <div className={styles.chartCardRightContent}>
               <div className={clsx(!isLoading && styles.hidden)}>
                 <ChartCardLoading />

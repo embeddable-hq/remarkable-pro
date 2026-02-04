@@ -33,6 +33,7 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
   i18nSetup(theme);
 
   const {
+    tooltip,
     hideMenu,
     dimension,
     measures,
@@ -73,6 +74,7 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
       errorMessage={results.error}
       description={description}
       title={title}
+      tooltip={tooltip}
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField

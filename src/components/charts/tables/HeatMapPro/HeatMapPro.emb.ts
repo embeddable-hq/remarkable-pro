@@ -29,6 +29,7 @@ export const meta = {
     },
     inputs.title,
     inputs.description,
+    inputs.tooltip,
     inputs.displayNullAs,
     {
       ...inputs.color,

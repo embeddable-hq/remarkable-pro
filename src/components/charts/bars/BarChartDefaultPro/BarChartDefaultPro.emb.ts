@@ -23,6 +23,7 @@ export const meta = {
     },
     inputs.title,
     inputs.description,
+    inputs.tooltip,
     inputs.showLegend,
     inputs.showTooltips,
     inputs.showValueLabels,

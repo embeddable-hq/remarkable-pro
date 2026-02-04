@@ -33,7 +33,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { title, description } = resolveI18nProps(props);
+  const { title, description, tooltip } = resolveI18nProps(props);
   const {
     hideMenu,
     changeFontSize,
@@ -101,6 +101,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
       errorMessage={results.error}
       description={description}
       title={title}
+      tooltip={tooltip}
       hideMenu={hideMenu}
     >
       <KpiChart

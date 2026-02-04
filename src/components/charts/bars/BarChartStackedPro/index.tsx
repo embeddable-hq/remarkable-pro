@@ -36,7 +36,7 @@ type BarChartStackedProProps = {
 const BarChartStackedPro = (props: BarChartStackedProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
-  const { description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
 
   const {
     groupBy,
@@ -86,6 +86,7 @@ const BarChartStackedPro = (props: BarChartStackedProProps) => {
       errorMessage={results.error}
       description={description}
       title={title}
+      tooltip={tooltip}
       hideMenu={hideMenu}
     >
       <ChartGranularitySelectField
