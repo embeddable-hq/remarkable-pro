@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.5
+
+### Patch Changes
+
+- c11a28b: Increase Rui Version
+
 ## 0.1.4
 
 ### Patch Changes
