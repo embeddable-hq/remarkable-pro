@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
@@ -32,6 +33,24 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
+  /*
+  Here we check the theme for a `useCustomProps` hook. This allows the end user to provide a hook that can manipulate the props before they are used in the chart. This is useful for things like hitting an outside API to get additional data, manipulating the data in some way, or even just providing default values for certain props.
+
+  The `useCustomProps` hook should take two arguments, the props, and an additional string telling it which chart is being rendered. This allows the hook to be used for multiple charts and manipulate the props differently based on the chart type.
+  */
+  const [customProps, setCustomProps] = useState<BarChartDefaultProProps>(props);
+
+  useEffect(() => {
+    const customPropsHook = theme.useCustomProps;
+    if (customPropsHook) {
+      customPropsHook<BarChartDefaultProProps>(props, 'BarChartDefaultPro').then((result) =>
+        setCustomProps(result || props),
+      );
+    } else {
+      setCustomProps(props);
+    }
+  }, [props, theme.useCustomProps]);
+
   const {
     measures,
     yAxisRangeMin,
@@ -46,12 +65,12 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     dimension,
     setGranularity,
     onBarClicked,
-  } = props;
+  } = customProps;
 
-  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(customProps);
 
   const results = useFillGaps({
-    results: props.results,
+    results: customProps.results,
     dimension,
   });
 

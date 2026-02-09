@@ -6,6 +6,7 @@ import { ComparisonPeriodOption } from './defaults/defaults.ComparisonPeriods.co
 import { DateRangeOption } from './defaults/defaults.DateRanges.constants';
 import { ChartCardMenuOption } from './defaults/defaults.ChartCardMenu.constants';
 import { TableCellStyleOption } from './defaults/defaults.TableCellStyle.constants';
+import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 
 export type ThemeI18n = { language: string; translations: Resource };
 
@@ -52,10 +53,18 @@ export type ThemeDefaults = {
   tableCellStyleOptions?: TableCellStyleOption[];
 };
 
+export type BaseChartTypes = {
+  dimension: Dimension;
+  measures: Measure[];
+  results: DataResponse;
+};
+
 export type Theme = {
   i18n: ThemeI18n;
   charts: ThemeCharts;
   styles: ThemeStyles;
   formatter: ThemeFormatter;
   defaults: ThemeDefaults;
+  // Updated to use a generic type for custom props
+  useCustomProps?: <T extends BaseChartTypes>(props: T, chartName: string) => Promise<T>;
 };
