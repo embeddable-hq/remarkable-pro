@@ -11,11 +11,11 @@ import {
   getComparisonPeriodDateRange,
   getComparisonPeriodLabel,
 } from '../../../utils/timeRange.utils';
+import { getKpiResults } from '../kpis.utils';
 
 type KpiChartNumberComparisonProProp = {
   changeFontSize?: number;
   comparisonPeriod?: string;
-
   displayChangeAsPercentage?: boolean;
   fontSize?: number;
   measure: Measure;
@@ -23,9 +23,9 @@ type KpiChartNumberComparisonProProp = {
   results: DataResponse;
   resultsComparison: DataResponse | undefined;
   reversePositiveNegativeColors?: boolean;
-
   percentageDecimalPlaces?: number;
   comparisonDateRange: TimeRange;
+  displayNullAs?: string;
   setComparisonDateRange?: (dateRange: TimeRange) => void;
 } & ChartCardHeaderProps;
 
@@ -33,7 +33,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { title, description, tooltip } = resolveI18nProps(props);
+  const { title, description, tooltip, displayNullAs } = resolveI18nProps(props);
   const {
     hideMenu,
     changeFontSize,
@@ -85,9 +85,11 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
           ],
   };
 
+  const resultsWithNullsHandled = getKpiResults(resultsCombined, measure, Boolean(displayNullAs));
+
   return (
     <ChartCard
-      data={resultsCombined}
+      data={resultsWithNullsHandled}
       dimensionsAndMeasures={[
         // Add a label dimension to distinguish primary and comparison periods in exports
         {
@@ -105,6 +107,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
       hideMenu={hideMenu}
     >
       <KpiChart
+        displayNullAs={displayNullAs}
         value={value}
         comparisonValue={resultsCombined.isLoading ? undefined : comparisonValue}
         valueFormatter={valueFormatter}
