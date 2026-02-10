@@ -1,32 +1,29 @@
 // Utils
-export { getObjectStableKey } from './utils.ts/object.utils';
-export { setColorAlpha, isColorValid } from './utils.ts/color.utils';
+export * from './utils/object.utils';
+export * from './utils/color.utils';
 
 // Types
 export { type DeepPartial } from './types/deep-partial';
 
-// Theme i18n
-export { i18n, i18nSetup } from './theme/i18n/i18n';
-
-// Theme theme
+// Theme
+export * from './theme/styles/styles.utils';
+export * from './theme/i18n/i18n';
 export * from './theme/theme.types';
 export * from './theme/theme.constants';
-
-// Theme formatter
 export type {
   NumberFormatter,
   DateTimeFormatter,
   StringFormatter,
   ThemeFormatter,
 } from './theme/formatter/formatter.types';
-export { getThemeFormatter } from './theme/formatter/formatter.utils';
+export * from './theme/formatter/formatter.utils';
 
 // Component inputs
-export { inputs } from './components/component.inputs.constants';
-export { subInputs } from './components/component.subinputs.constants';
+export * from './components/component.inputs.constants';
+export * from './components/component.subinputs.constants';
 
 // Components utils
-export { resolveI18nProps } from './components/component.utils';
+export * from './components/component.utils';
 
 // Components charts
 export * as BarChartDefaultPro from './components/charts/bars/BarChartDefaultPro';
@@ -58,18 +55,26 @@ export * as PivotTablePro from './components/charts/tables/PivotTablePro';
 export * as TableChartPaginatedPro from './components/charts/tables/TableChartPaginated';
 export * from './components/charts/tables/tables.utils';
 
-export { ChartCard } from './components/charts/shared/ChartCard/ChartCard';
+// Shared charts
+export * from './components/charts/shared/ChartCard/ChartCard';
 export * from './components/component.inputs.constants';
 export * from './components/component.subinputs.constants';
 
-//Components editors
+// Components editors
 export * as ComparisonPeriodSelectFieldPro from './components/editors/ComparisonPeriodSelectFieldPro';
 export * from './components/editors/ComparisonPeriodSelectFieldPro/ComparisonPeriodSelectFieldPro.utils';
 export * as DateRangeSelectFieldPro from './components/editors/dates/DateRangePickerPresetsPro';
 export * from './components/editors/dates/DateRangePickerPresetsPro/DateRangePickerPresetsPro.utils';
 export * as MultiSelectFieldPro from './components/editors/MultiSelectFieldPro';
 export * as SingleSelectFieldPro from './components/editors/SingleSelectFieldPro';
-export { EditorCard } from './components/editors/shared/EditorCard/EditorCard';
+
+// Shared editors
+export * from './components/charts/shared/ChartGranularitySelectField/ChartGranularitySelectField';
+export * from './components/charts/utils/granularity.utils';
+export * from './components/editors/shared/EditorCard/EditorCard';
 
 // Custom types
 export { default as ComparisonPeriodType } from './components/types/ComparisonPeriod.type.emb';
+
+// Hooks
+export * from './components/charts/charts.fillGaps.hooks';

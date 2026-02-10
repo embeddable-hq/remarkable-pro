@@ -1,7 +1,7 @@
 import { useTheme } from '@embeddable.com/react';
 import { DateRange, DateRangePickerField } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../../theme/theme.types';
-import { useLoadDayjsLocale } from '../../../../utils.ts/date.utils';
+import { useLoadDayjsLocale } from '../../../../utils/date.utils';
 import { TimeRange } from '@embeddable.com/core';
 import { resolveI18nProps } from '../../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../../shared/EditorCard/EditorCard';

@@ -11,7 +11,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import { i18n } from '../../../../theme/i18n/i18n';
 import { mergician } from 'mergician';
-import { isColorValid, setColorAlpha } from '../../../../utils.ts/color.utils';
+import { isColorValid, setColorAlpha } from '../../../../utils/color.utils';
 import { getLineChartProOptions, LineChartProOptionsClick } from '../lines.utils';
 
 const AXIS_ID_MAIN = 'mainAxis';
