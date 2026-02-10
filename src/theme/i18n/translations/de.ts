@@ -29,8 +29,8 @@ export const de: ResourceLanguage = {
       'menuOptions.downloadXLSX': 'XLSX herunterladen',
       errorTitle: 'Etwas ist schiefgelaufen.',
       errorMessage: 'Beim Laden des Diagramms ist ein Fehler aufgetreten.',
-      emptyTitle: 'Hier ist es etwas leer.',
-      emptyMessage: 'Versuchen Sie, etwas hinzuzufügen.',
+      emptyTitle: 'Keine Ergebnisse.',
+      emptyMessage: 'Hier ist es etwas leer.',
       tablePaginated: {
         pagination: 'Seite {{page}} von {{totalPages}}',
       },

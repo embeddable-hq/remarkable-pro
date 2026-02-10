@@ -18,6 +18,7 @@ export const meta = {
     inputs.measure,
     inputs.title,
     inputs.description,
+    inputs.displayNullAs,
     inputs.tooltip,
     inputs.fontSize,
   ],
