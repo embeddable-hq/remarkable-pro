@@ -1,6 +1,6 @@
 import { Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../theme.types';
-import { getObjectStableKey } from '../../utils.ts/object.utils';
+import { getObjectStableKey } from '../../utils/object.utils';
 
 const generateCssVariables = (variables: Record<string, string>) => {
   let textContent = '';

@@ -1,8 +1,8 @@
 import { DimensionOrMeasure } from '@embeddable.com/core';
 import { DateTimeFormatter, NumberFormatter, StringFormatter } from './formatter.types';
 import { Theme } from '../theme.types';
-import { cache } from '../../utils.ts/cache.utils';
-import { isValidISODate } from '../../utils.ts/data.utils';
+import { cache } from '../../utils/cache.utils';
+import { isValidISODate } from '../../utils/data.utils';
 import { resolveI18nString } from '../../components/component.utils';
 import { DisplayFormatTypeOptions } from '../../components/types/DisplayFormat.type.emb';
 

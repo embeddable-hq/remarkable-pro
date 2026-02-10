@@ -4,7 +4,7 @@ import { ChartData, ChartOptions } from 'chart.js';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { mergician } from 'mergician';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
-import { setColorAlpha } from '../../../../utils.ts/color.utils';
+import { setColorAlpha } from '../../../../utils/color.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { getLineChartProOptions, LineChartProOptionsClick } from '../lines.utils';
 
