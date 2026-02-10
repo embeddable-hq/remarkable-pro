@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.7
+
+### Patch Changes
+
+- 8f0f472: New EmptyBlockPro component
+
 ## 0.1.6
 
 ### Patch Changes
