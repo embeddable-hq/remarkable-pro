@@ -18,8 +18,8 @@ export const en: ResourceLanguage = {
       'menuOptions.downloadXLSX': 'Download XLSX',
       errorTitle: 'Something went wrong.',
       errorMessage: 'An error occurred while loading the chart.',
-      emptyTitle: "It's a bit empty here.",
-      emptyMessage: 'Try adding something.',
+      emptyTitle: 'No results.',
+      emptyMessage: "It's a bit empty here.",
       tablePaginated: {
         pagination: 'Page {{page}} of {{totalPages}}',
       },
