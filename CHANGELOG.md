@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.6
+
+### Patch Changes
+
+- cb74128: Improve KPI chart with displayNullAs
+
 ## 0.1.5
 
 ### Patch Changes
