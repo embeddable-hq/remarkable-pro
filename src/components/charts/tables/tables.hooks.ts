@@ -73,20 +73,21 @@ export const getTableSortedResults = (props: useGetTableSortedResultsProps) => {
     }, {});
 
   const reorderByAxis = (
+    inputData: Record<string, unknown>[],
     axisOrder: (string | number | boolean)[],
     axisDimension: Dimension,
     fixedDimension: Dimension,
   ) => {
     if (!isTableOrderMixed(axisOrder)) {
-      return data;
+      return inputData;
     }
 
     const order = getTablePredominantOrder(axisOrder);
     const sortedAxisOrder = [...axisOrder].sort(getTableSortComparator(order));
 
-    // “Leader” rows: one per value in the axis order, at the fixed dimension’s first value
+    // "Leader" rows: one per value in the axis order, at the fixed dimension's first value
     const leaderRows = sortedAxisOrder.map((value) => {
-      const existing = data.find(
+      const existing = inputData.find(
         (x) =>
           x[axisDimension.name] === value &&
           x[fixedDimension.name] === firstRow[fixedDimension.name],
@@ -102,7 +103,7 @@ export const getTableSortedResults = (props: useGetTableSortedResultsProps) => {
     });
 
     // Remove rows that are already covered by leaderRows (same [axis, fixed] tuple)
-    const restResults = data.filter(
+    const restResults = inputData.filter(
       (resultRow) =>
         !leaderRows.some(
           (leaderRow) =>
@@ -114,16 +115,11 @@ export const getTableSortedResults = (props: useGetTableSortedResultsProps) => {
     return [...leaderRows, ...restResults];
   };
 
-  // Preserve original behavior: fix columns if mixed, otherwise rows if mixed
-  if (isTableOrderMixed(props.columnOrder)) {
-    return reorderByAxis(props.columnOrder, props.columnDimension, props.rowDimension);
-  }
+  // Apply both sorts sequentially: fix columns first, then rows
+  let result = reorderByAxis(data, props.columnOrder, props.columnDimension, props.rowDimension);
+  result = reorderByAxis(result, props.rowOrder, props.rowDimension, props.columnDimension);
 
-  if (isTableOrderMixed(props.rowOrder)) {
-    return reorderByAxis(props.rowOrder, props.rowDimension, props.columnDimension);
-  }
-
-  return data;
+  return result;
 };
 
 export const useGetTableSortedResults = (props: useGetTableSortedResultsProps) => {
