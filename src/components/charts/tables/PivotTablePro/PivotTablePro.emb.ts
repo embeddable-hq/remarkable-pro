@@ -53,7 +53,7 @@ export const meta = {
     {
       ...inputs.dimension,
       label: 'Secondary row dimension (optional)',
-      name: 'rowDimension2',
+      name: 'subRowDimension',
       required: false,
       description:
         'When set, each primary row becomes expandable. Clicking a row loads a breakdown by the second dimension.',
@@ -113,13 +113,13 @@ export default defineComponent(PivotTablePro, meta, {
         limit: inputs.maxResults,
         countRows: true,
       }),
-      results2:
+      resultsSubRows:
         expandedRowKeys.length > 0
           ? loadData({
               from: inputs.dataset,
               select: [
                 inputs.rowDimension,
-                inputs.rowDimension2,
+                inputs.subRowDimension,
                 inputs.columnDimension,
                 ...inputs.measures,
               ],

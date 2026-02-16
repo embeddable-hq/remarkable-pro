@@ -20,10 +20,10 @@ import { sortArrayByProp } from '../../../../utils/array.utils';
 
 type PivotTableProProps = {
   results: DataResponse;
-  results2?: DataResponse;
+  resultsSubRows?: DataResponse;
   measures: Measure[];
   rowDimension: Dimension;
-  rowDimension2?: Dimension;
+  subRowDimension?: Dimension;
   columnDimension: Dimension;
   displayNullAs?: string;
   columnWidth?: number;
@@ -38,10 +38,10 @@ const PivotTablePro = (props: PivotTableProProps) => {
 
   const { title, description, tooltip } = resolveI18nProps(props);
   const {
-    results2,
+    resultsSubRows,
     measures,
     rowDimension,
-    rowDimension2,
+    subRowDimension,
     columnDimension,
     displayNullAs,
     columnWidth,
@@ -84,8 +84,8 @@ const PivotTablePro = (props: PivotTableProProps) => {
 
   const pivotMeasures = getPivotMeasures({ measures, displayNullAs }, theme);
   const pivotRowDimension = getPivotDimension({ dimension: rowDimension }, theme);
-  const pivotRowDimension2 = rowDimension2
-    ? getPivotDimension({ dimension: rowDimension2 }, theme)
+  const pivotSubRowDimension = subRowDimension
+    ? getPivotDimension({ dimension: subRowDimension }, theme)
     : undefined;
   const pivotColumnDimension = getPivotDimension({ dimension: columnDimension }, theme);
   const pivotColumnTotalsFor = getPivotColumnTotalsFor(measures);
@@ -101,18 +101,18 @@ const PivotTablePro = (props: PivotTableProProps) => {
 
   useEffect(() => {
     // No results or no expandedRowKeys, nothing to load
-    if (!results2 || !results2?.data || expandedRowKeys.length === 0) {
+    if (!resultsSubRows || !resultsSubRows?.data || expandedRowKeys.length === 0) {
       return;
     }
 
     const subRowsByRowData = new Map<string, any[]>();
     expandedRowKeys.forEach((rowKey) => {
-      const containsSubRow = results2.data?.some((row) => row[rowDimension.name] === rowKey);
+      const containsSubRow = resultsSubRows.data?.some((row) => row[rowDimension.name] === rowKey);
       if (!containsSubRow) return;
 
-      const subRows = results2.data?.filter((row) => row[rowDimension.name] === rowKey) ?? [];
-      const subRowsSorted = rowDimension2
-        ? sortArrayByProp(subRows, rowDimension2.name, 'asc')
+      const subRows = resultsSubRows.data?.filter((row) => row[rowDimension.name] === rowKey) ?? [];
+      const subRowsSorted = subRowDimension
+        ? sortArrayByProp(subRows, subRowDimension.name, 'asc')
         : subRows;
 
       subRowsByRowData.set(rowKey, subRowsSorted);
@@ -124,7 +124,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
       });
     });
     setSubRowsByRow(subRowsByRowData);
-  }, [results2, expandedRowKeys, setLoadingRows]);
+  }, [resultsSubRows, expandedRowKeys, setLoadingRows]);
 
   return (
     <ChartCard
@@ -147,11 +147,11 @@ const PivotTablePro = (props: PivotTableProProps) => {
         columnDimension={pivotColumnDimension}
         columnTotalsFor={pivotColumnTotalsFor}
         rowTotalsFor={pivotRowTotalsFor}
-        expandableRows={Boolean(rowDimension2)}
+        expandableRows={Boolean(subRowDimension)}
         subRowsByRow={subRowsByRow}
         loadingRows={loadingRows}
         onRowExpand={handleRowExpand}
-        subRowDimension={pivotRowDimension2}
+        subRowDimension={pivotSubRowDimension}
       />
     </ChartCard>
   );
