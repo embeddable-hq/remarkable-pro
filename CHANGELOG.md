@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.10
+
+### Patch Changes
+
+- 73344f6: HorizontalDivider component
+
 ## 0.1.9
 
 ### Patch Changes
