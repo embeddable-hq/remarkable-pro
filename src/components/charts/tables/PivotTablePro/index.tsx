@@ -107,15 +107,19 @@ const PivotTablePro = (props: PivotTableProProps) => {
 
     const subRowsByRowData = new Map<string, any[]>();
     expandedRowKeys.forEach((rowKey) => {
-      const containsSubRow = resultsSubRows.data?.some((row) => row[rowDimension.name] === rowKey);
-      if (!containsSubRow) return;
+      const containsSubRow = resultsSubRows.data?.some(
+        (row) => String(row[rowDimension.name]) === rowKey,
+      );
 
-      const subRows = resultsSubRows.data?.filter((row) => row[rowDimension.name] === rowKey) ?? [];
-      const subRowsSorted = subRowDimension
-        ? sortArrayByProp(subRows, subRowDimension.name, 'asc')
-        : subRows;
+      if (containsSubRow) {
+        const subRows =
+          resultsSubRows.data?.filter((row) => String(row[rowDimension.name]) === rowKey) ?? [];
+        const subRowsSorted = subRowDimension
+          ? sortArrayByProp(subRows, subRowDimension.name, 'asc')
+          : subRows;
 
-      subRowsByRowData.set(rowKey, subRowsSorted);
+        subRowsByRowData.set(rowKey, subRowsSorted);
+      }
 
       setLoadingRows((prev) => {
         const next = new Set(prev);
@@ -124,7 +128,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
       });
     });
     setSubRowsByRow(subRowsByRowData);
-  }, [resultsSubRows, expandedRowKeys, setLoadingRows]);
+  }, [resultsSubRows, expandedRowKeys, rowDimension, subRowDimension]);
 
   return (
     <ChartCard
