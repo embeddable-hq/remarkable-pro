@@ -33,7 +33,7 @@ export type TableChartPaginatedProState = {
   hasTotalResults: boolean;
 };
 
-type TableChartPaginatedProProps = {
+export type TableChartPaginatedProProps = {
   allResults?: DataResponse;
   clickDimension?: Dimension;
 

@@ -14,7 +14,7 @@ import {
 import { useEffect, useMemo } from 'react';
 import { getTimeRangeFromPresets } from '../dates/dates.utils';
 
-type DateComparisonSelectFieldPro = {
+export type DateComparisonSelectFieldPro = {
   placeholder?: string;
   primaryDateRange?: TimeRange;
   comparisonPeriod?: string;

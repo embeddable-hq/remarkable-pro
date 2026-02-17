@@ -9,7 +9,7 @@ import { SingleSelectField } from '@embeddable.com/remarkable-ui';
 
 export const MAX_OPTIONS = 200;
 
-type SingleSelectFieldProProps = {
+export type SingleSelectFieldProProps = {
   dimension: Dimension;
   optionalSecondDimension?: Dimension;
   placeholder?: string;

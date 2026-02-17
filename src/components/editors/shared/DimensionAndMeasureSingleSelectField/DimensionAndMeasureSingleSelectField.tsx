@@ -5,7 +5,7 @@ import { SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { getDimensionAndMeasureOptions } from '../../utils/dimensionsAndMeasures.utils';
 import { Dimension, Measure } from '@embeddable.com/core';
 
-type DimensionAndMeasureSingleSelectFieldProps<T> = {
+export type DimensionAndMeasureSingleSelectFieldProps<T> = {
   selectedValue?: T;
   options: T[];
   placeholder?: string;

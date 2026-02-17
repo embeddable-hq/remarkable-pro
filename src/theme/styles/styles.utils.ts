@@ -90,7 +90,7 @@ export const getColor = (key: string, value: string, palette: string[], idx: num
   return color;
 };
 
-type GetDimensionMeasureColorProps = {
+export type GetDimensionMeasureColorProps = {
   dimensionOrMeasure: Dimension | Measure;
   theme: Theme;
   value: string;

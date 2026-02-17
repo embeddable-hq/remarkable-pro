@@ -12,7 +12,7 @@ import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelect
 
 export type LineChartProPropsOnLineClicked = { axisDimensionValue: string | null };
 
-type LineChartProProp = {
+export type LineChartProProp = {
   xAxis: Dimension;
   measures: Measure[];
   results: DataResponse;

@@ -15,7 +15,7 @@ import { LineChartProOptionsClick } from '../lines.utils';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 
-type LineChartComparisonDefaultProProps = {
+export type LineChartComparisonDefaultProProps = {
   xAxis: Dimension;
   measures: Measure[];
   results: DataResponse;

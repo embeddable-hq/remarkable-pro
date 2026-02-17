@@ -13,7 +13,7 @@ import {
 } from '../dates.utils';
 import { IconCalendarFilled } from '@tabler/icons-react';
 
-type DateRangePickerPresetsProps = {
+export type DateRangePickerPresetsProps = {
   onChange: (newDateRange: TimeRange) => void;
   placeholder?: string;
   selectedValue?: TimeRange;

@@ -9,7 +9,7 @@ import { MultiSelectField } from '@embeddable.com/remarkable-ui';
 
 export const MAX_OPTIONS = 200;
 
-type MultiSelectFieldProProps = {
+export type MultiSelectFieldProProps = {
   dimension: Dimension;
   optionalSecondDimension?: Dimension;
   placeholder?: string;

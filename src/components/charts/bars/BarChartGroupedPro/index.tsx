@@ -10,7 +10,7 @@ import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/c
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 
-type BarChartGroupedProProps = {
+export type BarChartGroupedProProps = {
   groupBy: Dimension;
   measure: Measure;
   results: DataResponse;

@@ -10,7 +10,7 @@ import { DonutChart } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
 import { resolveI18nProps } from '../../../component.utils';
 
-type DonutLabelChartProProps = DefaultPieChartProps & {
+export type DonutLabelChartProProps = DefaultPieChartProps & {
   innerLabelMeasure: Measure;
   innerLabelText?: string;
   resultsInnerLabel: DataResponse;

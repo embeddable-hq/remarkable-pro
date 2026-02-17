@@ -6,7 +6,7 @@ import {
 import styles from './ChartGranularitySelectField.module.css';
 import clsx from 'clsx';
 
-type ChartGranularitySelectFieldProps = Pick<GranularitySelectFieldProps, 'onChange'> & {
+export type ChartGranularitySelectFieldProps = Pick<GranularitySelectFieldProps, 'onChange'> & {
   dimension: Dimension;
   hasMarginTop?: boolean;
 };

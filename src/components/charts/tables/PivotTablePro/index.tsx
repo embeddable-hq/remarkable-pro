@@ -17,7 +17,7 @@ import { useGetTableSortedResults } from '../tables.hooks';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-type PivotTableProProps = {
+export type PivotTableProProps = {
   results: DataResponse;
   measures: Measure[];
   rowDimension: Dimension;

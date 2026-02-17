@@ -28,7 +28,7 @@ import {
   getTimeRangeLabel,
 } from '../dates.utils';
 
-type DateRangePickerPresetsProps = {
+export type DateRangePickerPresetsProps = {
   onChange: (newDateRange: TimeRange) => void;
   placeholder?: string;
   selectedValue?: TimeRange;
