@@ -7,7 +7,7 @@ import { useTheme } from '@embeddable.com/react';
 import { i18nSetup } from '../../../theme/i18n/i18n';
 import { DimensionAndMeasureSingleSelectField } from '../shared/DimensionAndMeasureSingleSelectField/DimensionAndMeasureSingleSelectField';
 
-type DimensionSingleSelectFieldProProps = {
+export type DimensionSingleSelectFieldProProps = {
   selectedDimension?: Dimension;
   dimensionOptions: Dimension[];
   placeholder?: string;

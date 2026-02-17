@@ -7,7 +7,7 @@ import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCa
 import { TGranularityValue } from '../../../theme/defaults/defaults.GranularityOptions.constants';
 import { GranularitySelectField } from '../shared/GranularitySelectField/GranularitySelectField';
 
-type GranularitySelectFieldProProps = {
+export type GranularitySelectFieldProProps = {
   onChange: (newGranularity: string) => void;
   placeholder?: string;
   primaryTimeRange?: TimeRange;

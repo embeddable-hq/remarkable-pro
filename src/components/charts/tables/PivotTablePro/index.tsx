@@ -18,7 +18,7 @@ import { sortArrayByProp } from '../../../../utils/array.utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-type PivotTableProProps = {
+export type PivotTableProProps = {
   results: DataResponse;
   resultsSubRows?: DataResponse;
   measures: Measure[];

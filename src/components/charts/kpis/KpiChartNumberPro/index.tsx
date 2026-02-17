@@ -8,7 +8,7 @@ import { KpiChart } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getKpiResults } from '../kpis.utils';
 
-type KpiChartNumberProProp = {
+export type KpiChartNumberProProp = {
   results: DataResponse;
   measure: Measure;
   fontSize?: number;

@@ -8,7 +8,7 @@ import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { mergician } from 'mergician';
 import { resolveI18nProps } from '../../../component.utils';
 
-type PieChartProProps = DefaultPieChartProps;
+export type PieChartProProps = DefaultPieChartProps;
 
 const PieChartPro = (props: PieChartProProps) => {
   const theme = useTheme() as Theme;

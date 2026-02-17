@@ -12,7 +12,7 @@ export type EditorCardHeaderProps = {
   tooltip?: string;
 };
 
-type EditorCardProps = {
+export type EditorCardProps = {
   children: React.ReactNode;
   errorMessage?: string;
 } & EditorCardHeaderProps;

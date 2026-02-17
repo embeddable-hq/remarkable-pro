@@ -18,7 +18,7 @@ export type LineChartGroupedProPropsOnLineClicked = {
   groupingDimensionValue: string | null;
 };
 
-type LineChartGroupedProProp = {
+export type LineChartGroupedProProp = {
   xAxis: Dimension;
   groupBy: Dimension;
   measure: Measure;

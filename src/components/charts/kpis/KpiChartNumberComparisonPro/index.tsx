@@ -13,7 +13,7 @@ import {
 } from '../../../utils/timeRange.utils';
 import { getKpiResults } from '../kpis.utils';
 
-type KpiChartNumberComparisonProProp = {
+export type KpiChartNumberComparisonProProp = {
   changeFontSize?: number;
   comparisonPeriod?: string;
   displayChangeAsPercentage?: boolean;

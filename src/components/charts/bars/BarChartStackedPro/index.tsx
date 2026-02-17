@@ -10,7 +10,7 @@ import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/c
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 
-type BarChartStackedProProps = {
+export type BarChartStackedProProps = {
   groupBy: Dimension;
   maxLegendItems?: number;
   measure: Measure;

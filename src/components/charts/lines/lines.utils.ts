@@ -10,7 +10,7 @@ type LineDataset = ChartDataset<'line'> & {
   rawLabel?: string;
 };
 
-export const getLineChartProOptions = (props: {
+export const getLineChartProOptionsOnClick = (props: {
   onLineClicked?: LineChartProOptionsClick;
 }): ChartOptions<'line'> => {
   const { onLineClicked } = props;
