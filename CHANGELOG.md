@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.8
+
+### Patch Changes
+
+- d80c7e7: PivotTable with subrows
+
 ## 0.1.7
 
 ### Patch Changes
