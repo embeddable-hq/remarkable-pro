@@ -8,7 +8,7 @@ import { DonutChart } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
 import { resolveI18nProps } from '../../../component.utils';
 
-type DonutChartProProps = DefaultPieChartProps;
+export type DonutChartProProps = DefaultPieChartProps;
 
 const DonutChartPro = (props: DonutChartProProps) => {
   const theme = useTheme() as Theme;

@@ -42,13 +42,21 @@ export const meta = {
     },
     {
       ...inputs.dimensionWithDateBounds,
-      label: 'Row dimension',
-      name: 'rowDimension',
+      label: 'Column dimension',
+      name: 'columnDimension',
     },
     {
       ...inputs.dimensionWithDateBounds,
-      label: 'Column dimension',
-      name: 'columnDimension',
+      label: 'Primary row dimension',
+      name: 'rowDimension',
+    },
+    {
+      ...inputs.dimension,
+      label: 'Secondary row dimension (optional)',
+      name: 'subRowDimension',
+      required: false,
+      description:
+        'When set, each primary row becomes expandable. Clicking a row loads a breakdown by the second dimension.',
     },
     inputs.title,
     inputs.description,
@@ -78,19 +86,54 @@ export const preview = definePreview(PivotTablePro, {
   columnDimension: previewData.dimensionGroup,
   results: previewData.results1Measure2Dimensions,
   hideMenu: true,
+  expandedRowKeys: [],
+  setExpandedRowKey: () => {},
 });
 
+export type PivotTableProState = {
+  expandedRowKeys?: string[];
+};
+
 export default defineComponent(PivotTablePro, meta, {
-  props: (inputs: Inputs<typeof meta>) => {
+  props: (
+    inputs: Inputs<typeof meta>,
+    [state, setState]: [PivotTableProState, (state: PivotTableProState) => void],
+  ) => {
+    const expandedRowKeys = state?.expandedRowKeys ?? [];
+
     return {
       ...inputs,
-
+      state,
+      expandedRowKeys,
+      setExpandedRowKey: (rowKey: string) =>
+        setState({ expandedRowKeys: [...expandedRowKeys, rowKey] }),
       results: loadData({
         from: inputs.dataset,
         select: [inputs.rowDimension, inputs.columnDimension, ...inputs.measures],
         limit: inputs.maxResults,
         countRows: true,
       }),
+      resultsSubRows:
+        expandedRowKeys.length > 0
+          ? loadData({
+              from: inputs.dataset,
+              select: [
+                inputs.rowDimension,
+                inputs.subRowDimension,
+                inputs.columnDimension,
+                ...inputs.measures,
+              ],
+              limit: inputs.maxResults,
+              countRows: true,
+              filters: [
+                {
+                  property: inputs.rowDimension,
+                  operator: 'equals',
+                  value: expandedRowKeys,
+                },
+              ],
+            })
+          : undefined,
     };
   },
 });

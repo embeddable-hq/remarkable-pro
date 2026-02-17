@@ -12,7 +12,7 @@ import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils'
 import { i18n } from '../../../../theme/i18n/i18n';
 import { mergician } from 'mergician';
 import { isColorValid, setColorAlpha } from '../../../../utils/color.utils';
-import { getLineChartProOptions, LineChartProOptionsClick } from '../lines.utils';
+import { getLineChartProOptionsOnClick, LineChartProOptionsClick } from '../lines.utils';
 
 const AXIS_ID_MAIN = 'mainAxis';
 const AXIS_ID_COMPARISON = 'comparisonAxis';
@@ -370,7 +370,7 @@ export const getLineChartComparisonProOptions = (
       : getLineChartComparisonNonTimeOptions;
 
   return mergician(
-    getLineChartProOptions({ onLineClicked }),
+    getLineChartProOptionsOnClick({ onLineClicked }),
     getOptions(options, theme),
     theme.charts?.lineChartComparisonDefaultPro?.options || {},
   );

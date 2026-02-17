@@ -28,7 +28,7 @@ export type TableScrollableProState = {
   isLoadingDownloadData: boolean;
 };
 
-type TableScrollableProProps = {
+export type TableScrollableProProps = {
   dataset: Dataset;
   allResults?: DataResponse;
   clickDimension?: Dimension;
