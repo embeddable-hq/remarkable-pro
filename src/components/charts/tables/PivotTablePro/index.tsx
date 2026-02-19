@@ -119,16 +119,20 @@ const PivotTablePro = (props: PivotTableProProps) => {
           : subRows;
 
         subRowsByRowData.set(rowKey, subRowsSorted);
+        setLoadingRows((prev) => {
+          const next = new Set(prev);
+          next.delete(rowKey);
+          return next;
+        });
       }
-
-      setLoadingRows((prev) => {
-        const next = new Set(prev);
-        next.delete(rowKey);
-        return next;
-      });
     });
     setSubRowsByRow(subRowsByRowData);
   }, [resultsSubRows, expandedRowKeys, rowDimension, subRowDimension]);
+
+  const data: DataResponse = {
+    ...props.results,
+    isLoading: Boolean(props.results?.isLoading || resultsSubRows?.isLoading),
+  };
 
   return (
     <ChartCard
@@ -136,7 +140,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
       title={title}
       description={description}
       tooltip={tooltip}
-      data={props.results}
+      data={data}
       dimensionsAndMeasures={[rowDimension, columnDimension, ...measures]}
       errorMessage={props.results?.error}
       hideMenu={hideMenu}
