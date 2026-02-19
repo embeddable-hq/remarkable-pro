@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.12
+
+### Patch Changes
+
+- 40e0a94: BarChart dataLabel alignment fix
+
 ## 0.1.11
 
 ### Patch Changes
