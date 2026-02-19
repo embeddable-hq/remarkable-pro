@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.13
+
+### Patch Changes
+
+- d2d458a: Update SDK
+
 ## 0.1.12
 
 ### Patch Changes
