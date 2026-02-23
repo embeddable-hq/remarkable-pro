@@ -11,6 +11,4 @@ export const meta = {
 
 export const preview = definePreview(EmptyBlockPro, {});
 
-export default defineComponent(EmptyBlockPro, meta, {
-  props: () => ({}),
-});
+export default defineComponent(EmptyBlockPro, meta, {});

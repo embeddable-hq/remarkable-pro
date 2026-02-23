@@ -7,7 +7,6 @@ import {
 } from '@embeddable.com/react';
 import HeatMapPro from './index';
 import { inputs } from '../../../component.inputs.constants';
-import { getStyle } from '@embeddable.com/remarkable-ui';
 import { previewData } from '../../../preview.data.constants';
 
 export const meta = {
@@ -33,10 +32,9 @@ export const meta = {
     inputs.displayNullAs,
     {
       ...inputs.color,
-      required: true,
+
       name: 'midColor',
-      label: 'Mid-point color',
-      defaultValue: getStyle('--em-tablechart-heatmap-color', '#FF5400'),
+      label: 'Mid-point color (optional)',
     },
     {
       ...inputs.color,

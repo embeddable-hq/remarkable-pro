@@ -24,7 +24,7 @@ export type BarChartDefaultProProps = {
   showTooltips?: boolean;
   showValueLabels?: boolean;
   reverseXAxis?: boolean;
-  setGranularity: (granularity: Granularity) => void;
+  setGranularity?: (granularity: Granularity) => void;
   onBarClicked?: (args: { axisDimensionValue: string | null }) => void;
 } & ChartCardHeaderProps;
 
@@ -77,11 +77,13 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
       tooltip={tooltip}
       hideMenu={hideMenu}
     >
-      <ChartGranularitySelectField
-        hasMarginTop={granularitySelectorHasMarginTop}
-        dimension={dimension}
-        onChange={setGranularity}
-      />
+      {setGranularity && (
+        <ChartGranularitySelectField
+          hasMarginTop={granularitySelectorHasMarginTop}
+          dimension={dimension}
+          onChange={setGranularity}
+        />
+      )}
       <BarChart
         data={data}
         showLegend={showLegend}

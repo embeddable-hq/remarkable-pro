@@ -74,7 +74,7 @@ export * from './components/charts/kpis/kpis.utils';
 // Charts - Lines
 export * as LineChartDefaultPro from './components/charts/lines/LineChartDefaultPro';
 export type {
-  LineChartProProp,
+  LineChartProProps,
   LineChartProPropsOnLineClicked,
 } from './components/charts/lines/LineChartDefaultPro';
 export * as LineChartGroupedPro from './components/charts/lines/LineChartGroupedPro';

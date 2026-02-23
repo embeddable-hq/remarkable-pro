@@ -232,7 +232,7 @@ const measureOptions = {
   ...measures,
   name: 'measureOptions',
   label: 'Measure options',
-  inputs: [subInputs.displayName],
+  inputs: dimensionMeasureSubInputs,
 };
 
 const dimensionOptions = {
