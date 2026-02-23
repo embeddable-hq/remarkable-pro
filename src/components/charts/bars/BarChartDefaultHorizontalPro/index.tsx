@@ -24,7 +24,7 @@ export type BarChartDefaultHorizontalProProps = {
   xAxisRangeMin?: number;
   yAxisLabel?: string;
   yAxisMaxItems?: number;
-  setGranularity: (granularity: Granularity) => void;
+  setGranularity?: (granularity: Granularity) => void;
   onBarClicked?: (args: { axisDimensionValue: string | null }) => void;
 } & ChartCardHeaderProps;
 
@@ -62,7 +62,7 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
 
   const options = mergician(
     getBarChartProOptions({ measures, horizontal: true, onBarClicked, data, dimension }, theme), // Format X axis based on first measure
-    theme.charts?.barChartDefaultHorizontalPro?.options || {},
+    theme.charts?.barChartDefaultHorizontalPro?.options ?? {},
   );
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
@@ -77,11 +77,13 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
       tooltip={tooltip}
       hideMenu={hideMenu}
     >
-      <ChartGranularitySelectField
-        hasMarginTop={granularitySelectorHasMarginTop}
-        dimension={dimension}
-        onChange={setGranularity}
-      />
+      {setGranularity && (
+        <ChartGranularitySelectField
+          hasMarginTop={granularitySelectorHasMarginTop}
+          dimension={dimension}
+          onChange={setGranularity}
+        />
+      )}
       <BarChart
         horizontal
         data={data}

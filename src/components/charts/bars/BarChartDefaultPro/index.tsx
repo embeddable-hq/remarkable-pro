@@ -62,7 +62,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
 
   const options = mergician(
     getBarChartProOptions({ measures, horizontal: false, onBarClicked, data, dimension }, theme), // Format Y axis based on first measure
-    theme.charts?.barChartDefaultPro?.options || {},
+    theme.charts?.barChartDefaultPro?.options ?? {},
   );
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;

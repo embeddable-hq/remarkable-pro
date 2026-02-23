@@ -13,16 +13,13 @@ import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 
 const meta = {
-  name: 'BarChartDefaultPro',
-  label: 'Bar Chart - Default',
+  name: 'BarChartDefaultHorizontalPro',
+  label: 'Bar Chart - Default Horizontal',
   category: 'Bar Charts',
   inputs: [
     inputs.dataset,
     { ...inputs.measures, inputs: [...inputs.measures.inputs, inputs.color] },
-    {
-      ...inputs.dimensionWithGranularitySelectField,
-      label: 'X-axis',
-    },
+    { ...inputs.dimensionWithGranularitySelectField, label: 'Y-axis' },
     inputs.title,
     inputs.description,
     inputs.tooltip,
@@ -32,10 +29,10 @@ const meta = {
     inputs.showLogarithmicScale,
     inputs.xAxisLabel,
     inputs.yAxisLabel,
-    inputs.reverseXAxis,
-    inputs.yAxisRangeMin,
-    inputs.yAxisRangeMax,
-    inputs.xAxisMaxItems,
+    inputs.reverseYAxis,
+    inputs.xAxisRangeMin,
+    inputs.xAxisRangeMax,
+    inputs.yAxisMaxItems,
     inputs.maxResults,
   ],
   events: [
@@ -53,7 +50,7 @@ const meta = {
   ],
 } as const satisfies EmbeddedComponentMeta;
 
-export type BarChartDefaultProState = {
+export type BarChartDefaultHorizontalProState = {
   granularity?: Granularity;
 };
 
@@ -70,9 +67,9 @@ const loadDataResultsArgs = (
   inputs: Inputs<typeof meta>,
   dimension?: Dimension,
 ): LoadDataRequest => ({
-  limit: inputs.maxResults,
   from: inputs.dataset,
   select: [...inputs.measures, dimension ?? inputs.dimension],
+  limit: inputs.maxResults,
 });
 
 const loadDataResults = (inputs: Inputs<typeof meta>, dimension: Dimension): DataResponse =>
@@ -86,7 +83,10 @@ const events = {
 
 const props = (
   inputs: Inputs<typeof meta>,
-  [state, setState]: [BarChartDefaultProState, (state: BarChartDefaultProState) => void],
+  [state, setState]: [
+    BarChartDefaultHorizontalProState,
+    (state: BarChartDefaultHorizontalProState) => void,
+  ],
 ) => {
   const dimensionWithGranularity = getDimensionWithGranularity(
     inputs.dimension,
@@ -101,7 +101,7 @@ const props = (
   };
 };
 
-export const barChartDefaultPro = {
+export const barChartDefaultHorizontalPro = {
   Component,
   meta,
   preview,

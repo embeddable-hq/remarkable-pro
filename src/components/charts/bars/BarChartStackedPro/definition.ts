@@ -13,30 +13,28 @@ import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 
 const meta = {
-  name: 'BarChartDefaultPro',
-  label: 'Bar Chart - Default',
+  name: 'BarChartStackedPro',
+  label: 'Bar Chart - Stacked',
   category: 'Bar Charts',
   inputs: [
     inputs.dataset,
-    { ...inputs.measures, inputs: [...inputs.measures.inputs, inputs.color] },
-    {
-      ...inputs.dimensionWithGranularitySelectField,
-      label: 'X-axis',
-    },
+    inputs.measure,
+    { ...inputs.dimensionWithGranularitySelectField, name: 'xAxis', label: 'X-axis' },
+    inputs.groupBy,
     inputs.title,
     inputs.description,
     inputs.tooltip,
+    inputs.maxResults,
     inputs.showLegend,
     inputs.showTooltips,
-    inputs.showValueLabels,
+    { ...inputs.showValueLabels, defaultValue: false },
     inputs.showLogarithmicScale,
     inputs.xAxisLabel,
     inputs.yAxisLabel,
     inputs.reverseXAxis,
     inputs.yAxisRangeMin,
     inputs.yAxisRangeMax,
-    inputs.xAxisMaxItems,
-    inputs.maxResults,
+    inputs.showTotalLabels,
   ],
   events: [
     {
@@ -48,60 +46,61 @@ const meta = {
           label: 'Clicked axis dimension value',
           type: 'string',
         },
+        {
+          name: 'groupingDimensionValue',
+          label: 'Clicked grouping dimension value',
+          type: 'string',
+        },
       ],
     },
   ],
 } as const satisfies EmbeddedComponentMeta;
 
-export type BarChartDefaultProState = {
+export type BarChartStackedProState = {
   granularity?: Granularity;
 };
 
 const previewConfig = {
-  dimension: previewData.dimension,
-  measures: [previewData.measure],
-  results: previewData.results1Measure1Dimension,
+  xAxis: previewData.dimension,
+  groupBy: previewData.dimensionGroup,
+  measure: previewData.measure,
+  results: previewData.results1Measure2Dimensions,
   hideMenu: true,
 };
 
 const preview = definePreview(Component, previewConfig);
 
-const loadDataResultsArgs = (
-  inputs: Inputs<typeof meta>,
-  dimension?: Dimension,
-): LoadDataRequest => ({
+const loadDataResultsArgs = (inputs: Inputs<typeof meta>, xAxis?: Dimension): LoadDataRequest => ({
   limit: inputs.maxResults,
   from: inputs.dataset,
-  select: [...inputs.measures, dimension ?? inputs.dimension],
+  select: [xAxis ?? inputs.xAxis, inputs.groupBy, inputs.measure],
 });
 
-const loadDataResults = (inputs: Inputs<typeof meta>, dimension: Dimension): DataResponse =>
-  loadData(loadDataResultsArgs(inputs, dimension));
+const loadDataResults = (inputs: Inputs<typeof meta>, xAxis: Dimension): DataResponse =>
+  loadData(loadDataResultsArgs(inputs, xAxis));
 
 const events = {
-  onBarClicked: (value: { axisDimensionValue?: string }) => ({
+  onBarClicked: (value: { axisDimensionValue?: string; groupingDimensionValue?: string }) => ({
     axisDimensionValue: value.axisDimensionValue ?? Value.noFilter(),
+    groupingDimensionValue: value.groupingDimensionValue ?? Value.noFilter(),
   }),
 };
 
 const props = (
   inputs: Inputs<typeof meta>,
-  [state, setState]: [BarChartDefaultProState, (state: BarChartDefaultProState) => void],
+  [state, setState]: [BarChartStackedProState, (state: BarChartStackedProState) => void],
 ) => {
-  const dimensionWithGranularity = getDimensionWithGranularity(
-    inputs.dimension,
-    state?.granularity,
-  );
+  const xAxisWithGranularity = getDimensionWithGranularity(inputs.xAxis, state?.granularity);
 
   return {
     ...inputs,
-    dimension: dimensionWithGranularity,
+    xAxis: xAxisWithGranularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
-    results: loadDataResults(inputs, dimensionWithGranularity),
+    results: loadDataResults(inputs, xAxisWithGranularity),
   };
 };
 
-export const barChartDefaultPro = {
+export const barChartStackedPro = {
   Component,
   meta,
   preview,

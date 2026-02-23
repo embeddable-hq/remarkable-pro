@@ -33,7 +33,7 @@ export type LineChartComparisonDefaultProProps = {
   comparisonDateRange: TimeRange;
   showComparisonAxis?: boolean;
   primaryDateRange: TimeRange;
-  setGranularity: (granularity: Granularity) => void;
+  setGranularity?: (granularity: Granularity) => void;
   setComparisonDateRange?: (dateRange: TimeRange) => void;
   onLineClicked?: LineChartProOptionsClick;
 } & ChartCardHeaderProps;
@@ -128,11 +128,13 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
       title={title}
       hideMenu={hideMenu}
     >
-      <ChartGranularitySelectField
-        hasMarginTop={granularitySelectorHasMarginTop}
-        dimension={xAxis}
-        onChange={setGranularity}
-      />
+      {setGranularity && (
+        <ChartGranularitySelectField
+          hasMarginTop={granularitySelectorHasMarginTop}
+          dimension={xAxis}
+          onChange={setGranularity}
+        />
+      )}
       <LineChart
         data={data}
         reverseXAxis={reverseXAxis}
