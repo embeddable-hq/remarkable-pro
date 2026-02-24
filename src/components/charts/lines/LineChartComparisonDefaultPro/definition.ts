@@ -200,6 +200,10 @@ const props = (
   ],
 ) => {
   const xAxisWithGranularity = getDimensionWithGranularity(inputs.xAxis, state?.granularity);
+  const timeProperty =
+    xAxisWithGranularity.nativeType === 'time'
+      ? xAxisWithGranularity
+      : inputs.timePropertyForNonTimeDimensions;
 
   return {
     ...inputs,
@@ -210,7 +214,7 @@ const props = (
       setState({ ...state, comparisonDateRange }),
     results: loadDataResults(inputs, xAxisWithGranularity),
     resultsComparison:
-      inputs.primaryDateRange && state?.comparisonDateRange
+      inputs.primaryDateRange && timeProperty && state?.comparisonDateRange
         ? loadDataResultsComparison(inputs, xAxisWithGranularity, state.comparisonDateRange)
         : undefined,
   };
