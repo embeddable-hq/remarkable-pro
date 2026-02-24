@@ -25,7 +25,7 @@ export type BarChartGroupedHorizontalProProps = {
   yAxisLabel?: string;
   xAxisRangeMax?: number;
   xAxisRangeMin?: number;
-  setGranularity: (granularity: Granularity) => void;
+  setGranularity?: (granularity: Granularity) => void;
   onBarClicked?: (args: {
     axisDimensionValue: string | null;
     groupingDimensionValue: string | null;
@@ -75,7 +75,7 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
       { measures: [measure], horizontal: true, onBarClicked, data, dimension: yAxis },
       theme,
     ),
-    theme.charts?.barChartGroupedHorizontalPro?.options || {},
+    theme.charts?.barChartGroupedHorizontalPro?.options ?? {},
   );
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
@@ -90,11 +90,13 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
       tooltip={tooltip}
       hideMenu={hideMenu}
     >
-      <ChartGranularitySelectField
-        hasMarginTop={granularitySelectorHasMarginTop}
-        dimension={yAxis}
-        onChange={setGranularity}
-      />
+      {setGranularity && (
+        <ChartGranularitySelectField
+          hasMarginTop={granularitySelectorHasMarginTop}
+          dimension={yAxis}
+          onChange={setGranularity}
+        />
+      )}
       <BarChart
         data={data}
         showLegend={showLegend}

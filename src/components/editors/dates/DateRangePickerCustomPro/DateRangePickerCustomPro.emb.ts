@@ -1,76 +1,12 @@
-import {
-  defineComponent,
-  definePreview,
-  EmbeddedComponentMeta,
-  Inputs,
-} from '@embeddable.com/react';
-import { Value } from '@embeddable.com/core';
-import DateTimeSelectFieldPro from './index';
-import { inputs } from '../../../component.inputs.constants';
+import { defineComponent } from '@embeddable.com/react';
+import { dateRangePickerCustomPro } from './definition';
 
-export const meta = {
-  name: 'DateRangePickerCustomPro',
-  label: 'Date-Range Picker - Custom',
-  category: 'Dropdowns',
-  defaultWidth: 300,
-  defaultHeight: 120,
-  inputs: [
-    inputs.title,
-    inputs.description,
-    inputs.tooltip,
-    { ...inputs.placeholder, defaultValue: 'Select a date-range' },
-    inputs.clearable,
-    {
-      ...inputs.timeRange,
-      name: 'selectedValue',
-      label: 'Selected value',
-      category: 'Pre-configured variables',
-    },
-    {
-      ...inputs.boolean,
-      name: 'showTwoMonths',
-      label: 'Show two months',
-      defaultValue: false,
-      category: 'Component Settings',
-    },
-  ],
-  events: [
-    {
-      name: 'onChange',
-      label: 'Selected date-range updated',
-      properties: [
-        {
-          name: 'value',
-          label: 'Selected date-range',
-          type: 'timeRange',
-        },
-      ],
-    },
-  ],
-  variables: [
-    {
-      name: 'date-range value',
-      type: 'timeRange',
-      defaultValue: Value.noFilter(),
-      inputs: ['selectedValue'],
-      events: [{ name: 'onChange', property: 'value' }],
-    },
-  ],
-} as const satisfies EmbeddedComponentMeta;
+export const preview = dateRangePickerCustomPro.preview;
 
-export const preview = definePreview(DateTimeSelectFieldPro, {
-  onChange: () => null,
-});
+export const meta = dateRangePickerCustomPro.meta;
 
-export default defineComponent(DateTimeSelectFieldPro, meta, {
-  props: (inputs: Inputs<typeof meta>) => {
-    return {
-      ...inputs,
-    };
-  },
-  events: {
-    onChange: (range) => ({
-      value: range ?? Value.noFilter(),
-    }),
-  },
-});
+export default defineComponent(
+  dateRangePickerCustomPro.Component,
+  meta,
+  dateRangePickerCustomPro.config,
+);

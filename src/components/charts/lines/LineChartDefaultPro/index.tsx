@@ -12,7 +12,7 @@ import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelect
 
 export type LineChartProPropsOnLineClicked = { axisDimensionValue: string | null };
 
-export type LineChartProProp = {
+export type LineChartProProps = {
   xAxis: Dimension;
   measures: Measure[];
   results: DataResponse;
@@ -25,11 +25,11 @@ export type LineChartProProp = {
   yAxisLabel?: string;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
-  setGranularity: (granularity: Granularity) => void;
+  setGranularity?: (granularity: Granularity) => void;
   onLineClicked?: LineChartProOptionsClick;
 } & ChartCardHeaderProps;
 
-const LineChartPro = (props: LineChartProProp) => {
+const LineChartPro = (props: LineChartProProps) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
@@ -80,11 +80,13 @@ const LineChartPro = (props: LineChartProProp) => {
       tooltip={tooltip}
       hideMenu={hideMenu}
     >
-      <ChartGranularitySelectField
-        hasMarginTop={granularitySelectorHasMarginTop}
-        dimension={xAxis}
-        onChange={setGranularity}
-      />
+      {setGranularity && (
+        <ChartGranularitySelectField
+          hasMarginTop={granularitySelectorHasMarginTop}
+          dimension={xAxis}
+          onChange={setGranularity}
+        />
+      )}
       <LineChart
         data={data}
         reverseXAxis={reverseXAxis}

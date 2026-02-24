@@ -7,6 +7,7 @@ import { Theme } from '../../theme/theme.types';
 import { useTheme } from '@embeddable.com/react';
 import { useMemo } from 'react';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear.js';
+import { defaultGranularitySelectFieldOptions } from '../../theme/defaults/defaults.GranularityOptions.constants';
 
 dayjs.extend(utc);
 dayjs.extend(isoWeek);
@@ -32,8 +33,13 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
     const dimensionName = dimension.name;
     const dateBoundsTmp: TimeRange = dimension.inputs?.dateBounds;
 
+    const knownGranularities = defaultGranularitySelectFieldOptions.map(
+      (opt) => opt.value as string,
+    );
+
     if (
       !granularity ||
+      !knownGranularities.includes(granularity) ||
       !dimensionName ||
       !results ||
       results.isLoading ||

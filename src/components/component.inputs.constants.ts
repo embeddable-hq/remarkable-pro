@@ -2,7 +2,6 @@ import ColorType from '../editors/ColorEditor/Color.type.emb';
 import { Granularity } from '../theme/defaults/defaults.GranularityOptions.constants';
 import {
   dimensionMeasureSubInputs,
-  subInputs,
   timeDimensionSubInputs,
   timeDimensionWithGranularitySelectFieldSubInputs,
 } from './component.subinputs.constants';
@@ -232,14 +231,14 @@ const measureOptions = {
   ...measures,
   name: 'measureOptions',
   label: 'Measure options',
-  inputs: [subInputs.displayName],
+  inputs: dimensionMeasureSubInputs,
 };
 
 const dimensionOptions = {
   ...dimensions,
   name: 'dimensionOptions',
   label: 'Dimension options',
-  inputs: [subInputs.displayName],
+  inputs: dimensionMeasureSubInputs,
 };
 
 const comparisonPeriod = {

@@ -25,7 +25,7 @@ export type BarChartHorizontalStackedProProps = {
   yAxisLabel?: string;
   xAxisRangeMax?: number;
   xAxisRangeMin?: number;
-  setGranularity: (granularity: Granularity) => void;
+  setGranularity?: (granularity: Granularity) => void;
   onBarClicked?: (args: {
     axisDimensionValue: string | null;
     groupingDimensionValue: string | null;
@@ -90,11 +90,13 @@ const BarChartHorizontalStackedPro = (props: BarChartHorizontalStackedProProps) 
       tooltip={tooltip}
       hideMenu={hideMenu}
     >
-      <ChartGranularitySelectField
-        hasMarginTop={granularitySelectorHasMarginTop}
-        dimension={yAxis}
-        onChange={setGranularity}
-      />
+      {setGranularity && (
+        <ChartGranularitySelectField
+          hasMarginTop={granularitySelectorHasMarginTop}
+          dimension={yAxis}
+          onChange={setGranularity}
+        />
+      )}
       <BarChart
         data={data}
         showLegend={showLegend}

@@ -32,7 +32,7 @@ export type LineChartGroupedProProp = {
   yAxisLabel?: string;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
-  setGranularity: (granularity: Granularity) => void;
+  setGranularity?: (granularity: Granularity) => void;
   onLineClicked?: LineChartProOptionsClick;
 } & ChartCardHeaderProps;
 
@@ -89,11 +89,13 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
       tooltip={tooltip}
       hideMenu={hideMenu}
     >
-      <ChartGranularitySelectField
-        hasMarginTop={granularitySelectorHasMarginTop}
-        dimension={xAxis}
-        onChange={setGranularity}
-      />
+      {setGranularity && (
+        <ChartGranularitySelectField
+          hasMarginTop={granularitySelectorHasMarginTop}
+          dimension={xAxis}
+          onChange={setGranularity}
+        />
+      )}
       <LineChart
         data={data}
         reverseXAxis={reverseXAxis}

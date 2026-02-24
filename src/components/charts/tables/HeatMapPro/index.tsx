@@ -4,7 +4,12 @@ import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
-import { HeatMap, HeatMapPropsDimension, HeatMapPropsMeasure } from '@embeddable.com/remarkable-ui';
+import {
+  getStyle,
+  HeatMap,
+  HeatMapPropsDimension,
+  HeatMapPropsMeasure,
+} from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { useGetTableSortedResults } from '../tables.hooks';
@@ -126,7 +131,7 @@ const HeatMapPro = (props: HeatMapProProps) => {
         rowDimension={pivotRowDimension}
         columnDimension={pivotColumnDimension}
         maxColor={maxColor}
-        midColor={midColor}
+        midColor={midColor ?? getStyle('--em-tablechart-heatmap-color', '#FF5400')}
         minColor={minColor}
         showValues={showValues}
         minThreshold={minThreshold}
