@@ -63,6 +63,12 @@ export type { BarChartHorizontalStackedProProps } from './components/charts/bars
 export * as BarChartGroupedHorizontalPro from './components/charts/bars/BarChartGroupedHorizontalPro';
 export type { BarChartGroupedHorizontalProProps } from './components/charts/bars/BarChartGroupedHorizontalPro';
 export * from './components/charts/bars/bars.utils';
+export * from './components/charts/bars/BarChartDefaultPro/definition';
+export * from './components/charts/bars/BarChartStackedPro/definition';
+export * from './components/charts/bars/BarChartGroupedPro/definition';
+export * from './components/charts/bars/BarChartDefaultHorizontalPro/definition';
+export * from './components/charts/bars/BarChartStackedHorizontalPro/definition';
+export * from './components/charts/bars/BarChartGroupedHorizontalPro/definition';
 
 // Charts - KPIs
 export * as KpiChartNumberPro from './components/charts/kpis/KpiChartNumberPro';
@@ -70,6 +76,8 @@ export type { KpiChartNumberProProp } from './components/charts/kpis/KpiChartNum
 export * as KpiChartNumberComparisonPro from './components/charts/kpis/KpiChartNumberComparisonPro';
 export type { KpiChartNumberComparisonProProp } from './components/charts/kpis/KpiChartNumberComparisonPro';
 export * from './components/charts/kpis/kpis.utils';
+export * from './components/charts/kpis/KpiChartNumberPro/definition';
+export * from './components/charts/kpis/KpiChartNumberComparisonPro/definition';
 
 // Charts - Lines
 export * as LineChartDefaultPro from './components/charts/lines/LineChartDefaultPro';
@@ -92,6 +100,9 @@ export type {
 export * from './components/charts/lines/LineChartDefaultPro/LineChartDefaultPro.utils';
 export * from './components/charts/lines/LineChartGroupedPro/LineChartGroupedPro.utils';
 export * from './components/charts/lines/LineChartComparisonDefaultPro/LineChartComparisonDefaultPro.utils';
+export * from './components/charts/lines/LineChartDefaultPro/definition';
+export * from './components/charts/lines/LineChartGroupedPro/definition';
+export * from './components/charts/lines/LineChartComparisonDefaultPro/definition';
 
 // Charts - Pies
 export * as DonutChartPro from './components/charts/pies/DonutChartPro';
@@ -102,6 +113,9 @@ export * as DonutLabelChartPro from './components/charts/pies/DonutLabelChartPro
 export type { DonutLabelChartProProps } from './components/charts/pies/DonutLabelChartPro';
 export * from './components/charts/pies/pies.types';
 export * from './components/charts/pies/pies.utils';
+export * from './components/charts/pies/DonutChartPro/definition';
+export * from './components/charts/pies/PieChartPro/definition';
+export * from './components/charts/pies/DonutLabelChartPro/definition';
 
 // Charts - Tables
 export * as HeatMapPro from './components/charts/tables/HeatMapPro';
@@ -124,6 +138,10 @@ export * from './components/charts/tables/tables.utils';
 export * from './components/charts/tables/tables.hooks';
 export * from './components/charts/tables/PivotTablePro/PivotPro.utils';
 export * from './components/charts/tables/TableScrollable/TableScrollable.utils';
+export * from './components/charts/tables/HeatMapPro/definition';
+export * from './components/charts/tables/PivotTablePro/definition';
+export * from './components/charts/tables/TableChartPaginated/definition';
+export * from './components/charts/tables/TableScrollable/definition';
 
 // Charts - Shared
 export * from './components/charts/shared/ChartCard/ChartCard';
@@ -142,23 +160,31 @@ export * as ComparisonPeriodSelectFieldPro from './components/editors/Comparison
 export type { DateComparisonSelectFieldPro } from './components/editors/ComparisonPeriodSelectFieldPro';
 export * from './components/editors/ComparisonPeriodSelectFieldPro/ComparisonPeriodSelectFieldPro.utils';
 export * from './components/editors/ComparisonPeriodSelectFieldPro/ComparisonPeriodSelectFieldPro.types';
+export * from './components/editors/ComparisonPeriodSelectFieldPro/definition';
 export * as DateRangeSelectFieldPro from './components/editors/dates/DateRangePickerPresetsPro';
 export type { DateRangePickerPresetsProps } from './components/editors/dates/DateRangePickerPresetsPro';
 export * from './components/editors/dates/DateRangePickerPresetsPro/DateRangePickerPresetsPro.utils';
 export * from './components/editors/dates/DateRangePickerPresetsPro/DateRangePickerPresetsPro.types';
+export * from './components/editors/dates/DateRangePickerPresetsPro/definition';
 export * as DateRangePickerCustomPro from './components/editors/dates/DateRangePickerCustomPro';
 export type { DateRangePickerPresetsProps as DateRangePickerCustomProProps } from './components/editors/dates/DateRangePickerCustomPro';
 export * from './components/editors/dates/dates.utils';
+export * from './components/editors/dates/DateRangePickerCustomPro/definition';
 export * as MultiSelectFieldPro from './components/editors/MultiSelectFieldPro';
 export type { MultiSelectFieldProProps } from './components/editors/MultiSelectFieldPro';
+export * from './components/editors/MultiSelectFieldPro/definition';
 export * as SingleSelectFieldPro from './components/editors/SingleSelectFieldPro';
 export type { SingleSelectFieldProProps } from './components/editors/SingleSelectFieldPro';
+export * from './components/editors/SingleSelectFieldPro/definition';
 export * as DimensionSingleSelectFieldPro from './components/editors/DimensionSingleSelectFieldPro';
 export type { DimensionSingleSelectFieldProProps } from './components/editors/DimensionSingleSelectFieldPro';
+export * from './components/editors/DimensionSingleSelectFieldPro/definition';
 export * as MeasureSingleSelectFieldPro from './components/editors/MeasureSingleSelectFieldPro';
 export type { MeasureSingleSelectFieldProProps } from './components/editors/MeasureSingleSelectFieldPro';
+export * from './components/editors/MeasureSingleSelectFieldPro/definition';
 export * as GranularitySelectFieldPro from './components/editors/GranularitySelectFieldPro';
 export type { GranularitySelectFieldProProps } from './components/editors/GranularitySelectFieldPro';
+export * from './components/editors/GranularitySelectFieldPro/definition';
 
 // Editors - Shared
 export * from './components/editors/shared/EditorCard/EditorCard';

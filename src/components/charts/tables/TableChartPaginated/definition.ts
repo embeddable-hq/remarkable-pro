@@ -81,7 +81,7 @@ const previewConfig = {
 
 const preview = definePreview(TablePaginatedChart, previewConfig);
 
-export const defaultState: TableChartPaginatedProState = {
+export const defaultTableChartPaginatedState: TableChartPaginatedProState = {
   page: 0,
   pageSize: undefined,
   sort: undefined,
@@ -171,7 +171,7 @@ const props = (
 
   return {
     ...inputs,
-    state: mergician(defaultState, state ?? {}),
+    state: mergician(defaultTableChartPaginatedState, state ?? {}),
     setState,
     results: state?.pageSize
       ? loadDataResults(inputs, state.page, state.pageSize, orderBy, dimensionsAndMeasuresToLoad)

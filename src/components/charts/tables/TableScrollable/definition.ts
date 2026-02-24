@@ -71,7 +71,7 @@ const previewConfig = {
 
 const preview = definePreview(TableScrollableChart, previewConfig);
 
-export const defaultState: TableScrollableProState = {
+export const defaultTableScrollableState: TableScrollableProState = {
   page: 0,
   sort: undefined,
   isLoadingDownloadData: false,
@@ -141,11 +141,11 @@ const props = (
 
   return {
     ...inputs,
-    state: mergician(defaultState, state ?? {}),
+    state: mergician(defaultTableScrollableState, state ?? {}),
     setState,
     results: loadDataResults(
       inputs,
-      state?.page ? state.page : defaultState.page,
+      state?.page ? state.page : defaultTableScrollableState.page,
       orderBy,
       dimensionsAndMeasuresToLoad,
     ),
