@@ -108,8 +108,16 @@ const loadDataAllResultsArgs = (
   limit: inputs.maxResults,
 });
 
-const loadDataAllResults = (inputs: Inputs<typeof meta>, orderBy: OrderBy[]): DataResponse =>
-  loadData(loadDataAllResultsArgs(inputs, orderBy));
+const loadDataAllResults = (
+  inputs: Inputs<typeof meta>,
+  orderBy: OrderBy[],
+  state: TableScrollableProState,
+): DataResponse | undefined => {
+  if (state?.isLoadingDownloadData) {
+    return loadData(loadDataAllResultsArgs(inputs, orderBy));
+  }
+  return undefined;
+};
 
 const events = {
   onRowClicked: (rowDimensionValue: TableScrollableProOnRowClickArg) => ({
@@ -149,7 +157,7 @@ const props = (
       orderBy,
       dimensionsAndMeasuresToLoad,
     ),
-    allResults: state?.isLoadingDownloadData ? loadDataAllResults(inputs, orderBy) : undefined,
+    allResults: loadDataAllResults(inputs, orderBy, state),
   };
 };
 

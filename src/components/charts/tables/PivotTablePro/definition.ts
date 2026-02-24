@@ -121,7 +121,12 @@ const loadDataResultsSubRowsArgs = (
 const loadDataResultsSubRows = (
   inputs: Inputs<typeof meta>,
   expandedRowKeys: string[],
-): DataResponse => loadData(loadDataResultsSubRowsArgs(inputs, expandedRowKeys));
+): DataResponse | undefined => {
+  if (expandedRowKeys.length > 0) {
+    return loadData(loadDataResultsSubRowsArgs(inputs, expandedRowKeys));
+  }
+  return undefined;
+};
 
 const props = (
   inputs: Inputs<typeof meta>,
@@ -136,8 +141,7 @@ const props = (
     setExpandedRowKey: (rowKey: string) =>
       setState({ expandedRowKeys: [...expandedRowKeys, rowKey] }),
     results: loadDataResults(inputs),
-    resultsSubRows:
-      expandedRowKeys.length > 0 ? loadDataResultsSubRows(inputs, expandedRowKeys) : undefined,
+    resultsSubRows: loadDataResultsSubRows(inputs, expandedRowKeys),
   };
 };
 

@@ -103,7 +103,7 @@ const loadDataResultsComparisonArgs = (
   limit: 1,
   filters: [
     {
-      property: inputs.timeProperty!,
+      property: inputs.timeProperty,
       operator: 'inDateRange',
       value: comparisonDateRange,
     },
@@ -112,8 +112,13 @@ const loadDataResultsComparisonArgs = (
 
 const loadDataResultsComparison = (
   inputs: Inputs<typeof meta>,
-  comparisonDateRange: TimeRange,
-): DataResponse => loadData(loadDataResultsComparisonArgs(inputs, comparisonDateRange));
+  state: KpiChartNumberComparisonProState,
+): DataResponse | undefined => {
+  if (inputs.primaryDateRange && inputs.timeProperty && state?.comparisonDateRange) {
+    return loadData(loadDataResultsComparisonArgs(inputs, state.comparisonDateRange));
+  }
+  return undefined;
+};
 
 const props = (
   inputs: Inputs<typeof meta>,
@@ -127,10 +132,7 @@ const props = (
   comparisonDateRange: state?.comparisonDateRange,
   setComparisonDateRange: (comparisonDateRange: TimeRange) => setState({ comparisonDateRange }),
   results: loadDataResults(inputs),
-  resultsComparison:
-    inputs.primaryDateRange && inputs.timeProperty && state?.comparisonDateRange
-      ? loadDataResultsComparison(inputs, state.comparisonDateRange)
-      : undefined,
+  resultsComparison: loadDataResultsComparison(inputs, state),
 });
 
 export const kpiChartNumberComparisonPro = {

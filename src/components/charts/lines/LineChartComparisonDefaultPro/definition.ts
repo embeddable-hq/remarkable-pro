@@ -176,15 +176,23 @@ const loadDataResultsComparisonArgs = (
     from: inputs.dataset,
     select: [...inputs.measures, xAxis],
     orderBy,
-    filters: [{ property: timeProperty!, operator: 'inDateRange', value: comparisonDateRange }],
+    filters: [{ property: timeProperty, operator: 'inDateRange', value: comparisonDateRange }],
   };
 };
 
 const loadDataResultsComparison = (
   inputs: Inputs<typeof meta>,
   xAxis: Dimension,
-  comparisonDateRange: TimeRange,
-): DataResponse => loadData(loadDataResultsComparisonArgs(inputs, xAxis, comparisonDateRange));
+  state: LineChartComparisonDefaultProState,
+): DataResponse | undefined => {
+  const timeProperty =
+    xAxis.nativeType === 'time' ? xAxis : inputs.timePropertyForNonTimeDimensions;
+
+  if (inputs.primaryDateRange && timeProperty && state?.comparisonDateRange) {
+    return loadData(loadDataResultsComparisonArgs(inputs, xAxis, state.comparisonDateRange));
+  }
+  return undefined;
+};
 
 const events = {
   onLineClicked: (value: LineChartProOptionsClickArg) => ({
@@ -200,10 +208,6 @@ const props = (
   ],
 ) => {
   const xAxisWithGranularity = getDimensionWithGranularity(inputs.xAxis, state?.granularity);
-  const timeProperty =
-    xAxisWithGranularity.nativeType === 'time'
-      ? xAxisWithGranularity
-      : inputs.timePropertyForNonTimeDimensions;
 
   return {
     ...inputs,
@@ -213,10 +217,7 @@ const props = (
     setComparisonDateRange: (comparisonDateRange: TimeRange) =>
       setState({ ...state, comparisonDateRange }),
     results: loadDataResults(inputs, xAxisWithGranularity),
-    resultsComparison:
-      inputs.primaryDateRange && timeProperty && state?.comparisonDateRange
-        ? loadDataResultsComparison(inputs, xAxisWithGranularity, state.comparisonDateRange)
-        : undefined,
+    resultsComparison: loadDataResultsComparison(inputs, xAxisWithGranularity, state),
   };
 };
 

@@ -1,5 +1,5 @@
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
-import { Value, loadData } from '@embeddable.com/core';
+import { Value, loadData, LoadDataRequest, DataResponse } from '@embeddable.com/core';
 import Component, { MAX_OPTIONS } from '.';
 import { inputs } from '../../component.inputs.constants';
 import { previewData } from '../../preview.data.constants';
@@ -76,30 +76,34 @@ const preview = definePreview(Component, {
   onChange: () => null,
 });
 
+const loadDataResultsArgs = (
+  inputs: Inputs<typeof meta>,
+  state?: MultiSelectDropdownState,
+): LoadDataRequest => {
+  const operator = inputs.dimension.nativeType === 'string' ? 'contains' : 'equals';
+  return {
+    limit: inputs.maxOptions,
+    from: inputs.dataset,
+    select: [inputs.dimension, inputs.optionalSecondDimension].filter(Boolean),
+    filters: state?.searchValue
+      ? [{ operator, property: inputs.dimension, value: state.searchValue }]
+      : undefined,
+  };
+};
+
+const loadDataResults = (
+  inputs: Inputs<typeof meta>,
+  state?: MultiSelectDropdownState,
+): DataResponse => loadData(loadDataResultsArgs(inputs, state));
+
 const props = (
   inputs: Inputs<typeof meta>,
   [state, setState]: [MultiSelectDropdownState, (state: MultiSelectDropdownState) => void],
-) => {
-  const operator = inputs.dimension.nativeType === 'string' ? 'contains' : 'equals';
-  return {
-    ...inputs,
-    setSearchValue: (searchValue: string) => setState({ searchValue }),
-    results: loadData({
-      limit: inputs.maxOptions,
-      from: inputs.dataset,
-      select: [inputs.dimension, inputs.optionalSecondDimension].filter(Boolean),
-      filters: state?.searchValue
-        ? [
-            {
-              operator,
-              property: inputs.dimension,
-              value: state.searchValue,
-            },
-          ]
-        : undefined,
-    }),
-  };
-};
+) => ({
+  ...inputs,
+  setSearchValue: (searchValue: string) => setState({ searchValue }),
+  results: loadDataResults(inputs, state),
+});
 
 const events = {
   onChange: (selectedValues: string[]) => {
@@ -116,5 +120,9 @@ export const multiSelectFieldPro = {
   config: {
     props,
     events,
+  },
+  results: {
+    loadDataArgs: loadDataResultsArgs,
+    loadData: loadDataResults,
   },
 } as const;
