@@ -54,8 +54,8 @@ describe('getTimeRangeFromPresets', () => {
     const opts = [makeOption('jan', jan)];
     const result = getTimeRangeFromPresets(input, opts);
     expect(result).toEqual({
-      from: jan.from,
-      to: jan.to,
+      from: jan?.from,
+      to: jan?.to,
       relativeTimeString: 'jan',
     });
   });
@@ -65,8 +65,8 @@ describe('getTimeRangeFromPresets', () => {
     const opts = [makeOption('jan', jan), makeOption('feb', feb)];
     const result = getTimeRangeFromPresets(input, opts);
     expect(result).toEqual({
-      from: feb.from,
-      to: feb.to,
+      from: feb?.from,
+      to: feb?.to,
       relativeTimeString: 'feb',
     });
   });
@@ -139,9 +139,9 @@ describe('getTimeRangeFromDateRange', () => {
       to: new Date('2024-03-31T23:59:59.999Z'),
     };
     const result = getTimeRangeFromDateRange(dateRange);
-    expect(result.relativeTimeString).toBeUndefined();
-    expect(result.from).toEqual(new Date('2024-03-01T00:00:00.000Z'));
-    expect(result.to).toEqual(new Date('2024-03-31T23:59:59.999Z'));
+    expect(result?.relativeTimeString).toBeUndefined();
+    expect(result?.from).toEqual(new Date('2024-03-01T00:00:00.000Z'));
+    expect(result?.to).toEqual(new Date('2024-03-31T23:59:59.999Z'));
   });
 
   it('normalises non-UTC input dates to UTC', () => {
@@ -150,8 +150,8 @@ describe('getTimeRangeFromDateRange', () => {
       to: new Date('2024-03-31'),
     };
     const result = getTimeRangeFromDateRange(dateRange);
-    expect(result.from).toBeInstanceOf(Date);
-    expect(result.to).toBeInstanceOf(Date);
+    expect(result?.from).toBeInstanceOf(Date);
+    expect(result?.to).toBeInstanceOf(Date);
   });
 });
 

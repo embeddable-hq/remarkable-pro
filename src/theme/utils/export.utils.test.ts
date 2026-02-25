@@ -90,7 +90,7 @@ describe('exportCSV', () => {
 
     exportCSV({ title: 'test', data: rows, dimensionsAndMeasures: dims, theme: mockTheme });
 
-    const blob = createObjectURL.mock.calls[0][0] as Blob;
+    const blob = createObjectURL.mock.calls[0]?.[0] as Blob;
     expect(await blob.text()).toBe('"City","Revenue"\r\n"London","1000"\r\n"Paris",""');
   });
 
@@ -102,7 +102,7 @@ describe('exportCSV', () => {
       theme: mockTheme,
     });
 
-    const blob = createObjectURL.mock.calls[0][0] as Blob;
+    const blob = createObjectURL.mock.calls[0]?.[0] as Blob;
     expect(await blob.text()).toBe('"Name"\r\n"He said ""hello"""');
   });
 
@@ -114,7 +114,7 @@ describe('exportCSV', () => {
       theme: mockTheme,
     });
 
-    const blob = createObjectURL.mock.calls[0][0] as Blob;
+    const blob = createObjectURL.mock.calls[0]?.[0] as Blob;
     expect(await blob.text()).toBe('"Value"\r\n""');
   });
 });
@@ -256,7 +256,8 @@ describe('exportPNG', () => {
 
     await exportPNG({ title: 'test', containerRef: { current: el }, theme: mockTheme });
 
-    const { filter } = (domtoimage.toPng as Mock).mock.calls[0][1];
+    const callArgs = (domtoimage.toPng as Mock).mock.calls[0];
+    const filter = callArgs && callArgs[1] ? callArgs[1].filter : undefined;
 
     const excluded = document.createElement('div');
     excluded.setAttribute('data-no-export', '');

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { getLineChartProOptionsOnClick } from './lines.utils';
+import { getLineChartProOptionsOnClick, LineChartProOptionsClick } from './lines.utils';
 import type { ChartEvent } from 'chart.js';
 
 // ---------------------------------------------------------------------------
@@ -29,7 +29,7 @@ const makeChart = (options: {
 
 const invokeClick = (
   chart: ReturnType<typeof makeChart>,
-  onLineClicked: ReturnType<typeof vi.fn>,
+  onLineClicked: LineChartProOptionsClick,
 ) => {
   const options = getLineChartProOptionsOnClick({ onLineClicked });
   options.onClick!(makeEvent(), [], chart as never);

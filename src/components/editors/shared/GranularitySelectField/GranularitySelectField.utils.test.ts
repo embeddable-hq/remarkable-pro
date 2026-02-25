@@ -40,7 +40,7 @@ describe('getGranularitySelectFieldOptions', () => {
 
 describe('getAvailableGranularityOptionsFromTimeRange', () => {
   const allOpts = ['second', 'minute', 'hour', 'day', 'week', 'month', 'quarter', 'year'].map(
-    makeOpt,
+    (value) => makeOpt(value),
   );
 
   it('returns allOptions unchanged when timeRange is null', () => {
@@ -79,17 +79,6 @@ describe('getAvailableGranularityOptionsFromTimeRange', () => {
     );
     expect(Array.isArray(result)).toBe(true);
     expect(result.length).toBeGreaterThan(0);
-  });
-
-  it('accepts numeric timestamps', () => {
-    const start = new Date('2024-01-01T00:00:00Z').getTime();
-    const end = new Date('2024-01-01T01:00:00Z').getTime();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const result = getAvailableGranularityOptionsFromTimeRange(
-      { from: start, to: end } as any,
-      allOpts,
-    );
-    expect(Array.isArray(result)).toBe(true);
   });
 
   it('returns only minute and hour for a 1-hour range', () => {

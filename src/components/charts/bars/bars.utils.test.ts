@@ -107,7 +107,9 @@ describe('getBarStackedChartProData', () => {
       makeTheme(),
     );
 
-    const northDataset = result.datasets.find((ds) => ds.rawLabel === 'North');
+    const northDataset = result.datasets.find(
+      (ds) => (ds as { rawLabel?: string }).rawLabel === 'North',
+    );
     expect(northDataset?.data).toEqual([10, 0]); // present for A, missing for B
   });
 
@@ -165,7 +167,7 @@ describe('getBarStackedChartProData', () => {
     );
 
     expect(result.datasets).toHaveLength(1);
-    expect(result.datasets[0]?.rawLabel).toBe('Q1');
+    expect((result.datasets[0] as { rawLabel?: string })?.rawLabel).toBe('Q1');
   });
 
   it('assigns background and border colors from getDimensionMeasureColor', () => {
@@ -403,7 +405,7 @@ describe('getBarChartProOptions', () => {
       );
 
       const context = [{ label: 'Widget' }] as never;
-      options.plugins!.tooltip!.callbacks!.title!(context);
+      options.plugins!.tooltip!.callbacks!.title!.call({} as never, context);
 
       expect(mockFormatter.data).toHaveBeenCalledWith(dimension, 'Widget');
     });
@@ -422,7 +424,7 @@ describe('getBarChartProOptions', () => {
         raw: 50,
         dataset: { label: 'Revenue' },
       } as never;
-      options.plugins!.tooltip!.callbacks!.label!(context);
+      options.plugins!.tooltip!.callbacks!.label!.call({} as never, context);
 
       expect(mockFormatter.data).toHaveBeenCalledWith(measures[0], 50);
     });

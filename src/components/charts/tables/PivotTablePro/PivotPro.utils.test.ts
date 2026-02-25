@@ -12,7 +12,7 @@ vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatte
 
 const makeFormatter = (overrides: Record<string, any> = {}) => ({
   dimensionOrMeasureTitle: vi.fn((d: any) => `title:${d.name}`),
-  data: vi.fn((d: any, v: any) => `fmt:${v}`),
+  data: vi.fn((_d: any, v: any) => `fmt:${v}`),
   ...overrides,
 });
 
@@ -45,8 +45,8 @@ describe('getPivotMeasures', () => {
 
     const [result] = getPivotMeasures({ measures: [measure()] }, mockTheme)!;
 
-    expect(result.key).toBe('myMeasure');
-    expect(result.label).toBe('title:myMeasure');
+    expect(result?.key).toBe('myMeasure');
+    expect(result?.label).toBe('title:myMeasure');
     expect(fmt.dimensionOrMeasureTitle).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'myMeasure' }),
     );
@@ -60,7 +60,7 @@ describe('getPivotMeasures', () => {
       mockTheme,
     )!;
 
-    expect(result.showAsPercentage).toBe(true);
+    expect(result?.showAsPercentage).toBe(true);
   });
 
   it('sets showAsPercentage to false when inputs.showAsPercentage is absent', () => {
@@ -68,7 +68,7 @@ describe('getPivotMeasures', () => {
 
     const [result] = getPivotMeasures({ measures: [measure()] }, mockTheme)!;
 
-    expect(result.showAsPercentage).toBe(false);
+    expect(result?.showAsPercentage).toBe(false);
   });
 
   it('uses inputs.decimalPlaces for percentageDecimalPlaces', () => {
@@ -79,7 +79,7 @@ describe('getPivotMeasures', () => {
       mockTheme,
     )!;
 
-    expect(result.percentageDecimalPlaces).toBe(3);
+    expect(result?.percentageDecimalPlaces).toBe(3);
   });
 
   it('defaults percentageDecimalPlaces to 1 when decimalPlaces is absent', () => {
@@ -87,7 +87,7 @@ describe('getPivotMeasures', () => {
 
     const [result] = getPivotMeasures({ measures: [measure()] }, mockTheme)!;
 
-    expect(result.percentageDecimalPlaces).toBe(1);
+    expect(result?.percentageDecimalPlaces).toBe(1);
   });
 
   describe('accessor', () => {
@@ -99,7 +99,7 @@ describe('getPivotMeasures', () => {
         mockTheme,
       )!;
 
-      expect(result.accessor!({ myMeasure: null })).toBe('N/A');
+      expect(result?.accessor!({ myMeasure: null })).toBe('N/A');
     });
 
     it('returns displayNullAs when row value is undefined', () => {
@@ -107,7 +107,7 @@ describe('getPivotMeasures', () => {
 
       const [result] = getPivotMeasures({ measures: [measure()], displayNullAs: '-' }, mockTheme)!;
 
-      expect(result.accessor!({ myMeasure: undefined })).toBe('-');
+      expect(result?.accessor!({ myMeasure: undefined })).toBe('-');
     });
 
     it('returns formatted value via themeFormatter.data when value is present', () => {
@@ -116,7 +116,7 @@ describe('getPivotMeasures', () => {
 
       const [result] = getPivotMeasures({ measures: [measure()] }, mockTheme)!;
 
-      expect(result.accessor!({ myMeasure: 42 })).toBe('fmt:42');
+      expect(result?.accessor!({ myMeasure: 42 })).toBe('fmt:42');
       expect(fmt.data).toHaveBeenCalledWith(expect.objectContaining({ name: 'myMeasure' }), 42);
     });
   });
@@ -130,8 +130,8 @@ describe('getPivotMeasures', () => {
     )!;
 
     expect(results).toHaveLength(2);
-    expect(results[0].key).toBe('a');
-    expect(results[1].key).toBe('b');
+    expect(results[0]!.key).toBe('a');
+    expect(results[1]!.key).toBe('b');
   });
 });
 

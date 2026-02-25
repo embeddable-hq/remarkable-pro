@@ -23,14 +23,14 @@ describe('defaultChartMenuProOptions', () => {
   });
 
   it('has a Download CSV option', () => {
-    expect(defaultChartMenuProOptions[0].labelKey).toBe('charts.menuOptions.downloadCSV');
+    expect(defaultChartMenuProOptions[0]!.labelKey).toBe('charts.menuOptions.downloadCSV');
   });
 
   it('has a Download XLSX option', () => {
-    expect(defaultChartMenuProOptions[1].labelKey).toBe('charts.menuOptions.downloadXLSX');
+    expect(defaultChartMenuProOptions[1]!.labelKey).toBe('charts.menuOptions.downloadXLSX');
   });
 
   it('has a Download PNG option', () => {
-    expect(defaultChartMenuProOptions[2].labelKey).toBe('charts.menuOptions.downloadPNG');
+    expect(defaultChartMenuProOptions[2]!.labelKey).toBe('charts.menuOptions.downloadPNG');
   });
 });

@@ -41,8 +41,8 @@ describe('injectCssVariables', () => {
     injectCssVariables({ '--new': 'green' });
     const elements = document.querySelectorAll('#remarkable-ui-embeddable-style');
     expect(elements).toHaveLength(1);
-    expect(elements[0].textContent).toContain('--new: green;');
-    expect(elements[0].textContent).not.toContain('--old');
+    expect(elements[0]!.textContent).toContain('--new: green;');
+    expect(elements[0]!.textContent).not.toContain('--old');
   });
 
   it('returns a cleanup function that removes the style element', () => {

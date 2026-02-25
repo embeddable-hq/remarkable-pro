@@ -88,7 +88,7 @@ describe('getPieChartProData', () => {
 
     const result = getPieChartProData({ data, dimension, measure }, theme);
 
-    expect(result.datasets[0].data).toEqual([42, 7]);
+    expect(result.datasets[0]?.data).toEqual([42, 7]);
   });
 
   it('generates backgroundColor and borderColor arrays of the correct length', () => {
@@ -100,8 +100,8 @@ describe('getPieChartProData', () => {
 
     const result = getPieChartProData({ data, dimension, measure }, theme);
 
-    expect(result.datasets[0].backgroundColor).toHaveLength(3);
-    expect(result.datasets[0].borderColor).toHaveLength(3);
+    expect(result.datasets[0]?.backgroundColor).toHaveLength(3);
+    expect(result.datasets[0]?.borderColor).toHaveLength(3);
   });
 
   it('requests background and border colors via getDimensionMeasureColor', () => {

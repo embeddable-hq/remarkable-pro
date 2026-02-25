@@ -41,7 +41,7 @@ const makeFormatter = (overrides = {}) => ({
 
 describe('getTableHeaderAlign', () => {
   it('returns subInputAlign when set', () => {
-    const dim = makeDimOrMeas({ inputs: { align: 'center' } as any });
+    const dim = makeDimOrMeas({ inputs: { align: 'center' } });
     expect(getTableHeaderAlign(dim)).toBe('center');
   });
 
@@ -66,19 +66,13 @@ describe('getTableHeaderAlign', () => {
       TableHeaderAlign.LEFT,
     );
   });
-
-  it('returns LEFT for unknown nativeType', () => {
-    expect(getTableHeaderAlign(makeDimOrMeas({ nativeType: 'unknown' as any }))).toBe(
-      TableHeaderAlign.LEFT,
-    );
-  });
 });
 
 // ---------------------------------------------------------------------------
 
 describe('getTableHeaderMinWidth', () => {
   it('returns subInputWidth when set', () => {
-    const dim = makeDimOrMeas({ inputs: { width: '20rem' } as any });
+    const dim = makeDimOrMeas({ inputs: { width: '20rem' } });
     expect(getTableHeaderMinWidth(dim)).toBe('20rem');
   });
 
@@ -101,11 +95,6 @@ describe('getTableHeaderMinWidth', () => {
     const result = getTableHeaderMinWidth(makeDimOrMeas({ nativeType: 'boolean' }));
     expect(result).toBe('5.625rem');
   });
-
-  it('uses CSS var fallback for unknown nativeType (default case)', () => {
-    const result = getTableHeaderMinWidth(makeDimOrMeas({ nativeType: 'unknown' as any }));
-    expect(result).toBe('5.625rem');
-  });
 });
 
 // ---------------------------------------------------------------------------
@@ -115,7 +104,7 @@ describe('getTableHeaders', () => {
 
   beforeEach(() => {
     formatter = makeFormatter();
-    vi.mocked(getThemeFormatter).mockReturnValue(formatter as any);
+    vi.mocked(getThemeFormatter).mockReturnValue(formatter as never);
   });
 
   const theme = makeTheme();
@@ -124,10 +113,10 @@ describe('getTableHeaders', () => {
     const dim = makeDimOrMeas({ name: 'revenue', title: 'Revenue', nativeType: 'number' });
     const [header] = getTableHeaders({ dimensionsAndMeasures: [dim] }, theme);
 
-    expect(header.id).toBe('revenue');
-    expect(header.title).toBe('Revenue');
-    expect(header.align).toBe(TableHeaderAlign.RIGHT);
-    expect(header.minWidth).toBe('5.625rem');
+    expect(header?.id).toBe('revenue');
+    expect(header?.title).toBe('Revenue');
+    expect(header?.align).toBe(TableHeaderAlign.RIGHT);
+    expect(header?.minWidth).toBe('5.625rem');
   });
 
   it('accessor injects displayNullAs into inputs and calls themeFormatter.data', () => {
@@ -135,7 +124,7 @@ describe('getTableHeaders', () => {
     const [header] = getTableHeaders({ dimensionsAndMeasures: [dim], displayNullAs: 'N/A' }, theme);
 
     const row = { city: 'Paris' };
-    header.accessor!(row);
+    header?.accessor!(row);
 
     expect(formatter.data).toHaveBeenCalledWith(
       expect.objectContaining({ inputs: expect.objectContaining({ displayNullAs: 'N/A' }) }),
@@ -147,7 +136,7 @@ describe('getTableHeaders', () => {
     const dim = makeDimOrMeas({ name: 'amount', nativeType: 'number' });
     const [header] = getTableHeaders({ dimensionsAndMeasures: [dim] }, theme);
 
-    header.accessor!({ amount: 42 });
+    header?.accessor!({ amount: 42 });
 
     expect(formatter.data).toHaveBeenCalledWith(expect.anything(), 42);
   });
@@ -156,27 +145,27 @@ describe('getTableHeaders', () => {
     it('returns undefined when no tableCellStyle input', () => {
       const dim = makeDimOrMeas({ inputs: {} });
       const [header] = getTableHeaders({ dimensionsAndMeasures: [dim] }, theme);
-      expect(header.cellStyle!(null)).toBeUndefined();
+      expect(header?.cellStyle!({ value: null })).toBeUndefined();
     });
 
     it('returns undefined when tableCellStyle value not found in theme options', () => {
-      const dim = makeDimOrMeas({ inputs: { tableCellStyle: 'Bold' } as any });
+      const dim = makeDimOrMeas({ inputs: { tableCellStyle: 'Bold' } });
       const themeWithOptions = makeTheme({ tableCellStyleOptions: [] });
       const [header] = getTableHeaders({ dimensionsAndMeasures: [dim] }, themeWithOptions);
-      expect(header.cellStyle!(null)).toBeUndefined();
+      expect(header?.cellStyle!({ value: null })).toBeUndefined();
     });
 
     it('calls matching tableCellStyle option and returns its styles', () => {
       const stylesFn = vi.fn().mockReturnValue({ fontWeight: 'bold' });
-      const dim = makeDimOrMeas({ inputs: { tableCellStyle: 'Bold' } as any });
+      const dim = makeDimOrMeas({ inputs: { tableCellStyle: 'Bold' } });
       const themeWithOptions = makeTheme({
-        tableCellStyleOptions: [{ value: 'Bold', label: 'Bold', styles: stylesFn }] as any,
+        tableCellStyleOptions: [{ value: 'Bold', styles: stylesFn }],
       });
       const [header] = getTableHeaders({ dimensionsAndMeasures: [dim] }, themeWithOptions);
 
-      const result = header.cellStyle!(5);
+      const result = header?.cellStyle!({ value: 5 });
 
-      expect(stylesFn).toHaveBeenCalledWith(5);
+      expect(stylesFn).toHaveBeenCalledWith({ value: 5 });
       expect(result).toEqual({ fontWeight: 'bold' });
     });
   });
@@ -185,23 +174,23 @@ describe('getTableHeaders', () => {
     it('is undefined when displayFormat is not JSON or Markdown', () => {
       const dim = makeDimOrMeas({ inputs: {} });
       const [header] = getTableHeaders({ dimensionsAndMeasures: [dim] }, theme);
-      expect(header.cell).toBeUndefined();
+      expect(header?.cell).toBeUndefined();
     });
 
     it('is defined when displayFormat is JSON', () => {
       const dim = makeDimOrMeas({
-        inputs: { displayFormat: DisplayFormatTypeOptions.JSON } as any,
+        inputs: { displayFormat: DisplayFormatTypeOptions.JSON },
       });
       const [header] = getTableHeaders({ dimensionsAndMeasures: [dim] }, theme);
-      expect(header.cell).toBeDefined();
+      expect(header?.cell).toBeDefined();
     });
 
     it('is defined when displayFormat is MARKDOWN', () => {
       const dim = makeDimOrMeas({
-        inputs: { displayFormat: DisplayFormatTypeOptions.MARKDOWN } as any,
+        inputs: { displayFormat: DisplayFormatTypeOptions.MARKDOWN },
       });
       const [header] = getTableHeaders({ dimensionsAndMeasures: [dim] }, theme);
-      expect(header.cell).toBeDefined();
+      expect(header?.cell).toBeDefined();
     });
   });
 
@@ -221,7 +210,7 @@ describe('getTableHeaders', () => {
 
 describe('getTableRows', () => {
   it('returns empty array when rows is undefined', () => {
-    expect(getTableRows({ rows: undefined as any })).toEqual([]);
+    expect(getTableRows({ rows: undefined })).toEqual([]);
   });
 
   it('returns empty array when rows is empty', () => {

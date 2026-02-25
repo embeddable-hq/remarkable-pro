@@ -5,12 +5,13 @@ import { getKpiResults } from './kpis.utils';
 const measure = { name: 'revenue' } as Measure;
 
 const results: DataResponse = {
+  isLoading: false,
   data: [{ revenue: '1000' }],
 };
 
 describe('getKpiResults', () => {
   it('returns results unchanged when hasDisplayNullAs is false', () => {
-    const emptyResults: DataResponse = { data: [] };
+    const emptyResults: DataResponse = { data: [], isLoading: false };
     expect(getKpiResults(emptyResults, measure, false)).toBe(emptyResults);
   });
 
@@ -19,16 +20,18 @@ describe('getKpiResults', () => {
   });
 
   it('injects null row when hasDisplayNullAs is true and data is empty', () => {
-    const emptyResults: DataResponse = { data: [] };
+    const emptyResults: DataResponse = { data: [], isLoading: false };
     expect(getKpiResults(emptyResults, measure, true)).toEqual({
       data: [{ revenue: null }],
+      isLoading: false,
     });
   });
 
   it('injects null row when hasDisplayNullAs is true and data is undefined', () => {
-    const noDataResults: DataResponse = { data: undefined };
+    const noDataResults: DataResponse = { data: undefined, isLoading: false };
     expect(getKpiResults(noDataResults, measure, true)).toEqual({
       data: [{ revenue: null }],
+      isLoading: false,
     });
   });
 
@@ -40,7 +43,7 @@ describe('getKpiResults', () => {
 
   it('uses measure.name as the key for the null row', () => {
     const cost = { name: 'cost' } as Measure;
-    const output = getKpiResults({ data: [] }, cost, true);
+    const output = getKpiResults({ data: [], isLoading: false }, cost, true);
     expect(output.data?.[0]).toHaveProperty('cost', null);
   });
 });

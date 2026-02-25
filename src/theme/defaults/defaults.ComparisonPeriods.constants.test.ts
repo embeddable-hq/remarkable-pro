@@ -1,11 +1,15 @@
+import { TimeRangeDeserializedValue } from '@embeddable.com/core';
 import { defaultComparisonPeriodOptions } from './defaults.ComparisonPeriods.constants';
 
 const range = (from: Date, to: Date) => ({ from, to, relativeTimeString: '' });
-const noRange = { relativeTimeString: '' };
+const noRange: TimeRangeDeserializedValue = {
+  relativeTimeString: '',
+  from: undefined,
+  to: undefined,
+};
 
 const getOption = (value: string) => {
-  const opt = defaultComparisonPeriodOptions.find((o) => o.value === value);
-  if (!opt) throw new Error(`Option "${value}" not found`);
+  const opt = defaultComparisonPeriodOptions.find((o) => o.value === value)!;
   return opt;
 };
 
