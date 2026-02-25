@@ -18,6 +18,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "coverage": "vitest run --coverage",
     "build-storybook": "storybook build",
     "circular:check": "madge --circular .",
     "embeddable:build": "embeddable build",
@@ -34,6 +35,8 @@
     "prettier:write": "prettier . --write",
     "release": "npm run embeddable:package && changeset publish",
     "storybook": "storybook dev -p 6006",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "types:check": "tsc --noEmit --incremental false",
     "reinstall": "rm -rf node_modules package-lock.json && npm install"
   },
@@ -82,6 +85,7 @@
     "@types/chroma-js": "^3.1.1",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
+    "@vitest/coverage-v8": "^4.0.18",
     "esbuild-register": "^3.6.0",
     "eslint": "^9.31.0",
     "eslint-config-prettier": "^10.1.5",
@@ -91,13 +95,15 @@
     "eslint-plugin-storybook": "^9.0.17",
     "globals": "^16.3.0",
     "husky": "^9.1.7",
+    "jsdom": "^28.1.0",
     "lint-staged": "^16.1.2",
     "madge": "^8.0.0",
     "prettier": "^3.6.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.37.0"
+    "typescript-eslint": "^8.37.0",
+    "vitest": "^4.0.18"
   },
   "peerDependencies": {
     "react": ">=19.1.1",
