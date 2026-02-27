@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.15
+
+### Patch Changes
+
+- 2c94ac8: Fix dataOtherFormatter namespace parsing for raw string values
+
 ## 0.1.14
 
 ### Patch Changes
