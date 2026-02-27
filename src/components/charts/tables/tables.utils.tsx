@@ -89,12 +89,14 @@ export const getTableHeaders = (
       },
       cell: hasCustomCellFormatter
         ? ({ value }) => {
-            const currentValue: string | undefined =
-              typeof value === 'string'
-                ? value
-                : value !== undefined && value !== null
-                  ? String(value)
-                  : undefined;
+            let currentValue: string | undefined;
+            if (typeof value === 'string') {
+              currentValue = value;
+            } else if (value !== undefined && value !== null) {
+              currentValue = String(value);
+            } else {
+              currentValue = undefined;
+            }
 
             return (
               <TableBodyCellWithCopy value={value}>
