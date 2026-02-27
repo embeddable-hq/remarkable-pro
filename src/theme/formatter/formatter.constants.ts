@@ -158,6 +158,7 @@ const dataOthersFormatter = (theme: Theme, key: DimensionOrMeasure): StringForma
           stringValue, // e.g. 'Germany'
         ],
         {
+          defaultValue: stringValue,
           value: stringValue,
           type: key.nativeType,
           name: name,
