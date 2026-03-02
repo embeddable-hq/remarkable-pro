@@ -1,13 +1,13 @@
 import type { Dimension, Measure } from '@embeddable.com/core';
 import { getBarStackedChartProData, getBarChartProData, getBarChartProOptions } from './bars.utils';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { groupTailAsOther } from '../charts.utils';
+import { getDatalabelPercentage, groupTailAsOther } from '../charts.utils';
 import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import type { Context } from 'chartjs-plugin-datalabels';
 
 vi.mock('../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
-vi.mock('../charts.utils', () => ({ groupTailAsOther: vi.fn() }));
+vi.mock('../charts.utils', () => ({ groupTailAsOther: vi.fn(), getDatalabelPercentage: vi.fn() }));
 vi.mock('../../../theme/styles/styles.utils', () => ({ getDimensionMeasureColor: vi.fn() }));
 vi.mock('@embeddable.com/remarkable-ui', () => ({ getChartColors: vi.fn() }));
 vi.mock('../../../theme/theme.constants', () => ({ remarkableTheme: { charts: {} } }));
@@ -302,6 +302,17 @@ describe('getBarChartProData', () => {
 
     expect(mockFormatter.dimensionOrMeasureTitle).toHaveBeenCalledWith(measure);
   });
+
+  it('uses the default remarkableTheme when no theme argument is supplied', () => {
+    const dimension = makeDimension({ name: 'product' });
+    const data = [{ product: 'Widget', revenue: '100' }];
+
+    vi.mocked(groupTailAsOther).mockReturnValue(data);
+
+    const result = getBarChartProData({ data, dimension, measures: [makeMeasure()] });
+
+    expect(result.datasets).toHaveLength(1);
+  });
 });
 
 // ----------------------------------------------------------------------------
@@ -392,6 +403,26 @@ describe('getBarChartProOptions', () => {
 
       expect(mockFormatter.data).toHaveBeenCalledWith(measures[0], 30);
     });
+
+    it('returns getDatalabelPercentage result when showValueAsPercentage is true', () => {
+      vi.mocked(getDatalabelPercentage).mockReturnValue('50%');
+
+      const measureWithPct = makeMeasure({
+        name: 'revenue',
+        inputs: { showValueAsPercentage: true },
+      });
+      const data = makeChartData(['A'], [[50]]);
+      const options = getBarChartProOptions(
+        { measures: [measureWithPct], dimension, horizontal: false, data: data as never },
+        makeTheme(),
+      );
+
+      const context = { datasetIndex: 0, dataset: { data: [50] } } as never;
+      const result = options.plugins!.datalabels!.labels!.value!.formatter!(50, context);
+
+      expect(getDatalabelPercentage).toHaveBeenCalledWith(50, [50]);
+      expect(result).toBe('50%');
+    });
   });
 
   // -- tooltip ---------------------------------------------------------------
@@ -427,6 +458,32 @@ describe('getBarChartProOptions', () => {
       options.plugins!.tooltip!.callbacks!.label!.call({} as never, context);
 
       expect(mockFormatter.data).toHaveBeenCalledWith(measures[0], 50);
+    });
+
+    it('appends percentage to label when showValueAsPercentage is true', () => {
+      vi.mocked(getDatalabelPercentage).mockReturnValue('50%');
+
+      const measureWithPct = makeMeasure({
+        name: 'revenue',
+        inputs: { showValueAsPercentage: true },
+      });
+      const data = makeChartData(['A'], [[50]]);
+      const options = getBarChartProOptions(
+        { measures: [measureWithPct], dimension, horizontal: false, data: data as never },
+        makeTheme(),
+      );
+
+      mockFormatter.data.mockImplementation((_, value) => `fmt:${value}`);
+
+      const context = {
+        datasetIndex: 0,
+        raw: 50,
+        dataset: { label: 'Revenue', data: [50] },
+      } as never;
+      const result = options.plugins!.tooltip!.callbacks!.label!.call({} as never, context);
+
+      expect(getDatalabelPercentage).toHaveBeenCalledWith(50, [50]);
+      expect(result).toBe('fmt:Revenue: fmt:50 (50%)');
     });
   });
 
