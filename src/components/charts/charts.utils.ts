@@ -29,5 +29,6 @@ export const groupTailAsOther = (
 export const getDatalabelPercentage = (value: number, data: unknown[]): string => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const total = data.reduce((sum: number, v: any) => sum + Number.parseFloat(v), 0);
+  if (total === 0) return '0%';
   return `${Number.parseFloat(((value / total) * 100).toFixed(2))}%`;
 };
