@@ -30,6 +30,10 @@ vi.mock('../../../theme/i18n/i18n', () => ({
 
 vi.mock('../charts.utils', () => ({
   groupTailAsOther: vi.fn((data: unknown[]) => data),
+  getDatalabelPercentage: vi.fn((value: number, data: number[]) => {
+    const total = data.reduce((sum, v) => sum + v, 0);
+    return `${Math.round((value / total) * 100)}%`;
+  }),
 }));
 
 // -- helpers -----------------------------------------------------------------
