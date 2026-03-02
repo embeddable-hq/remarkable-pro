@@ -11,6 +11,7 @@ import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
+import { subInputs } from '../../../component.subinputs.constants';
 
 const meta = {
   name: 'BarChartDefaultHorizontalPro',
@@ -18,7 +19,10 @@ const meta = {
   category: 'Bar Charts',
   inputs: [
     inputs.dataset,
-    { ...inputs.measures, inputs: [...inputs.measures.inputs, inputs.color] },
+    {
+      ...inputs.measures,
+      inputs: [...inputs.measures.inputs, subInputs.color, subInputs.showValueAsPercentage],
+    },
     { ...inputs.dimensionWithGranularitySelectField, label: 'Y-axis' },
     inputs.title,
     inputs.description,

@@ -3,6 +3,7 @@ import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/re
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
+import { subInputs } from '../../../component.subinputs.constants';
 
 const meta = {
   name: 'DonutChartPro',
@@ -10,7 +11,7 @@ const meta = {
   category: 'Pie Charts',
   inputs: [
     inputs.dataset,
-    inputs.measure,
+    { ...inputs.measure, inputs: [...inputs.measure.inputs, subInputs.showValueAsPercentage] },
     inputs.dimension,
     inputs.title,
     inputs.description,
