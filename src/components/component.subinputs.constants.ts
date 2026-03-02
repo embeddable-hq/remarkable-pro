@@ -136,6 +136,13 @@ const tableCellStyle = {
   label: 'Table cell style',
 } as const;
 
+const showValueAsPercentage = {
+  name: 'showValuesAsPercentage',
+  type: 'boolean',
+  label: 'Show values as percentage',
+  defaultValue: false,
+} as const;
+
 const showGranularityDropdown = {
   type: 'boolean',
   name: 'showGranularityDropdown',
@@ -211,4 +218,5 @@ export const subInputs = {
   displayFormat,
   tableCellStyle,
   showGranularityDropdown,
+  showValueAsPercentage,
 };

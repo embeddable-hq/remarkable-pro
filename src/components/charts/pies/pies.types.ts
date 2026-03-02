@@ -9,6 +9,7 @@ export type DefaultPieChartProps = {
   showLegend?: boolean;
   showTooltips?: boolean;
   showValueLabels?: boolean;
+  showValueLabelsAsPercentage?: boolean;
 
   onSegmentClick?: (args: { dimensionValue: string | null }) => void;
 } & ChartCardHeaderProps;

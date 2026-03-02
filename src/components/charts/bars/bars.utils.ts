@@ -3,7 +3,7 @@ import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
 import { ChartData, ChartOptions } from 'chart.js';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { groupTailAsOther } from '../charts.utils';
+import { getDatalabelPercentage, groupTailAsOther } from '../charts.utils';
 import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { Context } from 'chartjs-plugin-datalabels';
@@ -162,6 +162,10 @@ export const getBarChartProOptions = (
           value: {
             formatter: (value: string | number, context) => {
               const measure = measures[context.datasetIndex % measures.length]!;
+
+              if (measure.inputs?.showValuesAsPercentage) {
+                return getDatalabelPercentage(Number(value), context.dataset.data);
+              }
               return themeFormatter.data(measure, value);
             },
           },
@@ -173,10 +177,19 @@ export const getBarChartProOptions = (
             const label = context[0]?.label;
             return themeFormatter.data(dimension, label);
           },
+
           label: (context) => {
             const measure = measures[context.datasetIndex % measures.length]!;
             const raw = context.raw as number;
-            return `${themeFormatter.data(dimension, context.dataset.label) || ''}: ${themeFormatter.data(measure, raw)}`;
+
+            const dimensionLabel = themeFormatter.data(dimension, context.dataset.label) || '';
+            const measureValue = themeFormatter.data(measure, raw);
+
+            let percentage = '';
+            if (measure.inputs?.showValuesAsPercentage) {
+              percentage = `(${getDatalabelPercentage(raw, context.dataset.data)})`;
+            }
+            return `${dimensionLabel}: ${measureValue} ${percentage}`;
           },
         },
       },

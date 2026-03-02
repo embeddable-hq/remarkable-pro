@@ -1,6 +1,6 @@
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { ChartData, ChartOptions } from 'chart.js';
-import { groupTailAsOther } from '../charts.utils';
+import { getDatalabelPercentage, groupTailAsOther } from '../charts.utils';
 import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
@@ -86,19 +86,18 @@ export const getPieChartProOptions = (
     plugins: {
       legend: { position: theme.charts.legendPosition ?? 'bottom' },
       datalabels: {
-        formatter: (value: string | number) => themeFormatter.data(measure, value),
+        formatter: (value: string | number, context) => {
+          if (measure.inputs?.showValuesAsPercentage) {
+            return getDatalabelPercentage(Number(value), context.dataset.data);
+          }
+          return themeFormatter.data(measure, value);
+        },
       },
       tooltip: {
         callbacks: {
           label(context) {
             const raw = context.raw as number;
-            const total = context.dataset.data.reduce(
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              (sum: number, v: any) => sum + parseFloat(v),
-              0,
-            );
-            const pct = Math.round((raw / total) * 100);
-            return `${themeFormatter.data(measure, raw)} (${pct}%)`;
+            return `${themeFormatter.data(measure, raw)} (${getDatalabelPercentage(raw, context.dataset.data)})`;
           },
         },
       },

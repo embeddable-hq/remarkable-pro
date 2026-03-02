@@ -14,8 +14,9 @@ const PieChartPro = (props: PieChartProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
+  const { description, title } = resolveI18nProps(props);
+
   const {
-    description,
     dimension,
     maxLegendItems,
     measure,
@@ -23,9 +24,8 @@ const PieChartPro = (props: PieChartProProps) => {
     showLegend,
     showTooltips,
     showValueLabels,
-    title,
     onSegmentClick,
-  } = resolveI18nProps(props);
+  } = props;
 
   const { hideMenu } = props;
 
