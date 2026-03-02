@@ -137,7 +137,7 @@ const tableCellStyle = {
 } as const;
 
 const showValueAsPercentage = {
-  name: 'showValuesAsPercentage',
+  name: 'showValueAsPercentage',
   type: 'boolean',
   label: 'Show values as percentage',
   defaultValue: false,

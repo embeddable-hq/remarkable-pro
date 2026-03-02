@@ -87,7 +87,7 @@ export const getPieChartProOptions = (
       legend: { position: theme.charts.legendPosition ?? 'bottom' },
       datalabels: {
         formatter: (value: string | number, context) => {
-          if (measure.inputs?.showValuesAsPercentage) {
+          if (measure.inputs?.showValueAsPercentage) {
             return getDatalabelPercentage(Number(value), context.dataset.data);
           }
           return themeFormatter.data(measure, value);
