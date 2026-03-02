@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.16
+
+### Patch Changes
+
+- 2c4e1f5: Include display value as percentage for pie charts and simple bar charts
+
 ## 0.1.15
 
 ### Patch Changes
