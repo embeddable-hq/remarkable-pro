@@ -1,4 +1,4 @@
-import { EmbeddedComponentMeta, Inputs, definePreview } from '@embeddable.com/react';
+import { EmbeddedComponentMeta, Inputs, definePreview } from '@embeddable.com/react'; // NOSONAR
 import Component from './index';
 import { inputs } from '../../component.inputs.constants';
 
