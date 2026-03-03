@@ -1,4 +1,5 @@
-import ColorType from '../editors/ColorEditor/Color.type.emb'; // NOSONAR
+/* istanbul ignore file */
+import ColorType from '../editors/ColorEditor/Color.type.emb';
 import { Granularity } from '../theme/defaults/defaults.GranularityOptions.constants';
 import AlignType from './types/Align.type.emb';
 import DisplayFormatType from './types/DisplayFormat.type.emb';

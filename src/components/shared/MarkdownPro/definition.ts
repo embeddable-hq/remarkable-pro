@@ -1,4 +1,5 @@
-import { EmbeddedComponentMeta, Inputs, definePreview } from '@embeddable.com/react'; // NOSONAR
+/* istanbul ignore file */
+import { EmbeddedComponentMeta, Inputs, definePreview } from '@embeddable.com/react';
 import Component from './index';
 import { inputs } from '../../component.inputs.constants';
 
