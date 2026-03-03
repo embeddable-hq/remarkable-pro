@@ -3,7 +3,7 @@ import { vi, describe, it, expect } from 'vitest';
 import ColorInput from './index';
 
 vi.mock('@embeddable.com/remarkable-ui', () => ({
-  ActionIcon: ({ onClick }: { onClick: () => void }) => (
+  GhostButtonIcon: ({ onClick }: { onClick: () => void }) => (
     <button onClick={onClick} data-testid="clear-button" />
   ),
 }));
