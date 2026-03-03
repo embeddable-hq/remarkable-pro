@@ -1,6 +1,4 @@
-// NOSONAR
-
-import ColorType from '../editors/ColorEditor/Color.type.emb';
+import ColorType from '../editors/ColorEditor/Color.type.emb'; // NOSONAR
 import { Granularity } from '../theme/defaults/defaults.GranularityOptions.constants';
 import AlignType from './types/Align.type.emb';
 import DisplayFormatType from './types/DisplayFormat.type.emb';

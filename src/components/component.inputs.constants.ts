@@ -1,6 +1,4 @@
-// NOSONAR
-
-import ColorType from '../editors/ColorEditor/Color.type.emb';
+import ColorType from '../editors/ColorEditor/Color.type.emb'; // NOSONAR
 import { Granularity } from '../theme/defaults/defaults.GranularityOptions.constants';
 import {
   dimensionMeasureSubInputs,
