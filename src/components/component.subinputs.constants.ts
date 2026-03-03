@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 import ColorType from '../editors/ColorEditor/Color.type.emb';
 import { Granularity } from '../theme/defaults/defaults.GranularityOptions.constants';
 import AlignType from './types/Align.type.emb';
