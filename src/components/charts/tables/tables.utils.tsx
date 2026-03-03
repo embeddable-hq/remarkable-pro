@@ -1,6 +1,6 @@
 import { DataResponse, Dimension, DimensionOrMeasure } from '@embeddable.com/core';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { CssSize, TableBodyCellWithCopy } from '@embeddable.com/remarkable-ui';
+import { CssSize, Markdown, TableBodyCellWithCopy } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../theme/theme.types';
 import {
   getStyleNumber,
@@ -8,8 +8,6 @@ import {
   TableHeaderItem,
   TableHeaderItemAlign,
 } from '@embeddable.com/remarkable-ui';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { DisplayFormatTypeOptions } from '../../types/DisplayFormat.type.emb';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -102,7 +100,7 @@ export const getTableHeaders = (
               <TableBodyCellWithCopy value={value}>
                 {displayFormat === DisplayFormatTypeOptions.MARKDOWN ? (
                   // Markdown
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{currentValue}</ReactMarkdown>
+                  <Markdown content={currentValue} />
                 ) : (
                   // JSON
                   <pre>{currentValue}</pre>
