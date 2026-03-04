@@ -1,14 +1,8 @@
-import { defineComponent, definePreview, EmbeddedComponentMeta } from '@embeddable.com/react';
-import EmptyBlockPro from './index';
+import { defineComponent } from '@embeddable.com/react';
+import { emptyBlockPro } from './definition';
 
-export const meta = {
-  name: 'EmptyBlockPro',
-  label: 'Empty Block',
-  category: 'Layout',
-  defaultWidth: 450,
-  defaultHeight: 120,
-} as const satisfies EmbeddedComponentMeta;
+export const preview = emptyBlockPro.preview;
 
-export const preview = definePreview(EmptyBlockPro, {});
+export const meta = emptyBlockPro.meta;
 
-export default defineComponent(EmptyBlockPro, meta, {});
+export default defineComponent(emptyBlockPro.Component, meta, emptyBlockPro.config);
