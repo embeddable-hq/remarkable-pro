@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.18
+
+### Patch Changes
+
+- 03040d3: Update Markdown category and export layout components
+
 ## 0.1.17
 
 ### Patch Changes
