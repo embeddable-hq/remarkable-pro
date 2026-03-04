@@ -25,11 +25,11 @@ const meta = {
   events: [
     {
       name: 'onChange',
-      label: 'Value updated',
+      label: 'Entered value updated',
       properties: [
         {
           name: 'value',
-          label: 'Value',
+          label: 'Entered value',
           type: 'string',
         },
       ],
@@ -37,7 +37,7 @@ const meta = {
   ],
   variables: [
     {
-      name: 'text input value',
+      name: 'text value',
       type: 'string',
       defaultValue: Value.noFilter(),
       inputs: ['value'],
