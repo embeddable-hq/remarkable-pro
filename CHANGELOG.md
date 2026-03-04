@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.17
+
+### Patch Changes
+
+- 676ba0d: MarkdownPro component, MarkdownEditor and markdown type
+
 ## 0.1.16
 
 ### Patch Changes
