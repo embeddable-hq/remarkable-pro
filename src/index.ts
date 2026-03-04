@@ -149,6 +149,11 @@ export * from './components/charts/shared/ChartGranularitySelectField/ChartGranu
 
 // Components - Shared
 export * as EmptyContainerPro from './components/shared/EmptyContainerPro';
+export * from './components/shared/EmptyContainerPro/definition';
+export * as HorizontalDividerPro from './components/shared/HorizontalDividerPro';
+export * from './components/shared/HorizontalDividerPro/definition';
+export * as MarkdownPro from './components/shared/MarkdownPro';
+export * from './components/shared/MarkdownPro/definition';
 
 // Charts - Utils
 export * from './components/charts/charts.utils';
@@ -196,5 +201,6 @@ export * from './components/editors/utils/dimensionsAndMeasures.utils';
 // Custom types
 export { default as ComparisonPeriodType } from './components/types/ComparisonPeriod.type.emb';
 
-// Color Editor
+// Custom Editors
 export * as ColorEditorPro from './editors/ColorEditor';
+export * as MarkdownEditorPro from './editors/MarkdownEditor';
