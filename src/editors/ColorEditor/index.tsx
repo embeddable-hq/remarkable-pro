@@ -1,6 +1,6 @@
 import { useState, useEffect, FC } from 'react';
 import styles from './ColorEditor.module.css';
-import { ActionIcon } from '@embeddable.com/remarkable-ui';
+import { GhostButtonIcon } from '@embeddable.com/remarkable-ui';
 import { IconX } from '@tabler/icons-react';
 
 type ColorInputProps = {
@@ -23,7 +23,7 @@ const ColorInput: FC<ColorInputProps> = ({ value, onChange }) => {
         value={color ?? '#FFFFFF'}
         onChange={(e) => onChange(e.target.value)}
       />
-      {color && <ActionIcon icon={IconX} onClick={() => onChange(undefined)} />}
+      {color && <GhostButtonIcon icon={IconX} onClick={() => onChange(undefined)} />}
     </div>
   );
 };

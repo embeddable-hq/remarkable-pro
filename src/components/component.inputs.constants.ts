@@ -6,6 +6,7 @@ import {
   timeDimensionWithGranularitySelectFieldSubInputs,
 } from './component.subinputs.constants';
 import ComparisonPeriodType from './types/ComparisonPeriod.type.emb';
+import MarkdownType from '../editors/MarkdownEditor/Markdown.type.emb';
 
 /* -------------------- */
 /* ----- Generics ----- */
@@ -412,6 +413,15 @@ const yAxisMaxItems = {
   category: 'Axes Settings',
 } as const;
 
+const markdown = {
+  name: 'markdown',
+  type: MarkdownType,
+  label: 'Markdown',
+  description:
+    'All markdown features are supported, including tables, images, links, etc. You can also access translations using {{translation_key|fallback value}}.',
+  category: 'Component Settings',
+} as const;
+
 export const inputs = {
   boolean,
   timeRange,
@@ -460,4 +470,5 @@ export const inputs = {
   yAxisMaxItems,
   granularity,
   granularities,
+  markdown,
 } as const;
