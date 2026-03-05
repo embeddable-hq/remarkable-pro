@@ -4,8 +4,6 @@ import { EditorCard } from '../shared/EditorCard/EditorCard';
 import { resolveI18nProps } from '../../component.utils';
 import { EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 
-const DEBOUNCE_MS = 350;
-
 export type TextFieldProProps = {
   value?: string;
   placeholder?: string;
@@ -13,54 +11,45 @@ export type TextFieldProProps = {
 } & EditorCardHeaderProps;
 
 const TextFieldPro = (props: TextFieldProProps) => {
-  const { title, description, tooltip } = resolveI18nProps(props);
-  const { value: variableValue, placeholder, onChange } = props;
+  const { title, description, tooltip, placeholder = '' } = resolveI18nProps(props);
+  const { value: variableValue, onChange } = props;
 
   const [localValue, setLocalValue] = useState(() => variableValue ?? '');
   const lastEmittedValueRef = useRef<string | undefined>(variableValue ?? '');
   const latestLocalValueRef = useRef(localValue);
-  latestLocalValueRef.current = localValue;
 
-  const debouncedCommit = useDebounce((value: string) => {
-    if (latestLocalValueRef.current === value) {
-      lastEmittedValueRef.current = value;
-      onChange?.(value);
-    }
-  }, DEBOUNCE_MS);
+  const debouncedOnChange = useDebounce((value: string) => {
+    if (latestLocalValueRef.current !== value) return;
+    lastEmittedValueRef.current = value;
+    onChange?.(value);
+  });
 
   useEffect(() => {
     const externalValue = variableValue ?? '';
     if (externalValue !== lastEmittedValueRef.current) {
       lastEmittedValueRef.current = externalValue;
+      latestLocalValueRef.current = externalValue;
       setLocalValue(externalValue);
     }
   }, [variableValue]);
 
-  useEffect(() => {
-    if (localValue === lastEmittedValueRef.current) return;
-    if (localValue === '') return;
-    debouncedCommit(localValue);
-  }, [localValue, debouncedCommit]);
-
   const handleChange = useCallback(
     (newValue: string) => {
       setLocalValue(newValue);
+      latestLocalValueRef.current = newValue;
       if (newValue === '') {
         lastEmittedValueRef.current = '';
         onChange?.('');
+      } else {
+        debouncedOnChange(newValue);
       }
     },
-    [onChange],
+    [onChange, debouncedOnChange],
   );
 
   return (
     <EditorCard title={title} description={description} tooltip={tooltip}>
-      <TextField
-        value={localValue}
-        placeholder={placeholder ?? ''}
-        onChange={handleChange}
-        clearable
-      />
+      <TextField value={localValue} placeholder={placeholder} onChange={handleChange} clearable />
     </EditorCard>
   );
 };
