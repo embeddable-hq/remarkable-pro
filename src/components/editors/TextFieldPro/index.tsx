@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { TextField, useDebounce } from '@embeddable.com/remarkable-ui';
-import { EditorCard } from '../shared/EditorCard/EditorCard';
+import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 import { resolveI18nProps } from '../../component.utils';
-import { EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 
 export type TextFieldProProps = {
   value?: string;
