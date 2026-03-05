@@ -88,6 +88,20 @@ describe('TextFieldPro', () => {
     const input = screen.getByTestId('text-field-input');
     expect(input).toHaveValue('initial');
   });
+
+  it('calls onChange when user types in the input (debounced path)', () => {
+    render(<TextFieldPro onChange={mockOnChange} />);
+    const input = screen.getByTestId('text-field-input');
+    fireEvent.change(input, { target: { value: 'typed' } });
+    expect(mockOnChange).toHaveBeenCalledWith('typed');
+  });
+
+  it('syncs local value when value prop changes from parent', () => {
+    const { rerender } = render(<TextFieldPro value="first" onChange={mockOnChange} />);
+    expect(screen.getByTestId('text-field-input')).toHaveValue('first');
+    rerender(<TextFieldPro value="second" onChange={mockOnChange} />);
+    expect(screen.getByTestId('text-field-input')).toHaveValue('second');
+  });
 });
 
 describe('TextFieldPro definition config.events.onChange', () => {
@@ -108,5 +122,19 @@ describe('TextFieldPro definition config.events.onChange', () => {
   it('returns the value for non-empty string', () => {
     expect(onChange('hello')).toEqual({ value: 'hello' });
     expect(onChange('search term')).toEqual({ value: 'search term' });
+  });
+});
+
+describe('TextFieldPro definition config.props', () => {
+  const { props } = textFieldPro.config;
+
+  it('returns inputs with placeholder defaulting to empty string', () => {
+    expect(props({} as Parameters<typeof props>[0])).toMatchObject({ placeholder: '' });
+  });
+
+  it('returns inputs with provided placeholder', () => {
+    expect(props({ placeholder: 'Search...' } as Parameters<typeof props>[0])).toMatchObject({
+      placeholder: 'Search...',
+    });
   });
 });
