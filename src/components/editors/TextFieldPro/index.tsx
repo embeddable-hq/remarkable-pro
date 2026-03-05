@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TextField, useDebounce } from '@embeddable.com/remarkable-ui';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 import { resolveI18nProps } from '../../component.utils';
@@ -11,44 +11,26 @@ export type TextFieldProProps = {
 
 const TextFieldPro = (props: TextFieldProProps) => {
   const { title, description, tooltip, placeholder = '' } = resolveI18nProps(props);
-  const { value: variableValue, onChange } = props;
+  const { value, onChange } = props;
 
-  const [localValue, setLocalValue] = useState(() => variableValue ?? '');
-  const lastEmittedValueRef = useRef<string | undefined>(variableValue ?? '');
-  const latestLocalValueRef = useRef(localValue);
+  const [currentValue, setCurrentValue] = useState(value);
 
-  const debouncedOnChange = useDebounce((value: string) => {
-    if (latestLocalValueRef.current !== value) return;
-    lastEmittedValueRef.current = value;
-    onChange?.(value);
+  const debouncedUpdateState = useDebounce((newValue: string) => {
+    onChange?.(newValue);
   });
 
   useEffect(() => {
-    const externalValue = variableValue ?? '';
-    if (externalValue !== lastEmittedValueRef.current) {
-      lastEmittedValueRef.current = externalValue;
-      latestLocalValueRef.current = externalValue;
-      setLocalValue(externalValue);
-    }
-  }, [variableValue]);
-
-  const handleChange = useCallback(
-    (newValue: string) => {
-      setLocalValue(newValue);
-      latestLocalValueRef.current = newValue;
-      if (newValue === '') {
-        lastEmittedValueRef.current = '';
-        onChange?.('');
-      } else {
-        debouncedOnChange(newValue);
-      }
-    },
-    [onChange, debouncedOnChange],
-  );
+    debouncedUpdateState(currentValue ?? '');
+  }, [currentValue, debouncedUpdateState]);
 
   return (
     <EditorCard title={title} description={description} tooltip={tooltip}>
-      <TextField value={localValue} placeholder={placeholder} onChange={handleChange} clearable />
+      <TextField
+        value={currentValue}
+        placeholder={placeholder}
+        onChange={setCurrentValue}
+        clearable
+      />
     </EditorCard>
   );
 };

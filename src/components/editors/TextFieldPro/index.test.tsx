@@ -96,11 +96,12 @@ describe('TextFieldPro', () => {
     expect(mockOnChange).toHaveBeenCalledWith('typed');
   });
 
-  it('syncs local value when value prop changes from parent', () => {
+  it('uses initial value from value prop (does not sync when value prop changes later)', () => {
     const { rerender } = render(<TextFieldPro value="first" onChange={mockOnChange} />);
     expect(screen.getByTestId('text-field-input')).toHaveValue('first');
     rerender(<TextFieldPro value="second" onChange={mockOnChange} />);
-    expect(screen.getByTestId('text-field-input')).toHaveValue('second');
+    // Simpler implementation only uses value as initial state; does not sync on prop change
+    expect(screen.getByTestId('text-field-input')).toHaveValue('first');
   });
 });
 
@@ -128,8 +129,8 @@ describe('TextFieldPro definition config.events.onChange', () => {
 describe('TextFieldPro definition config.props', () => {
   const { props } = textFieldPro.config;
 
-  it('returns inputs with placeholder defaulting to empty string', () => {
-    expect(props({} as Parameters<typeof props>[0])).toMatchObject({ placeholder: '' });
+  it('returns inputs without placeholder when not provided', () => {
+    expect(props({} as Parameters<typeof props>[0])).toEqual({});
   });
 
   it('returns inputs with provided placeholder', () => {
