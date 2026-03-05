@@ -1,11 +1,14 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
+import { Value } from '@embeddable.com/core';
 import TextFieldPro from './index';
+import { textFieldPro } from './definition';
 
 const mockOnChange = vi.fn();
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
+  definePreview: vi.fn((Component: React.ComponentType, props: object) => ({ Component, props })),
 }));
 
 vi.mock('../../component.utils', () => ({
@@ -84,5 +87,26 @@ describe('TextFieldPro', () => {
     render(<TextFieldPro value="initial" onChange={mockOnChange} />);
     const input = screen.getByTestId('text-field-input');
     expect(input).toHaveValue('initial');
+  });
+});
+
+describe('TextFieldPro definition config.events.onChange', () => {
+  const onChange = textFieldPro.config.events.onChange;
+
+  it('returns noFilter for empty string', () => {
+    expect(onChange('')).toStrictEqual({ value: Value.noFilter() });
+  });
+
+  it('returns noFilter for null', () => {
+    expect(onChange(null as unknown as string)).toStrictEqual({ value: Value.noFilter() });
+  });
+
+  it('returns noFilter for undefined', () => {
+    expect(onChange(undefined as unknown as string)).toStrictEqual({ value: Value.noFilter() });
+  });
+
+  it('returns the value for non-empty string', () => {
+    expect(onChange('hello')).toEqual({ value: 'hello' });
+    expect(onChange('search term')).toEqual({ value: 'search term' });
   });
 });

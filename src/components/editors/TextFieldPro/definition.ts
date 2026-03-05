@@ -2,7 +2,6 @@ import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/re
 import { Value } from '@embeddable.com/core';
 import Component from '.';
 import { inputs } from '../../component.inputs.constants';
-import { getTextFieldProOnChangeValue } from './TextFieldPro.utils';
 
 const meta = {
   name: 'TextFieldPro',
@@ -58,7 +57,7 @@ const props = (inputs: Inputs<typeof meta>) => ({
 
 const events = {
   onChange: (value: string) => ({
-    value: getTextFieldProOnChangeValue(value),
+    value: value === '' || value == null ? Value.noFilter() : value,
   }),
 };
 
