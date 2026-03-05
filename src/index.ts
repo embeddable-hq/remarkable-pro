@@ -190,6 +190,9 @@ export * from './components/editors/MeasureSingleSelectFieldPro/definition';
 export * as GranularitySelectFieldPro from './components/editors/GranularitySelectFieldPro';
 export type { GranularitySelectFieldProProps } from './components/editors/GranularitySelectFieldPro';
 export * from './components/editors/GranularitySelectFieldPro/definition';
+export * as TextFieldPro from './components/editors/TextFieldPro';
+export type { TextFieldProProps } from './components/editors/TextFieldPro';
+export * from './components/editors/TextFieldPro/definition';
 
 // Editors - Shared
 export * from './components/editors/shared/EditorCard/EditorCard';
