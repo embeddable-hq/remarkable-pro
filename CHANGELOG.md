@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.19
+
+### Patch Changes
+
+- 864c0e6: Added TextFieldPro component
+
 ## 0.1.18
 
 ### Patch Changes
