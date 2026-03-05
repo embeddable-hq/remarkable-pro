@@ -52,7 +52,6 @@ const preview = definePreview(Component, {
 
 const props = (inputs: Inputs<typeof meta>) => ({
   ...inputs,
-  placeholder: inputs.placeholder ?? '',
 });
 
 const events = {
