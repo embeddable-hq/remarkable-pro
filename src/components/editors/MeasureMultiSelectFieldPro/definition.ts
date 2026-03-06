@@ -69,6 +69,7 @@ const props = (inputs: Inputs<typeof meta>) => {
   return {
     ...inputs,
     measureOptions: inputs.measureOptions ?? [],
+    selectedMeasures: inputs.selectedMeasures ?? [],
   };
 };
 

@@ -67,6 +67,8 @@ const preview = definePreview(Component, {
 const props = (inputs: Inputs<typeof meta>) => {
   return {
     ...inputs,
+    dimensionsAndMeasures: inputs.dimensionsAndMeasures ?? [],
+    selectedDimensionsAndMeasures: inputs.selectedDimensionsAndMeasures ?? [],
   };
 };
 
