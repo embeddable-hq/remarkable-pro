@@ -36,7 +36,7 @@ const DimensionMeasureMultiSelectFieldPro = (props: DimensionMeasureMultiSelectF
     theme,
   });
 
-  const showNoOptionsMessage = dimensionsAndMeasures.length === 0;
+  const showNoOptionsMessage = options.length === 0;
 
   const handleChange = (newValues: string[]) => {
     const newSelection = newValues

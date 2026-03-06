@@ -34,7 +34,7 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
     theme,
   });
 
-  const showNoOptionsMessage = measureOptions.length === 0;
+  const showNoOptionsMessage = options.length === 0;
 
   const handleChange = (newValues: string[]) => {
     const newSelection = newValues
