@@ -3,8 +3,7 @@ import { useTheme } from '@embeddable.com/react';
 import { MultiSelectField } from '@embeddable.com/remarkable-ui';
 import { useState } from 'react';
 import { Theme } from '../../../theme/theme.types';
-import { i18nSetup } from '../../../theme/i18n/i18n';
-import { i18n } from '../../../theme/i18n/i18n';
+import { i18nSetup, i18n } from '../../../theme/i18n/i18n';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 import { resolveI18nProps } from '../../component.utils';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
@@ -21,12 +20,12 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { selectedMeasures, measureOptions, clearable, onChange } = props;
+  const { selectedMeasures = [], measureOptions = [], clearable, onChange } = props;
   const { title, description, tooltip, placeholder } = resolveI18nProps(props);
 
   const [searchValue, setSearchValue] = useState('');
 
-  const selectedNames = selectedMeasures?.map((m) => m.name) ?? [];
+  const selectedNames = selectedMeasures.map((m) => m.name);
 
   const options = getDimensionAndMeasureOptions({
     dimensionsAndMeasures: measureOptions,
@@ -34,13 +33,9 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
     theme,
   });
 
-  const showNoOptionsMessage = options.length === 0;
-
   const handleChange = (newValues: string[]) => {
-    const newSelection = newValues
-      .map((name) => measureOptions.find((opt) => opt.name === name))
-      .filter((v): v is Measure => v != null);
-    onChange(newSelection);
+    const selectedNamesSet = new Set(newValues);
+    onChange(measureOptions.filter((m) => selectedNamesSet.has(m.name)));
   };
 
   return (
@@ -51,7 +46,7 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
         values={selectedNames}
         options={options}
         placeholder={placeholder}
-        noOptionsMessage={showNoOptionsMessage ? i18n.t('common.noOptionsFound') : undefined}
+        noOptionsMessage={i18n.t('common.noOptionsFound')}
         onChange={handleChange}
         onSearch={setSearchValue}
         avoidCollisions={false}

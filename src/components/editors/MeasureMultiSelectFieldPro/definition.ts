@@ -25,7 +25,7 @@ const meta = {
       ...inputs.measure,
       array: true,
       name: 'selectedMeasures',
-      label: 'Selected values',
+      label: 'Selected measures',
       category: 'Pre-configured Variables',
       required: false,
       config: {
@@ -37,7 +37,7 @@ const meta = {
   events: [
     {
       name: 'onChange',
-      label: 'Selected values updated',
+      label: 'Selected measures updated',
       properties: [
         {
           name: 'value',
