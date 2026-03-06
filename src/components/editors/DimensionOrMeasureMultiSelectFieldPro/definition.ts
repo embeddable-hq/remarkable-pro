@@ -5,7 +5,7 @@ import { inputs } from '../../component.inputs.constants';
 import { previewData } from '../../preview.data.constants';
 
 const meta = {
-  name: 'DimensionOrMeasureMultiSelectFieldPro',
+  name: 'DimensionMeasureMultiSelectFieldPro',
   label: 'Dimension and Measure Multi Select Field',
   category: 'Dropdowns',
   defaultWidth: 300,
@@ -49,7 +49,7 @@ const meta = {
   ],
   variables: [
     {
-      name: 'dimension-or-measure multi-select values',
+      name: 'dimension-measure multi-select values',
       type: 'dimensionOrMeasure',
       array: true,
       defaultValue: Value.noFilter(),
@@ -79,7 +79,7 @@ const events = {
   },
 };
 
-export const dimensionOrMeasureMultiSelectFieldPro = {
+export const dimensionMeasureMultiSelectFieldPro = {
   Component,
   meta,
   preview,

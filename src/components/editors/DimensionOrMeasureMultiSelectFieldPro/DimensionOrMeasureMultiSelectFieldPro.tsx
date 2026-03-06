@@ -9,7 +9,7 @@ import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCa
 import { resolveI18nProps } from '../../component.utils';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
 
-export type DimensionOrMeasureMultiSelectFieldProProps = {
+export type DimensionMeasureMultiSelectFieldProProps = {
   selectedDimensionsAndMeasures?: DimensionOrMeasure[];
   dimensionsAndMeasures: DimensionOrMeasure[];
   placeholder?: string;
@@ -17,9 +17,9 @@ export type DimensionOrMeasureMultiSelectFieldProProps = {
   onChange: (value: DimensionOrMeasure[]) => void;
 } & EditorCardHeaderProps;
 
-const DimensionOrMeasureMultiSelectFieldPro = (
-  props: DimensionOrMeasureMultiSelectFieldProProps,
-) => {
+export type DimensionOrMeasureMultiSelectFieldProProps = DimensionMeasureMultiSelectFieldProProps;
+
+const DimensionMeasureMultiSelectFieldPro = (props: DimensionMeasureMultiSelectFieldProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
@@ -62,4 +62,4 @@ const DimensionOrMeasureMultiSelectFieldPro = (
   );
 };
 
-export default DimensionOrMeasureMultiSelectFieldPro;
+export default DimensionMeasureMultiSelectFieldPro;

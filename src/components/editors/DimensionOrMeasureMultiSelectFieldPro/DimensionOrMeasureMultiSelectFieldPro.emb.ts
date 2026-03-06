@@ -1,12 +1,12 @@
 import { defineComponent } from '@embeddable.com/react';
-import { dimensionOrMeasureMultiSelectFieldPro } from './definition';
+import { dimensionMeasureMultiSelectFieldPro } from './definition';
 
-export const preview = dimensionOrMeasureMultiSelectFieldPro.preview;
+export const preview = dimensionMeasureMultiSelectFieldPro.preview;
 
-export const meta = dimensionOrMeasureMultiSelectFieldPro.meta;
+export const meta = dimensionMeasureMultiSelectFieldPro.meta;
 
 export default defineComponent(
-  dimensionOrMeasureMultiSelectFieldPro.Component,
+  dimensionMeasureMultiSelectFieldPro.Component,
   meta,
-  dimensionOrMeasureMultiSelectFieldPro.config,
+  dimensionMeasureMultiSelectFieldPro.config,
 );

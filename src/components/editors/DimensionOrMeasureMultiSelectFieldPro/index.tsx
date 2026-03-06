@@ -1,4 +1,4 @@
 export {
   default,
-  type DimensionOrMeasureMultiSelectFieldProProps,
+  type DimensionMeasureMultiSelectFieldProProps,
 } from './DimensionOrMeasureMultiSelectFieldPro';
