@@ -1,8 +1,8 @@
 import { Value } from '@embeddable.com/core';
 import { EmbeddedComponentMeta, Inputs, definePreview } from '@embeddable.com/react';
-import Component from './DimensionOrMeasureMultiSelectFieldPro';
 import { inputs } from '../../component.inputs.constants';
 import { previewData } from '../../preview.data.constants';
+import Component from './index';
 
 const meta = {
   name: 'DimensionMeasureMultiSelectFieldPro',
@@ -12,11 +12,7 @@ const meta = {
   defaultHeight: 120,
   inputs: [
     inputs.dataset,
-    {
-      ...inputs.dimensionsAndMeasures,
-      label: 'Dimensions and measures (to show in dropdown)',
-      required: false,
-    },
+    inputs.dimensionAndMeasureOptions,
     inputs.title,
     inputs.description,
     inputs.tooltip,
@@ -67,8 +63,6 @@ const preview = definePreview(Component, {
 const props = (inputs: Inputs<typeof meta>) => {
   return {
     ...inputs,
-    dimensionsAndMeasures: inputs.dimensionsAndMeasures ?? [],
-    selectedDimensionsAndMeasures: inputs.selectedDimensionsAndMeasures ?? [],
   };
 };
 
