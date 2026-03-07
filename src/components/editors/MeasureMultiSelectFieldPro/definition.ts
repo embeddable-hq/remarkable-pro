@@ -12,11 +12,7 @@ const meta = {
   defaultHeight: 120,
   inputs: [
     inputs.dataset,
-    {
-      ...inputs.measureOptions,
-      label: 'Measure options (to show in dropdown)',
-      required: false,
-    },
+    inputs.measureOptions,
     inputs.title,
     inputs.description,
     inputs.tooltip,

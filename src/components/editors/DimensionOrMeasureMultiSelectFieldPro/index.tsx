@@ -10,7 +10,7 @@ import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.ut
 
 export type DimensionMeasureMultiSelectFieldProProps = {
   selectedDimensionsAndMeasures?: DimensionOrMeasure[];
-  dimensionsAndMeasures: DimensionOrMeasure[];
+  dimensionAndMeasureOptions?: DimensionOrMeasure[];
   placeholder?: string;
   clearable?: boolean;
   onChange: (value: DimensionOrMeasure[]) => void;
@@ -22,7 +22,7 @@ const DimensionMeasureMultiSelectFieldPro = (props: DimensionMeasureMultiSelectF
 
   const {
     selectedDimensionsAndMeasures = [],
-    dimensionsAndMeasures = [],
+    dimensionAndMeasureOptions = [],
     clearable,
     onChange,
   } = props;
@@ -33,14 +33,14 @@ const DimensionMeasureMultiSelectFieldPro = (props: DimensionMeasureMultiSelectF
   const currentDimensionAndMeasureNames = selectedDimensionsAndMeasures.map((d) => d.name);
 
   const options = getDimensionAndMeasureOptions({
-    dimensionsAndMeasures,
+    dimensionsAndMeasures: dimensionAndMeasureOptions,
     searchValue,
     theme,
   });
 
   const handleChange = (newValues: string[]) => {
     const selectedNamesSet = new Set(newValues);
-    onChange(dimensionsAndMeasures.filter((d) => selectedNamesSet.has(d.name)));
+    onChange(dimensionAndMeasureOptions.filter((d) => selectedNamesSet.has(d.name)));
   };
 
   return (
