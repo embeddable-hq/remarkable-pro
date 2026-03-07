@@ -1,6 +1,6 @@
 import { Value } from '@embeddable.com/core';
 import { EmbeddedComponentMeta, Inputs, definePreview } from '@embeddable.com/react';
-import Component from './MeasureMultiSelectFieldPro';
+import Component from './index';
 import { inputs } from '../../component.inputs.constants';
 import { previewData } from '../../preview.data.constants';
 
@@ -68,8 +68,6 @@ const preview = definePreview(Component, {
 const props = (inputs: Inputs<typeof meta>) => {
   return {
     ...inputs,
-    measureOptions: inputs.measureOptions ?? [],
-    selectedMeasures: inputs.selectedMeasures ?? [],
   };
 };
 
