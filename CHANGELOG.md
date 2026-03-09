@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.20
+
+### Patch Changes
+
+- b1ff7d0: Added MeasureMultiSelectFieldPro and DimensionMeasureMultiSelectFieldPro components
+
 ## 0.1.19
 
 ### Patch Changes
