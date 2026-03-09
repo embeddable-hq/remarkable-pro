@@ -1,6 +1,6 @@
 import { render, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
-import DimensionMeasureMultiSelectFieldPro from './DimensionOrMeasureMultiSelectFieldPro';
+import DimensionMeasureMultiSelectFieldPro from './index';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
 
@@ -40,7 +40,7 @@ describe('DimensionMeasureMultiSelectFieldPro', () => {
   it('renders the MultiSelectField', () => {
     const { getByTestId } = render(
       <DimensionMeasureMultiSelectFieldPro
-        dimensionsAndMeasures={[revenue, country]}
+        dimensionAndMeasureOptions={[revenue, country]}
         onChange={vi.fn()}
       />,
     );
@@ -50,7 +50,7 @@ describe('DimensionMeasureMultiSelectFieldPro', () => {
   it('passes selected names as values to MultiSelectField', () => {
     const { getByTestId } = render(
       <DimensionMeasureMultiSelectFieldPro
-        dimensionsAndMeasures={[revenue, country]}
+        dimensionAndMeasureOptions={[revenue, country]}
         selectedDimensionsAndMeasures={[revenue, country]}
         onChange={vi.fn()}
       />,
@@ -61,7 +61,7 @@ describe('DimensionMeasureMultiSelectFieldPro', () => {
   it('passes empty values when nothing is selected', () => {
     const { getByTestId } = render(
       <DimensionMeasureMultiSelectFieldPro
-        dimensionsAndMeasures={[revenue, country]}
+        dimensionAndMeasureOptions={[revenue, country]}
         onChange={vi.fn()}
       />,
     );
@@ -71,7 +71,7 @@ describe('DimensionMeasureMultiSelectFieldPro', () => {
   it('passes clearable prop to MultiSelectField', () => {
     const { getByTestId } = render(
       <DimensionMeasureMultiSelectFieldPro
-        dimensionsAndMeasures={[revenue, country]}
+        dimensionAndMeasureOptions={[revenue, country]}
         clearable
         onChange={vi.fn()}
       />,
@@ -82,7 +82,7 @@ describe('DimensionMeasureMultiSelectFieldPro', () => {
   it('passes placeholder prop to MultiSelectField', () => {
     const { getByTestId } = render(
       <DimensionMeasureMultiSelectFieldPro
-        dimensionsAndMeasures={[revenue, country]}
+        dimensionAndMeasureOptions={[revenue, country]}
         placeholder="Select dimensions or measures"
         onChange={vi.fn()}
       />,
@@ -94,7 +94,9 @@ describe('DimensionMeasureMultiSelectFieldPro', () => {
   });
 
   it('shows noOptionsMessage when dimensionsAndMeasures is empty', () => {
-    render(<DimensionMeasureMultiSelectFieldPro dimensionsAndMeasures={[]} onChange={vi.fn()} />);
+    render(
+      <DimensionMeasureMultiSelectFieldPro dimensionAndMeasureOptions={[]} onChange={vi.fn()} />,
+    );
     expect(getDimensionAndMeasureOptions).toHaveBeenCalledWith(
       expect.objectContaining({ dimensionsAndMeasures: [] }),
     );
@@ -104,7 +106,7 @@ describe('DimensionMeasureMultiSelectFieldPro', () => {
     const onChange = vi.fn();
     const { getByTestId } = render(
       <DimensionMeasureMultiSelectFieldPro
-        dimensionsAndMeasures={[revenue, country]}
+        dimensionAndMeasureOptions={[revenue, country]}
         onChange={onChange}
       />,
     );
@@ -116,7 +118,7 @@ describe('DimensionMeasureMultiSelectFieldPro', () => {
     const onChange = vi.fn();
     const { getByTestId } = render(
       <DimensionMeasureMultiSelectFieldPro
-        dimensionsAndMeasures={[revenue, country]}
+        dimensionAndMeasureOptions={[revenue, country]}
         selectedDimensionsAndMeasures={[revenue]}
         onChange={onChange}
       />,
@@ -129,7 +131,7 @@ describe('DimensionMeasureMultiSelectFieldPro', () => {
     const onChange = vi.fn();
     const { getByTestId } = render(
       <DimensionMeasureMultiSelectFieldPro
-        dimensionsAndMeasures={[revenue, country]}
+        dimensionAndMeasureOptions={[revenue, country]}
         selectedDimensionsAndMeasures={[revenue, country]}
         onChange={onChange}
       />,
@@ -141,7 +143,7 @@ describe('DimensionMeasureMultiSelectFieldPro', () => {
   it('passes updated searchValue to getDimensionAndMeasureOptions when search changes', () => {
     const { getByTestId } = render(
       <DimensionMeasureMultiSelectFieldPro
-        dimensionsAndMeasures={[revenue, country]}
+        dimensionAndMeasureOptions={[revenue, country]}
         onChange={vi.fn()}
       />,
     );
@@ -154,7 +156,7 @@ describe('DimensionMeasureMultiSelectFieldPro', () => {
   it('calls getDimensionAndMeasureOptions with dimensionsAndMeasures and theme', () => {
     render(
       <DimensionMeasureMultiSelectFieldPro
-        dimensionsAndMeasures={[revenue, country]}
+        dimensionAndMeasureOptions={[revenue, country]}
         onChange={vi.fn()}
       />,
     );

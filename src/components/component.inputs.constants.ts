@@ -232,16 +232,19 @@ const measureOptions = {
   ...measures,
   name: 'measureOptions',
   label: 'Measure options',
-  inputs: dimensionMeasureSubInputs,
 };
 
 const dimensionOptions = {
   ...dimensions,
   name: 'dimensionOptions',
   label: 'Dimension options',
-  inputs: dimensionMeasureSubInputs,
 };
 
+const dimensionAndMeasureOptions = {
+  ...dimensionsAndMeasures,
+  name: 'dimensionAndMeasureOptions',
+  label: 'Dimension and measure options',
+};
 const comparisonPeriod = {
   name: 'comparisonPeriod',
   type: ComparisonPeriodType,
@@ -445,6 +448,7 @@ export const inputs = {
   measures,
   measureOptions,
   dimensionOptions,
+  dimensionAndMeasureOptions,
   comparisonPeriod,
   maxResults,
   placeholder,

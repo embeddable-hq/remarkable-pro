@@ -1,6 +1,6 @@
 import { render, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
-import MeasureMultiSelectFieldPro from './MeasureMultiSelectFieldPro';
+import MeasureMultiSelectFieldPro from './index';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
 import type { Measure } from '@embeddable.com/core';
 
