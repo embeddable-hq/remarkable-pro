@@ -56,13 +56,15 @@ const meta = {
 } as const satisfies EmbeddedComponentMeta;
 
 const preview = definePreview(Component, {
-  dimensionsAndMeasures: [previewData.dimension, previewData.measure],
+  dimensionAndMeasureOptions: [previewData.dimension, previewData.measure],
   onChange: () => null,
 });
 
 const props = (inputs: Inputs<typeof meta>) => {
   return {
     ...inputs,
+    dimensionAndMeasureOptions: inputs.dimensionAndMeasureOptions ?? [],
+    selectedDimensionsAndMeasures: inputs.selectedDimensionsAndMeasures ?? [],
   };
 };
 
