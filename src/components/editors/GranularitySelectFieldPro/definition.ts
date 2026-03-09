@@ -7,7 +7,7 @@ import Component from './index';
 const meta = {
   name: 'GranularitySelectFieldPro',
   label: 'Granularity Select Field',
-  category: 'Dropdowns',
+  category: 'Dropdowns - dates',
   defaultWidth: 300,
   defaultHeight: 120,
   inputs: [
