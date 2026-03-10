@@ -197,6 +197,14 @@ describe('dataDateTimeFormatter', () => {
     expect(formatter.format(date)).toContain('2024');
   });
 
+  it('applies granularity from key.meta when inputs.granularity is absent', () => {
+    const formatter = remarkableThemeFormatter.dataDateTimeFormatter(
+      mockTheme,
+      makeKey({}, { granularity: 'year' }),
+    );
+    expect(formatter.format(date)).toContain('2024');
+  });
+
   it('quarter granularity calls i18n.t with quarter number and year', () => {
     const formatter = remarkableThemeFormatter.dataDateTimeFormatter(
       mockTheme,

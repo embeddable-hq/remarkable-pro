@@ -6,12 +6,16 @@ import { isValidISODate } from '../../utils/data.utils';
 import { resolveI18nString } from '../../components/component.utils';
 import { DisplayFormatTypeOptions } from '../../components/types/DisplayFormat.type.emb';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+const formatOption = (key: DimensionOrMeasure, inputKey: string, metaKey?: string) =>
+  key.inputs?.[inputKey] ?? (key.meta as any)?.[metaKey ?? inputKey];
+
 export type GetThemeFormatter = {
   string: (key: string) => string;
   number: (value: number | bigint, options?: Intl.NumberFormatOptions) => string;
   dateTime: (value: Date, options?: Intl.DateTimeFormatOptions) => string;
   dimensionOrMeasureTitle: (key: DimensionOrMeasure) => string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: (key: DimensionOrMeasure, value: any) => string;
 };
 
@@ -45,7 +49,7 @@ export const getThemeFormatter = (theme: Theme): GetThemeFormatter => {
       return cachedDateTimeFormatter(options).format(value);
     },
     dimensionOrMeasureTitle: (key: DimensionOrMeasure): string => {
-      const displayName = key.inputs?.displayName;
+      const displayName = formatOption(key, 'displayName');
       if (displayName) {
         if (displayName.includes('|')) {
           return resolveI18nString(displayName);
@@ -56,19 +60,20 @@ export const getThemeFormatter = (theme: Theme): GetThemeFormatter => {
       const resolved = cachedDataOthersFormatter(key).format(key.name);
       return resolved === key.name ? (key.title ?? key.name) : resolved;
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: (key: DimensionOrMeasure, value: any): string => {
       let newValue = value;
 
-      // Nulls
+      // Nulls (inputs override meta)
       if (value == null) {
-        return key.inputs?.displayNullAs ?? '';
+        return formatOption(key, 'displayNullAs') ?? '';
       }
 
-      // JSON and Markdown
-      if (key.inputs?.displayFormat === DisplayFormatTypeOptions.JSON) {
+      // JSON and Markdown (inputs override meta)
+      const displayFormat = formatOption(key, 'displayFormat');
+      if (displayFormat === DisplayFormatTypeOptions.JSON) {
         return JSON.stringify(value, null, 2);
-      } else if (key.inputs?.displayFormat === DisplayFormatTypeOptions.MARKDOWN) {
+      }
+      if (displayFormat === DisplayFormatTypeOptions.MARKDOWN) {
         return value;
       }
       // Objects
@@ -91,15 +96,18 @@ export const getThemeFormatter = (theme: Theme): GetThemeFormatter => {
         newValue = cachedDataOthersFormatter(key).format(value);
       }
 
-      // Prefix and suffix
-      const appended = `${key.inputs?.prefix || ''}${newValue}${key.inputs?.suffix || ''}`;
+      // Prefix and suffix (inputs override meta; meta uses pretext/posttext)
+      const prefix = formatOption(key, 'prefix', 'pretext') || '';
+      const suffix = formatOption(key, 'suffix', 'posttext') || '';
+      const appended = `${prefix}${newValue}${suffix}`;
 
-      // Max characters
-      if (key.inputs?.maxCharacters) {
-        if (appended.length <= key.inputs.maxCharacters) {
+      // Max characters (inputs override meta)
+      const maxCharacters = formatOption(key, 'maxCharacters');
+      if (maxCharacters != null) {
+        if (appended.length <= maxCharacters) {
           return appended;
         }
-        return appended.substring(0, key.inputs.maxCharacters) + '...';
+        return appended.substring(0, maxCharacters) + '...';
       }
 
       return appended;

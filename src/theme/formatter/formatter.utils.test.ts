@@ -166,6 +166,26 @@ describe('getThemeFormatter', () => {
 
       expect(result).toBe('Renamed Field');
     });
+
+    it('uses displayName from meta when inputs.displayName is absent', () => {
+      const { theme } = createMockTheme();
+      const fmt = getThemeFormatter(theme);
+
+      const result = fmt.dimensionOrMeasureTitle(dim({ meta: { displayName: 'Meta Label' } }));
+
+      expect(result).toBe('Meta Label');
+    });
+
+    it('prefers inputs.displayName over meta.displayName', () => {
+      const { theme } = createMockTheme();
+      const fmt = getThemeFormatter(theme);
+
+      const result = fmt.dimensionOrMeasureTitle(
+        dim({ inputs: { displayName: 'Input Label' }, meta: { displayName: 'Meta Label' } }),
+      );
+
+      expect(result).toBe('Input Label');
+    });
   });
 
   describe('data', () => {
@@ -189,6 +209,22 @@ describe('getThemeFormatter', () => {
         const fmt = getThemeFormatter(theme);
 
         expect(fmt.data(dim({ inputs: { displayNullAs: 'N/A' } }), null)).toBe('N/A');
+      });
+
+      it('returns displayNullAs from meta when inputs.displayNullAs is absent', () => {
+        const { theme } = createMockTheme();
+        const fmt = getThemeFormatter(theme);
+
+        expect(fmt.data(dim({ meta: { displayNullAs: '—' } }), null)).toBe('—');
+      });
+
+      it('prefers inputs.displayNullAs over meta.displayNullAs', () => {
+        const { theme } = createMockTheme();
+        const fmt = getThemeFormatter(theme);
+
+        expect(
+          fmt.data(dim({ inputs: { displayNullAs: 'N/A' }, meta: { displayNullAs: '—' } }), null),
+        ).toBe('N/A');
       });
     });
 
@@ -216,6 +252,34 @@ describe('getThemeFormatter', () => {
         );
 
         expect(result).toBe('**bold**');
+      });
+
+      it('uses displayFormat from meta when inputs.displayFormat is absent', () => {
+        const { theme } = createMockTheme();
+        const fmt = getThemeFormatter(theme);
+        const value = { x: 1 };
+
+        const result = fmt.data(
+          dim({ meta: { displayFormat: DisplayFormatTypeOptions.JSON } }),
+          value,
+        );
+
+        expect(result).toBe(JSON.stringify(value, null, 2));
+      });
+
+      it('prefers inputs.displayFormat over meta.displayFormat', () => {
+        const { theme } = createMockTheme();
+        const fmt = getThemeFormatter(theme);
+
+        const result = fmt.data(
+          dim({
+            inputs: { displayFormat: DisplayFormatTypeOptions.MARKDOWN },
+            meta: { displayFormat: DisplayFormatTypeOptions.JSON },
+          }),
+          '**text**',
+        );
+
+        expect(result).toBe('**text**');
       });
     });
 
@@ -316,6 +380,36 @@ describe('getThemeFormatter', () => {
 
         expect(result).toBe('value <<');
       });
+
+      it('uses meta.pretext and meta.posttext as prefix/suffix when inputs are absent', () => {
+        const { theme, dataOthersFormatFn } = createMockTheme();
+        dataOthersFormatFn.mockReturnValue('value');
+        const fmt = getThemeFormatter(theme);
+
+        const result = fmt.data(
+          dim({ nativeType: 'string', meta: { pretext: '[', posttext: ']' } }),
+          'value',
+        );
+
+        expect(result).toBe('[value]');
+      });
+
+      it('prefers inputs.prefix/suffix over meta.pretext/posttext', () => {
+        const { theme, dataOthersFormatFn } = createMockTheme();
+        dataOthersFormatFn.mockReturnValue('value');
+        const fmt = getThemeFormatter(theme);
+
+        const result = fmt.data(
+          dim({
+            nativeType: 'string',
+            inputs: { prefix: '(', suffix: ')' },
+            meta: { pretext: '[', posttext: ']' },
+          }),
+          'value',
+        );
+
+        expect(result).toBe('(value)');
+      });
     });
 
     describe('maxCharacters', () => {
@@ -357,6 +451,32 @@ describe('getThemeFormatter', () => {
         );
 
         expect(result).toBe('PREFI...');
+      });
+
+      it('uses maxCharacters from meta when inputs.maxCharacters is absent', () => {
+        const { theme, dataOthersFormatFn } = createMockTheme();
+        dataOthersFormatFn.mockReturnValue('Hello World');
+        const fmt = getThemeFormatter(theme);
+
+        const result = fmt.data(
+          dim({ nativeType: 'string', meta: { maxCharacters: 5 } }),
+          'Hello World',
+        );
+
+        expect(result).toBe('Hello...');
+      });
+
+      it('prefers inputs.maxCharacters over meta.maxCharacters', () => {
+        const { theme, dataOthersFormatFn } = createMockTheme();
+        dataOthersFormatFn.mockReturnValue('Hello');
+        const fmt = getThemeFormatter(theme);
+
+        const result = fmt.data(
+          dim({ nativeType: 'string', inputs: { maxCharacters: 10 }, meta: { maxCharacters: 2 } }),
+          'Hello',
+        );
+
+        expect(result).toBe('Hello');
       });
     });
   });

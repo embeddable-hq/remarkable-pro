@@ -104,7 +104,7 @@ const dataDateTimeFormatter = (theme: Theme, key: DimensionOrMeasure): DateTimeF
 
   const locale = getLocale(theme.formatter.locale);
 
-  const granularity = key.inputs?.granularity;
+  const granularity = key.inputs?.granularity ?? (key.meta as any)?.granularity;
 
   const { year, month, day, hour, minute, second } = theme.formatter.defaultDateTimeFormatOptions;
 
