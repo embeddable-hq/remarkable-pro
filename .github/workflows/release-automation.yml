@@ -58,17 +58,12 @@ jobs:
           git add pages/component-libraries/remarkable-pro/changelog.mdx
           git commit -m "chore: add changelog entry for $VERSION"
           git push origin "changelog/$VERSION"
+          PR_BODY="Automated changelog update from remarkable-pro $VERSION ($RELEASE_URL)."
+
           gh pr create \
             --repo embeddable-hq/handbook \
             --head "changelog/$VERSION" \
             --base main \
-            --title "📦 Changelog: Remarkable Pro $VERSION" \
-            --body "Automated changelog update from [remarkable-pro $VERSION]($RELEASE_URL).
-
-**Review checklist before merging:**
-- [ ] Version entry looks correct
-- [ ] Any breaking changes are clearly marked
-- [ ] Links resolve correctly
-
-_This PR was opened automatically by the release automation workflow._" \
+            --title "Changelog: Remarkable Pro $VERSION" \
+            --body "$PR_BODY" \
             --label "changelog,automated"

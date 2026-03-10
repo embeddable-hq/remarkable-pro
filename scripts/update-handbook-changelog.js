@@ -67,6 +67,12 @@ const newEntry = buildEntry();
 const marker = '## Changelog entries';
 
 const existing = fs.readFileSync(handbookPath, 'utf-8');
+
+if (!existing.includes(marker)) {
+  console.error(`❌ Marker "${marker}" not found in ${handbookPath}. Aborting.`);
+  process.exit(1);
+}
+
 const updated = existing.replace(marker, `${marker}\n\n${newEntry}`);
 
 fs.writeFileSync(handbookPath, updated);
