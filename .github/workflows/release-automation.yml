@@ -58,7 +58,7 @@ jobs:
           git add pages/component-libraries/remarkable-pro/changelog.mdx
           git commit -m "chore: add changelog entry for $VERSION"
           git push origin "changelog/$VERSION"
-          PR_BODY="Automated changelog update from remarkable-pro $VERSION ($RELEASE_URL)."
+s          PR_BODY="Automated changelog update from remarkable-pro $VERSION ($RELEASE_URL)."
 
           gh pr create \
             --repo embeddable-hq/handbook \
