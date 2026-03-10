@@ -1,7 +1,7 @@
 import { DimensionOrMeasure } from '@embeddable.com/core';
 import { useTheme } from '@embeddable.com/react';
 import { MultiSelectField } from '@embeddable.com/remarkable-ui';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Theme } from '../../../theme/theme.types';
 import { i18nSetup, i18n } from '../../../theme/i18n/i18n';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
@@ -29,6 +29,21 @@ const DimensionMeasureMultiSelectFieldPro = (props: DimensionMeasureMultiSelectF
   const { title, description, tooltip, placeholder } = resolveI18nProps(props);
 
   const [searchValue, setSearchValue] = useState('');
+  const hasInitializedSelection = useRef(false);
+
+  // Pre-select first option on first load when not clearable (require at least one selection)
+  useEffect(() => {
+    if (clearable) return;
+    const firstOption = dimensionAndMeasureOptions[0];
+    if (
+      !hasInitializedSelection.current &&
+      selectedDimensionsAndMeasures.length === 0 &&
+      firstOption
+    ) {
+      hasInitializedSelection.current = true;
+      onChange([firstOption]);
+    }
+  }, [clearable, dimensionAndMeasureOptions, selectedDimensionsAndMeasures.length, onChange]);
 
   const currentDimensionAndMeasureNames = selectedDimensionsAndMeasures.map((d) => d.name);
 
