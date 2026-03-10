@@ -12,9 +12,13 @@ vi.mock('../i18n/i18n', () => ({
   i18nSetup: vi.fn(),
 }));
 
-vi.mock('@embeddable.com/core', () => ({
-  isDimension: vi.fn(() => true),
-}));
+vi.mock('@embeddable.com/core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@embeddable.com/core')>();
+  return {
+    ...actual,
+    isDimension: vi.fn(() => true),
+  };
+});
 
 const mockTheme = {
   formatter: {

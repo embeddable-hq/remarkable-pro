@@ -7,6 +7,7 @@ import {
 import { Theme } from '../theme.types';
 import { DimensionOrMeasure, isDimension } from '@embeddable.com/core';
 import { i18n, i18nSetup } from '../i18n/i18n';
+import { getSubInputValue } from './formatter.utils';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -60,8 +61,8 @@ const numberFormatter = (
 };
 
 const dataNumberFormatter = (theme: Theme, key: DimensionOrMeasure): NumberFormatter => {
-  const currency = key.inputs?.currency ?? (key.meta as any)?.currency;
-  const decimalPlaces = key.inputs?.decimalPlaces ?? (key.meta as any)?.decimalPlaces;
+  const currency = getSubInputValue(key, 'currency');
+  const decimalPlaces = getSubInputValue(key, 'decimalPlaces');
   const hasDecimalPlaces = decimalPlaces != null;
 
   const fixedFractionDigits = hasDecimalPlaces ? decimalPlaces : undefined;
@@ -69,10 +70,7 @@ const dataNumberFormatter = (theme: Theme, key: DimensionOrMeasure): NumberForma
   const options: Intl.NumberFormatOptions = {
     style: currency ? 'currency' : undefined,
     currency: currency ? currency : undefined,
-    notation:
-      (key.inputs?.abbreviateLargeNumber ?? (key.meta as any)?.abbreviateLargeNumber ?? false)
-        ? 'compact'
-        : undefined,
+    notation: (getSubInputValue(key, 'abbreviateLargeNumber') ?? false) ? 'compact' : undefined,
     minimumFractionDigits: fixedFractionDigits,
     maximumFractionDigits: fixedFractionDigits,
   };
@@ -104,7 +102,7 @@ const dataDateTimeFormatter = (theme: Theme, key: DimensionOrMeasure): DateTimeF
 
   const locale = getLocale(theme.formatter.locale);
 
-  const granularity = key.inputs?.granularity ?? (key.meta as any)?.granularity;
+  const granularity = getSubInputValue(key, 'granularity');
 
   const { year, month, day, hour, minute, second } = theme.formatter.defaultDateTimeFormatOptions;
 

@@ -8,7 +8,7 @@ import { DisplayFormatTypeOptions } from '../../components/types/DisplayFormat.t
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-const formatOption = (key: DimensionOrMeasure, inputKey: string, metaKey?: string) =>
+export const getSubInputValue = (key: DimensionOrMeasure, inputKey: string, metaKey?: string) =>
   key.inputs?.[inputKey] ?? (key.meta as any)?.[metaKey ?? inputKey];
 
 export type GetThemeFormatter = {
@@ -49,7 +49,7 @@ export const getThemeFormatter = (theme: Theme): GetThemeFormatter => {
       return cachedDateTimeFormatter(options).format(value);
     },
     dimensionOrMeasureTitle: (key: DimensionOrMeasure): string => {
-      const displayName = formatOption(key, 'displayName');
+      const displayName = getSubInputValue(key, 'displayName');
       if (displayName) {
         if (displayName.includes('|')) {
           return resolveI18nString(displayName);
@@ -65,11 +65,11 @@ export const getThemeFormatter = (theme: Theme): GetThemeFormatter => {
 
       // Nulls (inputs override meta)
       if (value == null) {
-        return formatOption(key, 'displayNullAs') ?? '';
+        return getSubInputValue(key, 'displayNullAs') ?? '';
       }
 
       // JSON and Markdown (inputs override meta)
-      const displayFormat = formatOption(key, 'displayFormat');
+      const displayFormat = getSubInputValue(key, 'displayFormat');
       if (displayFormat === DisplayFormatTypeOptions.JSON) {
         return JSON.stringify(value, null, 2);
       }
@@ -97,12 +97,12 @@ export const getThemeFormatter = (theme: Theme): GetThemeFormatter => {
       }
 
       // Prefix and suffix (inputs override meta; meta uses pretext/posttext)
-      const prefix = formatOption(key, 'prefix', 'pretext') || '';
-      const suffix = formatOption(key, 'suffix', 'posttext') || '';
+      const prefix = getSubInputValue(key, 'prefix', 'pretext') || '';
+      const suffix = getSubInputValue(key, 'suffix', 'posttext') || '';
       const appended = `${prefix}${newValue}${suffix}`;
 
       // Max characters (inputs override meta)
-      const maxCharacters = formatOption(key, 'maxCharacters');
+      const maxCharacters = getSubInputValue(key, 'maxCharacters');
       if (maxCharacters != null) {
         if (appended.length <= maxCharacters) {
           return appended;
