@@ -12,9 +12,9 @@
  *   RELEASE_URL      — GitHub release URL
  */
 
-import fs from 'fs';
-import path from 'path';
-import process from 'process';
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
 
 const latest = JSON.parse(fs.readFileSync('/tmp/changelog-latest.json', 'utf-8'));
 const handbookPath = path.join(process.cwd(), 'handbook', 'pages', 'component-libraries', 'remarkable-pro', 'changelog.mdx');

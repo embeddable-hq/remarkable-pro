@@ -20,9 +20,9 @@
  *   - def456: Fix tooltip overflow on small screens
  */
 
-import fs from 'fs';
-import path from 'path';
-import process from 'process';
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
 
 const changelogPath = path.join(process.cwd(), 'CHANGELOG.md');
 const raw = fs.readFileSync(changelogPath, 'utf-8');
