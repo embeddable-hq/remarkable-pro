@@ -24,6 +24,7 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
   const { title, description, tooltip, placeholder } = resolveI18nProps(props);
 
   const [searchValue, setSearchValue] = useState('');
+  const [pendingValues, setPendingValues] = useState<string[]>([]);
   const hasInitializedSelection = useRef(false);
 
   // Pre-select first option on first load when not clearable (require at least one selection)
@@ -53,12 +54,14 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
     <EditorCard title={title} description={description} tooltip={tooltip}>
       <MultiSelectField
         isClearable={clearable}
+        disableApplyButton={!clearable && pendingValues.length === 0}
         isSearchable
         values={currentMeasureName}
         options={options}
         placeholder={placeholder}
         noOptionsMessage={i18n.t('common.noOptionsFound')}
         onChange={handleChange}
+        onPendingChange={setPendingValues}
         onSearch={setSearchValue}
         avoidCollisions={false}
       />
