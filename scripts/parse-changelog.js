@@ -74,7 +74,7 @@ function buildVersionMarkdown(version, sections) {
 
 for (const line of lines) {
   // Version header: "## 0.1.15" or "## 0.1.15-beta.1"
-  const versionMatch = line.match(/^## (\d+\.\d+\.\d+[\w.-]*)\s*$/);
+  const versionMatch = line.match(/^## (\d+\.\d+\.\d+(?:[-+][a-zA-Z0-9._-]*)?)\s*$/);
   if (versionMatch) {
     flushVersion();
     currentVersion = versionMatch[1];
@@ -108,11 +108,13 @@ if (versions.length === 0) {
   process.exit(1);
 }
 
+const tmpDir = process.env.RUNNER_TEMP ?? '/tmp';
+
 // Write all versions
-fs.writeFileSync('/tmp/changelog-parsed.json', JSON.stringify(versions, null, 2));
+fs.writeFileSync(`${tmpDir}/changelog-parsed.json`, JSON.stringify(versions, null, 2));
 
 // Write latest version only
-fs.writeFileSync('/tmp/changelog-latest.json', JSON.stringify(versions[0], null, 2));
+fs.writeFileSync(`${tmpDir}/changelog-latest.json`, JSON.stringify(versions[0], null, 2));
 
 console.log(`✅ Parsed ${versions.length} versions. Latest: ${versions[0].version}`);
 console.log(`   Sections: ${Object.keys(versions[0].sections).join(', ')}`);

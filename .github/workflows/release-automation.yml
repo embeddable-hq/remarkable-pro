@@ -46,73 +46,29 @@ jobs:
         run: node scripts/update-handbook-changelog.js
 
       - name: Open PR in handbook
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.HANDBOOK_GITHUB_TOKEN }}
-          path: handbook
-          commit-message: "chore: add changelog entry for ${{ github.ref_name }}"
-          title: "📦 Changelog: Remarkable Pro ${{ github.ref_name }}"
-          body: |
-            Automated changelog update from [remarkable-pro ${{ github.ref_name }}](${{ github.event.release.html_url }}).
+        env:
+          GH_TOKEN: ${{ secrets.HANDBOOK_GITHUB_TOKEN }}
+          VERSION: ${{ github.ref_name }}
+          RELEASE_URL: ${{ github.event.release.html_url }}
+        run: |
+          cd handbook
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "changelog/$VERSION"
+          git add pages/component-libraries/remarkable-pro/changelog.mdx
+          git commit -m "chore: add changelog entry for $VERSION"
+          git push origin "changelog/$VERSION"
+          gh pr create \
+            --repo embeddable-hq/handbook \
+            --head "changelog/$VERSION" \
+            --base main \
+            --title "📦 Changelog: Remarkable Pro $VERSION" \
+            --body "Automated changelog update from [remarkable-pro $VERSION]($RELEASE_URL).
 
-            **Review checklist before merging:**
-            - [ ] Version entry looks correct
-            - [ ] Any breaking changes are clearly marked
-            - [ ] Links resolve correctly
+**Review checklist before merging:**
+- [ ] Version entry looks correct
+- [ ] Any breaking changes are clearly marked
+- [ ] Links resolve correctly
 
-            _This PR was opened automatically by the release automation workflow._
-          branch: "changelog/${{ github.ref_name }}"
-          base: main
-          labels: changelog,automated
-
-  # # ──────────────────────────────────────────────────────
-  # # JOB 2: Create newsletter draft issue for Loops
-  # # ──────────────────────────────────────────────────────
-  # draft-newsletter:
-  #   name: Draft newsletter → GitHub Issue
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout remarkable-pro
-  #       uses: actions/checkout@v4
-
-  #     - name: Set up Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 20
-
-  #     - name: Parse CHANGELOG.md
-  #       run: node scripts/parse-changelog.js
-
-  #     - name: Generate newsletter draft
-  #       id: newsletter
-  #       env:
-  #         RELEASE_VERSION: ${{ github.ref_name }}
-  #         RELEASE_DATE: ${{ github.event.release.published_at }}
-  #         RELEASE_URL: ${{ github.event.release.html_url }}
-  #         NPM_URL: https://www.npmjs.com/package/@embeddable.com/remarkable-pro
-  #       run: node scripts/generate-newsletter.js
-
-  #     - name: Create GitHub issue as newsletter staging area
-  #       uses: actions/github-script@v7
-  #       env:
-  #         NEWSLETTER_BODY: ${{ steps.newsletter.outputs.issue_body }}
-  #       with:
-  #         script: |
-  #           const body = process.env.NEWSLETTER_BODY;
-  #           const issue = await github.rest.issues.create({
-  #             owner: context.repo.owner,
-  #             repo: context.repo.repo,
-  #             title: `📧 Newsletter Draft — Remarkable Pro ${{ github.ref_name }}`,
-  #             body,
-  #             labels: ['newsletter', 'draft']
-  #           });
-  #           console.log(`Newsletter draft issue created: ${issue.data.html_url}`);
-
-  #     # Optional: if you add a LOOPS_API_KEY secret, this step will also
-  #     # push the draft as a Loops transactional email to your internal team
-  #     - name: Notify internal team via Loops (optional)
-  #       if: ${{ env.LOOPS_API_KEY != '' }}
-  #       env:
-  #         LOOPS_API_KEY: ${{ secrets.LOOPS_API_KEY }}
-  #         RELEASE_VERSION: ${{ github.ref_name }}
-  #       run: node scripts/notify-loops-team.js
+_This PR was opened automatically by the release automation workflow._" \
+            --label "changelog,automated"

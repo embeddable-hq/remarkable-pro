@@ -16,7 +16,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 
-const latest = JSON.parse(fs.readFileSync('/tmp/changelog-latest.json', 'utf-8'));
+const tmpDir = process.env.RUNNER_TEMP ?? '/tmp';
+const latest = JSON.parse(fs.readFileSync(`${tmpDir}/changelog-latest.json`, 'utf-8'));
 const handbookPath = path.join(process.cwd(), 'handbook', 'pages', 'component-libraries', 'remarkable-pro', 'changelog.mdx');
 
 // Strip leading "v" if present for display
