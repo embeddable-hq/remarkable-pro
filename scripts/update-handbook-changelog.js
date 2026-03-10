@@ -18,16 +18,23 @@ import process from 'node:process';
 
 const tmpDir = process.env.RUNNER_TEMP ?? '/tmp';
 const latest = JSON.parse(fs.readFileSync(`${tmpDir}/changelog-latest.json`, 'utf-8'));
-const handbookPath = path.join(process.cwd(), 'handbook', 'pages', 'component-libraries', 'remarkable-pro', 'changelog.mdx');
+const handbookPath = path.join(
+  process.cwd(),
+  'handbook',
+  'pages',
+  'component-libraries',
+  'remarkable-pro',
+  'changelog.mdx',
+);
 
 // Strip leading "v" if present for display
 const rawVersion = process.env.RELEASE_VERSION || latest.version;
 const version = rawVersion.replace(/^v/, '');
 const date = process.env.RELEASE_DATE || new Date().toISOString().split('T')[0];
-const releaseUrl = process.env.RELEASE_URL || `https://github.com/embeddable-hq/remarkable-pro/releases/tag/v${version}`;
+const releaseUrl =
+  process.env.RELEASE_URL ||
+  `https://github.com/embeddable-hq/remarkable-pro/releases/tag/v${version}`;
 const npmUrl = `https://www.npmjs.com/package/@embeddable.com/remarkable-pro/v/${version}`;
-
-
 
 // Build the MDX entry for this version
 function buildEntry() {
@@ -76,4 +83,6 @@ if (!existing.includes(marker)) {
 const updated = existing.replace(marker, `${marker}\n\n${newEntry}`);
 
 fs.writeFileSync(handbookPath, updated);
-console.log(`✅ Updated handbook/pages/component-libraries/remarkable-pro/changelog.mdx with v${version}`);
+console.log(
+  `✅ Updated handbook/pages/component-libraries/remarkable-pro/changelog.mdx with v${version}`,
+);

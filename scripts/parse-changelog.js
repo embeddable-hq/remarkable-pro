@@ -96,7 +96,11 @@ for (const line of lines) {
   }
 
   // Continuation of previous bullet (indented)
-  if ((line.startsWith('  ') || line.startsWith('\t')) && currentSection && currentItems.length > 0) {
+  if (
+    (line.startsWith('  ') || line.startsWith('\t')) &&
+    currentSection &&
+    currentItems.length > 0
+  ) {
     currentItems[currentItems.length - 1] += ' ' + line.trim();
   }
 }
