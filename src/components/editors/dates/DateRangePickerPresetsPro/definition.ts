@@ -1,5 +1,5 @@
 import { EmbeddedComponentMeta, Inputs, definePreview } from '@embeddable.com/react';
-import { Value } from '@embeddable.com/core';
+import { TimeRange, Value } from '@embeddable.com/core';
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 
@@ -82,12 +82,11 @@ const props = (inputs: Inputs<typeof meta>) => {
 };
 
 const events = {
-  onChange: (range: unknown) => {
-    const timeRange = range as { from?: Date; to?: Date } | undefined;
+  onChange: (timeRange: TimeRange) => {
     return {
-      value: range ?? Value.noFilter(),
-      fromDate: timeRange?.from,
-      toDate: timeRange?.to,
+      value: timeRange ?? Value.noFilter(),
+      fromDate: timeRange?.from ? { date: timeRange?.from } : Value.noFilter(),
+      toDate: timeRange?.to ? { date: timeRange?.to } : Value.noFilter(),
     };
   },
 };
