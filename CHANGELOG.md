@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.23
+
+### Patch Changes
+
+- 87af76a: Rename BarChartStackedHorizontalPro and type
+
 ## 0.1.22
 
 ### Patch Changes
