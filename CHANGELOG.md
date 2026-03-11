@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.21
+
+### Patch Changes
+
+- 28f1365: Support all per-type subinputs in data model meta
+
 ## 0.1.20
 
 ### Patch Changes
