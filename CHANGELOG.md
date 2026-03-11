@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.22
+
+### Patch Changes
+
+- e1b48d7: Selects categories cleanup, MeasureMultiSelect and MeasureDimensionMultiSelect logic updates
+
 ## 0.1.21
 
 ### Patch Changes
