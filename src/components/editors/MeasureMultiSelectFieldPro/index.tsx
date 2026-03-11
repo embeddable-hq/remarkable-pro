@@ -1,7 +1,7 @@
 import { Measure } from '@embeddable.com/core';
 import { useTheme } from '@embeddable.com/react';
 import { MultiSelectField } from '@embeddable.com/remarkable-ui';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Theme } from '../../../theme/theme.types';
 import { i18nSetup, i18n } from '../../../theme/i18n/i18n';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
@@ -25,17 +25,15 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
 
   const [searchValue, setSearchValue] = useState('');
   const [pendingValues, setPendingValues] = useState<string[]>([]);
-  const hasInitializedSelection = useRef(false);
 
-  // Pre-select first option on first load when not clearable (require at least one selection)
   useEffect(() => {
     if (clearable) return;
-    const firstOption = measureOptions[0];
-    if (!hasInitializedSelection.current && selectedMeasures.length === 0 && firstOption) {
-      hasInitializedSelection.current = true;
-      onChange([firstOption]);
-    }
-  }, [clearable, measureOptions, selectedMeasures.length, onChange]);
+    if (selectedMeasures.length > 0) return;
+    const first = measureOptions[0];
+    if (!first) return;
+
+    onChange([first]);
+  }, [clearable, selectedMeasures.length, measureOptions, onChange]);
 
   const currentMeasureName = selectedMeasures.map((m) => m.name);
 
