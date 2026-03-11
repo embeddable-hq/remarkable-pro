@@ -9,13 +9,15 @@ export const getDimensionAndMeasureOptions = ({
   theme,
 }: {
   dimensionsAndMeasures: DimensionOrMeasure[];
-  searchValue: string;
+  searchValue?: string;
   theme: Theme;
 }): SelectListOptionProps[] => {
   const themeFormatter = getThemeFormatter(theme);
 
   return dimensionsAndMeasures
     .filter((dimensionOrMeasure) => {
+      if (!searchValue) return true;
+
       return themeFormatter
         .dimensionOrMeasureTitle(dimensionOrMeasure)
         .toLowerCase()

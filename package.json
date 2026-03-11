@@ -61,8 +61,8 @@
   },
   "dependencies": {
     "@changesets/cli": "^2.29.6",
-    "@embeddable.com/core": "^2.13.6",
-    "@embeddable.com/react": "^2.13.4",
+    "@embeddable.com/core": "file:../embeddable-sdk/packages/core",
+    "@embeddable.com/react": "file:../embeddable-sdk/packages/react",
     "@embeddable.com/remarkable-ui": "^2.0.44",
     "@tabler/icons-react": "^3.34.1",
     "chart.js": "^4.5.0",
@@ -77,9 +77,10 @@
     "xlsx": "npm:@e965/xlsx@^0.20.3"
   },
   "devDependencies": {
-    "@embeddable.com/sdk-core": "^4.2.0",
-    "@embeddable.com/sdk-react": "4.3.1",
+    "@embeddable.com/sdk-core": "file:../embeddable-sdk/packages/core-sdk",
+    "@embeddable.com/sdk-react": "file:../embeddable-sdk/packages/react-sdk",
     "@eslint/css": "^0.13.0",
+    "@stencil/core": "^4.43.2",
     "@testing-library/react": "^16.3.2",
     "@types/chroma-js": "^3.1.1",
     "@types/react": "^19.1.9",
