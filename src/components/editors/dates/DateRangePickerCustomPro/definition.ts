@@ -39,6 +39,16 @@ const meta = {
           label: 'Selected date-range',
           type: 'timeRange',
         },
+        {
+          name: 'fromDate',
+          label: 'Start date of selected range',
+          type: 'time',
+        },
+        {
+          name: 'toDate',
+          label: 'To date of selected range',
+          type: 'time',
+        },
       ],
     },
   ],
@@ -64,9 +74,14 @@ const props = (inputs: Inputs<typeof meta>) => {
 };
 
 const events = {
-  onChange: (range: unknown) => ({
-    value: range ?? Value.noFilter(),
-  }),
+  onChange: (range: unknown) => {
+    const timeRange = range as { from?: Date; to?: Date } | undefined;
+    return {
+      value: range ?? Value.noFilter(),
+      fromDate: timeRange?.from,
+      toDate: timeRange?.to,
+    };
+  },
 };
 
 export const dateRangePickerCustomPro = {
