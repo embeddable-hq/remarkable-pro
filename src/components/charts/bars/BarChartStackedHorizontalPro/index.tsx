@@ -10,7 +10,7 @@ import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/c
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 
-export type BarChartHorizontalStackedProProps = {
+export type BarChartStackedHorizontalProProps = {
   groupBy: Dimension;
   measure: Measure;
   results: DataResponse;
@@ -32,7 +32,7 @@ export type BarChartHorizontalStackedProProps = {
   }) => void;
 } & ChartCardHeaderProps;
 
-const BarChartHorizontalStackedPro = (props: BarChartHorizontalStackedProProps) => {
+const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
@@ -117,4 +117,4 @@ const BarChartHorizontalStackedPro = (props: BarChartHorizontalStackedProProps) 
   );
 };
 
-export default BarChartHorizontalStackedPro;
+export default BarChartStackedHorizontalPro;
