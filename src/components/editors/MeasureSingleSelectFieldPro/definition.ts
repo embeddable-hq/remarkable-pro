@@ -7,7 +7,7 @@ import { previewData } from '../../preview.data.constants';
 const meta = {
   name: 'MeasureSingleSelectFieldPro',
   label: 'Measure Single Select Field',
-  category: 'Dropdowns',
+  category: 'Dropdowns - dimensions and measures',
   defaultWidth: 300,
   defaultHeight: 120,
   inputs: [

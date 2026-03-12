@@ -6,7 +6,7 @@ import { inputs } from '../../../component.inputs.constants';
 const meta = {
   name: 'DateRangeSelectFieldPro',
   label: 'Date-Range Picker - Presets',
-  category: 'Dropdowns',
+  category: 'Dropdowns - dates',
   defaultWidth: 300,
   defaultHeight: 120,
   inputs: [

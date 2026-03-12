@@ -7,7 +7,7 @@ import { previewData } from '../../preview.data.constants';
 const meta = {
   name: 'MeasureMultiSelectFieldPro',
   label: 'Measure Multi Select Field',
-  category: 'Dropdowns',
+  category: 'Dropdowns - dimensions and measures',
   defaultWidth: 300,
   defaultHeight: 120,
   inputs: [

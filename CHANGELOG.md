@@ -1,5 +1,17 @@
 # @embeddable/remarkable-ui
 
+## 0.1.23
+
+### Patch Changes
+
+- 87af76a: Rename BarChartStackedHorizontalPro and type
+
+## 0.1.22
+
+### Patch Changes
+
+- e1b48d7: Selects categories cleanup, MeasureMultiSelect and MeasureDimensionMultiSelect logic updates
+
 ## 0.1.21
 
 ### Patch Changes

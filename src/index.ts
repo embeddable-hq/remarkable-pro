@@ -59,7 +59,7 @@ export type { BarChartGroupedProProps } from './components/charts/bars/BarChartG
 export * as BarChartDefaultHorizontalPro from './components/charts/bars/BarChartDefaultHorizontalPro';
 export type { BarChartDefaultHorizontalProProps } from './components/charts/bars/BarChartDefaultHorizontalPro';
 export * as BarChartStackedHorizontalPro from './components/charts/bars/BarChartStackedHorizontalPro';
-export type { BarChartHorizontalStackedProProps } from './components/charts/bars/BarChartStackedHorizontalPro';
+export type { BarChartStackedHorizontalProProps } from './components/charts/bars/BarChartStackedHorizontalPro';
 export * as BarChartGroupedHorizontalPro from './components/charts/bars/BarChartGroupedHorizontalPro';
 export type { BarChartGroupedHorizontalProProps } from './components/charts/bars/BarChartGroupedHorizontalPro';
 export * from './components/charts/bars/bars.utils';

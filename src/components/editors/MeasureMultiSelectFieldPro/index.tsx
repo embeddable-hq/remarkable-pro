@@ -1,7 +1,7 @@
 import { Measure } from '@embeddable.com/core';
 import { useTheme } from '@embeddable.com/react';
 import { MultiSelectField } from '@embeddable.com/remarkable-ui';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Theme } from '../../../theme/theme.types';
 import { i18nSetup, i18n } from '../../../theme/i18n/i18n';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
@@ -24,6 +24,16 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
   const { title, description, tooltip, placeholder } = resolveI18nProps(props);
 
   const [searchValue, setSearchValue] = useState('');
+  const [pendingValues, setPendingValues] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (clearable) return;
+    if (selectedMeasures.length > 0) return;
+    const first = measureOptions[0];
+    if (!first) return;
+
+    onChange([first]);
+  }, [clearable, selectedMeasures.length, measureOptions, onChange]);
 
   const currentMeasureName = selectedMeasures.map((m) => m.name);
 
@@ -42,12 +52,14 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
     <EditorCard title={title} description={description} tooltip={tooltip}>
       <MultiSelectField
         isClearable={clearable}
+        disableApplyButton={!clearable && pendingValues.length === 0}
         isSearchable
         values={currentMeasureName}
         options={options}
         placeholder={placeholder}
         noOptionsMessage={i18n.t('common.noOptionsFound')}
         onChange={handleChange}
+        onPendingChange={setPendingValues}
         onSearch={setSearchValue}
         avoidCollisions={false}
       />
