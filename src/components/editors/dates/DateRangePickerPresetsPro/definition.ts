@@ -1,12 +1,12 @@
 import { EmbeddedComponentMeta, Inputs, definePreview } from '@embeddable.com/react';
-import { Value } from '@embeddable.com/core';
+import { TimeRange, Value } from '@embeddable.com/core';
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 
 const meta = {
   name: 'DateRangeSelectFieldPro',
   label: 'Date-Range Picker - Presets',
-  category: 'Dropdowns',
+  category: 'Dropdowns - dates',
   defaultWidth: 300,
   defaultHeight: 120,
   inputs: [
@@ -46,6 +46,16 @@ const meta = {
           label: 'Selected date-range',
           type: 'timeRange',
         },
+        {
+          name: 'fromDate',
+          label: 'Start date of selected range',
+          type: 'time',
+        },
+        {
+          name: 'toDate',
+          label: 'To date of selected range',
+          type: 'time',
+        },
       ],
     },
   ],
@@ -72,9 +82,13 @@ const props = (inputs: Inputs<typeof meta>) => {
 };
 
 const events = {
-  onChange: (range: unknown) => ({
-    value: range ?? Value.noFilter(),
-  }),
+  onChange: (timeRange: TimeRange) => {
+    return {
+      value: timeRange ?? Value.noFilter(),
+      fromDate: timeRange?.from ? { date: timeRange?.from } : Value.noFilter(),
+      toDate: timeRange?.to ? { date: timeRange?.to } : Value.noFilter(),
+    };
+  },
 };
 
 export const dateRangeSelectFieldPro = {

@@ -1,5 +1,35 @@
 # @embeddable/remarkable-ui
 
+## 0.1.24
+
+### Patch Changes
+
+- 458f030: Extend date ranges component with fromDate, toDate props; upgrade sdk versions
+
+## 0.1.23
+
+### Patch Changes
+
+- 87af76a: Rename BarChartStackedHorizontalPro and type
+
+## 0.1.22
+
+### Patch Changes
+
+- e1b48d7: Selects categories cleanup, MeasureMultiSelect and MeasureDimensionMultiSelect logic updates
+
+## 0.1.21
+
+### Patch Changes
+
+- 28f1365: Support all per-type subinputs in data model meta
+
+## 0.1.20
+
+### Patch Changes
+
+- b1ff7d0: Added MeasureMultiSelectFieldPro and DimensionMeasureMultiSelectFieldPro components
+
 ## 0.1.19
 
 ### Patch Changes

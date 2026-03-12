@@ -20,7 +20,7 @@ type FilterBuilderItemProps = {
 };
 
 const FilterBuilderItem = (props: FilterBuilderItemProps) => {
-  const { dimensionsAndMeasures, theme, filter, onChange } = props;
+  const { dimensionsAndMeasures = [], theme, filter: _filter, onChange: _onChange } = props;
 
   const [searchValue, setSearchValue] = useState<string>('');
 
@@ -30,7 +30,7 @@ const FilterBuilderItem = (props: FilterBuilderItemProps) => {
     theme,
   });
 
-  const handleChange = (newValue: string) => {};
+  const handleChange = (_newValue: string) => {};
 
   return (
     <div>
@@ -49,7 +49,8 @@ const FilterBuilderItem = (props: FilterBuilderItemProps) => {
 };
 
 export type FilterBuilderProProps = {
-  dimensionsAndMeasures: DimensionOrMeasure[];
+  dimensionsAndMeasures?: DimensionOrMeasure[];
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   onApply?: (data: any) => void;
 };
 
@@ -58,11 +59,17 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
 
   const { dimensionsAndMeasures = [], onApply } = props;
 
-  const handleChange = (newValue: string) => {};
+  const handleChange = (_newValue: string) => {};
 
   return (
     <div>
       <FilterBuilderItem
+        filter={{
+          member: 'customers.count',
+          nativeDataType: 'number',
+          operator: 'equals',
+          value: '1',
+        }}
         theme={theme}
         dimensionsAndMeasures={dimensionsAndMeasures}
         onChange={handleChange}
