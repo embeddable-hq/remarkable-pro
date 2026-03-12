@@ -37,4 +37,13 @@ describe('MarkdownInput', () => {
     rerender(<MarkdownInput value="second" onChange={vi.fn()} />);
     expect(screen.getByDisplayValue('second')).toBeInTheDocument();
   });
+
+  it('calls onChange when value is undefined initially (ensures first keystroke is saved)', () => {
+    const onChange = vi.fn();
+    render(<MarkdownInput value={undefined} onChange={onChange} />);
+    const editor = screen.getByTestId('markdown-editor');
+    expect(editor).toHaveValue('');
+    fireEvent.change(editor, { target: { value: 'first typed' } });
+    expect(onChange).toHaveBeenCalledWith('first typed');
+  });
 });
