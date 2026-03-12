@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.24
+
+### Patch Changes
+
+- 458f030: Extend date ranges component with fromDate, toDate props; upgrade sdk versions
+
 ## 0.1.23
 
 ### Patch Changes
