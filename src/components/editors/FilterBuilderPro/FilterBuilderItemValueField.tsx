@@ -1,10 +1,17 @@
-import { DataResponse, DimensionOrMeasure, FilterOperator, NativeDataType } from '@embeddable.com/core';
+import {
+  DataResponse,
+  DimensionOrMeasure,
+  FilterOperator,
+  NativeDataType,
+} from '@embeddable.com/core';
 import { FilterBuilderFilter } from './definition';
 import { MultiSelectField, SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../theme/theme.types';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { i18n } from '../../../theme/i18n/i18n';
 import FilterBuilderItemNumberValueField from './FilterBuilderItemNumberValueField';
+import styles from './FilterBuilderPro.module.css';
+import clsx from 'clsx';
 
 export type FilterBuilderItemValueFieldProps = {
   filter: FilterBuilderFilter;
@@ -34,21 +41,36 @@ const FilterBuilderItemValueField = ({
   const showNoOptionsMessage = Boolean(!results?.isLoading && (results?.data?.length ?? 0) === 0);
 
   if (dimensionOrMeasure.nativeType === NativeDataType.number) {
-    return (
-      <FilterBuilderItemNumberValueField
-        filter={filter}
-        onSelectValue={onSelectValue}
-      />
-    );
+    return <FilterBuilderItemNumberValueField filter={filter} onSelectValue={onSelectValue} />;
   }
 
-  if (filter.operator === FilterOperator.contains || filter.operator === FilterOperator.notContains) {
+  if (
+    filter.operator === FilterOperator.contains ||
+    filter.operator === FilterOperator.notContains
+  ) {
+    const filterValue = (filter.value as string[]) ?? [];
+    const selectedValues = options.filter((option) => filterValue.includes(option.value));
+
+    let displayValue: string;
+    if (selectedValues.length === 0) {
+      displayValue = '...';
+    } else if (selectedValues.length > 2) {
+      displayValue = `${selectedValues.length} selected`;
+    } else {
+      displayValue = selectedValues.map((o) => o.label).join(', ');
+    }
+
     return (
       <MultiSelectField
+        triggerComponent={
+          <button className={clsx(styles.filterButton, styles.filterButtonValue)}>
+            {displayValue}
+          </button>
+        }
         isSearchable
         isClearable
         isLoading={results?.isLoading}
-        values={(filter.value as string[]) ?? []}
+        values={filterValue}
         options={options}
         onChange={(newValue) => onSelectValue(newValue.length === 0 ? null : newValue)}
         onSearch={onSearchValue}
@@ -59,8 +81,15 @@ const FilterBuilderItemValueField = ({
   }
 
   if (filter.operator === FilterOperator.equals || filter.operator === FilterOperator.notEquals) {
+    const displayValue = options.find((option) => option.value === filter.value)?.label ?? '...';
+
     return (
       <SingleSelectField
+        triggerComponent={
+          <button className={clsx(styles.filterButton, styles.filterButtonValue)}>
+            {displayValue}
+          </button>
+        }
         searchable
         clearable
         isLoading={results?.isLoading}

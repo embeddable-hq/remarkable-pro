@@ -1,14 +1,23 @@
-import {
-  DataResponse,
-  DimensionOrMeasure,
-  FilterOperator,
-  NativeDataType,
-} from '@embeddable.com/core';
+import { DataResponse, DimensionOrMeasure } from '@embeddable.com/core';
 import { useTheme } from '@embeddable.com/react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Theme } from '../../../theme/theme.types';
 import FilterBuilderItem from './FilterBuilderItem';
 import { FilterBuilderFilter, FilterBuilderState } from './definition';
+import { ActionIcon, SingleSelectField } from '@embeddable.com/remarkable-ui';
+import { IconPlus, IconChevronRight } from '@tabler/icons-react';
+import styles from './FilterBuilderPro.module.css';
+import clsx from 'clsx';
+import { generateFilterValue, getSupportedDimensionsAndMeasures } from './FilterBuilderPro.utils';
+import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
+import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
+
+// DISCUSS WITH DENIS
+// - review all the css variables
+// - check the todos
+// - loading when fetching data
+// - debounces
+// - input sizes
 
 export type FilterBuilderProProps = {
   embeddableState?: FilterBuilderState;
@@ -22,6 +31,21 @@ export type FilterBuilderProProps = {
 
 const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const theme = useTheme() as Theme;
+  i18nSetup(theme);
+
+  const [searchNew, setSearchNew] = useState('');
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const updateScrollState = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  };
+
+  const handleScrollRight = () => {
+    scrollRef.current?.scrollBy({ left: 200, behavior: 'smooth' });
+  };
 
   const {
     dimensionsAndMeasures = [],
@@ -35,16 +59,16 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const nextIdRef = useRef(
     (embeddableState?.filters?.reduce((max, f) => Math.max(max, f.id ?? 0), 0) ?? 0) + 1,
   );
-  const newFilter = (): FilterBuilderFilter => ({
-    id: nextIdRef.current++,
-    dimensionOrMeasure: null,
-    search: '',
-    value: null,
-  });
+  const newFilter = (dimensionOrMeasureValue: string | null = null): FilterBuilderFilter => {
+    const dimensionOrMeasure =
+      dimensionsAndMeasures.find((d) => d.name === dimensionOrMeasureValue) ?? null;
+
+    return { id: nextIdRef.current++, dimensionOrMeasure, search: '', value: null };
+  };
 
   const filters = embeddableState?.filters?.length ? embeddableState.filters : [newFilter()];
 
-  const handleSelectDimensionOrMeasure = (index: number, name: string) => {
+  const handleSelectDimensionOrMeasure = (index: number, name: string | null) => {
     const selected = dimensionsAndMeasures.find((d) => d.name === name) ?? null;
     setEmbeddableState?.((prev: any) => {
       const newFilters = [...(prev?.filters ?? [])];
@@ -59,7 +83,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     });
   };
 
-  const handleSelectOperator = (index: number, operator: string) => {
+  const handleSelectOperator = (index: number, operator: string | null) => {
     setEmbeddableState?.((prev: any) => {
       const newFilters = [...(prev?.filters ?? [])];
       newFilters[index] = { ...newFilters[index], operator, value: null };
@@ -83,11 +107,19 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     });
   };
 
-  const handleAddFilter = () => {
-    setEmbeddableState?.((prev: any) => ({
-      ...prev,
-      filters: [...(prev?.filters ?? []), newFilter()],
-    }));
+  const handleDeleteFilter = (index: number) => {
+    setEmbeddableState?.((prev: any) => {
+      const newFilters = [...(prev?.filters ?? [])];
+      newFilters.splice(index, 1);
+      return { ...prev, filters: newFilters };
+    });
+  };
+
+  const handleAddFilter = (value: string | null) => {
+    setEmbeddableState?.((prev: any) => {
+      const newFilters = [...(prev?.filters ?? []), newFilter(value)];
+      return { ...prev, filters: newFilters };
+    });
   };
 
   useEffect(() => {
@@ -98,51 +130,83 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     onApply?.(filterValue);
   }, [filters]);
 
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    updateScrollState();
+    el.addEventListener('scroll', updateScrollState);
+    const ro = new ResizeObserver(updateScrollState);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener('scroll', updateScrollState);
+      ro.disconnect();
+    };
+  }, []);
+
+  const supportedDimensionsAndMeasures = getSupportedDimensionsAndMeasures(dimensionsAndMeasures);
+
+  const dimensionOptionsNew = getDimensionAndMeasureOptions({
+    dimensionsAndMeasures: supportedDimensionsAndMeasures,
+    searchValue: searchNew,
+    theme,
+  });
+
+  const hasClearAll = filters.some((f) => f.dimensionOrMeasure && f.operator && f.value);
+
+  const handleClearAll = () => {
+    setEmbeddableState?.((prev: any) => ({ ...prev, filters: [newFilter()] }));
+  };
+
   return (
-    <>
-      {filters.map((filter, index) => (
-        <FilterBuilderItem
-          key={filter.id}
-          filter={filter}
-          dimensionsAndMeasures={dimensionsAndMeasures}
-          results={results[index]}
-          theme={theme}
-          onSelectDimensionOrMeasure={(value) => handleSelectDimensionOrMeasure(index, value)}
-          onSelectOperator={(value) => handleSelectOperator(index, value)}
-          onSelectValue={(value) => handleSelectValue(index, value)}
-          onSearchValue={(search) => handleDimensionSearch(index, search)}
-        />
-      ))}
-      <button onClick={handleAddFilter}>button</button>
-    </>
+    <div className={styles.filterContainer}>
+      <div className={styles.filterScrollArea} ref={scrollRef}>
+        {filters.map((filter, index) => (
+          <FilterBuilderItem
+            key={filter.id}
+            filter={filter}
+            dimensionsAndMeasures={dimensionsAndMeasures}
+            results={results[index]}
+            theme={theme}
+            onSelectDimensionOrMeasure={(value) => handleSelectDimensionOrMeasure(index, value)}
+            onSelectOperator={(value) => handleSelectOperator(index, value)}
+            onSelectValue={(value) => handleSelectValue(index, value)}
+            onSearchValue={(search) => handleDimensionSearch(index, search)}
+            onDelete={() => handleDeleteFilter(index)}
+          />
+        ))}
+        {/* TODO: check this behavior with DENIS */}
+        {filters[0]?.dimensionOrMeasure && (
+          <SingleSelectField
+            triggerComponent={<ActionIcon icon={IconPlus} />}
+            searchable
+            onChange={(value) => handleAddFilter(value)}
+            onSearch={setSearchNew}
+            options={dimensionOptionsNew}
+            avoidCollisions={false}
+            noOptionsMessage={i18n.t('common.noOptionsFound')}
+          />
+        )}
+      </div>
+      <div className={styles.filterFixedRight}>
+        {canScrollRight && (
+          <button
+            className={clsx(styles.filterButton, styles.filterButtonScrollRight)}
+            onClick={handleScrollRight}
+          >
+            <IconChevronRight />
+          </button>
+        )}
+        {hasClearAll && (
+          <button
+            className={clsx(styles.filterButton, styles.filterButtonClearAll)}
+            onClick={handleClearAll}
+          >
+            {i18n.t('filterBuilderPro.clearAll')}
+          </button>
+        )}
+      </div>
+    </div>
   );
 };
 
 export default FilterBuilderPro;
-
-type Clause = {
-  property: string;
-  operator: string;
-  value: FilterBuilderFilter['value'];
-};
-
-const filterToClause = (f: FilterBuilderFilter): Clause[] => {
-  if (f.operator === 'between' && f.dimensionOrMeasure?.nativeType === NativeDataType.number) {
-    const [min, max] = f.value as [number, number];
-    return [
-      { property: f.dimensionOrMeasure.name, operator: FilterOperator.gte, value: min },
-      { property: f.dimensionOrMeasure.name, operator: FilterOperator.lte, value: max },
-    ];
-  }
-  return [{ property: f.dimensionOrMeasure!.name, operator: f.operator!, value: f.value }];
-};
-
-const generateFilterValue = (filters: FilterBuilderFilter[]) => {
-  const clauses = filters
-    .filter((f) => f.dimensionOrMeasure && f.operator && f.value != null)
-    .flatMap(filterToClause);
-
-  if (clauses.length === 0) return null;
-
-  return { operator: 'and', clauses };
-};

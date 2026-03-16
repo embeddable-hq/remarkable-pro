@@ -8,6 +8,9 @@ import { FilterBuilderFilter } from './definition';
 import { SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../theme/theme.types';
 import FilterBuilderItemValueField from './FilterBuilderItemValueField';
+import { useEffect } from 'react';
+import styles from './FilterBuilderPro.module.css';
+import clsx from 'clsx';
 
 const OPERATORS_STRING_BOOLEAN = [
   { value: FilterOperator.equals, label: 'is' },
@@ -29,7 +32,7 @@ type FilterBuilderItemOperatorValueFieldsProps = {
   filter: FilterBuilderFilter;
   results?: DataResponse;
   theme: Theme;
-  onSelectOperator: (value: string) => void;
+  onSelectOperator: (value: string | null) => void;
   onSelectValue: (value: FilterBuilderFilter['value']) => void;
   onSearchValue: (value: string) => void;
 };
@@ -48,9 +51,20 @@ const FilterBuilderItemOperatorValueFields = ({
       ? OPERATORS_NUMBER
       : OPERATORS_STRING_BOOLEAN;
 
+  useEffect(() => {
+    if (!filter.operator) {
+      onSelectOperator(operatorOptions[0]!.value);
+    }
+  });
+
   return (
     <>
       <SingleSelectField
+        triggerComponent={
+          <button className={clsx(styles.filterButton, styles.filterButtonOperator)}>
+            {operatorOptions.find((x) => x.value === filter.operator)?.label}
+          </button>
+        }
         value={filter.operator}
         options={operatorOptions}
         onChange={onSelectOperator}

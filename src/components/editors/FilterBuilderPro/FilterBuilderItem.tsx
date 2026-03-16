@@ -1,28 +1,30 @@
 import { DataResponse, DimensionOrMeasure, NativeDataType } from '@embeddable.com/core';
 import { FilterBuilderFilter } from './definition';
-import { SingleSelectField } from '@embeddable.com/remarkable-ui';
+import { ActionIcon, SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../theme/theme.types';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
 import { useState } from 'react';
 import { i18n } from '../../../theme/i18n/i18n';
 import FilterBuilderItemOperatorValueFields from './FilterBuilderItemOperatorValueFields';
+import styles from './FilterBuilderPro.module.css';
+import clsx from 'clsx';
+import { IconPlus, IconX } from '@tabler/icons-react';
+import {
+  FILTER_BUILDER_PRO_SUPPORTED_TYPES,
+  getSupportedDimensionsAndMeasures,
+} from './FilterBuilderPro.utils';
 
 type FilterBuilderItemProps = {
   filter: FilterBuilderFilter;
   dimensionsAndMeasures: DimensionOrMeasure[];
   results?: DataResponse;
   theme: Theme;
-  onSelectDimensionOrMeasure: (value: string) => void;
-  onSelectOperator: (value: string) => void;
+  onSelectDimensionOrMeasure: (value: string | null) => void;
+  onSelectOperator: (value: string | null) => void;
   onSelectValue: (value: FilterBuilderFilter['value']) => void;
   onSearchValue: (value: string) => void;
+  onDelete: () => void;
 };
-
-const SUPPORTED_NATIVE_TYPES: string[] = [
-  NativeDataType.string,
-  NativeDataType.boolean,
-  NativeDataType.number,
-];
 
 const FilterBuilderItem = ({
   filter,
@@ -33,13 +35,12 @@ const FilterBuilderItem = ({
   onSelectOperator,
   onSelectValue,
   onSearchValue,
+  onDelete,
 }: FilterBuilderItemProps) => {
   const { dimensionOrMeasure } = filter;
   const [search, setSearch] = useState('');
 
-  const supportedDimensionsAndMeasures = dimensionsAndMeasures.filter((d) =>
-    SUPPORTED_NATIVE_TYPES.includes(d.nativeType),
-  );
+  const supportedDimensionsAndMeasures = getSupportedDimensionsAndMeasures(dimensionsAndMeasures);
 
   const dimensionOptions = getDimensionAndMeasureOptions({
     dimensionsAndMeasures: supportedDimensionsAndMeasures,
@@ -47,12 +48,27 @@ const FilterBuilderItem = ({
     theme,
   });
 
-  const showOperatorValue =
-    dimensionOrMeasure !== null && SUPPORTED_NATIVE_TYPES.includes(dimensionOrMeasure.nativeType);
+  const getMemberTriggerComponent = () => {
+    if (dimensionOrMeasure) {
+      return (
+        <button className={clsx(styles.filterButton, styles.filterButtonMember)}>
+          {dimensionOptions.find((option) => option.value === dimensionOrMeasure?.name)?.label}
+        </button>
+      );
+    }
+
+    return (
+      <button className={styles.filterButton}>
+        <IconPlus />
+        <span>{i18n.t('filterBuilderPro.addFilter')}</span>
+      </button>
+    );
+  };
 
   return (
-    <div>
+    <div className={styles.filterItemContainer}>
       <SingleSelectField
+        triggerComponent={getMemberTriggerComponent()}
         searchable
         value={dimensionOrMeasure?.name}
         onChange={onSelectDimensionOrMeasure}
@@ -61,16 +77,25 @@ const FilterBuilderItem = ({
         avoidCollisions={false}
         noOptionsMessage={i18n.t('common.noOptionsFound')}
       />
-      {showOperatorValue && (
-        <FilterBuilderItemOperatorValueFields
-          dimensionOrMeasure={dimensionOrMeasure}
-          filter={filter}
-          results={results}
-          theme={theme}
-          onSelectOperator={onSelectOperator}
-          onSelectValue={onSelectValue}
-          onSearchValue={onSearchValue}
-        />
+
+      {dimensionOrMeasure && (
+        <>
+          <FilterBuilderItemOperatorValueFields
+            dimensionOrMeasure={dimensionOrMeasure}
+            filter={filter}
+            results={results}
+            theme={theme}
+            onSelectOperator={onSelectOperator}
+            onSelectValue={onSelectValue}
+            onSearchValue={onSearchValue}
+          />
+          <button
+            className={clsx(styles.filterButton, styles.filterButtonDelete)}
+            onClick={onDelete}
+          >
+            <IconX />
+          </button>
+        </>
       )}
     </div>
   );

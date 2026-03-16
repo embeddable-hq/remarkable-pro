@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { FilterBuilderFilter } from './definition';
 import { NumberField } from '@embeddable.com/remarkable-ui';
+import styles from './FilterBuilderPro.module.css';
+import clsx from 'clsx';
+import { i18n } from '../../../theme/i18n/i18n';
 
 export type FilterBuilderItemNumberValueFieldProps = {
   filter: FilterBuilderFilter;
@@ -24,17 +27,33 @@ const FilterBuilderItemNumberValueField = ({
   if (filter.operator === 'between') {
     return (
       <>
-        <NumberField value={min} onChange={setMin} />
-        <NumberField value={max} onChange={setMax} />
+        {/* TODO: ask denis */}
+        <input
+          type="number"
+          className={styles.filterInput}
+          value={min ?? ''}
+          onChange={(e) => setMin(e.target.value === '' ? null : Number(e.target.value))}
+        />
+        <button className={clsx(styles.filterButton, styles.filterButtonOperator)}>
+          {i18n.t('filterBuilderPro.betweenAnd')}
+        </button>
+        <input
+          type="number"
+          className={styles.filterInput}
+          value={max ?? ''}
+          onChange={(e) => setMax(e.target.value === '' ? null : Number(e.target.value))}
+        />
       </>
     );
   }
 
   return (
-    <NumberField
-      value={filter.value == null ? null : (filter.value as number)}
-      onChange={(v) => onSelectValue(v)}
-      clearable
+    <input
+      type="number"
+      className={styles.filterInput}
+      value={filter.value == null ? '' : (filter.value as number)}
+      onChange={(v) => onSelectValue(v.target.value === '' ? null : Number(v.target.value))}
+      // clearable
     />
   );
 };

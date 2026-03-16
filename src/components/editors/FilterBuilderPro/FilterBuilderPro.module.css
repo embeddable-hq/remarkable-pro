@@ -1,0 +1,152 @@
+.filterContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  /* gap: var(--em-filter-gap--external, 12px); */
+  overflow: hidden;
+  padding-right: var(--em-filter-gap--external, 12px);
+}
+
+.filterScrollArea {
+  display: flex;
+  align-items: center;
+  gap: var(--em-filter-gap--external, 12px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filterScrollArea::-webkit-scrollbar {
+  display: none;
+}
+
+.filterFixedRight {
+  display: flex;
+  align-items: center;
+  gap: var(--em-filter-gap--external, 12px);
+  flex-shrink: 0;
+}
+
+.filterItemContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--em-filter-gap--internal, 2px);
+}
+
+.filterButton {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  height: var(--em-filter-height, 2rem);
+  padding-left: var(--em-filter-padding-left-right, 0.75rem);
+  padding-right: var(--em-filter-padding-left-right, 0.75rem);
+  gap: var(--em-filter-gap--internal, 0.125rem);
+  border-radius: var(--em-filter-border-radius--group, 2rem);
+  border-width: var(--em-filter-border-width, 0);
+  border-style: solid;
+  border-color: var(--em-filter-border-color, rgb(255 255 255));
+  background: var(--em-filter-background--filter, rgb(237 237 241));
+  color: var(--em-filter-color, rgb(0 0 0));
+  font-family: var(--em-filter-label-font-family, 'Inter');
+  font-size: var(--em-filter-label-font-size, 0.75rem);
+  font-weight: var(--em-filter-label-font-weight, 500);
+  line-height: var(--em-filter-label-line-height, 0.875rem);
+  cursor: pointer;
+}
+
+.filterButton svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.filterButton:hover {
+  background: var(--em-filter-background--hover, rgb(228 228 234));
+  border-color: var(--em-filter-border-color--hover, rgb(255 255 255));
+}
+
+.filterButtonMember {
+  background: var(--em-filter-background--filter, rgb(237 237 241));
+  border-color: var(--em-filter-border-color, rgb(255 255 255));
+  /* color: var(--em-filter-color, rgb(0 0 0)); */
+  /* font-weight: var(--em-filter-label-font-weight, 500); */
+  /* padding-left: var(--em-filter-padding-left-right, 0.75rem);
+  padding-right: var(--em-filter-padding-left-right, 0.75rem); */
+  border-top-right-radius: var(--em-filter-border-radius, 0.25rem);
+  border-bottom-right-radius: var(--em-filter-border-radius, 0.25rem);
+}
+
+.filterButtonOperator {
+  background: var(--em-filter-background--operator, rgb(247 247 248));
+  border-color: var(--em-filter-border-color--operator, rgb(255 255 255));
+  color: var(--em-filter-color--operator, rgb(92 92 102));
+  /* font-weight: var(--em-filter-label-font-weight--operator, 400); */
+  padding-left: var(--em-filter-padding-left-right--operator, 4px);
+  padding-right: var(--em-filter-padding-left-right--operator, 4px);
+  border-radius: var(--em-filter-border-radius, 0.25rem);
+}
+
+.filterButtonValue {
+  /* background: var(--em-filter-background--selected, rgb(210 210 213));
+  border-color: var(--em-filter-border-color--selected, rgb(255 255 255)); */
+  /* color: var(--em-filter-color, rgb(0 0 0)); */
+  /* font-weight: var(--em-filter-label-font-weight, 500); */
+  padding-left: var(--em-filter-padding-left-right, 12px);
+  padding-right: var(--em-filter-padding-left-right, 12px);
+  border-radius: var(--em-filter-border-radius, 0.25rem);
+}
+
+.filterButtonDelete {
+  background: var(--em-filter-background--operator, rgb(247 247 248));
+  border-color: var(--em-filter-border-color--operator, rgb(255 255 255));
+  /* color: var(--em-filter-color, rgb(0 0 0)); */
+  /* font-weight: var(--em-filter-label-font-weight, 500); */
+  padding-left: var(--em-filter-padding-left-right--operator, 4px);
+  padding-right: var(--em-filter-padding-left-right--operator, 4px);
+  border-top-left-radius: var(--em-filter-border-radius, 0.25rem);
+  border-bottom-left-radius: var(--em-filter-border-radius, 0.25rem);
+}
+
+.filterButtonDelete svg {
+  /* DENIS */
+  width: 1rem;
+  height: 1rem;
+}
+
+.filterButtonClearAll {
+  background: none;
+}
+
+.filterActionPanel {
+  display: flex;
+  align-items: center;
+}
+
+.filterInput {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  height: var(--em-filter-height, 2rem);
+  padding-left: var(--em-filter-padding-left-right, 0.75rem);
+  padding-right: var(--em-filter-padding-left-right, 0.75rem);
+  gap: var(--em-filter-gap--internal, 0.125rem);
+  border-radius: var(--em-filter-border-radius, 0.25rem);
+  border-width: var(--em-filter-border-width, 0);
+  border-style: solid;
+  border-color: var(--em-filter-border-color, rgb(255 255 255));
+  background: var(--em-filter-background--filter, rgb(237 237 241));
+  color: var(--em-filter-color, rgb(0 0 0));
+  font-family: var(--em-filter-label-font-family, 'Inter');
+  font-size: var(--em-filter-label-font-size, 0.75rem);
+  font-weight: var(--em-filter-label-font-weight, 500);
+  line-height: var(--em-filter-label-line-height, 0.875rem);
+  width: 100px;
+  /* TODO: check with DENIS */
+  box-sizing: border-box;
+}
+
+.filterButtonScrollRight {
+  background: none;
+  border-color: var(--em-filter-border-color--operator, rgb(255 255 255));
+  border-top-left-radius: var(--em-filter-border-radius, 0.25rem);
+  border-bottom-left-radius: var(--em-filter-border-radius, 0.25rem);
+}

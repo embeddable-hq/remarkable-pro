@@ -79,8 +79,9 @@ const props = (
 });
 
 const events = {
+  // Add type
   onApply: (value: unknown) => ({
-    value,
+    value: value ?? Value.noFilter(),
   }),
 };
 
