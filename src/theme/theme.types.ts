@@ -36,6 +36,7 @@ export type ThemeCharts = {
   donutLabelChartPro?: { options: Partial<ChartOptions<'pie'>> };
   barChartDefaultPro?: { options: Partial<ChartOptions<'bar'>> };
   barChartDefaultHorizontalPro?: { options: Partial<ChartOptions<'bar'>> };
+  barChartDefaultWithLinePro?: { options: Partial<ChartOptions<'bar'>> };
   barChartGroupedPro?: { options: Partial<ChartOptions<'bar'>> };
   barChartGroupedHorizontalPro?: { options: Partial<ChartOptions<'bar'>> };
   barChartStackedPro?: { options: Partial<ChartOptions<'bar'>> };
