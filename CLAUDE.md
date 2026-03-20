@@ -1,10 +1,10 @@
-# Create a New Component
+# Step 1 - Create a New Component
 
 When asked to create a component, **always stop first** and present the following 5 experiment options to the user before writing any code:
 
 ---
 
-## Which flow would you like to follow?
+## Step 2 - Which flow would you like to follow?
 
 1. **No context**
    - Follow instructions in `.claude/experiments/1-no-context.md`
@@ -27,28 +27,34 @@ When asked to create a component, **always stop first** and present the followin
 
 ---
 
-After the component is created, pause and ask the user to run `/context` to log the current token usage. Wait for the user to confirm before continuing to Step 2.
+After the component is created, pause and ask the user to run `/context` to log the current token usage. Wait for the user to confirm before continuing to Step 3.
 
-<!-- ## Step 2 — Audit the new component
+## Step 3 — Start the dev server
 
-Run the design system audit on the component folder created in Step 1.
+Read `.claude/01-dev-server.md`.
+Run the dev server and wait for it to be ready.
+
+# Step 4 — Navigate the Embeddable UI
+
+Read `.claude/02-navigate-embeddable.md`.
+
+Before running the script, extract the `meta.label` value from the component
+created in Step 2 and pass it as the `<component-name>` argument.
+
+Run the script and wait for the new page to load.
+
+# Step 5 — Allow additional input
+
+Ask the user if the result is adequate.
+If yes, stop the agent.
+If no, ask the user to present more input in chat, and repeat to question if the result is adequate.
+
+## Final — Audit the new component
+
+Run the design system audit on the component folder created in Step 2.
 
 ```
 /design-system-audit audit {path/to/NewComponentFolder}
 ```
 
-The audit result is for documentation purposes only. Do not fix or act on any findings. -->
-
-## Step 2 — Start the dev server
-
-Read `.claude/01-dev-server.md`.
-Run the dev server and wait for it to be ready.
-
-# Step 3 — Navigate the Embeddable UI
-
-Read `.claude/02-navigate-embeddable.md`.
-
-Before running the script, extract the `meta.label` value from the component
-created in Step 1 and pass it as the `<component-name>` argument.
-
-Run the script and wait for the new page to load.
+The audit result is for documentation purposes only. Do not fix or act on any findings.
