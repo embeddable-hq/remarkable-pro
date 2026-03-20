@@ -1,5 +1,4 @@
 import { chromium } from '@playwright/test';
-import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import { fileURLToPath } from 'url';
@@ -32,7 +31,6 @@ if (!url || !componentName) {
 
   const page = await context.newPage();
 
-  // First run — may need to log in manually
   console.log(`Navigating to ${url}...`);
   await page.goto(url, { waitUntil: 'domcontentloaded' });
 
@@ -56,22 +54,24 @@ if (!url || !componentName) {
     // No cookie banner — continue
   }
 
+  // Step 1 — Create new embeddable
   console.log('Looking for "Create new embeddable" button...');
   const createNewBtn = page.locator('button', { hasText: /create new embeddable/i });
   await createNewBtn.waitFor({ timeout: 15000 });
   await createNewBtn.scrollIntoViewIfNeeded();
   await createNewBtn.click();
   console.log('Clicked "Create new embeddable". Waiting for next page...');
-
   await page.waitForSelector('button', { timeout: 30000 });
   console.log(`New page URL: ${page.url()}`);
 
+  // Step 2 — Add component
   console.log('Looking for "Add Component" button...');
   const addComponentBtn = page.locator('button', { hasText: /add component/i });
   await addComponentBtn.waitFor({ timeout: 15000 });
   await addComponentBtn.click();
   console.log('Clicked "Add Component".');
 
+  // Step 3 — Search and select component
   console.log(`Searching for "${componentName}" component...`);
   const searchInput = page.locator('input[placeholder="Search components"]');
   await searchInput.waitFor({ timeout: 15000 });
@@ -81,53 +81,22 @@ if (!url || !componentName) {
   const firstSelect = page.locator('button', { hasText: /select/i }).first();
   await firstSelect.waitFor({ timeout: 15000 });
   await firstSelect.click();
-  console.log('Component selected.');
+  console.log('Component selected. Page is ready for manual input.');
 
-  console.log('Filling in required fields...');
-
-  // Fill Title with "test"
-  const titleInput = page.locator('input[placeholder="No value"]').first();
-  await titleInput.waitFor({ timeout: 10000 });
-  await titleInput.fill('test');
-
-  // Select first option in all required select fields
-  const requiredSelects = page.locator('text=Required ~ * select, .select__control').all();
-  const selects = page.locator('[class*="select"]').filter({ hasText: 'Select...' });
-  const selectCount = await selects.count();
-
-  // Handle Dataset field — click it and either select first option or create dataset
-  console.log('Handling Dataset field...');
-  const datasetSelect = selects.nth(0);
-  await datasetSelect.click();
-
-  try {
-    const firstOption = page.locator('[class*="option"]').first();
-    await firstOption.waitFor({ timeout: 3000 });
-    await firstOption.click();
-    console.log('Selected existing dataset.');
-  } catch {
-    // No existing options — click "Create dataset"
-    const createDatasetBtn = page.locator('button', { hasText: /create dataset/i });
-    await createDatasetBtn.waitFor({ timeout: 5000 });
-    await createDatasetBtn.click();
-    console.log('Clicked "Create dataset".');
-  }
-
-  // Select first option in remaining required select fields
-  for (let i = 1; i < selectCount; i++) {
-    const select = selects.nth(i);
-    await select.click();
-    const firstOption = page.locator('[class*="option"]').first();
-    await firstOption.waitFor({ timeout: 5000 });
-    await firstOption.click();
-    console.log(`Selected first option in field ${i + 1}`);
-  }
-
-  console.log('Clicking "Add to dashboard"...');
+  // Step 4 — Wait for user to fill in the required fields and click "Add to dashboard"
+  console.log('Waiting for "Add to dashboard" to be clicked...');
+  await page.waitForSelector('button:not([disabled])', { timeout: 120000 });
   const addBtn = page.locator('button', { hasText: /add to dashboard/i });
-  await addBtn.waitFor({ timeout: 10000 });
+  await addBtn.waitFor({ timeout: 120000 });
   await addBtn.click();
   console.log('Component added to dashboard!');
 
-  // Keep browser open for further interactions
+  // Step 5 — Click Preview
+  console.log('Clicking "Preview" button...');
+  const previewBtn = page.locator('button', { hasText: /preview/i });
+  await previewBtn.waitFor({ timeout: 15000 });
+  await previewBtn.click();
+  console.log('Preview mode activated. Component is ready to view.');
+
+  // Keep browser open for inspection
 })();

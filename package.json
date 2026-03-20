@@ -18,6 +18,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "chrome:debug": "open -a 'Google Chrome' --args --remote-debugging-port=9222 --profile-directory='Profile 1'",
     "coverage": "vitest run --coverage",
     "build-storybook": "storybook build",
     "circular:check": "madge --circular .",
@@ -74,16 +75,19 @@
     "fast-equals": "^6.0.0",
     "i18next": "^25.3.2",
     "mergician": "^2.0.2",
+    "react-simple-maps": "^3.0.0",
     "xlsx": "npm:@e965/xlsx@^0.20.3"
   },
   "devDependencies": {
     "@embeddable.com/sdk-core": "^4.3.1",
     "@embeddable.com/sdk-react": "^4.3.3",
     "@eslint/css": "^0.13.0",
+    "@playwright/test": "^1.58.2",
     "@testing-library/react": "^16.3.2",
     "@types/chroma-js": "^3.1.1",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
+    "@types/react-simple-maps": "^3.0.6",
     "@vitest/coverage-v8": "^4.0.18",
     "esbuild-register": "^3.6.0",
     "eslint": "^9.31.0",

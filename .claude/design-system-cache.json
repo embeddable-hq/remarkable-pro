@@ -1,0 +1,71 @@
+{
+  "scanned_at": "2026-03-19T00:00:00.000Z",
+  "components_sampled": [
+    "src/components/charts/bars/BarChartDefaultPro",
+    "src/components/charts/bars/BarChartStackedPro",
+    "src/components/charts/bars/BarChartGroupedPro",
+    "src/components/charts/bars/BarChartDefaultHorizontalPro",
+    "src/components/charts/bars/BarChartGroupedHorizontalPro",
+    "src/components/charts/bars/BarChartStackedHorizontalPro",
+    "src/components/charts/lines/LineChartDefaultPro",
+    "src/components/charts/lines/LineChartGroupedPro",
+    "src/components/charts/lines/LineChartComparisonDefaultPro",
+    "src/components/charts/lines/LineAreaChartWithKpisPro",
+    "src/components/charts/lines/KpiLineChartFilteredPro",
+    "src/components/charts/pies/PieChartPro",
+    "src/components/charts/pies/DonutChartPro",
+    "src/components/charts/pies/DonutLabelChartPro",
+    "src/components/charts/kpis/KpiChartNumberPro",
+    "src/components/charts/kpis/KpiChartNumberComparisonPro",
+    "src/components/charts/tables/PivotTablePro",
+    "src/components/charts/tables/HeatMapPro",
+    "src/components/editors/ComparisonPeriodSelectFieldPro",
+    "src/components/editors/DimensionOrMeasureMultiSelectFieldPro",
+    "src/components/editors/DimensionSingleSelectFieldPro",
+    "src/components/editors/GranularitySelectFieldPro",
+    "src/components/editors/MeasureMultiSelectFieldPro",
+    "src/components/editors/MeasureSingleSelectFieldPro",
+    "src/components/editors/MultiSelectFieldPro",
+    "src/components/editors/SingleSelectFieldPro",
+    "src/components/editors/TextFieldPro"
+  ],
+  "patterns": {
+    "tokens": {
+      "colors": "Colors are NEVER hardcoded as hex, rgb, or CSS variables in component files. Chart dataset colors come from two sources: (1) getDimensionMeasureColor({ dimensionOrMeasure, theme, color: 'background'|'border', value, chartColors, index }) from 'src/theme/styles/styles.utils', and (2) getChartColors() from '@embeddable.com/remarkable-ui'. Theme-level chart color arrays are accessed via theme.charts.backgroundColors and theme.charts.borderColors. The theme object is always typed as Theme from 'src/theme/theme.types'. Example: const backgroundColor = getDimensionMeasureColor({ dimensionOrMeasure: measure, theme, color: 'background', value: measure.name, chartColors, index })",
+      "spacing": "No direct spacing values in component tsx files. Layout and spacing are handled entirely by shared card components (ChartCard, EditorCard) and UI library components from '@embeddable.com/remarkable-ui'. No raw px/rem/em values observed anywhere in component implementations.",
+      "typography": "No direct font-size, font-weight, or line-height references in component files. Typography is handled by the UI library. The one exception is KpiChartNumberPro which accepts a numeric `fontSize` prop passed directly to the KpiChart component from the library: <KpiChart valueFontSize={fontSize} />",
+      "breakpoints": "No responsive breakpoint tokens found in any sampled component. Components are not responsive within their own code — that concern is handled by the UI library or the embedding layer.",
+      "other": "Theme is accessed via: const theme = useTheme() as Theme (or const theme: Theme = useTheme() as Theme). i18n is set up at the top of each component via: i18nSetup(theme). Data formatting uses: getThemeFormatter(theme) from 'src/theme/formatter/formatter.utils'. Chart.js options are merged with theme overrides via mergician: mergician(getChartOptions(..., theme), theme.charts?.componentNameCamelCase?.options ?? {})"
+    },
+    "naming": {
+      "index_export": "The .emb.ts file (NOT index.tsx) is the embeddable entry point. Pattern: import defineComponent from '@embeddable.com/react'; import { camelCaseName } from './definition'; export const preview = camelCaseName.preview; export const meta = camelCaseName.meta; export default defineComponent(camelCaseName.Component, meta, camelCaseName.config). Example from KpiChartNumberPro.emb.ts: import { kpiChartNumberPro } from './definition'; export const preview = kpiChartNumberPro.preview; export const meta = kpiChartNumberPro.meta; export default defineComponent(kpiChartNumberPro.Component, meta, kpiChartNumberPro.config)",
+      "props_interface": "Props are typed as 'export type {ComponentName}Props = { ... } & ChartCardHeaderProps' for charts, or '& EditorCardHeaderProps' for editors. Name must exactly match the component name. Examples: BarChartDefaultProProps, TextFieldProProps, MultiSelectFieldProProps, KpiChartNumberProProp (NOTE: KpiChartNumberPro uses 'KpiChartNumberProProp' without 's' — this appears to be a deviation). Standard is {ComponentName}Props with 's'.",
+      "emb_file": "Named {ComponentName}.emb.ts — always matches the folder name exactly. E.g. BarChartDefaultPro.emb.ts, TextFieldPro.emb.ts, MultiSelectFieldPro.emb.ts",
+      "definition_file": "Always named definition.ts. Contains: (1) a 'const meta' object satisfying EmbeddedComponentMeta, (2) optional state type '{ComponentName}State', (3) loadDataResultsArgs and loadDataResults functions for data-fetching components, (4) props() and events() functions, (5) a named 'export const camelCaseName = { Component, meta, preview, previewConfig?, config: { props, events? }, results?: { loadDataArgs, loadData } } as const'"
+    },
+    "file_structure": {
+      "required_files": [
+        "{ComponentName}.emb.ts",
+        "definition.ts",
+        "index.tsx"
+      ],
+      "optional_files": [
+        "{ComponentName}.utils.ts",
+        "{ComponentName}.utils.test.ts",
+        "{ComponentName}.types.ts",
+        "index.test.tsx"
+      ],
+      "notes": "The .emb.ts file is the Embeddable SDK entry point (not index.tsx). The index.tsx file is the React component implementation. The definition.ts file contains all Embeddable SDK configuration (meta, inputs, events, variables, loadData). Optional utils file is added when the component has complex data transformation logic (e.g., LineChartDefaultPro.utils.ts, PivotPro.utils.ts). Test files follow the pattern {subject}.utils.test.ts for utils and index.test.tsx for component tests."
+    }
+  },
+  "raw_examples": {
+    "good_token_usage": [
+      "// Correct: theme-based color access via utility\nconst chartColors = getChartColors();\nconst backgroundColor = getDimensionMeasureColor({ dimensionOrMeasure: measure, theme, color: 'background', value: measure.name, chartColors, index });",
+      "// Correct: theme access pattern in every component\nconst theme: Theme = useTheme() as Theme;\ni18nSetup(theme);",
+      "// Correct: merging chart.js options with theme overrides\nconst options = mergician(\n  getBarChartProOptions({ measures, horizontal: false, onBarClicked, data, dimension }, theme),\n  theme.charts?.barChartDefaultPro?.options ?? {},\n);",
+      "// Correct: formatter usage\nconst themeFormatter = getThemeFormatter(theme);\nlabel: themeFormatter.data(dimension, data[dimension.name])",
+      "// Correct: i18n usage\nconst { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);\nconst noOptionsMessage = i18n.t('common.noOptionsFound')"
+    ],
+    "file_structure_example": "// KpiChartNumberPro.emb.ts — canonical .emb.ts structure\nimport { defineComponent } from '@embeddable.com/react';\nimport { kpiChartNumberPro } from './definition';\n\nexport const preview = kpiChartNumberPro.preview;\nexport const meta = kpiChartNumberPro.meta;\nexport default defineComponent(kpiChartNumberPro.Component, meta, kpiChartNumberPro.config);\n\n// definition.ts — canonical definition structure\nconst meta = { name: 'KpiChartNumberPro', label: '...', category: '...', inputs: [...] } as const satisfies EmbeddedComponentMeta;\nexport const kpiChartNumberPro = { Component, meta, preview, previewConfig, config: { props }, results: { loadDataArgs: loadDataResultsArgs, loadData: loadDataResults } } as const;"
+  }
+}
