@@ -18,7 +18,7 @@ if (!url || !componentName) {
   // Kill any leftover Playwright browser processes before launching
   try {
     execSync('pkill -f "Google Chrome for Testing"', { stdio: 'ignore' });
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise((r) => setTimeout(r, 1000));
   } catch {
     // No processes to kill — continue
   }

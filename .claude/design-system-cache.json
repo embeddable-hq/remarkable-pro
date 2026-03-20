@@ -44,11 +44,7 @@
       "definition_file": "Always named definition.ts. Contains: (1) a 'const meta' object satisfying EmbeddedComponentMeta, (2) optional state type '{ComponentName}State', (3) loadDataResultsArgs and loadDataResults functions for data-fetching components, (4) props() and events() functions, (5) a named 'export const camelCaseName = { Component, meta, preview, previewConfig?, config: { props, events? }, results?: { loadDataArgs, loadData } } as const'"
     },
     "file_structure": {
-      "required_files": [
-        "{ComponentName}.emb.ts",
-        "definition.ts",
-        "index.tsx"
-      ],
+      "required_files": ["{ComponentName}.emb.ts", "definition.ts", "index.tsx"],
       "optional_files": [
         "{ComponentName}.utils.ts",
         "{ComponentName}.utils.test.ts",
