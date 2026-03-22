@@ -4,7 +4,7 @@ import react from '@embeddable.com/sdk-react';
 export default defineConfig({
   plugins: [react],
   lifecycleHooksFile: './embeddable.lifecycle.ts',
-  // pushModels: false,
+  pushModels: false,
   region: 'US',
   // previewBaseUrl: 'http://localhost:3000',
   // pushBaseUrl: 'https://api.dev.embeddable.com',

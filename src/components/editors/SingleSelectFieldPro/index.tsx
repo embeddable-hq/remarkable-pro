@@ -17,7 +17,7 @@ export type SingleSelectFieldProProps = {
   selectedValue?: string;
   maxOptions?: number;
   setSearchValue?: (search: string) => void;
-  onChange?: (selectedValue: string) => void;
+  onChange?: (selectedValue: string | null) => void;
 } & EditorCardHeaderProps;
 
 const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
@@ -47,7 +47,7 @@ const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
         options={options}
         placeholder={placeholder}
         noOptionsMessage={showNoOptionsMessage ? i18n.t('common.noOptionsFound') : undefined}
-        onChange={(newValue: string) => onChange?.(newValue)}
+        onChange={(newValue) => onChange?.(newValue)}
         onSearch={setSearchValue}
         avoidCollisions={false}
       />

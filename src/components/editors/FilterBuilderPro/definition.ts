@@ -1,5 +1,5 @@
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
-import { DimensionOrMeasure, loadData, LoadDataRequest, Value } from '@embeddable.com/core';
+import { DimensionOrMeasure, loadData, Value } from '@embeddable.com/core';
 import Component from '.';
 import { inputs } from '../../component.inputs.constants';
 

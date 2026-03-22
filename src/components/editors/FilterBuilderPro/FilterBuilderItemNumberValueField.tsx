@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { FilterBuilderFilter } from './definition';
-import { NumberField } from '@embeddable.com/remarkable-ui';
 import styles from './FilterBuilderPro.module.css';
 import clsx from 'clsx';
 import { i18n } from '../../../theme/i18n/i18n';

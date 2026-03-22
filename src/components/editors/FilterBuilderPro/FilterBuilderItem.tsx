@@ -1,6 +1,6 @@
-import { DataResponse, DimensionOrMeasure, NativeDataType } from '@embeddable.com/core';
+import { DataResponse, DimensionOrMeasure } from '@embeddable.com/core';
 import { FilterBuilderFilter } from './definition';
-import { ActionIcon, SingleSelectField } from '@embeddable.com/remarkable-ui';
+import { SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../theme/theme.types';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
 import { useState } from 'react';
@@ -9,10 +9,7 @@ import FilterBuilderItemOperatorValueFields from './FilterBuilderItemOperatorVal
 import styles from './FilterBuilderPro.module.css';
 import clsx from 'clsx';
 import { IconPlus, IconX } from '@tabler/icons-react';
-import {
-  FILTER_BUILDER_PRO_SUPPORTED_TYPES,
-  getSupportedDimensionsAndMeasures,
-} from './FilterBuilderPro.utils';
+import { getSupportedDimensionsAndMeasures } from './FilterBuilderPro.utils';
 
 type FilterBuilderItemProps = {
   filter: FilterBuilderFilter;

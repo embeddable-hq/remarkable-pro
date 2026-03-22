@@ -5,4 +5,4 @@ export const preview = filterBuilderPro.preview;
 
 export const meta = filterBuilderPro.meta;
 
-export default defineComponent(filterBuilderPro.Component, meta, filterBuilderPro.config);
+export default defineComponent(filterBuilderPro.Component, meta, filterBuilderPro.config as any);
