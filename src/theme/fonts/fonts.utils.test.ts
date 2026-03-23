@@ -218,6 +218,14 @@ describe('injectInter', () => {
 });
 
 describe('removeThemeFonts', () => {
+  it('removes preconnect links', () => {
+    loadThemeFonts(makeTheme({ fonts: { google: { families: ['Roboto'] } } }));
+    expect(document.querySelectorAll('link[data-remarkable-preconnect]')).toHaveLength(2);
+
+    removeThemeFonts();
+    expect(document.querySelectorAll('link[data-remarkable-preconnect]')).toHaveLength(0);
+  });
+
   it('removes Google Font links', () => {
     loadThemeFonts(makeTheme({ fonts: { google: { families: ['Roboto'] } } }));
     expect(getGoogleFontLinks()).toHaveLength(1);

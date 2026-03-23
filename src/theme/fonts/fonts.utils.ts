@@ -4,6 +4,7 @@ import { ThemeFontCustom } from './fonts.types';
 
 const REMARKABLE_FONTS_STYLE_ID = 'remarkable-theme-fonts';
 const REMARKABLE_INTER_LINK_SELECTOR = 'link[data-remarkable-inter]';
+const REMARKABLE_PRECONNECT_ATTR = 'data-remarkable-preconnect';
 const DEFAULT_FONT_BASE = 'inter';
 const GENERIC_FONT_FAMILIES = new Set([
   'serif',
@@ -16,22 +17,29 @@ const GENERIC_FONT_FAMILIES = new Set([
 
 let pendingInterTimeout: ReturnType<typeof setTimeout> | null = null;
 
-const injectGoogleFonts = (families: string[], display = 'swap'): void => {
-  if (typeof document === 'undefined' || !document.head) return;
-  if (document.querySelector('link[data-remarkable-google-fonts]')) return;
-
-  const head = document.head;
+const injectGooglePreconnect = (head: HTMLHeadElement): void => {
+  if (document.querySelector(`link[${REMARKABLE_PRECONNECT_ATTR}]`)) return;
 
   const pre1 = document.createElement('link');
   pre1.rel = 'preconnect';
   pre1.href = 'https://fonts.googleapis.com';
+  pre1.setAttribute(REMARKABLE_PRECONNECT_ATTR, '1');
   head.appendChild(pre1);
 
   const pre2 = document.createElement('link');
   pre2.rel = 'preconnect';
   pre2.href = 'https://fonts.gstatic.com';
   pre2.crossOrigin = 'anonymous';
+  pre2.setAttribute(REMARKABLE_PRECONNECT_ATTR, '1');
   head.appendChild(pre2);
+};
+
+const injectGoogleFonts = (families: string[], display = 'swap'): void => {
+  if (typeof document === 'undefined' || !document.head) return;
+  if (document.querySelector('link[data-remarkable-google-fonts]')) return;
+
+  const head = document.head;
+  injectGooglePreconnect(head);
 
   const query = families
     .map((f) => `family=${encodeURIComponent(f.replace(/\s+/g, ' '))}:wght@100..900`)
@@ -126,6 +134,7 @@ export const removeThemeFonts = (): void => {
     pendingInterTimeout = null;
   }
 
+  document.querySelectorAll(`link[${REMARKABLE_PRECONNECT_ATTR}]`).forEach((el) => el.remove());
   document.querySelectorAll('link[data-remarkable-google-fonts]').forEach((el) => el.remove());
   document.querySelectorAll(REMARKABLE_INTER_LINK_SELECTOR).forEach((el) => el.remove());
   document.getElementById(REMARKABLE_FONTS_STYLE_ID)?.remove();
@@ -139,16 +148,7 @@ export const injectInter = (): void => {
 
   if (document.querySelector(REMARKABLE_INTER_LINK_SELECTOR)) return;
 
-  const pre1 = document.createElement('link');
-  pre1.rel = 'preconnect';
-  pre1.href = 'https://fonts.googleapis.com';
-  head.appendChild(pre1);
-
-  const pre2 = document.createElement('link');
-  pre2.rel = 'preconnect';
-  pre2.href = 'https://fonts.gstatic.com';
-  pre2.crossOrigin = 'anonymous';
-  head.appendChild(pre2);
+  injectGooglePreconnect(head);
 
   const link = document.createElement('link');
   link.rel = 'stylesheet';
