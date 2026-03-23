@@ -30,6 +30,8 @@
 }
 
 .addButton {
+  box-sizing: border-box;
+  font: inherit;
   white-space: nowrap;
   cursor: pointer;
   display: flex;
@@ -37,7 +39,7 @@
   height: var(--em-filterbuilder-add-button-height, 2rem);
   gap: var(--em-filterbuilder-add-button-gap, 2px);
   border: var(--em-filterbuilder-add-button-border-width, 0px) solid
-    var(--em-filterbuilder-border-color, rgba(255, 255, 255, 0));
+    var(--em-filterbuilder-add-button-border-color, rgba(255, 255, 255, 0));
   background: var(--em-filterbuilder-add-button-background, #ededf1);
   padding: var(--em-filterbuilder-add-button-padding-y, 0)
     var(--em-filterbuilder-add-button-padding-x, 12px);
@@ -56,6 +58,8 @@
 }
 
 .memberButton {
+  box-sizing: border-box;
+  font: inherit;
   white-space: nowrap;
   cursor: pointer;
   display: flex;
@@ -77,6 +81,8 @@
 }
 
 .deleteButton {
+  box-sizing: border-box;
+  font: inherit;
   white-space: nowrap;
   cursor: pointer;
   display: flex;
@@ -106,6 +112,8 @@
 }
 
 .operatorButton {
+  box-sizing: border-box;
+  font: inherit;
   white-space: nowrap;
   cursor: pointer;
   display: flex;
@@ -128,6 +136,8 @@
 }
 
 .valueButton {
+  box-sizing: border-box;
+  font: inherit;
   cursor: pointer;
   white-space: nowrap;
   display: flex;
@@ -135,7 +145,7 @@
   height: var(--em-filterbuilder-value-button-height, 2rem);
   gap: var(--em-filterbuilder-value-button-gap, 2px);
   border: var(--em-filterbuilder-value-button-border-width, 0px) solid
-    var(--em-filterbuilder-border-color, rgba(255, 255, 255, 0));
+    var(--em-filterbuilder-value-button-border-color, rgba(255, 255, 255, 0));
   background: var(--em-filterbuilder-value-button-background, #ededf1);
   padding: var(--em-filterbuilder-value-button-padding-y, 0)
     var(--em-filterbuilder-value-button-padding-x, 12px);
@@ -167,6 +177,7 @@
 }
 
 .clearButton {
+  box-sizing: border-box;
   cursor: pointer;
   white-space: nowrap;
   display: flex;
@@ -186,6 +197,7 @@
 }
 
 .scrollButton {
+  box-sizing: border-box;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -213,6 +225,8 @@
 }
 
 .valueInput {
+  box-sizing: border-box;
+  font: inherit;
   height: var(--em-filterbuilder-value-input-height, 2rem);
   border: var(--em-filterbuilder-value-input-border-width, 0px) solid
     var(--em-filterbuilder-value-input-border-color, rgba(255, 255, 255, 0));
