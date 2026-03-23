@@ -7,19 +7,9 @@ import { FilterBuilderFilter, FilterBuilderState } from './definition';
 import { ActionIcon, SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { IconPlus, IconChevronRight } from '@tabler/icons-react';
 import styles from './FilterBuilderPro.module.css';
-import clsx from 'clsx';
 import { generateFilterValue, getSupportedDimensionsAndMeasures } from './FilterBuilderPro.utils';
 import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
-
-// DISCUSS WITH DENIS
-// - review all the css variables
-// - input sizes
-
-// add spinner when fetching data for select and multi select
-// when it is an input value, auto focus the 1st input
-// fire filter change on select option or debounce value
-// inputs should start growing with the text
 
 export type FilterBuilderProProps = {
   embeddableState?: FilterBuilderState;
@@ -160,8 +150,8 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   };
 
   return (
-    <div className={styles.filterContainer}>
-      <div className={styles.filterScrollArea} ref={scrollRef}>
+    <div className={styles.container}>
+      <div className={styles.scroll} ref={scrollRef}>
         {filters.map((filter, index) => (
           <FilterBuilderItem
             key={filter.id}
@@ -188,24 +178,16 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
           />
         )}
       </div>
-      <div className={styles.filterFixedRight}>
-        {canScrollRight && (
-          <button
-            className={clsx(styles.filterButton, styles.filterButtonScrollRight)}
-            onClick={handleScrollRight}
-          >
-            <IconChevronRight />
-          </button>
-        )}
-        {hasClearAll && (
-          <button
-            className={clsx(styles.filterButton, styles.filterButtonClearAll)}
-            onClick={handleClearAll}
-          >
-            {i18n.t('filterBuilderPro.clearAll')}
-          </button>
-        )}
-      </div>
+      {canScrollRight && (
+        <button className={styles.scrollButton} onClick={handleScrollRight}>
+          <IconChevronRight />
+        </button>
+      )}
+      {hasClearAll && (
+        <button className={styles.clearButton} onClick={handleClearAll}>
+          {i18n.t('filterBuilderPro.clearAll')}
+        </button>
+      )}
     </div>
   );
 };

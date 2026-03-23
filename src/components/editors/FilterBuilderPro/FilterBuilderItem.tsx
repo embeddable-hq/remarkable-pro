@@ -48,14 +48,14 @@ const FilterBuilderItem = ({
   const getMemberTriggerComponent = () => {
     if (dimensionOrMeasure) {
       return (
-        <button className={clsx(styles.filterButton, styles.filterButtonMember)}>
+        <button className={styles.memberButton}>
           {dimensionOptions.find((option) => option.value === dimensionOrMeasure?.name)?.label}
         </button>
       );
     }
 
     return (
-      <button className={styles.filterButton}>
+      <button className={styles.addButton}>
         <IconPlus />
         <span>{i18n.t('filterBuilderPro.addFilter')}</span>
       </button>
@@ -63,7 +63,7 @@ const FilterBuilderItem = ({
   };
 
   return (
-    <div className={styles.filterItemContainer}>
+    <div className={styles.filter}>
       <SingleSelectField
         triggerComponent={getMemberTriggerComponent()}
         searchable
@@ -86,10 +86,7 @@ const FilterBuilderItem = ({
             onSelectValue={onSelectValue}
             onSearchValue={onSearchValue}
           />
-          <button
-            className={clsx(styles.filterButton, styles.filterButtonDelete)}
-            onClick={onDelete}
-          >
+          <button className={styles.deleteButton} onClick={onDelete}>
             <IconX />
           </button>
         </>

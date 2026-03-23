@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useDebounce } from '@embeddable.com/remarkable-ui';
 import { FilterBuilderFilter } from './definition';
 import styles from './FilterBuilderPro.module.css';
-import clsx from 'clsx';
 import { i18n } from '../../../theme/i18n/i18n';
 
 export type FilterBuilderItemNumberValueFieldProps = {
@@ -9,36 +9,59 @@ export type FilterBuilderItemNumberValueFieldProps = {
   onSelectValue: (value: number | number[] | null) => void;
 };
 
+const getOnChangeValue = (v: React.ChangeEvent<HTMLInputElement>) => {
+  return v.target.value === '' ? null : Number(v.target.value);
+};
+
 const FilterBuilderItemNumberValueField = ({
   filter,
   onSelectValue,
 }: FilterBuilderItemNumberValueFieldProps) => {
+  const [value, setValue] = useState<number | null>((filter?.value as number) ?? null);
   const [min, setMin] = useState<number | null>(null);
   const [max, setMax] = useState<number | null>(null);
+  const firstInputRef = useRef<HTMLInputElement>(null);
+
+  const debouncedSelectValue = useDebounce((value: number | number[] | null) => {
+    onSelectValue(value);
+  });
 
   useEffect(() => {
     if (min != null && max != null) {
-      onSelectValue([min, max]);
+      debouncedSelectValue([min, max]);
     }
   }, [min, max]);
+
+  useEffect(() => {
+    if (value != null) {
+      debouncedSelectValue(value);
+    }
+  }, [value]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      firstInputRef.current?.focus();
+    }, 100);
+  }, [filter.operator]);
 
   if (filter.operator === 'between') {
     return (
       <>
         <input
+          ref={firstInputRef}
           type="number"
-          className={styles.filterInput}
+          className={styles.valueInput}
           value={min ?? ''}
-          onChange={(e) => setMin(e.target.value === '' ? null : Number(e.target.value))}
+          onChange={(e) => setMin(getOnChangeValue(e))}
         />
-        <button className={clsx(styles.filterButton, styles.filterButtonOperator)}>
+        <button disabled className={styles.operatorButton}>
           {i18n.t('filterBuilderPro.betweenAnd')}
         </button>
         <input
           type="number"
-          className={styles.filterInput}
+          className={styles.valueInput}
           value={max ?? ''}
-          onChange={(e) => setMax(e.target.value === '' ? null : Number(e.target.value))}
+          onChange={(e) => setMax(getOnChangeValue(e))}
         />
       </>
     );
@@ -46,10 +69,11 @@ const FilterBuilderItemNumberValueField = ({
 
   return (
     <input
+      ref={firstInputRef}
       type="number"
-      className={styles.filterInput}
-      value={filter.value == null ? '' : (filter.value as number)}
-      onChange={(v) => onSelectValue(v.target.value === '' ? null : Number(v.target.value))}
+      className={styles.valueInput}
+      value={value == null ? '' : (filter.value as number)}
+      onChange={(v) => setValue(getOnChangeValue(v))}
     />
   );
 };

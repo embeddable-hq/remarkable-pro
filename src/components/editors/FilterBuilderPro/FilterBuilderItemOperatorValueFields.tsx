@@ -10,7 +10,6 @@ import { Theme } from '../../../theme/theme.types';
 import FilterBuilderItemValueField from './FilterBuilderItemValueField';
 import { useEffect } from 'react';
 import styles from './FilterBuilderPro.module.css';
-import clsx from 'clsx';
 
 const OPERATORS_STRING_BOOLEAN = [
   { value: FilterOperator.equals, label: 'is' },
@@ -61,7 +60,7 @@ const FilterBuilderItemOperatorValueFields = ({
     <>
       <SingleSelectField
         triggerComponent={
-          <button className={clsx(styles.filterButton, styles.filterButtonOperator)}>
+          <button className={styles.operatorButton}>
             {operatorOptions.find((x) => x.value === filter.operator)?.label}
           </button>
         }

@@ -1,4 +1,4 @@
-import { FilterOperator, NativeDataType } from '@embeddable.com/core';
+import { DimensionOrMeasure, FilterOperator, NativeDataType } from '@embeddable.com/core';
 import { FilterBuilderFilter } from './definition';
 
 export const FILTER_BUILDER_PRO_SUPPORTED_TYPES: string[] = [
@@ -7,7 +7,7 @@ export const FILTER_BUILDER_PRO_SUPPORTED_TYPES: string[] = [
   NativeDataType.number,
 ];
 
-export const getSupportedDimensionsAndMeasures = (dimensionsAndMeasures: any[]) => {
+export const getSupportedDimensionsAndMeasures = (dimensionsAndMeasures: DimensionOrMeasure[]) => {
   return dimensionsAndMeasures.filter((d) =>
     FILTER_BUILDER_PRO_SUPPORTED_TYPES.includes(d.nativeType),
   );
