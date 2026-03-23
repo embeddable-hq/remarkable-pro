@@ -95,7 +95,7 @@ const FilterBuilderItemValueField = ({
         isLoading={results?.isLoading}
         value={filter.value as string}
         options={options}
-        onChange={(newValue) => onSelectValue(newValue === '' ? null : newValue)}
+        onChange={onSelectValue}
         onSearch={onSearchValue}
         avoidCollisions={false}
         noOptionsMessage={showNoOptionsMessage ? i18n.t('common.noOptionsFound') : undefined}

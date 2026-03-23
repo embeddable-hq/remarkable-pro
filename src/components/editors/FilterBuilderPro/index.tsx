@@ -14,10 +14,12 @@ import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.ut
 
 // DISCUSS WITH DENIS
 // - review all the css variables
-// - check the todos
-// - loading when fetching data
-// - debounces
 // - input sizes
+
+// add spinner when fetching data for select and multi select
+// when it is an input value, auto focus the 1st input
+// fire filter change on select option or debounce value
+// inputs should start growing with the text
 
 export type FilterBuilderProProps = {
   embeddableState?: FilterBuilderState;
@@ -174,7 +176,6 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
             onDelete={() => handleDeleteFilter(index)}
           />
         ))}
-        {/* TODO: check this behavior with DENIS */}
         {filters[0]?.dimensionOrMeasure && (
           <SingleSelectField
             triggerComponent={<ActionIcon icon={IconPlus} />}

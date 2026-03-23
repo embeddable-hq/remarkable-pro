@@ -16,7 +16,6 @@ const FilterBuilderItemNumberValueField = ({
   const [min, setMin] = useState<number | null>(null);
   const [max, setMax] = useState<number | null>(null);
 
-  // TODO: check with denis and harry if the between can work with only 1 value (min or max)
   useEffect(() => {
     if (min != null && max != null) {
       onSelectValue([min, max]);
@@ -26,7 +25,6 @@ const FilterBuilderItemNumberValueField = ({
   if (filter.operator === 'between') {
     return (
       <>
-        {/* TODO: ask denis */}
         <input
           type="number"
           className={styles.filterInput}
@@ -52,7 +50,6 @@ const FilterBuilderItemNumberValueField = ({
       className={styles.filterInput}
       value={filter.value == null ? '' : (filter.value as number)}
       onChange={(v) => onSelectValue(v.target.value === '' ? null : Number(v.target.value))}
-      // clearable
     />
   );
 };

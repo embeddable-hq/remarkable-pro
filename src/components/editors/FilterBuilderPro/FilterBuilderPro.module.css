@@ -2,7 +2,6 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  /* gap: var(--em-filter-gap--external, 12px); */
   overflow: hidden;
   padding-right: var(--em-filter-gap--external, 12px);
 }
@@ -79,7 +78,7 @@
   background: var(--em-filter-background--operator, rgb(247 247 248));
   border-color: var(--em-filter-border-color--operator, rgb(255 255 255));
   color: var(--em-filter-color--operator, rgb(92 92 102));
-  /* font-weight: var(--em-filter-label-font-weight--operator, 400); */
+  font-weight: var(--em-filter-label-font-weight--operator, 400);
   padding-left: var(--em-filter-padding-left-right--operator, 4px);
   padding-right: var(--em-filter-padding-left-right--operator, 4px);
   border-radius: var(--em-filter-border-radius, 0.25rem);
@@ -139,9 +138,10 @@
   font-size: var(--em-filter-label-font-size, 0.75rem);
   font-weight: var(--em-filter-label-font-weight, 500);
   line-height: var(--em-filter-label-line-height, 0.875rem);
-  width: 100px;
-  /* TODO: check with DENIS */
   box-sizing: border-box;
+  /* need for css variable here */
+  /* make it grow */
+  width: 40px;
 }
 
 .filterButtonScrollRight {
