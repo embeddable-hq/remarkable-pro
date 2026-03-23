@@ -17,6 +17,17 @@ export * from './theme/styles/styles.types';
 export * from './theme/styles/styles.constants';
 export * from './theme/styles/styles.utils';
 
+// Theme - Fonts
+export * from './theme/fonts/fonts.types';
+export {
+  applyRemarkableTheme,
+  getFontFamilyStyles,
+  injectInter,
+  loadThemeFonts,
+  removeThemeFonts,
+  themeHasFonts,
+} from './theme/fonts/fonts.utils';
+
 // Theme - Formatter
 export type {
   NumberFormatter,

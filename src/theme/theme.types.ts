@@ -1,6 +1,7 @@
 import { Resource } from 'i18next';
 import { ThemeFormatter } from './formatter/formatter.types';
 import { ThemeStyles } from './styles/styles.types';
+import { ThemeFonts } from './fonts/fonts.types';
 import { ChartOptions } from 'chart.js';
 import { ComparisonPeriodOption } from './defaults/defaults.ComparisonPeriods.constants';
 import { DateRangeOption } from './defaults/defaults.DateRanges.constants';
@@ -58,4 +59,5 @@ export type Theme = {
   styles: ThemeStyles;
   formatter: ThemeFormatter;
   defaults: ThemeDefaults;
+  fonts?: ThemeFonts;
 };
