@@ -29,9 +29,7 @@ const remarkableThemeDefaults: ThemeDefaults = {
 };
 
 const remarkableThemeFonts: ThemeFonts = {
-  google: {
-    families: [{ name: 'Inter', weights: '100..900' }],
-  },
+  google: [{ name: 'Inter', weights: '100..900' }],
 };
 
 export const remarkableTheme: Theme = {

@@ -1,6 +1,4 @@
-import { injectCssVariables } from '../styles/styles.utils';
-import { Theme } from '../theme.types';
-import { ThemeFontCustom, ThemeGoogleFontFamily } from './fonts.types';
+import { ThemeFonts, ThemeFontCustom, ThemeFontGoogle } from './fonts.types';
 
 const REMARKABLE_FONTS_STYLE_ID = 'remarkable-theme-fonts';
 const REMARKABLE_PRECONNECT_ATTR = 'data-remarkable-preconnect';
@@ -23,14 +21,14 @@ const injectGooglePreconnect = (head: HTMLHeadElement): void => {
   head.appendChild(pre2);
 };
 
-const injectGoogleFonts = (families: ThemeGoogleFontFamily[], display = 'swap'): void => {
+const injectGoogleFonts = (fonts: ThemeFontGoogle[]): void => {
   if (typeof document === 'undefined' || !document.head) return;
   if (document.querySelector(`link[${REMARKABLE_GOOGLE_FONTS_ATTR}]`)) return;
 
   const head = document.head;
   injectGooglePreconnect(head);
 
-  const query = families
+  const query = fonts
     .map((f) => {
       const encoded = encodeURIComponent(f.name.replace(/\s+/g, ' '));
       const weights = f.weights ?? '100..900';
@@ -40,22 +38,13 @@ const injectGoogleFonts = (families: ThemeGoogleFontFamily[], display = 'swap'):
 
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = `https://fonts.googleapis.com/css2?${query}&display=${display}`;
+  link.href = `https://fonts.googleapis.com/css2?${query}&display=swap`;
   link.setAttribute(REMARKABLE_GOOGLE_FONTS_ATTR, '1');
   head.appendChild(link);
 };
 
 const fontFaceCss = (font: ThemeFontCustom): string => {
   const family = font.family.replace(/'/g, "\\'");
-  let src: string;
-
-  if (typeof font.src === 'string') {
-    src = `url(${font.src})`;
-  } else {
-    src = font.src
-      .map((s) => (s.format ? `url(${s.url}) format('${s.format}')` : `url(${s.url})`))
-      .join(', ');
-  }
 
   const descriptorParts: string[] = [];
   if (font.descriptors) {
@@ -69,7 +58,7 @@ const fontFaceCss = (font: ThemeFontCustom): string => {
   const descriptors = descriptorParts.join('; ');
   const decl = descriptors ? `; ${descriptors}` : '';
 
-  return `@font-face { font-family: '${family}'; src: ${src}${decl}; }`;
+  return `@font-face { font-family: '${family}'; src: url(${font.src})${decl}; }`;
 };
 
 const injectCustomFonts = (custom: ThemeFontCustom[]): void => {
@@ -88,34 +77,13 @@ const injectCustomFonts = (custom: ThemeFontCustom[]): void => {
   }
 };
 
-export const loadThemeFonts = (theme: Theme): void => {
-  const fonts = theme.fonts;
+export const loadThemeFonts = (fonts?: ThemeFonts): void => {
   if (!fonts) return;
 
-  if (fonts.google?.families?.length) {
-    injectGoogleFonts(fonts.google.families, fonts.google.display ?? 'swap');
+  if (fonts.google?.length) {
+    injectGoogleFonts(fonts.google);
   }
   if (fonts.custom?.length) {
     injectCustomFonts(fonts.custom);
   }
-};
-
-export const removeThemeFonts = (): void => {
-  if (typeof document === 'undefined') return;
-
-  document.querySelectorAll(`link[${REMARKABLE_PRECONNECT_ATTR}]`).forEach((el) => el.remove());
-  document.querySelectorAll(`link[${REMARKABLE_GOOGLE_FONTS_ATTR}]`).forEach((el) => el.remove());
-  document.getElementById(REMARKABLE_FONTS_STYLE_ID)?.remove();
-};
-
-/**
- * Applies Remarkable theme to the DOM: loads fonts and injects CSS variables.
- *
- * Fonts are loaded based on theme.fonts (Inter by default via remarkableTheme).
- * Font assignment (which font is used where) is controlled via theme.styles CSS variables.
- */
-export const applyRemarkableTheme = (theme: Theme): (() => void) | void => {
-  removeThemeFonts();
-  loadThemeFonts(theme);
-  return injectCssVariables(theme.styles);
 };

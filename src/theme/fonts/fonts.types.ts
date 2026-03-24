@@ -1,16 +1,6 @@
-export type ThemeGoogleFontFamily = {
+export type ThemeFontGoogle = {
   name: string;
   weights?: string;
-};
-
-export type ThemeFontGoogleConfig = {
-  families: ThemeGoogleFontFamily[];
-  display?: string;
-};
-
-export type ThemeFontCustomSrc = {
-  url: string;
-  format?: string;
 };
 
 export type ThemeFontCustomDescriptors = {
@@ -22,11 +12,11 @@ export type ThemeFontCustomDescriptors = {
 
 export type ThemeFontCustom = {
   family: string;
-  src: string | ThemeFontCustomSrc[];
+  src: string;
   descriptors?: ThemeFontCustomDescriptors;
 };
 
 export type ThemeFonts = {
-  google?: ThemeFontGoogleConfig;
+  google?: ThemeFontGoogle[];
   custom?: ThemeFontCustom[];
 };
