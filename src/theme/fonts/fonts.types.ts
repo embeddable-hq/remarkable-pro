@@ -1,5 +1,10 @@
+export type ThemeGoogleFontFamily = {
+  name: string;
+  weights?: string;
+};
+
 export type ThemeFontGoogleConfig = {
-  families: string[];
+  families: ThemeGoogleFontFamily[];
   display?: string;
 };
 
@@ -24,6 +29,4 @@ export type ThemeFontCustom = {
 export type ThemeFonts = {
   google?: ThemeFontGoogleConfig;
   custom?: ThemeFontCustom[];
-  familyBase?: string;
-  familyCode?: string;
 };

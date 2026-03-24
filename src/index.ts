@@ -19,14 +19,7 @@ export * from './theme/styles/styles.utils';
 
 // Theme - Fonts
 export * from './theme/fonts/fonts.types';
-export {
-  applyRemarkableTheme,
-  getFontFamilyStyles,
-  injectInter,
-  loadThemeFonts,
-  removeThemeFonts,
-  themeHasFonts,
-} from './theme/fonts/fonts.utils';
+export { applyRemarkableTheme, loadThemeFonts, removeThemeFonts } from './theme/fonts/fonts.utils';
 
 // Theme - Formatter
 export type {
