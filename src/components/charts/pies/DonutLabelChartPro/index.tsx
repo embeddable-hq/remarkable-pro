@@ -22,7 +22,6 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
   i18nSetup(theme);
 
   const {
-    description,
     dimension,
     maxLegendItems,
     measure,
@@ -30,12 +29,11 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
     showLegend,
     showTooltips,
     showValueLabels,
-    title,
-    innerLabelMeasure,
     resultsInnerLabel,
-    innerLabelText,
-    onSegmentClick,
-  } = resolveI18nProps(props);
+    innerLabelMeasure,
+  } = props;
+
+  const { description, title, tooltip, innerLabelText, onSegmentClick } = resolveI18nProps(props);
 
   const { hideMenu } = props;
 
@@ -69,6 +67,7 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
       errorMessage={results.error}
       description={description}
       title={title}
+      tooltip={tooltip}
       hideMenu={hideMenu}
     >
       <DonutChart

@@ -14,7 +14,7 @@ const PieChartPro = (props: PieChartProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { description, title } = resolveI18nProps(props);
+  const { description, title, tooltip } = resolveI18nProps(props);
 
   const {
     dimension,
@@ -54,6 +54,7 @@ const PieChartPro = (props: PieChartProProps) => {
       errorMessage={results.error}
       description={description}
       title={title}
+      tooltip={tooltip}
       hideMenu={hideMenu}
     >
       <PieChart
