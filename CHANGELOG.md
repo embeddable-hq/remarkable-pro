@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.26
+
+### Patch Changes
+
+- cdcf9bc: Fix tooltip on pies
+
 ## 0.1.25
 
 ### Patch Changes
