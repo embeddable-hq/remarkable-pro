@@ -14,7 +14,7 @@ export type SingleSelectFieldProProps = {
   optionalSecondDimension?: Dimension;
   placeholder?: string;
   results: DataResponse;
-  selectedValue?: string;
+  selectedValue?: string | null;
   maxOptions?: number;
   setSearchValue?: (search: string) => void;
   onChange?: (selectedValue: string | null) => void;
@@ -43,7 +43,7 @@ const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
         clearable
         searchable
         isLoading={results.isLoading}
-        value={selectedValue}
+        value={selectedValue ?? undefined}
         options={options}
         placeholder={placeholder}
         noOptionsMessage={showNoOptionsMessage ? i18n.t('common.noOptionsFound') : undefined}
