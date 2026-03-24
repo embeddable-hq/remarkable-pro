@@ -4,13 +4,13 @@ import {
   FilterOperator,
   NativeDataType,
 } from '@embeddable.com/core';
-import { FilterBuilderFilter } from './definition';
+import { FilterBuilderFilter } from '../definition';
 import { MultiSelectField, SingleSelectField } from '@embeddable.com/remarkable-ui';
-import { Theme } from '../../../theme/theme.types';
-import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { i18n } from '../../../theme/i18n/i18n';
+import { Theme } from '../../../../theme/theme.types';
+import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
+import { i18n } from '../../../../theme/i18n/i18n';
 import FilterBuilderItemNumberValueField from './FilterBuilderItemNumberValueField';
-import styles from './FilterBuilderPro.module.css';
+import styles from '../FilterBuilderPro.module.css';
 import { IconLoader2 } from '@tabler/icons-react';
 
 export type FilterBuilderItemValueFieldProps = {

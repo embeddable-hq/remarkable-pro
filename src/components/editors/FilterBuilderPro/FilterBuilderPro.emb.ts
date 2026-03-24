@@ -5,4 +5,5 @@ export const preview = filterBuilderPro.preview;
 
 export const meta = filterBuilderPro.meta;
 
-export default defineComponent(filterBuilderPro.Component, meta, filterBuilderPro.config as any);
+// @ts-expect-error - to be fixed in @embeddable.com/react
+export default defineComponent(filterBuilderPro.Component, meta, filterBuilderPro.config);

@@ -1,13 +1,18 @@
 import { DataResponse, DimensionOrMeasure } from '@embeddable.com/core';
 import { useTheme } from '@embeddable.com/react';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Theme } from '../../../theme/theme.types';
-import FilterBuilderItem from './FilterBuilderItem';
+import FilterBuilderItem from './components/FilterBuilderItem';
 import { FilterBuilderFilter, FilterBuilderState } from './definition';
 import { ActionIcon, SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { IconPlus, IconChevronRight } from '@tabler/icons-react';
 import styles from './FilterBuilderPro.module.css';
-import { generateFilterValue, getSupportedDimensionsAndMeasures } from './FilterBuilderPro.utils';
+import {
+  FilterBuilderOperator,
+  filterBuilderOperator,
+  generateFilterValue,
+  getSupportedDimensionsAndMeasures,
+} from './FilterBuilderPro.utils';
 import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
 
@@ -18,13 +23,16 @@ export type FilterBuilderProProps = {
   ) => void;
   dimensionsAndMeasures?: DimensionOrMeasure[];
   results?: DataResponse[];
-  onApply?: (value: unknown) => void;
+  onChange?: (value: unknown) => void;
 };
 
 const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
+  const [andOrOperator, setAndOrOperator] = useState<FilterBuilderOperator>(
+    filterBuilderOperator.AND,
+  );
   const [searchNew, setSearchNew] = useState('');
   const [canScrollRight, setCanScrollRight] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -44,7 +52,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     results = [],
     setEmbeddableState,
     embeddableState,
-    onApply,
+    onChange,
   } = props;
 
   const prevFilterValueRef = useRef<unknown>(undefined);
@@ -55,52 +63,52 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     const dimensionOrMeasure =
       dimensionsAndMeasures.find((d) => d.name === dimensionOrMeasureValue) ?? null;
 
-    return { id: nextIdRef.current++, dimensionOrMeasure, search: '', value: null };
+    return { id: nextIdRef.current++, dimensionOrMeasure, search: '', operator: null, value: null };
   };
 
   const filters = embeddableState?.filters?.length ? embeddableState.filters : [newFilter()];
 
   const handleSelectDimensionOrMeasure = (index: number, name: string | null) => {
     const selected = dimensionsAndMeasures.find((d) => d.name === name) ?? null;
-    setEmbeddableState?.((prev: any) => {
+    setEmbeddableState?.((prev: FilterBuilderState) => {
       const newFilters = [...(prev?.filters ?? [])];
       newFilters[index] = {
-        ...newFilters[index],
+        ...newFilters[index]!,
         dimensionOrMeasure: selected,
         value: null,
         search: '',
-        operator: undefined,
+        operator: null,
       };
       return { ...prev, filters: newFilters };
     });
   };
 
   const handleSelectOperator = (index: number, operator: string | null) => {
-    setEmbeddableState?.((prev: any) => {
+    setEmbeddableState?.((prev: FilterBuilderState) => {
       const newFilters = [...(prev?.filters ?? [])];
-      newFilters[index] = { ...newFilters[index], operator, value: null };
+      newFilters[index] = { ...newFilters[index]!, operator, value: null };
       return { ...prev, filters: newFilters };
     });
   };
 
   const handleSelectValue = (index: number, value: FilterBuilderFilter['value']) => {
-    setEmbeddableState?.((prev: any) => {
+    setEmbeddableState?.((prev: FilterBuilderState) => {
       const newFilters = [...(prev?.filters ?? [])];
-      newFilters[index] = { ...newFilters[index], value };
+      newFilters[index] = { ...newFilters[index]!, value };
       return { ...prev, filters: newFilters };
     });
   };
 
   const handleDimensionSearch = (index: number, search: string) => {
-    setEmbeddableState?.((prev: any) => {
+    setEmbeddableState?.((prev: FilterBuilderState) => {
       const newFilters = [...(prev?.filters ?? [])];
-      newFilters[index] = { ...newFilters[index], search };
+      newFilters[index] = { ...newFilters[index]!, search };
       return { ...prev, filters: newFilters };
     });
   };
 
   const handleDeleteFilter = (index: number) => {
-    setEmbeddableState?.((prev: any) => {
+    setEmbeddableState?.((prev: FilterBuilderState) => {
       const newFilters = [...(prev?.filters ?? [])];
       newFilters.splice(index, 1);
       return { ...prev, filters: newFilters };
@@ -108,19 +116,19 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   };
 
   const handleAddFilter = (value: string | null) => {
-    setEmbeddableState?.((prev: any) => {
+    setEmbeddableState?.((prev: FilterBuilderState) => {
       const newFilters = [...(prev?.filters ?? []), newFilter(value)];
       return { ...prev, filters: newFilters };
     });
   };
 
   useEffect(() => {
-    const filterValue = generateFilterValue(filters);
+    const filterValue = generateFilterValue(andOrOperator, filters);
     const serialized = JSON.stringify(filterValue);
     if (serialized === JSON.stringify(prevFilterValueRef.current)) return;
     prevFilterValueRef.current = filterValue;
-    onApply?.(filterValue);
-  }, [filters]);
+    onChange?.(filterValue);
+  }, [filters, andOrOperator]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -146,25 +154,40 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const hasClearAll = filters.some((f) => f.dimensionOrMeasure && f.operator && f.value);
 
   const handleClearAll = () => {
-    setEmbeddableState?.((prev: any) => ({ ...prev, filters: [newFilter()] }));
+    setEmbeddableState?.((prev: FilterBuilderState) => ({ ...prev, filters: [newFilter()] }));
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.scroll} ref={scrollRef}>
         {filters.map((filter, index) => (
-          <FilterBuilderItem
-            key={filter.id}
-            filter={filter}
-            dimensionsAndMeasures={dimensionsAndMeasures}
-            results={results[index]}
-            theme={theme}
-            onSelectDimensionOrMeasure={(value) => handleSelectDimensionOrMeasure(index, value)}
-            onSelectOperator={(value) => handleSelectOperator(index, value)}
-            onSelectValue={(value) => handleSelectValue(index, value)}
-            onSearchValue={(search) => handleDimensionSearch(index, search)}
-            onDelete={() => handleDeleteFilter(index)}
-          />
+          <React.Fragment key={filter.id}>
+            <FilterBuilderItem
+              filter={filter}
+              dimensionsAndMeasures={dimensionsAndMeasures}
+              results={results[index]}
+              theme={theme}
+              onSelectDimensionOrMeasure={(value) => handleSelectDimensionOrMeasure(index, value)}
+              onSelectOperator={(value) => handleSelectOperator(index, value)}
+              onSelectValue={(value) => handleSelectValue(index, value)}
+              onSearchValue={(search) => handleDimensionSearch(index, search)}
+              onDelete={() => handleDeleteFilter(index)}
+            />
+            {index < filters.length - 1 && (
+              <button
+                className={styles.andOrButton}
+                onClick={() =>
+                  setAndOrOperator((prev) =>
+                    prev === filterBuilderOperator.AND
+                      ? filterBuilderOperator.OR
+                      : filterBuilderOperator.AND,
+                  )
+                }
+              >
+                {i18n.t(`editors.filterBuilder.${andOrOperator}`)}
+              </button>
+            )}
+          </React.Fragment>
         ))}
         {filters[0]?.dimensionOrMeasure && (
           <SingleSelectField
@@ -185,7 +208,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
       )}
       {hasClearAll && (
         <button className={styles.clearButton} onClick={handleClearAll}>
-          {i18n.t('filterBuilderPro.clearAll')}
+          {i18n.t('editors.filterBuilder.clearAll')}
         </button>
       )}
     </div>

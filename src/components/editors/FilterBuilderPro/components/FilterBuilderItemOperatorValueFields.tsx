@@ -4,12 +4,12 @@ import {
   FilterOperator,
   NativeDataType,
 } from '@embeddable.com/core';
-import { FilterBuilderFilter } from './definition';
+import { FilterBuilderFilter } from '../definition';
 import { SingleSelectField } from '@embeddable.com/remarkable-ui';
-import { Theme } from '../../../theme/theme.types';
+import { Theme } from '../../../../theme/theme.types';
 import FilterBuilderItemValueField from './FilterBuilderItemValueField';
 import { useEffect } from 'react';
-import styles from './FilterBuilderPro.module.css';
+import styles from '../FilterBuilderPro.module.css';
 
 const OPERATORS_STRING_BOOLEAN = [
   { value: FilterOperator.equals, label: 'is' },

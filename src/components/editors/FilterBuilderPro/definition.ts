@@ -1,7 +1,8 @@
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
-import { DimensionOrMeasure, loadData, Value } from '@embeddable.com/core';
+import { DimensionOrMeasure, FilterOperator, loadData, Value } from '@embeddable.com/core';
 import Component from '.';
 import { inputs } from '../../component.inputs.constants';
+import { FilterBuilderClause } from './FilterBuilderPro.utils';
 
 const meta = {
   name: 'FilterBuilderPro',
@@ -12,8 +13,8 @@ const meta = {
   inputs: [inputs.dataset, inputs.dimensionsAndMeasures],
   events: [
     {
-      name: 'onApply',
-      label: 'Apply',
+      name: 'onChange',
+      label: 'Filter value updated',
       properties: [
         {
           name: 'value',
@@ -24,25 +25,23 @@ const meta = {
   ],
   variables: [
     {
-      name: 'filter builder filters',
+      name: 'filter value',
       type: 'filters',
-      defaultValue: Value.noFilter(),
+      defaultValue: {},
       inputs: [],
-      events: [{ name: 'onApply', property: 'value' }],
+      events: [{ name: 'onChange', property: 'value' }],
     },
   ],
 } as const satisfies EmbeddedComponentMeta;
 
-const preview = definePreview(Component, {
-  onApply: () => null,
-});
+const preview = definePreview(Component, {});
 
 export type FilterBuilderFilter = {
   id: number;
   dimensionOrMeasure: DimensionOrMeasure | null;
   search: string;
   value: string | string[] | number | number[] | boolean | null;
-  operator?: string;
+  operator: string | null;
 };
 
 export type FilterBuilderState = {
@@ -66,7 +65,8 @@ const props = (
     }
 
     const { dimensionOrMeasure } = filter;
-    const operator = dimensionOrMeasure.nativeType === 'string' ? 'contains' : 'equals';
+    const operator =
+      dimensionOrMeasure.nativeType === 'string' ? FilterOperator.contains : FilterOperator.equals;
 
     return loadData({
       from: inputs.dataset,
@@ -79,8 +79,7 @@ const props = (
 });
 
 const events = {
-  // Add type
-  onApply: (value: unknown) => ({
+  onChange: (value: FilterBuilderClause | null) => ({
     value: value ?? Value.noFilter(),
   }),
 };

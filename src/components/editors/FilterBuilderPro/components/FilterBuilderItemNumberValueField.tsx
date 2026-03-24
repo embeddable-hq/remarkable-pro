@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDebounce } from '@embeddable.com/remarkable-ui';
-import { FilterBuilderFilter } from './definition';
-import styles from './FilterBuilderPro.module.css';
-import { i18n } from '../../../theme/i18n/i18n';
+import { FilterBuilderFilter } from '../definition';
+import styles from '../FilterBuilderPro.module.css';
+import { i18n } from '../../../../theme/i18n/i18n';
 
 export type FilterBuilderItemNumberValueFieldProps = {
   filter: FilterBuilderFilter;
@@ -55,7 +55,7 @@ const FilterBuilderItemNumberValueField = ({
           onChange={(e) => setMin(getOnChangeValue(e))}
         />
         <button disabled className={styles.operatorButton}>
-          {i18n.t('filterBuilderPro.betweenAnd')}
+          {i18n.t('editors.filterBuilder.betweenAnd')}
         </button>
         <input
           type="number"

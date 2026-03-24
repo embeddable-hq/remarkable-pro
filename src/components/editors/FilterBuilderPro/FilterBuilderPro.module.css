@@ -3,18 +3,16 @@
   align-items: center;
   justify-content: flex-start;
   overflow: hidden;
-  padding-right: var(--em-filterbuilder-gap, 12px);
-
-  /* reuse */
-  font-family: var(--em-filterbuilder-font-family, 'DM Sans');
+  padding-right: var(--em-filterbuilder-gap, 0.75rem);
+  font-family: var(--em-filterbuilder-font-family, Inter);
   font-weight: var(--em-filterbuilder-font-weight, 500);
-  font-size: var(--em-filterbuilder-font-size, 12px);
+  font-size: var(--em-filterbuilder-font-size, 0.75rem);
 }
 
 .scroll {
   display: flex;
   align-items: center;
-  gap: var(--em-filterbuilder-gap, 12px);
+  gap: var(--em-filterbuilder-gap, 0.75rem);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -26,7 +24,7 @@
 .filter {
   display: flex;
   align-items: center;
-  gap: var(--em-filterbuilder-filter-gap, 2px);
+  gap: var(--em-filterbuilder-filter-gap, 0.125rem);
 }
 
 .addButton {
@@ -37,12 +35,12 @@
   display: flex;
   align-items: center;
   height: var(--em-filterbuilder-add-button-height, 2rem);
-  gap: var(--em-filterbuilder-add-button-gap, 2px);
-  border: var(--em-filterbuilder-add-button-border-width, 0px) solid
+  gap: var(--em-filterbuilder-add-button-gap, 0.125rem);
+  border: var(--em-filterbuilder-add-button-border-width, 0rem) solid
     var(--em-filterbuilder-add-button-border-color, rgba(255, 255, 255, 0));
   background: var(--em-filterbuilder-add-button-background, #ededf1);
-  padding: var(--em-filterbuilder-add-button-padding-y, 0)
-    var(--em-filterbuilder-add-button-padding-x, 12px);
+  padding: var(--em-filterbuilder-add-button-padding-y, 0rem)
+    var(--em-filterbuilder-add-button-padding-x, 0.75rem);
   border-radius: var(--em-filterbuilder-add-button-border-radius, 2rem);
   color: var(--em-filterbuilder-add-button-color, #000000);
 }
@@ -65,15 +63,15 @@
   display: flex;
   align-items: center;
   height: var(--em-filterbuilder-member-button-height, 2rem);
-  border: var(--em-filterbuilder-member-button-border-width, 0px) solid
+  border: var(--em-filterbuilder-member-button-border-width, 0rem) solid
     var(--em-filterbuilder-member-button-border-color, rgba(255, 255, 255, 0));
   background: var(--em-filterbuilder-member-button-background, #ededf1);
-  padding: var(--em-filterbuilder-member-button-padding-y, 0)
-    var(--em-filterbuilder-member-button-padding-x, 12px);
+  padding: var(--em-filterbuilder-member-button-padding-y, 0rem)
+    var(--em-filterbuilder-member-button-padding-x, 0.75rem);
   border-top-left-radius: var(--em-filterbuilder-member-button-border-left-radius, 2rem);
   border-bottom-left-radius: var(--em-filterbuilder-member-button-border-left-radius, 2rem);
-  border-top-right-radius: var(--em-filterbuilder-member-button-border-right-radius, 4px);
-  border-bottom-right-radius: var(--em-filterbuilder-member-button-border-right-radius, 4px);
+  border-top-right-radius: var(--em-filterbuilder-member-button-border-right-radius, 0.25rem);
+  border-bottom-right-radius: var(--em-filterbuilder-member-button-border-right-radius, 0.25rem);
 }
 
 .memberButton:hover {
@@ -88,15 +86,15 @@
   display: flex;
   align-items: center;
   height: var(--em-filterbuilder-delete-button-height, 2rem);
-  border: var(--em-filterbuilder-delete-button-border-width, 0px) solid
+  border: var(--em-filterbuilder-delete-button-border-width, 0rem) solid
     var(--em-filterbuilder-delete-button-border-color, rgba(255, 255, 255, 0));
   background: var(--em-filterbuilder-delete-button-background, #ededf1);
-  padding: var(--em-filterbuilder-delete-button-padding-y, 4px)
-    var(--em-filterbuilder-delete-button-padding-x, 4px);
+  padding: var(--em-filterbuilder-delete-button-padding-y, 0.25rem)
+    var(--em-filterbuilder-delete-button-padding-x, 0.25rem);
   color: var(--em-filterbuilder-delete-button-color, #5c5c66);
 
-  border-top-left-radius: var(--em-filterbuilder-delete-button-border-left-radius, 4px);
-  border-bottom-left-radius: var(--em-filterbuilder-delete-button-border-left-radius, 4px);
+  border-top-left-radius: var(--em-filterbuilder-delete-button-border-left-radius, 0.25rem);
+  border-bottom-left-radius: var(--em-filterbuilder-delete-button-border-left-radius, 0.25rem);
   border-top-right-radius: var(--em-filterbuilder-delete-button-border-right-radius, 2rem);
   border-bottom-right-radius: var(--em-filterbuilder-delete-button-border-right-radius, 2rem);
 }
@@ -119,16 +117,16 @@
   display: flex;
   align-items: center;
   height: var(--em-filterbuilder-operator-button-height, 2rem);
-  border: var(--em-filterbuilder-operator-button-border-width, 0px) solid
+  border: var(--em-filterbuilder-operator-button-border-width, 0rem) solid
     var(--em-filterbuilder-operator-button-border-color, rgba(255, 255, 255, 0));
   background: var(--em-filterbuilder-operator-button-background, #f7f7f8);
-  padding: var(--em-filterbuilder-operator-button-padding-y, 4px)
-    var(--em-filterbuilder-operator-button-padding-x, 4px);
+  padding: var(--em-filterbuilder-operator-button-padding-y, 0.25rem)
+    var(--em-filterbuilder-operator-button-padding-x, 0.25rem);
   color: var(--em-filterbuilder-operator-button-color, #5c5c66);
-  border-top-left-radius: var(--em-filterbuilder-operator-button-border-left-radius, 4px);
-  border-bottom-left-radius: var(--em-filterbuilder-operator-button-border-left-radius, 4px);
-  border-top-right-radius: var(--em-filterbuilder-operator-button-border-right-radius, 4px);
-  border-bottom-right-radius: var(--em-filterbuilder-operator-button-border-right-radius, 4px);
+  border-top-left-radius: var(--em-filterbuilder-operator-button-border-left-radius, 0.25rem);
+  border-bottom-left-radius: var(--em-filterbuilder-operator-button-border-left-radius, 0.25rem);
+  border-top-right-radius: var(--em-filterbuilder-operator-button-border-right-radius, 0.25rem);
+  border-bottom-right-radius: var(--em-filterbuilder-operator-button-border-right-radius, 0.25rem);
 }
 
 .operatorButton:hover {
@@ -143,24 +141,17 @@
   display: flex;
   align-items: center;
   height: var(--em-filterbuilder-value-button-height, 2rem);
-  gap: var(--em-filterbuilder-value-button-gap, 2px);
-  border: var(--em-filterbuilder-value-button-border-width, 0px) solid
+  gap: var(--em-filterbuilder-value-button-gap, 0.125rem);
+  border: var(--em-filterbuilder-value-button-border-width, 0rem) solid
     var(--em-filterbuilder-value-button-border-color, rgba(255, 255, 255, 0));
   background: var(--em-filterbuilder-value-button-background, #ededf1);
-  padding: var(--em-filterbuilder-value-button-padding-y, 0)
-    var(--em-filterbuilder-value-button-padding-x, 12px);
-  border-top-left-radius: var(--em-filterbuilder-value-button-border-left-radius, 4px);
-  border-bottom-left-radius: var(--em-filterbuilder-value-button-border-left-radius, 4px);
-  border-top-right-radius: var(--em-filterbuilder-value-button-border-right-radius, 4px);
-  border-bottom-right-radius: var(--em-filterbuilder-value-button-border-right-radius, 4px);
+  padding: var(--em-filterbuilder-value-button-padding-y, 0rem)
+    var(--em-filterbuilder-value-button-padding-x, 0.75rem);
+  border-top-left-radius: var(--em-filterbuilder-value-button-border-left-radius, 0.25rem);
+  border-bottom-left-radius: var(--em-filterbuilder-value-button-border-left-radius, 0.25rem);
+  border-top-right-radius: var(--em-filterbuilder-value-button-border-right-radius, 0.25rem);
+  border-bottom-right-radius: var(--em-filterbuilder-value-button-border-right-radius, 0.25rem);
   color: var(--em-filterbuilder-value-button-color, #000000);
-}
-
-.valueButton .loadingSpinner {
-  flex-shrink: 0;
-  width: var(--em-filterbuilder-value-button-icon-size, 1rem);
-  height: var(--em-filterbuilder-value-button-icon-size, 1rem);
-  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
@@ -170,6 +161,13 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.valueButton .loadingSpinner {
+  flex-shrink: 0;
+  width: var(--em-filterbuilder-value-button-icon-size, 1rem);
+  height: var(--em-filterbuilder-value-button-icon-size, 1rem);
+  animation: spin 1s linear infinite;
 }
 
 .valueButton:hover {
@@ -183,11 +181,11 @@
   display: flex;
   align-items: center;
   height: var(--em-filterbuilder-clear-button-height, 2rem);
-  border: var(--em-filterbuilder-clear-button-border-width, 0px) solid
+  border: var(--em-filterbuilder-clear-button-border-width, 0rem) solid
     var(--em-filterbuilder-clear-button-border-color, rgba(255, 255, 255, 0));
   background: var(--em-filterbuilder-clear-button-background, transparent);
-  padding: var(--em-filterbuilder-clear-button-padding-y, 0)
-    var(--em-filterbuilder-clear-button-padding-x, 12px);
+  padding: var(--em-filterbuilder-clear-button-padding-y, 0rem)
+    var(--em-filterbuilder-clear-button-padding-x, 0.75rem);
   border-radius: var(--em-filterbuilder-clear-button-border-radius, 2rem);
   color: var(--em-filterbuilder-clear-button-color, #5c5c66);
 }
@@ -202,13 +200,13 @@
   display: flex;
   align-items: center;
   height: var(--em-filterbuilder-scroll-button-height, 2rem);
-  border: var(--em-filterbuilder-scroll-button-border-width, 0px) solid
+  border: var(--em-filterbuilder-scroll-button-border-width, 0rem) solid
     var(--em-filterbuilder-scroll-button-border-color, rgba(255, 255, 255, 0));
   background: var(--em-filterbuilder-scroll-button-background, transparent);
-  padding: var(--em-filterbuilder-scroll-button-padding-y, 0)
-    var(--em-filterbuilder-scroll-button-padding-x, 12px);
-  border-top-left-radius: var(--em-filterbuilder-scroll-button-border-left-radius, 4px);
-  border-bottom-left-radius: var(--em-filterbuilder-scroll-button-border-left-radius, 4px);
+  padding: var(--em-filterbuilder-scroll-button-padding-y, 0rem)
+    var(--em-filterbuilder-scroll-button-padding-x, 0.75rem);
+  border-top-left-radius: var(--em-filterbuilder-scroll-button-border-left-radius, 0.25rem);
+  border-bottom-left-radius: var(--em-filterbuilder-scroll-button-border-left-radius, 0.25rem);
   border-top-right-radius: var(--em-filterbuilder-scroll-button-border-right-radius, 2rem);
   border-bottom-right-radius: var(--em-filterbuilder-scroll-button-border-right-radius, 2rem);
   color: var(--em-filterbuilder-scroll-button-color, #000000);
@@ -228,16 +226,37 @@
   box-sizing: border-box;
   font: inherit;
   height: var(--em-filterbuilder-value-input-height, 2rem);
-  border: var(--em-filterbuilder-value-input-border-width, 0px) solid
+  border: var(--em-filterbuilder-value-input-border-width, 0rem) solid
     var(--em-filterbuilder-value-input-border-color, rgba(255, 255, 255, 0));
-  padding: var(--em-filterbuilder-value-input-padding-y, 0)
-    var(--em-filterbuilder-value-input-padding-x, 12px);
-  border-top-left-radius: var(--em-filterbuilder-value-input-border-left-radius, 4px);
-  border-bottom-left-radius: var(--em-filterbuilder-value-input-border-left-radius, 4px);
-  border-top-right-radius: var(--em-filterbuilder-value-input-border-right-radius, 4px);
-  border-bottom-right-radius: var(--em-filterbuilder-value-input-border-right-radius, 4px);
+  padding: var(--em-filterbuilder-value-input-padding-y, 0rem)
+    var(--em-filterbuilder-value-input-padding-x, 0.75rem);
+  border-top-left-radius: var(--em-filterbuilder-value-input-border-left-radius, 0.25rem);
+  border-bottom-left-radius: var(--em-filterbuilder-value-input-border-left-radius, 0.25rem);
+  border-top-right-radius: var(--em-filterbuilder-value-input-border-right-radius, 0.25rem);
+  border-bottom-right-radius: var(--em-filterbuilder-value-input-border-right-radius, 0.25rem);
   color: var(--em-filterbuilder-value-input-color, #000000);
-  min-width: var(--em-filterbuilder-value-input-min-width, 40px);
+  min-width: var(--em-filterbuilder-value-input-min-width, 2.5rem);
   background: var(--em-filterbuilder-value-input-background, #ededf1);
   field-sizing: content;
+}
+
+.andOrButton {
+  box-sizing: border-box;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--em-filterbuilder-andOr-button-height, 2rem);
+  border: var(--em-filterbuilder-andOr-button-border-width, 0rem) solid
+    var(--em-filterbuilder-andOr-button-border-color, rgba(255, 255, 255, 0));
+  background: var(--em-filterbuilder-andOr-button-background, #ededf1);
+  padding: var(--em-filterbuilder-andOr-button-padding-y, 0rem)
+    var(--em-filterbuilder-andOr-button-padding-x, 0.75rem);
+  border-radius: var(--em-filterbuilder-andOr-button-border-radius, 2rem);
+  color: var(--em-filterbuilder-andOr-button-color, #000000);
+}
+
+.andOrButton:hover {
+  background: var(--em-filterbuilder-andOr-button-background--hover, #e4e4ea);
 }

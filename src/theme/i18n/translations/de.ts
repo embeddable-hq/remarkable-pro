@@ -50,6 +50,13 @@ export const de: ResourceLanguage = {
         apply: 'Anwenden',
         placeholder: 'Datumsbereich auswählen',
       },
+      filterBuilder: {
+        clearAll: 'alle löschen',
+        addFilter: 'Filter hinzufügen',
+        betweenAnd: 'und',
+        and: 'und',
+        or: 'oder',
+      },
     },
     defaults: {
       granularityOptions: {

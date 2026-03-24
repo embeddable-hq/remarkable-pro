@@ -9,13 +9,6 @@ export const en: ResourceLanguage = {
       compared: 'Compared',
       loading: 'Loading...',
     },
-
-    // TODO: review the best place
-    filterBuilderPro: {
-      clearAll: 'clear all',
-      addFilter: 'add filter',
-      betweenAnd: 'and',
-    },
     charts: {
       label: 'Label',
       primaryPeriod: 'Primary period',
@@ -45,6 +38,13 @@ export const en: ResourceLanguage = {
         backToPresets: 'Back to presets',
         apply: 'Apply',
         placeholder: 'Select date range',
+      },
+      filterBuilder: {
+        clearAll: 'clear all',
+        addFilter: 'add filter',
+        betweenAnd: 'and',
+        and: 'and',
+        or: 'or',
       },
     },
     defaults: {

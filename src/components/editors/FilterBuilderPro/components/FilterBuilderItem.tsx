@@ -1,15 +1,14 @@
 import { DataResponse, DimensionOrMeasure } from '@embeddable.com/core';
-import { FilterBuilderFilter } from './definition';
+import { FilterBuilderFilter } from '../definition';
 import { SingleSelectField } from '@embeddable.com/remarkable-ui';
-import { Theme } from '../../../theme/theme.types';
-import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
+import { Theme } from '../../../../theme/theme.types';
+import { getDimensionAndMeasureOptions } from '../../utils/dimensionsAndMeasures.utils';
 import { useState } from 'react';
-import { i18n } from '../../../theme/i18n/i18n';
+import { i18n } from '../../../../theme/i18n/i18n';
 import FilterBuilderItemOperatorValueFields from './FilterBuilderItemOperatorValueFields';
-import styles from './FilterBuilderPro.module.css';
-import clsx from 'clsx';
+import styles from '../FilterBuilderPro.module.css';
 import { IconPlus, IconX } from '@tabler/icons-react';
-import { getSupportedDimensionsAndMeasures } from './FilterBuilderPro.utils';
+import { getSupportedDimensionsAndMeasures } from '../FilterBuilderPro.utils';
 
 type FilterBuilderItemProps = {
   filter: FilterBuilderFilter;
@@ -57,7 +56,7 @@ const FilterBuilderItem = ({
     return (
       <button className={styles.addButton}>
         <IconPlus />
-        <span>{i18n.t('filterBuilderPro.addFilter')}</span>
+        <span>{i18n.t('editors.filterBuilder.addFilter')}</span>
       </button>
     );
   };
