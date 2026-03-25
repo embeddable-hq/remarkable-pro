@@ -47,7 +47,7 @@ const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
         options={options}
         placeholder={placeholder}
         noOptionsMessage={showNoOptionsMessage ? i18n.t('common.noOptionsFound') : undefined}
-        onChange={(newValue) => onChange?.(newValue)}
+        onChange={(newValue) => onChange?.(newValue as string | null)}
         onSearch={setSearchValue}
         avoidCollisions={false}
       />
