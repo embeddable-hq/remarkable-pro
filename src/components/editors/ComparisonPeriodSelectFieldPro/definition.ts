@@ -59,9 +59,9 @@ const preview = definePreview(Component, {
 const props = (inputs: Inputs<typeof meta>) => inputs;
 
 const events = {
-  onChange: (value: unknown) => {
+  onChange: (value: string | null) => {
     return {
-      value: value || Value.noFilter(),
+      value: value ?? Value.noFilter(),
     };
   },
 };

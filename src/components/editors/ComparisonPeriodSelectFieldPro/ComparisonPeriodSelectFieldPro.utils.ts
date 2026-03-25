@@ -15,7 +15,7 @@ export const isComparisonPeriodAvailable = (
 export const getComparisonPeriodSelectFieldProOptions = (
   comparisonPeriodSelectFieldProOptions: ComparisonPeriodSelectFieldProOption[],
   toCompareTimeRange: TimeRange,
-): SelectListOptionProps[] => {
+): SelectListOptionProps<string>[] => {
   return comparisonPeriodSelectFieldProOptions.map((option) => {
     return {
       rightLabel: toCompareTimeRange

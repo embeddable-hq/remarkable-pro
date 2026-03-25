@@ -18,7 +18,7 @@ export type GranularitySelectFieldProps = {
   granularity?: TGranularityValue;
   granularities?: TGranularityValue[];
 } & ChartCardHeaderProps &
-  Pick<SingleSelectFieldProps, 'variant' | 'side' | 'align' | 'clearable' | 'placeholder'>;
+  Pick<SingleSelectFieldProps<string>, 'variant' | 'side' | 'align' | 'clearable' | 'placeholder'>;
 
 export const GranularitySelectField = (props: GranularitySelectFieldProps) => {
   const theme: Theme = useTheme() as Theme;
@@ -64,7 +64,7 @@ export const GranularitySelectField = (props: GranularitySelectFieldProps) => {
   const safeValue = getSafeSelection(availableOptions, granularity);
 
   return (
-    <SingleSelectField
+    <SingleSelectField<string>
       variant={variant}
       clearable={clearable}
       placeholder={placeholder}

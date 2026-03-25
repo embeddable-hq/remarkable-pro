@@ -18,7 +18,7 @@ export type DateComparisonSelectFieldPro = {
   placeholder?: string;
   primaryDateRange?: TimeRange;
   comparisonPeriod?: string;
-  onChange: (newComparisonPeriod?: string) => void;
+  onChange: (newComparisonPeriod: string | null) => void;
 } & EditorCardHeaderProps;
 
 const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
@@ -38,7 +38,7 @@ const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
   // If the current comparison period is not available, reset the field
   useEffect(() => {
     if (!comparisonPeriodAvailable) {
-      onChange(undefined);
+      onChange(null);
     }
   }, [comparisonPeriodAvailable, onChange]);
 
@@ -61,7 +61,7 @@ const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
 
   return (
     <EditorCard title={title} description={description} tooltip={tooltip}>
-      <SingleSelectField
+      <SingleSelectField<string>
         startIcon={IconCalendarTime}
         clearable
         placeholder={placeholder}
