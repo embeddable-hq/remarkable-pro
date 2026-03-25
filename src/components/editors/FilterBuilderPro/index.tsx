@@ -15,6 +15,7 @@ import {
 } from './FilterBuilderPro.utils';
 import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
+import { FilterBuilderProAndOrButton } from './components/FilterBuilderProAndOrButton';
 
 export type FilterBuilderProProps = {
   embeddableState?: FilterBuilderState;
@@ -22,11 +23,11 @@ export type FilterBuilderProProps = {
     state: FilterBuilderState | ((prev: FilterBuilderState) => FilterBuilderState),
   ) => void;
   dimensionsAndMeasures?: DimensionOrMeasure[];
-  results?: DataResponse[];
   onChange?: (value: unknown) => void;
 };
 
 const FilterBuilderPro = (props: FilterBuilderProProps) => {
+  console.log('props', props);
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
@@ -47,38 +48,32 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     scrollRef.current?.scrollBy({ left: 200, behavior: 'smooth' });
   };
 
-  const {
-    dimensionsAndMeasures = [],
-    results = [],
-    setEmbeddableState,
-    embeddableState,
-    onChange,
-  } = props;
+  const { dimensionsAndMeasures = [], setEmbeddableState, embeddableState, onChange } = props;
 
   const prevFilterValueRef = useRef<unknown>(undefined);
-  const nextIdRef = useRef(
-    (embeddableState?.filters?.reduce((max, f) => Math.max(max, f.id ?? 0), 0) ?? 0) + 1,
-  );
+
+  const lastFilterId = embeddableState?.filters?.[embeddableState.filters.length - 1]?.id ?? 0;
+
   const newFilter = (dimensionOrMeasureValue: string | null = null): FilterBuilderFilter => {
     const dimensionOrMeasure =
       dimensionsAndMeasures.find((d) => d.name === dimensionOrMeasureValue) ?? null;
 
-    return { id: nextIdRef.current++, dimensionOrMeasure, search: '', operator: null, value: null };
+    return { id: lastFilterId + 1, dimensionOrMeasure, search: '', operator: null, value: null };
   };
 
   const filters = embeddableState?.filters?.length ? embeddableState.filters : [newFilter()];
 
   const handleSelectDimensionOrMeasure = (index: number, name: string | null) => {
-    const selected = dimensionsAndMeasures.find((d) => d.name === name) ?? null;
     setEmbeddableState?.((prev: FilterBuilderState) => {
       const newFilters = [...(prev?.filters ?? [])];
+
+      const existing = newFilters[index];
+
       newFilters[index] = {
-        ...newFilters[index]!,
-        dimensionOrMeasure: selected,
-        value: null,
-        search: '',
-        operator: null,
+        ...newFilter(name),
+        ...(existing?.id ? { id: existing.id } : {}),
       };
+
       return { ...prev, filters: newFilters };
     });
   };
@@ -165,7 +160,11 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
             <FilterBuilderItem
               filter={filter}
               dimensionsAndMeasures={dimensionsAndMeasures}
-              results={results[index]}
+              results={
+                (props as Record<string, unknown>)[`filterResults${filter.id}`] as
+                  | DataResponse
+                  | undefined
+              }
               theme={theme}
               onSelectDimensionOrMeasure={(value) => handleSelectDimensionOrMeasure(index, value)}
               onSelectOperator={(value) => handleSelectOperator(index, value)}
@@ -174,18 +173,10 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
               onDelete={() => handleDeleteFilter(index)}
             />
             {index < filters.length - 1 && (
-              <button
-                className={styles.andOrButton}
-                onClick={() =>
-                  setAndOrOperator((prev) =>
-                    prev === filterBuilderOperator.AND
-                      ? filterBuilderOperator.OR
-                      : filterBuilderOperator.AND,
-                  )
-                }
-              >
-                {i18n.t(`editors.filterBuilder.${andOrOperator}`)}
-              </button>
+              <FilterBuilderProAndOrButton
+                operator={andOrOperator}
+                onChange={(value) => setAndOrOperator(value)}
+              />
             )}
           </React.Fragment>
         ))}

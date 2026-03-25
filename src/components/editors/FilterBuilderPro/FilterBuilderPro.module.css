@@ -245,18 +245,26 @@
   font: inherit;
   white-space: nowrap;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  height: var(--em-filterbuilder-andOr-button-height, 2rem);
-  border: var(--em-filterbuilder-andOr-button-border-width, 0rem) solid
-    var(--em-filterbuilder-andOr-button-border-color, rgba(255, 255, 255, 0));
-  background: var(--em-filterbuilder-andOr-button-background, #ededf1);
-  padding: var(--em-filterbuilder-andOr-button-padding-y, 0rem)
-    var(--em-filterbuilder-andOr-button-padding-x, 0.75rem);
-  border-radius: var(--em-filterbuilder-andOr-button-border-radius, 2rem);
-  color: var(--em-filterbuilder-andOr-button-color, #000000);
+  display: grid;
+  place-items: center;
+  height: var(--em-filterbuilder-andor-button-height, 2rem);
+  border: var(--em-filterbuilder-andor-button-border-width, 0rem) solid
+    var(--em-filterbuilder-andor-button-border-color, rgba(255, 255, 255, 0));
+  background: var(--em-filterbuilder-andor-button-background, #ededf1);
+  padding: var(--em-filterbuilder-andor-button-padding-y, 0rem)
+    var(--em-filterbuilder-andor-button-padding-x, 0.75rem);
+  border-radius: var(--em-filterbuilder-andor-button-border-radius, 2rem);
+  color: var(--em-filterbuilder-andor-button-color, #000000);
+}
+
+.andOrButton > span {
+  grid-area: 1 / 1;
+}
+
+.andOrButtonSizer {
+  visibility: hidden;
 }
 
 .andOrButton:hover {
-  background: var(--em-filterbuilder-andOr-button-background--hover, #e4e4ea);
+  background: var(--em-filterbuilder-andor-button-background--hover, #e4e4ea);
 }

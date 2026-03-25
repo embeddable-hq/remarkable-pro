@@ -54,29 +54,36 @@ const props = (
     FilterBuilderState,
     (state: FilterBuilderState | ((prev: FilterBuilderState) => FilterBuilderState)) => void,
   ],
-) => ({
-  ...inputs,
-  embeddableState: state,
-  setEmbeddableState: setState,
-  dimensionsAndMeasures: inputs.dimensionsAndMeasures ?? [],
-  results: state?.filters?.map((filter) => {
-    if (filter.dimensionOrMeasure?.__type__ !== 'dimension') {
-      return undefined;
+) => {
+  const filterResults = state?.filters?.reduce<Record<string, unknown>>((acc, item) => {
+    if (item.dimensionOrMeasure?.__type__ !== 'dimension' || !item.operator) {
+      return acc;
     }
 
-    const { dimensionOrMeasure } = filter;
+    const { dimensionOrMeasure } = item;
     const operator =
       dimensionOrMeasure.nativeType === 'string' ? FilterOperator.contains : FilterOperator.equals;
 
-    return loadData({
+    acc[`filterResults${item.id}`] = loadData({
       from: inputs.dataset,
-      select: [dimensionOrMeasure],
-      filters: filter.search
-        ? [{ operator, property: dimensionOrMeasure, value: filter.search }]
+      select: [item.dimensionOrMeasure],
+      filters: item.search
+        ? [{ operator, property: dimensionOrMeasure, value: item.search }]
         : undefined,
     });
-  }),
-});
+    return acc;
+  }, {});
+
+  console.log('filterResults', filterResults);
+
+  return {
+    ...inputs,
+    embeddableState: state,
+    setEmbeddableState: setState,
+    dimensionsAndMeasures: inputs.dimensionsAndMeasures ?? [],
+    ...filterResults,
+  };
+};
 
 const events = {
   onChange: (value: FilterBuilderClause | null) => ({
