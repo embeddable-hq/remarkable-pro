@@ -61,7 +61,7 @@ const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
 
   return (
     <EditorCard title={title} description={description} tooltip={tooltip}>
-      <SingleSelectField<string>
+      <SingleSelectField
         startIcon={IconCalendarTime}
         clearable
         placeholder={placeholder}

@@ -64,7 +64,7 @@ export const GranularitySelectField = (props: GranularitySelectFieldProps) => {
   const safeValue = getSafeSelection(availableOptions, granularity);
 
   return (
-    <SingleSelectField<string>
+    <SingleSelectField
       variant={variant}
       clearable={clearable}
       placeholder={placeholder}

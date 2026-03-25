@@ -39,7 +39,7 @@ const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
 
   return (
     <EditorCard title={title} description={description} tooltip={tooltip}>
-      <SingleSelectField<string>
+      <SingleSelectField
         clearable
         searchable
         isLoading={results.isLoading}

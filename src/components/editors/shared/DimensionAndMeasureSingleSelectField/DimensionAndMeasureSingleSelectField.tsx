@@ -41,7 +41,7 @@ export const DimensionAndMeasureSingleSelectField = <T extends Dimension | Measu
   }, [clearable, selectedValue, options, onChange]);
 
   return (
-    <SingleSelectField<string>
+    <SingleSelectField
       searchable
       clearable={clearable}
       placeholder={placeholder}
