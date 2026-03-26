@@ -30,13 +30,13 @@ const FilterBuilderItemNumberValueField = ({
     if (min != null && max != null) {
       debouncedSelectValue([min, max]);
     }
-  }, [min, max]);
+  }, [min, max, debouncedSelectValue]);
 
   useEffect(() => {
     if (value != null) {
       debouncedSelectValue(value);
     }
-  }, [value]);
+  }, [value, debouncedSelectValue]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -72,7 +72,7 @@ const FilterBuilderItemNumberValueField = ({
       ref={firstInputRef}
       type="number"
       className={styles.valueInput}
-      value={value == null ? '' : (filter.value as number)}
+      value={value ?? ''}
       onChange={(v) => setValue(getOnChangeValue(v))}
     />
   );
