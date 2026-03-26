@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.27
+
+### Patch Changes
+
+- d501f7f: Introduce drilldown modal css variables
+
 ## 0.1.26
 
 ### Patch Changes
