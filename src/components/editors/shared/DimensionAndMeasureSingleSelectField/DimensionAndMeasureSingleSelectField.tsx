@@ -22,7 +22,7 @@ export const DimensionAndMeasureSingleSelectField = <T extends Dimension | Measu
 
   const { selectedValue, options, clearable, placeholder, onChange } = props;
 
-  const handleChange = (newValue: string) => {
+  const handleChange = (newValue: string | null) => {
     const newSelection = options.find((option) => option.name === newValue);
     onChange(newSelection);
   };
