@@ -3,6 +3,7 @@
   align-items: center;
   justify-content: flex-start;
   overflow: hidden;
+  gap: var(--em-filterbuilder-gap, 0.75rem);
   padding-right: var(--em-filterbuilder-gap, 0.75rem);
   font-family: var(--em-filterbuilder-font-family, Inter);
   font-weight: var(--em-filterbuilder-font-weight, 500);
@@ -197,32 +198,66 @@
   background: var(--em-filterbuilder-clear-button-background--hover, #ededf1);
 }
 
-.scrollButton {
+.scrollRightButton {
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
   align-items: center;
-  height: var(--em-filterbuilder-scroll-button-height, 2rem);
-  border: var(--em-filterbuilder-scroll-button-border-width, 0rem) solid
-    var(--em-filterbuilder-scroll-button-border-color, rgba(255, 255, 255, 0));
-  background: var(--em-filterbuilder-scroll-button-background, transparent);
-  padding: var(--em-filterbuilder-scroll-button-padding-y, 0rem)
-    var(--em-filterbuilder-scroll-button-padding-x, 0.75rem);
-  border-top-left-radius: var(--em-filterbuilder-scroll-button-border-left-radius, 0.25rem);
-  border-bottom-left-radius: var(--em-filterbuilder-scroll-button-border-left-radius, 0.25rem);
-  border-top-right-radius: var(--em-filterbuilder-scroll-button-border-right-radius, 2rem);
-  border-bottom-right-radius: var(--em-filterbuilder-scroll-button-border-right-radius, 2rem);
-  color: var(--em-filterbuilder-scroll-button-color, #000000);
+  height: var(--em-filterbuilder-scroll-right-button-height, 2rem);
+  border: var(--em-filterbuilder-scroll-right-button-border-width, 0rem) solid
+    var(--em-filterbuilder-scroll-right-button-border-color, rgba(255, 255, 255, 0));
+  background: var(--em-filterbuilder-scroll-right-button-background, transparent);
+  padding: var(--em-filterbuilder-scroll-right-button-padding-y, 0rem)
+    var(--em-filterbuilder-scroll-right-button-padding-x, 0.75rem);
+  border-top-left-radius: var(--em-filterbuilder-scroll-right-button-border-left-radius, 0.25rem);
+  border-bottom-left-radius: var(
+    --em-filterbuilder-scroll-right-button-border-left-radius,
+    0.25rem
+  );
+  border-top-right-radius: var(--em-filterbuilder-scroll-right-button-border-right-radius, 2rem);
+  border-bottom-right-radius: var(--em-filterbuilder-scroll-right-button-border-right-radius, 2rem);
+  color: var(--em-filterbuilder-scroll-right-button-color, #000000);
 }
 
-.scrollButton svg {
+.scrollRightButton svg {
   flex-shrink: 0;
-  width: var(--em-filterbuilder-scroll-button-icon-size, 1rem);
-  height: var(--em-filterbuilder-scroll-button-icon-size, 1rem);
+  width: var(--em-filterbuilder-scroll-right-button-icon-size, 1rem);
+  height: var(--em-filterbuilder-scroll-right-button-icon-size, 1rem);
 }
 
-.scrollButton:hover {
-  background: var(--em-filterbuilder-scroll-button-background--hover, #ededf1);
+.scrollRightButton:hover {
+  background: var(--em-filterbuilder-scroll-right-button-background--hover, #ededf1);
+}
+
+.scrollLeftButton {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--em-filterbuilder-scroll-left-button-height, 2rem);
+  border: var(--em-filterbuilder-scroll-left-button-border-width, 0rem) solid
+    var(--em-filterbuilder-scroll-left-button-border-color, rgba(255, 255, 255, 0));
+  background: var(--em-filterbuilder-scroll-left-button-background, transparent);
+  padding: var(--em-filterbuilder-scroll-left-button-padding-y, 0rem)
+    var(--em-filterbuilder-scroll-left-button-padding-x, 0.75rem);
+  border-top-right-radius: var(--em-filterbuilder-scroll-left-button-border-right-radius, 0.25rem);
+  border-bottom-right-radius: var(
+    --em-filterbuilder-scroll-left-button-border-right-radius,
+    0.25rem
+  );
+  border-top-left-radius: var(--em-filterbuilder-scroll-left-button-border-left-radius, 2rem);
+  border-bottom-left-radius: var(--em-filterbuilder-scroll-left-button-border-left-radius, 2rem);
+  color: var(--em-filterbuilder-scroll-left-button-color, #000000);
+}
+
+.scrollLeftButton svg {
+  flex-shrink: 0;
+  width: var(--em-filterbuilder-scroll-left-button-icon-size, 1rem);
+  height: var(--em-filterbuilder-scroll-left-button-icon-size, 1rem);
+}
+
+.scrollLeftButton:hover {
+  background: var(--em-filterbuilder-scroll-left-button-background--hover, #ededf1);
 }
 
 .valueInput {

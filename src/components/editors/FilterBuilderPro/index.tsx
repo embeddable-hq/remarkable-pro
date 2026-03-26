@@ -5,7 +5,7 @@ import { Theme } from '../../../theme/theme.types';
 import FilterBuilderItem from './components/FilterBuilderItem';
 import { FilterBuilderFilter, FilterBuilderState } from './definition';
 import { ActionIcon, SingleSelectField } from '@embeddable.com/remarkable-ui';
-import { IconPlus, IconChevronRight } from '@tabler/icons-react';
+import { IconPlus, IconChevronRight, IconChevronLeft } from '@tabler/icons-react';
 import styles from './FilterBuilderPro.module.css';
 import {
   FilterBuilderOperator,
@@ -36,16 +36,22 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   );
   const [searchNew, setSearchNew] = useState('');
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const updateScrollState = () => {
     const el = scrollRef.current;
     if (!el) return;
     setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+    setCanScrollLeft(el.scrollLeft > 0);
   };
 
   const handleScrollRight = () => {
     scrollRef.current?.scrollBy({ left: 200, behavior: 'smooth' });
+  };
+
+  const handleScrollLeft = () => {
+    scrollRef.current?.scrollBy({ left: -200, behavior: 'smooth' });
   };
 
   const { dimensionsAndMeasures = [], setEmbeddableState, embeddableState, onChange } = props;
@@ -115,6 +121,9 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
       const newFilters = [...(prev?.filters ?? []), newFilter(value)];
       return { ...prev, filters: newFilters };
     });
+    setTimeout(() => {
+      scrollRef.current?.scrollTo({ left: scrollRef.current.scrollWidth, behavior: 'smooth' });
+    }, 0);
   };
 
   useEffect(() => {
@@ -154,6 +163,11 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
 
   return (
     <div className={styles.container}>
+      {canScrollLeft && (
+        <button className={styles.scrollLeftButton} onClick={handleScrollLeft}>
+          <IconChevronLeft />
+        </button>
+      )}
       <div className={styles.scroll} ref={scrollRef}>
         {filters.map((filter, index) => (
           <React.Fragment key={filter.id}>
@@ -180,22 +194,23 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
             )}
           </React.Fragment>
         ))}
-        {filters[0]?.dimensionOrMeasure && (
-          <SingleSelectField
-            triggerComponent={<ActionIcon icon={IconPlus} />}
-            searchable
-            onChange={(value) => handleAddFilter(value)}
-            onSearch={setSearchNew}
-            options={dimensionOptionsNew}
-            avoidCollisions={false}
-            noOptionsMessage={i18n.t('common.noOptionsFound')}
-          />
-        )}
       </div>
+
       {canScrollRight && (
-        <button className={styles.scrollButton} onClick={handleScrollRight}>
+        <button className={styles.scrollRightButton} onClick={handleScrollRight}>
           <IconChevronRight />
         </button>
+      )}
+      {filters[0]?.dimensionOrMeasure && (
+        <SingleSelectField
+          triggerComponent={<ActionIcon icon={IconPlus} />}
+          searchable
+          onChange={(value) => handleAddFilter(value)}
+          onSearch={setSearchNew}
+          options={dimensionOptionsNew}
+          avoidCollisions={false}
+          noOptionsMessage={i18n.t('common.noOptionsFound')}
+        />
       )}
       {hasClearAll && (
         <button className={styles.clearButton} onClick={handleClearAll}>
