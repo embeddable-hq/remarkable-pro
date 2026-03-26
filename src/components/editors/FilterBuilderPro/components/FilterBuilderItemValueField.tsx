@@ -1,17 +1,14 @@
-import {
-  DataResponse,
-  DimensionOrMeasure,
-  FilterOperator,
-  NativeDataType,
-} from '@embeddable.com/core';
+import { DataResponse, DimensionOrMeasure, NativeDataType } from '@embeddable.com/core';
 import { FilterBuilderFilter } from '../definition';
 import { MultiSelectField, SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../../theme/theme.types';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { i18n } from '../../../../theme/i18n/i18n';
 import FilterBuilderItemNumberValueField from './FilterBuilderItemNumberValueField';
+import FilterBuilderTextValueField from './FilterBuilderTextValueField';
 import styles from '../FilterBuilderPro.module.css';
 import { IconLoader2, IconX } from '@tabler/icons-react';
+import { operatorStringBoolean } from '../FilterBuilderPro.utils';
 
 export type FilterBuilderItemValueFieldProps = {
   filter: FilterBuilderFilter;
@@ -47,8 +44,17 @@ const FilterBuilderItemValueField = ({
     return <FilterBuilderItemNumberValueField filter={filter} onSelectValue={onSelectValue} />;
   }
 
+  const isTextField =
+    dimensionOrMeasure.nativeType === NativeDataType.string &&
+    filter.operator === operatorStringBoolean.contains;
+
+  if (isTextField) {
+    return <FilterBuilderTextValueField filter={filter} onSelectValue={onSelectValue} />;
+  }
+
   const isMultiSelectField =
-    filter.operator === FilterOperator.contains || filter.operator === FilterOperator.notContains;
+    filter.operator === operatorStringBoolean.isOneOf ||
+    filter.operator === operatorStringBoolean.isNotOneOf;
 
   const showClearIcon = !isLoading && filter.value !== null;
 
@@ -85,8 +91,9 @@ const FilterBuilderItemValueField = ({
       />
     );
   }
+
   const isSingleSelectField =
-    filter.operator === FilterOperator.equals || filter.operator === FilterOperator.notEquals;
+    filter.operator === operatorStringBoolean.is || filter.operator === operatorStringBoolean.isNot;
 
   if (isSingleSelectField) {
     const displayValue = options.find((option) => option.value === filter.value)?.label ?? '...';

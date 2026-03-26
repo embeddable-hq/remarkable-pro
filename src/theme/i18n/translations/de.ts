@@ -60,6 +60,7 @@ export const de: ResourceLanguage = {
         isNot: 'ist nicht',
         isOneOf: 'ist eines von',
         isNotOneOf: 'ist keines von',
+        contains: 'enthält',
         equals: 'Gleich',
         doesNotEqual: 'Ungleich',
         greaterThanOrEqualTo: 'Größer als oder gleich',

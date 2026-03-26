@@ -1,9 +1,4 @@
-import {
-  DataResponse,
-  DimensionOrMeasure,
-  FilterOperator,
-  NativeDataType,
-} from '@embeddable.com/core';
+import { DataResponse, DimensionOrMeasure, NativeDataType } from '@embeddable.com/core';
 import { FilterBuilderFilter } from '../definition';
 import { SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../../theme/theme.types';
@@ -11,20 +6,22 @@ import FilterBuilderItemValueField from './FilterBuilderItemValueField';
 import { useEffect } from 'react';
 import styles from '../FilterBuilderPro.module.css';
 import { i18n } from '../../../../theme/i18n/i18n';
+import { operatorNumber, operatorStringBoolean } from '../FilterBuilderPro.utils';
 
 const getOperatorsStringBoolean = () => [
-  { value: FilterOperator.equals, label: i18n.t('editors.filterBuilder.is') },
-  { value: FilterOperator.notEquals, label: i18n.t('editors.filterBuilder.isNot') },
-  { value: FilterOperator.contains, label: i18n.t('editors.filterBuilder.isOneOf') },
-  { value: FilterOperator.notContains, label: i18n.t('editors.filterBuilder.isNotOneOf') },
+  { value: operatorStringBoolean.is, label: i18n.t('editors.filterBuilder.is') },
+  { value: operatorStringBoolean.isNot, label: i18n.t('editors.filterBuilder.isNot') },
+  { value: operatorStringBoolean.isOneOf, label: i18n.t('editors.filterBuilder.isOneOf') },
+  { value: operatorStringBoolean.isNotOneOf, label: i18n.t('editors.filterBuilder.isNotOneOf') },
+  { value: operatorStringBoolean.contains, label: i18n.t('editors.filterBuilder.contains') },
 ];
 
 const getOperatorsNumber = () => [
-  { value: FilterOperator.equals, label: i18n.t('editors.filterBuilder.equals') },
-  { value: FilterOperator.notEquals, label: i18n.t('editors.filterBuilder.doesNotEqual') },
-  { value: FilterOperator.gte, label: i18n.t('editors.filterBuilder.greaterThanOrEqualTo') },
-  { value: FilterOperator.lte, label: i18n.t('editors.filterBuilder.lessThanOrEqualTo') },
-  { value: 'between', label: i18n.t('editors.filterBuilder.between') },
+  { value: operatorNumber.equals, label: i18n.t('editors.filterBuilder.equals') },
+  { value: operatorNumber.notEquals, label: i18n.t('editors.filterBuilder.doesNotEqual') },
+  { value: operatorNumber.gte, label: i18n.t('editors.filterBuilder.greaterThanOrEqualTo') },
+  { value: operatorNumber.lte, label: i18n.t('editors.filterBuilder.lessThanOrEqualTo') },
+  { value: operatorNumber.between, label: i18n.t('editors.filterBuilder.between') },
 ];
 
 type FilterBuilderItemOperatorValueFieldsProps = {

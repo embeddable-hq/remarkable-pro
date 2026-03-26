@@ -49,6 +49,7 @@ export const en: ResourceLanguage = {
         isNot: 'is not',
         isOneOf: 'is one of',
         isNotOneOf: 'is not one of',
+        contains: 'contains',
         equals: 'Equals',
         doesNotEqual: 'Does not equal',
         greaterThanOrEqualTo: 'Greater than or equal to',
