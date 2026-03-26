@@ -1,6 +1,7 @@
 import { styles } from '@embeddable.com/remarkable-ui/styles';
 
 const stylesRemarkablePro = {
+  // Filter Builder
   '--em-filterbuilder-gap': 'var(--em-core-spacing--0300)',
   '--em-filterbuilder-font-family': 'var(--em-core-font-family--base)',
   '--em-filterbuilder-font-weight': 'var(--em-core-font-weight--medium)',
@@ -83,6 +84,10 @@ const stylesRemarkablePro = {
   '--em-filterbuilder-andor-button-padding-x': 'var(--em-core-spacing--0300)',
   '--em-filterbuilder-andor-button-border-radius': 'var(--em-core-border-radius--400)',
   '--em-filterbuilder-andor-button-color': 'var(--em-sem-text--neutral)',
+
+  // Drilldown Modal
+  '--em-drilldown-modal-min-height': '100%',
+  '--em-drilldown-modal-width': '100%',
 };
 
 export type StylesRemarkablePro = typeof stylesRemarkablePro;
