@@ -29,11 +29,25 @@ const FilterBuilderItemValueField = ({
 }: FilterBuilderItemValueFieldProps) => {
   const themeFormatter = getThemeFormatter(theme);
 
-  const options =
+  const rawOptions =
     results?.data?.map((data) => ({
       value: data[dimensionOrMeasure.name],
       label: themeFormatter.data(dimensionOrMeasure, data[dimensionOrMeasure.name]),
     })) ?? [];
+
+  let selectedValues: string[];
+  if (Array.isArray(filter.value)) {
+    selectedValues = filter.value as string[];
+  } else if (filter.value === null || filter.value === undefined) {
+    selectedValues = [];
+  } else {
+    selectedValues = [filter.value as string];
+  }
+
+  const options = [
+    ...rawOptions.filter((o) => selectedValues.includes(o.value)),
+    ...rawOptions.filter((o) => !selectedValues.includes(o.value)),
+  ];
 
   const isLoading = results?.isLoading;
   const showNoOptionsMessage = Boolean(!isLoading && (results?.data?.length ?? 0) === 0);
