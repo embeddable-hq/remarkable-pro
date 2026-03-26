@@ -10,20 +10,21 @@ import { Theme } from '../../../../theme/theme.types';
 import FilterBuilderItemValueField from './FilterBuilderItemValueField';
 import { useEffect } from 'react';
 import styles from '../FilterBuilderPro.module.css';
+import { i18n } from '../../../../theme/i18n/i18n';
 
-const OPERATORS_STRING_BOOLEAN = [
-  { value: FilterOperator.equals, label: 'is' },
-  { value: FilterOperator.notEquals, label: 'is not' },
-  { value: FilterOperator.contains, label: 'includes' },
-  { value: FilterOperator.notContains, label: 'does not include' },
+const getOperatorsStringBoolean = () => [
+  { value: FilterOperator.equals, label: i18n.t('editors.filterBuilder.is') },
+  { value: FilterOperator.notEquals, label: i18n.t('editors.filterBuilder.isNot') },
+  { value: FilterOperator.contains, label: i18n.t('editors.filterBuilder.isOneOf') },
+  { value: FilterOperator.notContains, label: i18n.t('editors.filterBuilder.isNotOneOf') },
 ];
 
-const OPERATORS_NUMBER = [
-  { value: FilterOperator.equals, label: 'Equals' },
-  { value: FilterOperator.notEquals, label: 'Does not equal' },
-  { value: FilterOperator.gte, label: 'Greater than or equal to' },
-  { value: FilterOperator.lte, label: 'Less than or equal to' },
-  { value: 'between', label: 'Between' },
+const getOperatorsNumber = () => [
+  { value: FilterOperator.equals, label: i18n.t('editors.filterBuilder.equals') },
+  { value: FilterOperator.notEquals, label: i18n.t('editors.filterBuilder.doesNotEqual') },
+  { value: FilterOperator.gte, label: i18n.t('editors.filterBuilder.greaterThanOrEqualTo') },
+  { value: FilterOperator.lte, label: i18n.t('editors.filterBuilder.lessThanOrEqualTo') },
+  { value: 'between', label: i18n.t('editors.filterBuilder.between') },
 ];
 
 type FilterBuilderItemOperatorValueFieldsProps = {
@@ -47,8 +48,8 @@ const FilterBuilderItemOperatorValueFields = ({
 }: FilterBuilderItemOperatorValueFieldsProps) => {
   const operatorOptions =
     dimensionOrMeasure.nativeType === NativeDataType.number
-      ? OPERATORS_NUMBER
-      : OPERATORS_STRING_BOOLEAN;
+      ? getOperatorsNumber()
+      : getOperatorsStringBoolean();
 
   useEffect(() => {
     if (!filter.operator) {

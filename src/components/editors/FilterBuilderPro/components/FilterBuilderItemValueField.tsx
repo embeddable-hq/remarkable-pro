@@ -11,7 +11,7 @@ import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { i18n } from '../../../../theme/i18n/i18n';
 import FilterBuilderItemNumberValueField from './FilterBuilderItemNumberValueField';
 import styles from '../FilterBuilderPro.module.css';
-import { IconLoader2 } from '@tabler/icons-react';
+import { IconLoader2, IconX } from '@tabler/icons-react';
 
 export type FilterBuilderItemValueFieldProps = {
   filter: FilterBuilderFilter;
@@ -50,6 +50,8 @@ const FilterBuilderItemValueField = ({
   const isMultiSelectField =
     filter.operator === FilterOperator.contains || filter.operator === FilterOperator.notContains;
 
+  const showClearIcon = !isLoading && filter.value !== null;
+
   if (isMultiSelectField) {
     const filterValue = (filter.value as string[]) ?? [];
     const selectedValues = options.filter((option) => filterValue.includes(option.value));
@@ -68,6 +70,7 @@ const FilterBuilderItemValueField = ({
         triggerComponent={
           <button className={styles.valueButton}>
             {isLoading ? <IconLoader2 className={styles.loadingSpinner} /> : displayValue}
+            {showClearIcon && <IconX onClick={() => onSelectValue(null)} />}
           </button>
         }
         isSearchable
@@ -93,6 +96,7 @@ const FilterBuilderItemValueField = ({
         triggerComponent={
           <button className={styles.valueButton}>
             {isLoading ? <IconLoader2 className={styles.loadingSpinner} /> : displayValue}
+            {showClearIcon && <IconX onClick={() => onSelectValue(null)} />}
           </button>
         }
         searchable

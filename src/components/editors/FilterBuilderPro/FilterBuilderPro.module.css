@@ -75,7 +75,7 @@
 }
 
 .memberButton:hover {
-  background: var(--em-filterbuilder-member-button-background--hover, #ededf1);
+  background: var(--em-filterbuilder-member-button-background--hover, #e4e4ea);
 }
 
 .deleteButton {
@@ -88,7 +88,7 @@
   height: var(--em-filterbuilder-delete-button-height, 2rem);
   border: var(--em-filterbuilder-delete-button-border-width, 0rem) solid
     var(--em-filterbuilder-delete-button-border-color, rgba(255, 255, 255, 0));
-  background: var(--em-filterbuilder-delete-button-background, #ededf1);
+  background: var(--em-filterbuilder-delete-button-background, #f7f7f8);
   padding: var(--em-filterbuilder-delete-button-padding-y, 0.25rem)
     var(--em-filterbuilder-delete-button-padding-x, 0.25rem);
   color: var(--em-filterbuilder-delete-button-color, #5c5c66);
@@ -163,10 +163,13 @@
   }
 }
 
-.valueButton .loadingSpinner {
+.valueButton svg {
   flex-shrink: 0;
   width: var(--em-filterbuilder-value-button-icon-size, 1rem);
   height: var(--em-filterbuilder-value-button-icon-size, 1rem);
+}
+
+.valueButton .loadingSpinner {
   animation: spin 1s linear infinite;
 }
 
@@ -235,7 +238,7 @@
   border-top-right-radius: var(--em-filterbuilder-value-input-border-right-radius, 0.25rem);
   border-bottom-right-radius: var(--em-filterbuilder-value-input-border-right-radius, 0.25rem);
   color: var(--em-filterbuilder-value-input-color, #000000);
-  min-width: var(--em-filterbuilder-value-input-min-width, 2.5rem);
+  min-width: var(--em-filterbuilder-value-input-min-width, 3rem);
   background: var(--em-filterbuilder-value-input-background, #ededf1);
   field-sizing: content;
 }
