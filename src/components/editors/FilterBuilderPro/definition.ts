@@ -10,7 +10,16 @@ const meta = {
   category: 'Filters',
   defaultWidth: 300,
   defaultHeight: 80,
-  inputs: [inputs.dataset, inputs.dimensionsAndMeasures],
+  inputs: [
+    inputs.dataset,
+    {
+      ...inputs.dimensionsAndMeasures,
+      config: {
+        ...inputs.dimensionsAndMeasures.config,
+        supportedTypes: ['string', 'number', 'boolean'],
+      },
+    },
+  ],
   events: [
     {
       name: 'onChange',
