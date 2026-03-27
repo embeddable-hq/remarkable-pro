@@ -21,7 +21,8 @@ const injectGooglePreconnect = (head: HTMLHeadElement): void => {
   head.appendChild(pre2);
 };
 
-const injectGoogleFonts = (fonts: ThemeFontGoogle[]): void => {
+const injectGoogleFonts = (fonts: ThemeFontGoogle[] | undefined): void => {
+  if (!fonts || fonts.length === 0) return;
   if (typeof document === 'undefined' || !document.head) return;
   if (document.querySelector(`link[${REMARKABLE_GOOGLE_FONTS_ATTR}]`)) return;
 
@@ -61,7 +62,8 @@ const fontFaceCss = (font: ThemeFontCustom): string => {
   return `@font-face { font-family: '${family}'; src: url(${font.src})${decl}; }`;
 };
 
-const injectCustomFonts = (custom: ThemeFontCustom[]): void => {
+const injectCustomFonts = (custom: ThemeFontCustom[] | undefined): void => {
+  if (!custom || custom.length === 0) return;
   if (typeof document === 'undefined' || !document.head || custom.length === 0) return;
 
   let styleEl = document.getElementById(REMARKABLE_FONTS_STYLE_ID) as HTMLStyleElement | null;
@@ -80,10 +82,6 @@ const injectCustomFonts = (custom: ThemeFontCustom[]): void => {
 export const loadThemeFonts = (fonts?: ThemeFonts): void => {
   if (!fonts) return;
 
-  if (fonts.google?.length) {
-    injectGoogleFonts(fonts.google);
-  }
-  if (fonts.custom?.length) {
-    injectCustomFonts(fonts.custom);
-  }
+  injectGoogleFonts(fonts.google);
+  injectCustomFonts(fonts.custom);
 };
