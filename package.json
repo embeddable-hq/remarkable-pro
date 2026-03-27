@@ -1,7 +1,7 @@
 {
   "name": "@embeddable.com/remarkable-pro",
   "author": "embeddable (https://embeddable.com)",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "repository": {
     "type": "git",
     "url": "https://github.com/embeddable-hq/remarkable-pro"
@@ -63,7 +63,7 @@
     "@changesets/cli": "^2.29.6",
     "@embeddable.com/core": "file:../embeddable-sdk/packages/core",
     "@embeddable.com/react": "file:../embeddable-sdk/packages/react",
-    "@embeddable.com/remarkable-ui": "^3.0.1",
+    "@embeddable.com/remarkable-ui": "^3.0.2",
     "@tabler/icons-react": "^3.34.1",
     "chart.js": "^4.5.0",
     "chartjs-plugin-datalabels": "^2.2.0",
