@@ -153,6 +153,7 @@
   border-top-right-radius: var(--em-filterbuilder-value-button-border-right-radius, 0.25rem);
   border-bottom-right-radius: var(--em-filterbuilder-value-button-border-right-radius, 0.25rem);
   color: var(--em-filterbuilder-value-button-color, #000000);
+  min-width: var(--em-filterbuilder-value-button-min-width, 2.5rem);
 }
 
 @keyframes spin {
@@ -176,6 +177,10 @@
 
 .valueButton:hover {
   background: var(--em-filterbuilder-value-button-background--hover, #e4e4ea);
+}
+
+.valueButton.valueButtonEmpty {
+  display: block;
 }
 
 .clearButton {

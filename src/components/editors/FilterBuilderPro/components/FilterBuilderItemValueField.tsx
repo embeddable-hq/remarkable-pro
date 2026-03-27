@@ -9,6 +9,7 @@ import FilterBuilderTextValueField from './FilterBuilderTextValueField';
 import styles from '../FilterBuilderPro.module.css';
 import { IconLoader2, IconX } from '@tabler/icons-react';
 import { operatorStringBoolean } from '../FilterBuilderPro.utils';
+import clsx from 'clsx';
 
 export type FilterBuilderItemValueFieldProps = {
   filter: FilterBuilderFilter;
@@ -88,7 +89,7 @@ const FilterBuilderItemValueField = ({
     return (
       <MultiSelectField
         triggerComponent={
-          <button className={styles.valueButton}>
+          <button className={clsx(styles.valueButton, !filter.value && styles.valueButtonEmpty)}>
             {isLoading ? <IconLoader2 className={styles.loadingSpinner} /> : displayValue}
             {showClearIcon && <IconX onClick={() => onSelectValue(null)} />}
           </button>
@@ -115,7 +116,7 @@ const FilterBuilderItemValueField = ({
     return (
       <SingleSelectField
         triggerComponent={
-          <button className={styles.valueButton}>
+          <button className={clsx(styles.valueButton, !filter.value && styles.valueButtonEmpty)}>
             {isLoading ? <IconLoader2 className={styles.loadingSpinner} /> : displayValue}
             {showClearIcon && <IconX onClick={() => onSelectValue(null)} />}
           </button>

@@ -62,6 +62,15 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
 
   const lastFilterId = embeddableState?.filters?.[embeddableState.filters.length - 1]?.id ?? 0;
 
+  const lastFilter = embeddableState?.filters?.[embeddableState.filters.length - 1];
+  const lastFilterKey = `${lastFilter?.id}-${lastFilter?.dimensionOrMeasure?.name}-${lastFilter?.operator}-${JSON.stringify(lastFilter?.value)}`;
+
+  useEffect(() => {
+    setTimeout(() => {
+      scrollRef.current?.scrollTo({ left: scrollRef.current.scrollWidth, behavior: 'smooth' });
+    }, 100);
+  }, [lastFilterKey]);
+
   const newFilter = (dimensionOrMeasureValue: string | null = null): FilterBuilderFilter => {
     const dimensionOrMeasure =
       dimensionsAndMeasures.find((d) => d.name === dimensionOrMeasureValue) ?? null;

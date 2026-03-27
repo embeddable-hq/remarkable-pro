@@ -60,6 +60,7 @@ const stylesRemarkablePro = {
   '--em-filterbuilder-value-button-border-right-radius': 'var(--em-core-border-radius--100)',
   '--em-filterbuilder-value-button-color': 'var(--em-sem-text--neutral)',
   '--em-filterbuilder-value-button-icon-size': 'var(--em-core-size--0400)',
+  '--em-filterbuilder-value-button-min-width': 'var(--em-core-size--1000)',
   '--em-filterbuilder-clear-button-height': 'var(--em-core-size--0800)',
   '--em-filterbuilder-clear-button-border-width': 'var(--em-core-border-width--000)',
   '--em-filterbuilder-clear-button-border-color': 'rgb(255 255 255 / 0%)',
