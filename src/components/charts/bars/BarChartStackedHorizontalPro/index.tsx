@@ -32,6 +32,7 @@ export type BarChartStackedHorizontalProProps = {
   }) => void;
   totals?: DataResponse;
   totalsKey?: string;
+  axisTotalValues?: string[];
   setAxisTotalValues?: (values: string[], key?: string) => void;
 } & ChartCardHeaderProps;
 
@@ -61,6 +62,7 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
   const { results, axisOrder } = useAxisTotals({
     totals: props.totals,
     totalsKey: props.totalsKey,
+    axisTotalValues: props.axisTotalValues,
     setAxisTotalValues: props.setAxisTotalValues,
     results: props.results,
     axisDimension: yAxis,

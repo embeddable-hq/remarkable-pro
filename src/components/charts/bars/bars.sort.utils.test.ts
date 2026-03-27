@@ -308,7 +308,7 @@ describe('buildSortLimitProps', () => {
     expect(mockLoadResults).not.toHaveBeenCalled();
   });
 
-  it('uses cached axisTotalValues when the key matches', () => {
+  it('uses cached axisTotalValues when the key matches and skips totals query', () => {
     const key = getTotalsRequestKey({
       sortByAxisTotal: 'Descending',
       axisDimensionName: 'country',
@@ -322,7 +322,10 @@ describe('buildSortLimitProps', () => {
     });
 
     expect(result.results).toBe(mockResponse);
+    expect(result.axisTotalValues).toEqual(['US', 'UK']);
     expect(mockLoadResults).toHaveBeenCalledWith(['US', 'UK']);
+    expect(result.totals).toBeUndefined();
+    expect(mockLoadData).not.toHaveBeenCalled();
   });
 
   it('invalidates cache when the key changes', () => {

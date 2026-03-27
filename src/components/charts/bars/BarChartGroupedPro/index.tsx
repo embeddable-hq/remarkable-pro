@@ -32,6 +32,7 @@ export type BarChartGroupedProProps = {
   }) => void;
   totals?: DataResponse;
   totalsKey?: string;
+  axisTotalValues?: string[];
   setAxisTotalValues?: (values: string[], key?: string) => void;
 } & ChartCardHeaderProps;
 
@@ -62,6 +63,7 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
   const { results, axisOrder } = useAxisTotals({
     totals: props.totals,
     totalsKey: props.totalsKey,
+    axisTotalValues: props.axisTotalValues,
     setAxisTotalValues: props.setAxisTotalValues,
     results: props.results,
     axisDimension: xAxis,

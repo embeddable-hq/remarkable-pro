@@ -75,7 +75,7 @@ describe('useAxisTotals', () => {
     ).not.toThrow();
   });
 
-  it('derives axisOrder from totals data', () => {
+  it('derives axisOrder from totals data when axisTotalValues is not cached', () => {
     const totals = makeResponse([{ country: 'US' }, { country: 'DE' }, { country: 'UK' }]);
     const results = makeResponse([]);
 
@@ -88,6 +88,20 @@ describe('useAxisTotals', () => {
     );
 
     expect(result.current.axisOrder).toEqual(['US', 'DE', 'UK']);
+  });
+
+  it('uses axisTotalValues as axisOrder when provided (cached path)', () => {
+    const results = makeResponse([]);
+
+    const { result } = renderHook(() =>
+      useAxisTotals({
+        axisTotalValues: ['DE', 'US', 'UK'],
+        results,
+        axisDimension,
+      }),
+    );
+
+    expect(result.current.axisOrder).toEqual(['DE', 'US', 'UK']);
   });
 
   it('re-invokes callback when totalsKey changes', () => {

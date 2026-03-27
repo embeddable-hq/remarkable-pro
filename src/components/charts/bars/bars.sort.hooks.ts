@@ -5,11 +5,19 @@ import { useFillGaps } from '../charts.fillGaps.hooks';
 export const useAxisTotals = (params: {
   totals?: DataResponse;
   totalsKey?: string;
+  axisTotalValues?: string[];
   setAxisTotalValues?: (values: string[], key?: string) => void;
   results?: DataResponse;
   axisDimension: Dimension;
 }): { results: DataResponse; axisOrder?: string[] } => {
-  const { totals, totalsKey, setAxisTotalValues, results: rawResults, axisDimension } = params;
+  const {
+    totals,
+    totalsKey,
+    axisTotalValues,
+    setAxisTotalValues,
+    results: rawResults,
+    axisDimension,
+  } = params;
 
   const callbackRef = useRef(setAxisTotalValues);
   callbackRef.current = setAxisTotalValues;
@@ -26,7 +34,7 @@ export const useAxisTotals = (params: {
       dimension: axisDimension,
     }) ?? ({ isLoading: true, data: [] } as DataResponse);
 
-  const axisOrder = totals?.data?.map((d) => d[axisDimension.name] as string);
+  const axisOrder = axisTotalValues ?? totals?.data?.map((d) => d[axisDimension.name] as string);
 
   return { results, axisOrder };
 };

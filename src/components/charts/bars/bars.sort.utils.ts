@@ -74,6 +74,7 @@ export const buildSortLimitProps = (params: {
 }): {
   totals: DataResponse | undefined;
   totalsKey: string | undefined;
+  axisTotalValues: string[] | undefined;
   results: DataResponse | undefined;
   setAxisTotalValues: (values: string[], key?: string) => void;
 } => {
@@ -94,19 +95,21 @@ export const buildSortLimitProps = (params: {
       ? cachedState?.axisTotalValues
       : undefined;
 
-  const totalsRequest = needsSortOrLimit
-    ? buildTotalsRequest({
-        dataset: params.dataset,
-        axisDimension: params.axisDimension,
-        measure: params.measure,
-        sortByAxisTotal,
-        limitAxisItems,
-      })
-    : undefined;
+  const totalsRequest =
+    needsSortOrLimit && !axisTotalValues
+      ? buildTotalsRequest({
+          dataset: params.dataset,
+          axisDimension: params.axisDimension,
+          measure: params.measure,
+          sortByAxisTotal,
+          limitAxisItems,
+        })
+      : undefined;
 
   return {
     totals: totalsRequest ? params.loadData(totalsRequest) : undefined,
     totalsKey,
+    axisTotalValues,
     results: needsSortOrLimit && !axisTotalValues ? undefined : params.loadResults(axisTotalValues),
     setAxisTotalValues: (values: string[], key?: string) =>
       params.updateSortState({ axisTotalValues: values, axisTotalsKey: key }),
