@@ -1,4 +1,4 @@
-import type { Dimension, Measure } from '@embeddable.com/core';
+import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import {
   getValidLimit,
   hasSortOrLimit,
@@ -6,6 +6,7 @@ import {
   buildTotalsRequest,
   buildAxisTotalFilter,
   getTotalsRequestKey,
+  buildSortLimitProps,
 } from './bars.sort.utils';
 
 const makeDimension = (name = 'category'): Dimension =>
@@ -258,5 +259,112 @@ describe('getTotalsRequestKey', () => {
     expect(getTotalsRequestKey({ ...base, limitAxisItems: 3.7 })).toBe(
       getTotalsRequestKey({ ...base, limitAxisItems: 3 }),
     );
+  });
+});
+
+describe('buildSortLimitProps', () => {
+  const dataset = 'test-dataset' as never;
+  const axisDimension = makeDimension('country');
+  const measure = makeMeasure('revenue');
+  const mockResponse = { isLoading: false, data: [{ country: 'US' }] } as DataResponse;
+  const mockLoadData = vi.fn().mockReturnValue(mockResponse);
+  const mockLoadResults = vi.fn().mockReturnValue(mockResponse);
+  const mockUpdateState = vi.fn();
+
+  const baseParams = {
+    dataset,
+    axisDimension,
+    measure,
+    cachedState: undefined,
+    updateSortState: mockUpdateState,
+    loadData: mockLoadData,
+    loadResults: mockLoadResults,
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns no totals and calls loadResults when sort/limit are not set', () => {
+    const result = buildSortLimitProps(baseParams);
+
+    expect(result.totals).toBeUndefined();
+    expect(result.totalsKey).toBeUndefined();
+    expect(result.results).toBe(mockResponse);
+    expect(mockLoadData).not.toHaveBeenCalled();
+    expect(mockLoadResults).toHaveBeenCalledWith(undefined);
+  });
+
+  it('loads totals and withholds results when sort is set but cache is empty', () => {
+    const result = buildSortLimitProps({
+      ...baseParams,
+      sortByAxisTotal: 'Descending',
+    });
+
+    expect(result.totals).toBe(mockResponse);
+    expect(result.totalsKey).toBeDefined();
+    expect(result.results).toBeUndefined();
+    expect(mockLoadData).toHaveBeenCalledTimes(1);
+    expect(mockLoadResults).not.toHaveBeenCalled();
+  });
+
+  it('uses cached axisTotalValues when the key matches', () => {
+    const key = getTotalsRequestKey({
+      sortByAxisTotal: 'Descending',
+      axisDimensionName: 'country',
+      measureName: 'revenue',
+    });
+
+    const result = buildSortLimitProps({
+      ...baseParams,
+      sortByAxisTotal: 'Descending',
+      cachedState: { axisTotalValues: ['US', 'UK'], axisTotalsKey: key },
+    });
+
+    expect(result.results).toBe(mockResponse);
+    expect(mockLoadResults).toHaveBeenCalledWith(['US', 'UK']);
+  });
+
+  it('invalidates cache when the key changes', () => {
+    const staleKey = getTotalsRequestKey({
+      sortByAxisTotal: 'Ascending',
+      axisDimensionName: 'country',
+      measureName: 'revenue',
+    });
+
+    const result = buildSortLimitProps({
+      ...baseParams,
+      sortByAxisTotal: 'Descending',
+      cachedState: { axisTotalValues: ['US', 'UK'], axisTotalsKey: staleKey },
+    });
+
+    expect(result.results).toBeUndefined();
+    expect(mockLoadResults).not.toHaveBeenCalled();
+  });
+
+  it('loads totals and withholds results when limit is set but cache is empty', () => {
+    const result = buildSortLimitProps({
+      ...baseParams,
+      limitAxisItems: 5,
+    });
+
+    expect(result.totals).toBe(mockResponse);
+    expect(result.totalsKey).toBeDefined();
+    expect(result.results).toBeUndefined();
+    expect(mockLoadData).toHaveBeenCalledTimes(1);
+  });
+
+  it('setAxisTotalValues calls updateSortState with correct patch', () => {
+    const result = buildSortLimitProps({
+      ...baseParams,
+      sortByAxisTotal: 'Descending',
+    });
+
+    result.setAxisTotalValues(['A', 'B'], 'some-key');
+
+    expect(mockUpdateState).toHaveBeenCalledWith({
+      axisTotalValues: ['A', 'B'],
+      axisTotalsKey: 'some-key',
+    });
   });
 });

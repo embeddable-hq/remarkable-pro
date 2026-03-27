@@ -7,9 +7,8 @@ import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarChartProOptions, getBarStackedChartProData } from '../bars.utils';
 import { mergician } from 'mergician';
 import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
-import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { useEffect } from 'react';
+import { useAxisTotals } from '../bars.sort.hooks';
 
 export type BarChartGroupedProProps = {
   groupBy: Dimension;
@@ -54,28 +53,19 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
     yAxisRangeMin,
     setGranularity,
     onBarClicked,
-    totals,
-    totalsKey,
-    setAxisTotalValues,
   } = props;
 
   const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
 
   const { hideMenu } = props;
 
-  useEffect(() => {
-    if (!totals?.data || totals.isLoading || !setAxisTotalValues) return;
-    const values = totals.data.map((d) => d[xAxis.name] as string);
-    setAxisTotalValues(values, totalsKey);
-  }, [totals, xAxis.name, setAxisTotalValues, totalsKey]);
-
-  const results =
-    useFillGaps({
-      results: props.results,
-      dimension: props.xAxis,
-    }) ?? ({ isLoading: true, data: [] } as DataResponse);
-
-  const axisOrder = totals?.data?.map((d) => d[xAxis.name] as string);
+  const { results, axisOrder } = useAxisTotals({
+    totals: props.totals,
+    totalsKey: props.totalsKey,
+    setAxisTotalValues: props.setAxisTotalValues,
+    results: props.results,
+    axisDimension: xAxis,
+  });
 
   const data = getBarStackedChartProData(
     {
