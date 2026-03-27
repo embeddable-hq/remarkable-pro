@@ -9,7 +9,7 @@ const meta = {
   label: 'Filter Builder',
   category: 'Filters',
   defaultWidth: 300,
-  defaultHeight: 80,
+  defaultHeight: 120,
   inputs: [
     inputs.dataset,
     {
@@ -19,6 +19,9 @@ const meta = {
         supportedTypes: ['string', 'number', 'boolean'],
       },
     },
+    inputs.title,
+    inputs.description,
+    inputs.tooltip,
   ],
   events: [
     {

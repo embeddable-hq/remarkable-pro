@@ -16,6 +16,8 @@ import {
 import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
 import { FilterBuilderProAndOrButton } from './components/FilterBuilderProAndOrButton';
+import { resolveI18nProps } from '../../component.utils';
+import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 
 export type FilterBuilderProProps = {
   embeddableState?: FilterBuilderState;
@@ -24,12 +26,14 @@ export type FilterBuilderProProps = {
   ) => void;
   dimensionsAndMeasures?: DimensionOrMeasure[];
   onChange?: (value: unknown) => void;
-};
+} & EditorCardHeaderProps;
 
 const FilterBuilderPro = (props: FilterBuilderProProps) => {
-  console.log('props', props);
   const theme = useTheme() as Theme;
   i18nSetup(theme);
+
+  const { title, description, tooltip } = resolveI18nProps(props);
+  const { dimensionsAndMeasures = [], setEmbeddableState, embeddableState, onChange } = props;
 
   const [andOrOperator, setAndOrOperator] = useState<FilterBuilderOperator>(
     filterBuilderOperator.AND,
@@ -53,8 +57,6 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const handleScrollLeft = () => {
     scrollRef.current?.scrollBy({ left: -200, behavior: 'smooth' });
   };
-
-  const { dimensionsAndMeasures = [], setEmbeddableState, embeddableState, onChange } = props;
 
   const prevFilterValueRef = useRef<unknown>(undefined);
 
@@ -162,62 +164,64 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   };
 
   return (
-    <div className={styles.container}>
-      {canScrollLeft && (
-        <button className={styles.scrollLeftButton} onClick={handleScrollLeft}>
-          <IconChevronLeft />
-        </button>
-      )}
-      <div className={styles.scroll} ref={scrollRef}>
-        {filters.map((filter, index) => (
-          <React.Fragment key={filter.id}>
-            <FilterBuilderItem
-              filter={filter}
-              dimensionsAndMeasures={dimensionsAndMeasures}
-              results={
-                (props as Record<string, unknown>)[`filterResults${filter.id}`] as
-                  | DataResponse
-                  | undefined
-              }
-              theme={theme}
-              onSelectDimensionOrMeasure={(value) => handleSelectDimensionOrMeasure(index, value)}
-              onSelectOperator={(value) => handleSelectOperator(index, value)}
-              onSelectValue={(value) => handleSelectValue(index, value)}
-              onSearchValue={(search) => handleDimensionSearch(index, search)}
-              onDelete={() => handleDeleteFilter(index)}
-            />
-            {index < filters.length - 1 && (
-              <FilterBuilderProAndOrButton
-                operator={andOrOperator}
-                onChange={(value) => setAndOrOperator(value)}
+    <EditorCard title={title} description={description} tooltip={tooltip}>
+      <div className={styles.container}>
+        {canScrollLeft && (
+          <button className={styles.scrollLeftButton} onClick={handleScrollLeft}>
+            <IconChevronLeft />
+          </button>
+        )}
+        <div className={styles.scroll} ref={scrollRef}>
+          {filters.map((filter, index) => (
+            <React.Fragment key={filter.id}>
+              <FilterBuilderItem
+                filter={filter}
+                dimensionsAndMeasures={dimensionsAndMeasures}
+                results={
+                  (props as Record<string, unknown>)[`filterResults${filter.id}`] as
+                    | DataResponse
+                    | undefined
+                }
+                theme={theme}
+                onSelectDimensionOrMeasure={(value) => handleSelectDimensionOrMeasure(index, value)}
+                onSelectOperator={(value) => handleSelectOperator(index, value)}
+                onSelectValue={(value) => handleSelectValue(index, value)}
+                onSearchValue={(search) => handleDimensionSearch(index, search)}
+                onDelete={() => handleDeleteFilter(index)}
               />
-            )}
-          </React.Fragment>
-        ))}
-      </div>
+              {index < filters.length - 1 && (
+                <FilterBuilderProAndOrButton
+                  operator={andOrOperator}
+                  onChange={(value) => setAndOrOperator(value)}
+                />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
 
-      {canScrollRight && (
-        <button className={styles.scrollRightButton} onClick={handleScrollRight}>
-          <IconChevronRight />
-        </button>
-      )}
-      {filters[0]?.dimensionOrMeasure && (
-        <SingleSelectField
-          triggerComponent={<ActionIcon icon={IconPlus} />}
-          searchable
-          onChange={(value) => handleAddFilter(value)}
-          onSearch={setSearchNew}
-          options={dimensionOptionsNew}
-          avoidCollisions={false}
-          noOptionsMessage={i18n.t('common.noOptionsFound')}
-        />
-      )}
-      {hasClearAll && (
-        <button className={styles.clearButton} onClick={handleClearAll}>
-          {i18n.t('editors.filterBuilder.clearAll')}
-        </button>
-      )}
-    </div>
+        {canScrollRight && (
+          <button className={styles.scrollRightButton} onClick={handleScrollRight}>
+            <IconChevronRight />
+          </button>
+        )}
+        {filters[0]?.dimensionOrMeasure && (
+          <SingleSelectField
+            triggerComponent={<ActionIcon icon={IconPlus} />}
+            searchable
+            onChange={(value) => handleAddFilter(value)}
+            onSearch={setSearchNew}
+            options={dimensionOptionsNew}
+            avoidCollisions={false}
+            noOptionsMessage={i18n.t('common.noOptionsFound')}
+          />
+        )}
+        {hasClearAll && (
+          <button className={styles.clearButton} onClick={handleClearAll}>
+            {i18n.t('editors.filterBuilder.clearAll')}
+          </button>
+        )}
+      </div>
+    </EditorCard>
   );
 };
 
