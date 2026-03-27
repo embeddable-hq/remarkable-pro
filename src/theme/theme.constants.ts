@@ -2,6 +2,7 @@ import { en } from './i18n/translations/en';
 import { de } from './i18n/translations/de';
 import { remarkableThemeFormatter } from './formatter/formatter.constants';
 import { remarkableThemeStyles } from './styles/styles.constants';
+import { ThemeFonts } from './fonts/fonts.types';
 import { Theme, ThemeCharts, ThemeDefaults } from './theme.types';
 import { defaultComparisonPeriodOptions } from './defaults/defaults.ComparisonPeriods.constants';
 import { defaultDateRangeOptions } from './defaults/defaults.DateRanges.constants';
@@ -27,10 +28,15 @@ const remarkableThemeDefaults: ThemeDefaults = {
   tableCellStyleOptions: defaultTableCellStyleOptions,
 };
 
+const remarkableThemeFonts: ThemeFonts = {
+  google: [{ name: 'Inter', weights: '100..900' }],
+};
+
 export const remarkableTheme: Theme = {
   i18n: remarkableThemeI18n,
   charts: remarkableThemeCharts,
   formatter: remarkableThemeFormatter,
   styles: remarkableThemeStyles,
   defaults: remarkableThemeDefaults,
+  fonts: remarkableThemeFonts,
 } as const;
