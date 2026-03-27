@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.28
+
+### Patch Changes
+
+- 769b2fd: Inject fonts via theme
+
 ## 0.1.27
 
 ### Patch Changes
