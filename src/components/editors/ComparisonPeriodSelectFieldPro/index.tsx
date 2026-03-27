@@ -18,7 +18,7 @@ export type DateComparisonSelectFieldPro = {
   placeholder?: string;
   primaryDateRange?: TimeRange;
   comparisonPeriod?: string;
-  onChange: (newComparisonPeriod?: string) => void;
+  onChange: (newComparisonPeriod?: string | null) => void;
 } & EditorCardHeaderProps;
 
 const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
