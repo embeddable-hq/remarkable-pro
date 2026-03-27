@@ -166,7 +166,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     theme,
   });
 
-  const hasClearAll = filters.some((f) => f.dimensionOrMeasure && f.operator && f.value);
+  const hasClearAll = filters.some((f) => f.dimensionOrMeasure && f.operator && f.value != null);
 
   const handleClearAll = () => {
     setEmbeddableState?.((prev: FilterBuilderState) => ({ ...prev, filters: [newFilter()] }));

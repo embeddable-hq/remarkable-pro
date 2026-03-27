@@ -71,7 +71,8 @@ const FilterBuilderItemValueField = ({
     filter.operator === operatorStringBoolean.isOneOf ||
     filter.operator === operatorStringBoolean.isNotOneOf;
 
-  const showClearIcon = !isLoading && filter.value !== null;
+  const hasValue = filter.value != null;
+  const showClearIcon = !isLoading && hasValue;
 
   if (isMultiSelectField) {
     const filterValue = (filter.value as string[]) ?? [];
@@ -89,7 +90,7 @@ const FilterBuilderItemValueField = ({
     return (
       <MultiSelectField
         triggerComponent={
-          <button className={clsx(styles.valueButton, !filter.value && styles.valueButtonEmpty)}>
+          <button className={clsx(styles.valueButton, !hasValue && styles.valueButtonEmpty)}>
             {isLoading ? <IconLoader2 className={styles.loadingSpinner} /> : displayValue}
             {showClearIcon && <IconX onClick={() => onSelectValue(null)} />}
           </button>
@@ -116,7 +117,7 @@ const FilterBuilderItemValueField = ({
     return (
       <SingleSelectField
         triggerComponent={
-          <button className={clsx(styles.valueButton, !filter.value && styles.valueButtonEmpty)}>
+          <button className={clsx(styles.valueButton, !hasValue && styles.valueButtonEmpty)}>
             {isLoading ? <IconLoader2 className={styles.loadingSpinner} /> : displayValue}
             {showClearIcon && <IconX onClick={() => onSelectValue(null)} />}
           </button>
