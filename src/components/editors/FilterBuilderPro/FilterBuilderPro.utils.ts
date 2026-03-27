@@ -32,12 +32,12 @@ export const operatorNumberMappedFilterOperator: Record<string, FilterOperator> 
   [operatorNumber.lte]: FilterOperator.lte,
 };
 
-export const filterBuilderOperator = {
+export const filterBuilderAndOrOperator = {
   AND: 'and',
   OR: 'or',
 };
-export type FilterBuilderOperator =
-  (typeof filterBuilderOperator)[keyof typeof filterBuilderOperator];
+export type FilterBuilderAndOrOperator =
+  (typeof filterBuilderAndOrOperator)[keyof typeof filterBuilderAndOrOperator];
 
 export const FILTER_BUILDER_PRO_SUPPORTED_TYPES: string[] = [
   NativeDataType.string,
@@ -54,10 +54,10 @@ export const getSupportedDimensionsAndMeasures = (dimensionsAndMeasures: Dimensi
 export type FilterBuilderClause =
   | {
       property: string;
-      operator: FilterBuilderOperator;
+      operator: FilterOperator;
       value: FilterBuilderFilter['value'];
     }
-  | { operator: FilterBuilderOperator; clauses: FilterBuilderClause[] };
+  | { operator: FilterBuilderAndOrOperator; clauses: FilterBuilderClause[] };
 
 const filterToClause = (f: FilterBuilderFilter): FilterBuilderClause[] => {
   if (
@@ -67,7 +67,7 @@ const filterToClause = (f: FilterBuilderFilter): FilterBuilderClause[] => {
     const [min, max] = f.value as [number, number];
     return [
       {
-        operator: filterBuilderOperator.AND,
+        operator: filterBuilderAndOrOperator.AND,
         clauses: [
           { property: f.dimensionOrMeasure.name, operator: FilterOperator.gte, value: min },
           { property: f.dimensionOrMeasure.name, operator: FilterOperator.lte, value: max },
@@ -75,15 +75,15 @@ const filterToClause = (f: FilterBuilderFilter): FilterBuilderClause[] => {
       },
     ];
   }
-  const mappedOperator =
+  const mappedOperator: FilterOperator =
     operatorStringBooleanMappedFilterOperator[f.operator!] ??
-    operatorNumberMappedFilterOperator[f.operator!] ??
-    f.operator!;
+    operatorNumberMappedFilterOperator[f.operator!]!;
+
   return [{ property: f.dimensionOrMeasure!.name, operator: mappedOperator, value: f.value }];
 };
 
 export const generateFilterValue = (
-  operator: FilterBuilderOperator,
+  operator: FilterBuilderAndOrOperator,
   filters: FilterBuilderFilter[],
 ): FilterBuilderClause | null => {
   const clauses = filters

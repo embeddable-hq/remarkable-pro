@@ -8,8 +8,8 @@ import { ActionIcon, SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { IconPlus, IconChevronRight, IconChevronLeft } from '@tabler/icons-react';
 import styles from './FilterBuilderPro.module.css';
 import {
-  FilterBuilderOperator,
-  filterBuilderOperator,
+  FilterBuilderAndOrOperator,
+  filterBuilderAndOrOperator,
   generateFilterValue,
   getSupportedDimensionsAndMeasures,
 } from './FilterBuilderPro.utils';
@@ -35,8 +35,8 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const { title, description, tooltip } = resolveI18nProps(props);
   const { dimensionsAndMeasures = [], setEmbeddableState, embeddableState, onChange } = props;
 
-  const [andOrOperator, setAndOrOperator] = useState<FilterBuilderOperator>(
-    filterBuilderOperator.AND,
+  const [andOrOperator, setAndOrOperator] = useState<FilterBuilderAndOrOperator>(
+    filterBuilderAndOrOperator.AND,
   );
   const [searchNew, setSearchNew] = useState('');
   const [canScrollRight, setCanScrollRight] = useState(false);

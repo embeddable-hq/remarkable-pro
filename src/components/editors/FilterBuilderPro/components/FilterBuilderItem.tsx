@@ -38,19 +38,24 @@ const FilterBuilderItem = ({
 
   const supportedDimensionsAndMeasures = getSupportedDimensionsAndMeasures(dimensionsAndMeasures);
 
+  const allDimensionOptions = getDimensionAndMeasureOptions({
+    dimensionsAndMeasures: supportedDimensionsAndMeasures,
+    theme,
+  });
+
   const dimensionOptions = getDimensionAndMeasureOptions({
     dimensionsAndMeasures: supportedDimensionsAndMeasures,
     searchValue: search,
     theme,
   });
 
+  const selectedLabel = allDimensionOptions.find(
+    (o) => o.value === dimensionOrMeasure?.name,
+  )?.label;
+
   const getMemberTriggerComponent = () => {
     if (dimensionOrMeasure) {
-      return (
-        <button className={styles.memberButton}>
-          {dimensionOptions.find((option) => option.value === dimensionOrMeasure?.name)?.label}
-        </button>
-      );
+      return <button className={styles.memberButton}>{selectedLabel}</button>;
     }
 
     return (
