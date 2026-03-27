@@ -11,7 +11,12 @@ import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
-import { hasSortOrLimit, buildTotalsRequest, buildAxisTotalFilter } from '../bars.sort.utils';
+import {
+  hasSortOrLimit,
+  buildTotalsRequest,
+  buildAxisTotalFilter,
+  getTotalsRequestKey,
+} from '../bars.sort.utils';
 
 const meta = {
   name: 'BarChartStackedPro',
@@ -62,6 +67,7 @@ const meta = {
 export type BarChartStackedProState = {
   granularity?: Granularity;
   axisTotalValues?: string[];
+  axisTotalsKey?: string;
 };
 
 const previewConfig = {
@@ -106,7 +112,18 @@ const props = (
   const sortByAxisTotal = inputs.sortByAxisTotal as string | undefined;
   const limitAxisItems = inputs.limitAxisItems as number | undefined;
   const needsSortOrLimit = hasSortOrLimit(sortByAxisTotal, limitAxisItems);
-  const axisTotalValues = needsSortOrLimit ? state?.axisTotalValues : undefined;
+
+  const totalsKey = needsSortOrLimit
+    ? getTotalsRequestKey({
+        sortByAxisTotal,
+        limitAxisItems,
+        axisDimensionName: xAxisWithGranularity.name,
+        measureName: inputs.measure.name,
+      })
+    : undefined;
+
+  const axisTotalValues =
+    needsSortOrLimit && state?.axisTotalsKey === totalsKey ? state?.axisTotalValues : undefined;
 
   const totalsRequest = needsSortOrLimit
     ? buildTotalsRequest({
@@ -123,11 +140,13 @@ const props = (
     xAxis: xAxisWithGranularity,
     setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
     totals: totalsRequest ? loadData(totalsRequest) : undefined,
+    totalsKey,
     results:
       needsSortOrLimit && !axisTotalValues
         ? undefined
         : loadDataResults(inputs, xAxisWithGranularity, axisTotalValues),
-    setAxisTotalValues: (values: string[]) => setState({ ...state, axisTotalValues: values }),
+    setAxisTotalValues: (values: string[], key?: string) =>
+      setState({ ...state, axisTotalValues: values, axisTotalsKey: key }),
   };
 };
 

@@ -5,6 +5,7 @@ import {
   getSortDirection,
   buildTotalsRequest,
   buildAxisTotalFilter,
+  getTotalsRequestKey,
 } from './bars.sort.utils';
 
 const makeDimension = (name = 'category'): Dimension =>
@@ -183,5 +184,79 @@ describe('buildAxisTotalFilter', () => {
     const result = buildAxisTotalFilter(dimension, values);
 
     expect(result).toEqual([{ property: dimension, operator: 'equals', value: values }]);
+  });
+});
+
+describe('getTotalsRequestKey', () => {
+  it('produces a stable key for the same parameters', () => {
+    const params = {
+      sortByAxisTotal: 'Descending',
+      limitAxisItems: 5,
+      axisDimensionName: 'country',
+      measureName: 'revenue',
+    };
+
+    expect(getTotalsRequestKey(params)).toBe(getTotalsRequestKey(params));
+  });
+
+  it('produces different keys when sort changes', () => {
+    const base = { limitAxisItems: 5, axisDimensionName: 'country', measureName: 'revenue' };
+
+    expect(getTotalsRequestKey({ ...base, sortByAxisTotal: 'Ascending' })).not.toBe(
+      getTotalsRequestKey({ ...base, sortByAxisTotal: 'Descending' }),
+    );
+  });
+
+  it('produces different keys when limit changes', () => {
+    const base = {
+      sortByAxisTotal: 'Descending',
+      axisDimensionName: 'country',
+      measureName: 'revenue',
+    };
+
+    expect(getTotalsRequestKey({ ...base, limitAxisItems: 3 })).not.toBe(
+      getTotalsRequestKey({ ...base, limitAxisItems: 10 }),
+    );
+  });
+
+  it('produces different keys when dimension changes', () => {
+    const base = { sortByAxisTotal: 'Descending', limitAxisItems: 5, measureName: 'revenue' };
+
+    expect(getTotalsRequestKey({ ...base, axisDimensionName: 'country' })).not.toBe(
+      getTotalsRequestKey({ ...base, axisDimensionName: 'city' }),
+    );
+  });
+
+  it('produces different keys when measure changes', () => {
+    const base = {
+      sortByAxisTotal: 'Descending',
+      limitAxisItems: 5,
+      axisDimensionName: 'country',
+    };
+
+    expect(getTotalsRequestKey({ ...base, measureName: 'revenue' })).not.toBe(
+      getTotalsRequestKey({ ...base, measureName: 'cost' }),
+    );
+  });
+
+  it('handles undefined sort and limit', () => {
+    const key = getTotalsRequestKey({
+      axisDimensionName: 'country',
+      measureName: 'revenue',
+    });
+
+    expect(key).toBe('::country:revenue');
+  });
+
+  it('floors decimal limits in the key', () => {
+    const base = {
+      sortByAxisTotal: 'Descending',
+      axisDimensionName: 'country',
+      measureName: 'revenue',
+    };
+
+    expect(getTotalsRequestKey({ ...base, limitAxisItems: 3.7 })).toBe(
+      getTotalsRequestKey({ ...base, limitAxisItems: 3 }),
+    );
   });
 });

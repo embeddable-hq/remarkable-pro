@@ -33,7 +33,8 @@ export type BarChartStackedProProps = {
     groupingDimensionValue: string | null;
   }) => void;
   totals?: DataResponse;
-  setAxisTotalValues?: (values: string[]) => void;
+  totalsKey?: string;
+  setAxisTotalValues?: (values: string[], key?: string) => void;
 } & ChartCardHeaderProps;
 
 const BarChartStackedPro = (props: BarChartStackedProProps) => {
@@ -56,6 +57,7 @@ const BarChartStackedPro = (props: BarChartStackedProProps) => {
     setGranularity,
     onBarClicked,
     totals,
+    totalsKey,
     setAxisTotalValues,
   } = props;
 
@@ -64,8 +66,8 @@ const BarChartStackedPro = (props: BarChartStackedProProps) => {
   useEffect(() => {
     if (!totals?.data || totals.isLoading || !setAxisTotalValues) return;
     const values = totals.data.map((d) => d[xAxis.name] as string);
-    setAxisTotalValues(values);
-  }, [totals, xAxis.name, setAxisTotalValues]);
+    setAxisTotalValues(values, totalsKey);
+  }, [totals, xAxis.name, setAxisTotalValues, totalsKey]);
 
   const results =
     useFillGaps({

@@ -38,6 +38,16 @@ export const buildTotalsRequest = (params: {
   };
 };
 
+export const getTotalsRequestKey = (params: {
+  sortByAxisTotal?: string;
+  limitAxisItems?: number;
+  axisDimensionName: string;
+  measureName: string;
+}): string => {
+  const limit = getValidLimit(params.limitAxisItems);
+  return `${params.sortByAxisTotal ?? ''}:${limit ?? ''}:${params.axisDimensionName}:${params.measureName}`;
+};
+
 export const buildAxisTotalFilter = (
   axisDimension: Dimension,
   axisTotalValues?: string[],
