@@ -9,11 +9,12 @@ import { mergician } from 'mergician';
 import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
+import { useEffect } from 'react';
 
 export type BarChartGroupedHorizontalProProps = {
   groupBy: Dimension;
   measure: Measure;
-  results: DataResponse;
+  results?: DataResponse;
   reverseYAxis?: boolean;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
@@ -30,6 +31,8 @@ export type BarChartGroupedHorizontalProProps = {
     axisDimensionValue: string | null;
     groupingDimensionValue: string | null;
   }) => void;
+  totals?: DataResponse;
+  setAxisTotalValues?: (values: string[]) => void;
 } & ChartCardHeaderProps;
 
 const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) => {
@@ -53,12 +56,23 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
     xAxisRangeMin,
     setGranularity,
     onBarClicked,
+    totals,
+    setAxisTotalValues,
   } = props;
 
-  const results = useFillGaps({
-    results: props.results,
-    dimension: yAxis,
-  });
+  useEffect(() => {
+    if (!totals?.data || totals.isLoading || !setAxisTotalValues) return;
+    const values = totals.data.map((d) => d[yAxis.name] as string);
+    setAxisTotalValues(values);
+  }, [totals, yAxis.name, setAxisTotalValues]);
+
+  const results =
+    useFillGaps({
+      results: props.results,
+      dimension: yAxis,
+    }) ?? ({ isLoading: true, data: [] } as DataResponse);
+
+  const axisOrder = totals?.data?.map((d) => d[yAxis.name] as string);
 
   const data = getBarStackedChartProData(
     {
@@ -66,6 +80,7 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
       dimension: yAxis,
       groupDimension: groupBy,
       measure,
+      axisOrder,
     },
     theme,
   );

@@ -11,6 +11,7 @@ import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
+import { hasSortOrLimit, buildTotalsRequest, buildAxisTotalFilter } from '../bars.sort.utils';
 
 const meta = {
   name: 'BarChartGroupedPro',
@@ -34,6 +35,8 @@ const meta = {
     inputs.reverseXAxis,
     inputs.yAxisRangeMin,
     inputs.yAxisRangeMax,
+    inputs.sortByAxisTotal,
+    inputs.limitAxisItems,
   ],
   events: [
     {
@@ -57,6 +60,7 @@ const meta = {
 
 export type BarChartGroupedProState = {
   granularity?: Granularity;
+  axisTotalValues?: string[];
 };
 
 const previewConfig = {
@@ -69,14 +73,22 @@ const previewConfig = {
 
 const preview = definePreview(Component, previewConfig);
 
-const loadDataResultsArgs = (inputs: Inputs<typeof meta>, xAxis?: Dimension): LoadDataRequest => ({
+const loadDataResultsArgs = (
+  inputs: Inputs<typeof meta>,
+  xAxis?: Dimension,
+  axisTotalValues?: string[],
+): LoadDataRequest => ({
   limit: inputs.maxResults,
   from: inputs.dataset,
   select: [xAxis ?? inputs.xAxis, inputs.groupBy, inputs.measure],
+  filters: buildAxisTotalFilter(xAxis ?? inputs.xAxis, axisTotalValues),
 });
 
-const loadDataResults = (inputs: Inputs<typeof meta>, xAxis: Dimension): DataResponse =>
-  loadData(loadDataResultsArgs(inputs, xAxis));
+const loadDataResults = (
+  inputs: Inputs<typeof meta>,
+  xAxis: Dimension,
+  axisTotalValues?: string[],
+): DataResponse => loadData(loadDataResultsArgs(inputs, xAxis, axisTotalValues));
 
 const events = {
   onBarClicked: (value: { axisDimensionValue?: string; groupingDimensionValue?: string }) => ({
@@ -90,12 +102,31 @@ const props = (
   [state, setState]: [BarChartGroupedProState, (state: BarChartGroupedProState) => void],
 ) => {
   const xAxisWithGranularity = getDimensionWithGranularity(inputs.xAxis, state?.granularity);
+  const sortByAxisTotal = inputs.sortByAxisTotal as string | undefined;
+  const limitAxisItems = inputs.limitAxisItems as number | undefined;
+  const needsSortOrLimit = hasSortOrLimit(sortByAxisTotal, limitAxisItems);
+  const axisTotalValues = needsSortOrLimit ? state?.axisTotalValues : undefined;
+
+  const totalsRequest = needsSortOrLimit
+    ? buildTotalsRequest({
+        dataset: inputs.dataset,
+        axisDimension: xAxisWithGranularity,
+        measure: inputs.measure,
+        sortByAxisTotal,
+        limitAxisItems,
+      })
+    : undefined;
 
   return {
     ...inputs,
     xAxis: xAxisWithGranularity,
-    setGranularity: (granularity: Granularity) => setState({ granularity }),
-    results: loadDataResults(inputs, xAxisWithGranularity),
+    setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
+    totals: totalsRequest ? loadData(totalsRequest) : undefined,
+    results:
+      needsSortOrLimit && !axisTotalValues
+        ? undefined
+        : loadDataResults(inputs, xAxisWithGranularity, axisTotalValues),
+    setAxisTotalValues: (values: string[]) => setState({ ...state, axisTotalValues: values }),
   };
 };
 
