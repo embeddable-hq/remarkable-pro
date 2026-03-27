@@ -10,6 +10,7 @@ import styles from '../FilterBuilderPro.module.css';
 import { IconLoader2, IconX } from '@tabler/icons-react';
 import { operatorStringBoolean } from '../FilterBuilderPro.utils';
 import clsx from 'clsx';
+import { useRef } from 'react';
 
 export type FilterBuilderItemValueFieldProps = {
   filter: FilterBuilderFilter;
@@ -29,12 +30,22 @@ const FilterBuilderItemValueField = ({
   onSearchValue,
 }: FilterBuilderItemValueFieldProps) => {
   const themeFormatter = getThemeFormatter(theme);
+  const labelCache = useRef<Record<string, string>>({});
 
   const rawOptions =
     results?.data?.map((data) => ({
       value: data[dimensionOrMeasure.name],
       label: themeFormatter.data(dimensionOrMeasure, data[dimensionOrMeasure.name]),
     })) ?? [];
+
+  // Accumulate labels as options arrive. When a search is active, results are limited and
+  // previously selected values may no longer be present — the cache lets us still display
+  // their labels correctly.
+  rawOptions.forEach(({ value, label }) => {
+    if (value != null) labelCache.current[value] = label;
+  });
+
+  const getLabel = (value: string) => labelCache.current[value] ?? value;
 
   let selectedValues: string[];
   if (Array.isArray(filter.value)) {
@@ -76,15 +87,14 @@ const FilterBuilderItemValueField = ({
 
   if (isMultiSelectField) {
     const filterValue = (filter.value as string[]) ?? [];
-    const selectedValues = options.filter((option) => filterValue.includes(option.value));
 
     let displayValue: string;
-    if (selectedValues.length === 0) {
+    if (filterValue.length === 0) {
       displayValue = '...';
-    } else if (selectedValues.length > 2) {
-      displayValue = `${selectedValues.length} selected`;
+    } else if (filterValue.length > 2) {
+      displayValue = `${filterValue.length} selected`;
     } else {
-      displayValue = selectedValues.map((o) => o.label).join(', ');
+      displayValue = filterValue.map(getLabel).join(', ');
     }
 
     return (
@@ -112,7 +122,7 @@ const FilterBuilderItemValueField = ({
     filter.operator === operatorStringBoolean.is || filter.operator === operatorStringBoolean.isNot;
 
   if (isSingleSelectField) {
-    const displayValue = options.find((option) => option.value === filter.value)?.label ?? '...';
+    const displayValue = filter.value != null ? getLabel(filter.value as string) : '...';
 
     return (
       <SingleSelectField
