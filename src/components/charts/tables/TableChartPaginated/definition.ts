@@ -73,7 +73,6 @@ const previewConfig = {
     page: 0,
     pageSize: previewMaxResults,
     isLoadingDownloadData: false,
-    hasTotalResults: true,
     hideMenu: true,
   },
   hideMenu: true,
@@ -86,7 +85,6 @@ export const defaultTableChartPaginatedState: TableChartPaginatedProState = {
   pageSize: undefined,
   sort: undefined,
   isLoadingDownloadData: false,
-  hasTotalResults: true,
 };
 
 const loadDataResultsArgs = (
@@ -176,9 +174,7 @@ const props = (
     results: state?.pageSize
       ? loadDataResults(inputs, state.page, state.pageSize, orderBy, dimensionsAndMeasuresToLoad)
       : undefined,
-    totalResults: !state?.hasTotalResults
-      ? loadDataTotalResults(inputs, dimensionsAndMeasuresToLoad)
-      : undefined,
+    totalResults: loadDataTotalResults(inputs, dimensionsAndMeasuresToLoad),
     allResults: state?.isLoadingDownloadData ? loadDataAllResults(inputs, orderBy) : undefined,
   };
 };
