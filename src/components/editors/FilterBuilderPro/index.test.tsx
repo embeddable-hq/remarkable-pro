@@ -1,0 +1,440 @@
+import { render, screen, fireEvent } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import FilterBuilderPro from './index';
+import type { DimensionOrMeasure } from '@embeddable.com/core';
+import type { FilterBuilderFilter, FilterBuilderState } from './definition';
+
+// ---------------------------------------------------------------------------
+// Mocks
+// ---------------------------------------------------------------------------
+
+vi.mock('./FilterBuilderPro.module.css', () => ({
+  default: {
+    container: 'container',
+    scroll: 'scroll',
+    scrollLeftButton: 'scrollLeftButton',
+    scrollRightButton: 'scrollRightButton',
+    clearButton: 'clearButton',
+  },
+}));
+
+vi.mock('../../../theme/i18n/i18n', () => ({
+  i18nSetup: vi.fn(),
+  i18n: { t: vi.fn((key: string) => key) },
+}));
+
+vi.mock('@embeddable.com/react', () => ({
+  useTheme: vi.fn().mockReturnValue({}),
+}));
+
+vi.mock('@tabler/icons-react', () => ({
+  IconPlus: () => <span data-testid="icon-plus" />,
+  IconChevronRight: () => <span data-testid="icon-chevron-right" />,
+  IconChevronLeft: () => <span data-testid="icon-chevron-left" />,
+}));
+
+vi.mock('@embeddable.com/remarkable-ui', () => ({
+  SingleSelectField: ({
+    triggerComponent,
+    onChange,
+    options,
+  }: {
+    triggerComponent: React.ReactNode;
+    onChange: (v: string | null) => void;
+    options: { value: string; label: string }[];
+  }) => (
+    <div data-testid="new-filter-select">
+      {triggerComponent}
+      {options.map((o) => (
+        <button
+          key={o.value}
+          data-testid={`add-option-${o.value}`}
+          onClick={() => onChange(o.value)}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  ),
+  ActionIcon: ({ icon: Icon }: { icon: React.ComponentType }) => (
+    <button data-testid="action-icon">
+      <Icon />
+    </button>
+  ),
+}));
+
+vi.mock('./components/FilterBuilderItem', () => ({
+  default: ({
+    filter,
+    onSelectDimensionOrMeasure,
+    onSelectOperator,
+    onSelectValue,
+    onSearchValue,
+    onDelete,
+  }: {
+    filter: FilterBuilderFilter;
+    onSelectDimensionOrMeasure: (v: string | null) => void;
+    onSelectOperator: (v: string | null) => void;
+    onSelectValue: (v: FilterBuilderFilter['value']) => void;
+    onSearchValue: (v: string) => void;
+    onDelete: () => void;
+  }) => (
+    <div data-testid={`filter-item-${filter.id}`}>
+      <button
+        data-testid={`select-dim-${filter.id}`}
+        onClick={() => onSelectDimensionOrMeasure('country')}
+      >
+        Select Dim
+      </button>
+      <button data-testid={`select-op-${filter.id}`} onClick={() => onSelectOperator('is')}>
+        Select Op
+      </button>
+      <button data-testid={`select-val-${filter.id}`} onClick={() => onSelectValue('France')}>
+        Select Val
+      </button>
+      <button data-testid={`search-${filter.id}`} onClick={() => onSearchValue('fr')}>
+        Search
+      </button>
+      <button data-testid={`delete-${filter.id}`} onClick={onDelete}>
+        Delete
+      </button>
+    </div>
+  ),
+}));
+
+vi.mock('../shared/EditorCard/EditorCard', () => ({
+  EditorCard: ({ children, title }: { children: React.ReactNode; title?: string }) => (
+    <div data-testid="editor-card" data-title={title}>
+      {children}
+    </div>
+  ),
+}));
+
+vi.mock('../utils/dimensionsAndMeasures.utils', () => ({
+  getDimensionAndMeasureOptions: vi.fn(() => [{ value: 'country', label: 'Country' }]),
+}));
+
+vi.mock('../../component.utils', () => ({
+  resolveI18nProps: vi.fn((props) => props),
+}));
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+const makeDim = (name = 'country', nativeType = 'string'): DimensionOrMeasure =>
+  ({
+    name,
+    title: name.charAt(0).toUpperCase() + name.slice(1),
+    nativeType,
+    __type__: 'dimension',
+  }) as unknown as DimensionOrMeasure;
+
+const makeFilter = (overrides: Partial<FilterBuilderFilter> = {}): FilterBuilderFilter => ({
+  id: 1,
+  dimensionOrMeasure: null,
+  search: '',
+  value: null,
+  operator: null,
+  ...overrides,
+});
+
+const defaultProps = {
+  dimensionsAndMeasures: [makeDim('country'), makeDim('revenue', 'number')],
+  setEmbeddableState: vi.fn(),
+  onChange: vi.fn(),
+};
+
+// Capture the functional updater passed to setEmbeddableState and apply it to a given state.
+const applyUpdater = (
+  mock: ReturnType<typeof vi.fn>,
+  prevState: FilterBuilderState,
+): FilterBuilderState => {
+  const updater = mock.mock.calls.at(-1)?.[0];
+  return typeof updater === 'function' ? updater(prevState) : updater;
+};
+
+// ---------------------------------------------------------------------------
+// Setup
+// ---------------------------------------------------------------------------
+
+beforeEach(() => {
+  vi.clearAllMocks();
+
+  // jsdom doesn't implement ResizeObserver — must be a real constructor
+  globalThis.ResizeObserver = vi.fn().mockImplementation(function () {
+    return { observe: vi.fn(), disconnect: vi.fn() };
+  }) as unknown as typeof ResizeObserver;
+
+  // jsdom doesn't implement scrollBy / scrollTo on elements
+  Element.prototype.scrollBy = vi.fn();
+  Element.prototype.scrollTo = vi.fn();
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
+// ---------------------------------------------------------------------------
+// Tests
+// ---------------------------------------------------------------------------
+
+describe('FilterBuilderPro', () => {
+  describe('rendering', () => {
+    it('renders the EditorCard wrapper', () => {
+      render(<FilterBuilderPro {...defaultProps} />);
+      expect(screen.getByTestId('editor-card')).toBeInTheDocument();
+    });
+
+    it('renders one empty FilterBuilderItem when embeddableState has no filters', () => {
+      render(<FilterBuilderPro {...defaultProps} />);
+      expect(screen.getByTestId('filter-item-1')).toBeInTheDocument();
+    });
+
+    it('renders a FilterBuilderItem for each filter in embeddableState', () => {
+      const embeddableState: FilterBuilderState = {
+        filters: [makeFilter({ id: 1 }), makeFilter({ id: 2 })],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
+      expect(screen.getByTestId('filter-item-1')).toBeInTheDocument();
+      expect(screen.getByTestId('filter-item-2')).toBeInTheDocument();
+    });
+
+    it('does not render the add-filter (+) button when the first filter has no dimensionOrMeasure', () => {
+      render(<FilterBuilderPro {...defaultProps} />);
+      expect(screen.queryByTestId('new-filter-select')).not.toBeInTheDocument();
+    });
+
+    it('renders the add-filter (+) button when the first filter has a dimensionOrMeasure', () => {
+      const embeddableState: FilterBuilderState = {
+        filters: [makeFilter({ id: 1, dimensionOrMeasure: makeDim('country') })],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
+      expect(screen.getByTestId('new-filter-select')).toBeInTheDocument();
+    });
+
+    it('does not render the clear-all button when no filter is complete', () => {
+      render(<FilterBuilderPro {...defaultProps} />);
+      expect(screen.queryByText('editors.filterBuilder.clearAll')).not.toBeInTheDocument();
+    });
+
+    it('renders the clear-all button when at least one filter is fully set', () => {
+      const embeddableState: FilterBuilderState = {
+        filters: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'France',
+          }),
+        ],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
+      expect(screen.getByText('editors.filterBuilder.clearAll')).toBeInTheDocument();
+    });
+  });
+
+  describe('handleSelectDimensionOrMeasure', () => {
+    it('calls setEmbeddableState with an updated filter when a dimension is selected', () => {
+      const prevState: FilterBuilderState = { filters: [makeFilter({ id: 1 })] };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
+
+      fireEvent.click(screen.getByTestId('select-dim-1'));
+
+      expect(defaultProps.setEmbeddableState).toHaveBeenCalledTimes(1);
+      const next = applyUpdater(defaultProps.setEmbeddableState, prevState);
+      expect(next.filters[0]!.dimensionOrMeasure?.name).toBe('country');
+      expect(next.filters[0]!.operator).toBeNull();
+      expect(next.filters[0]!.value).toBeNull();
+    });
+
+    it('preserves the existing filter id when updating the dimension', () => {
+      const prevState: FilterBuilderState = { filters: [makeFilter({ id: 5 })] };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
+
+      fireEvent.click(screen.getByTestId('select-dim-5'));
+
+      const next = applyUpdater(defaultProps.setEmbeddableState, prevState);
+      expect(next.filters[0]!.id).toBe(5);
+    });
+  });
+
+  describe('handleSelectOperator', () => {
+    it('calls setEmbeddableState with the new operator and resets value', () => {
+      const prevState: FilterBuilderState = {
+        filters: [makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), value: 'old' })],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
+
+      fireEvent.click(screen.getByTestId('select-op-1'));
+
+      const next = applyUpdater(defaultProps.setEmbeddableState, prevState);
+      expect(next.filters[0]!.operator).toBe('is');
+      expect(next.filters[0]!.value).toBeNull();
+    });
+  });
+
+  describe('handleSelectValue', () => {
+    it('calls setEmbeddableState with the new value', () => {
+      const prevState: FilterBuilderState = {
+        filters: [makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), operator: 'is' })],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
+
+      fireEvent.click(screen.getByTestId('select-val-1'));
+
+      const next = applyUpdater(defaultProps.setEmbeddableState, prevState);
+      expect(next.filters[0]!.value).toBe('France');
+    });
+  });
+
+  describe('handleDimensionSearch', () => {
+    it('calls setEmbeddableState with the updated search string', () => {
+      const prevState: FilterBuilderState = { filters: [makeFilter({ id: 1 })] };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
+
+      fireEvent.click(screen.getByTestId('search-1'));
+
+      const next = applyUpdater(defaultProps.setEmbeddableState, prevState);
+      expect(next.filters[0]!.search).toBe('fr');
+    });
+  });
+
+  describe('handleDeleteFilter', () => {
+    it('removes the filter at the given index', () => {
+      const prevState: FilterBuilderState = {
+        filters: [makeFilter({ id: 1 }), makeFilter({ id: 2 })],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
+
+      fireEvent.click(screen.getByTestId('delete-1'));
+
+      const next = applyUpdater(defaultProps.setEmbeddableState, prevState);
+      expect(next.filters).toHaveLength(1);
+      expect(next.filters[0]!.id).toBe(2);
+    });
+
+    it('removes the correct filter when deleting the second of two', () => {
+      const prevState: FilterBuilderState = {
+        filters: [makeFilter({ id: 1 }), makeFilter({ id: 2 })],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
+
+      fireEvent.click(screen.getByTestId('delete-2'));
+
+      const next = applyUpdater(defaultProps.setEmbeddableState, prevState);
+      expect(next.filters).toHaveLength(1);
+      expect(next.filters[0]!.id).toBe(1);
+    });
+  });
+
+  describe('handleAddFilter', () => {
+    it('appends a new filter when an option is selected from the add-filter dropdown', () => {
+      const prevState: FilterBuilderState = {
+        filters: [makeFilter({ id: 3, dimensionOrMeasure: makeDim('country') })],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
+
+      fireEvent.click(screen.getByTestId('add-option-country'));
+
+      const next = applyUpdater(defaultProps.setEmbeddableState, prevState);
+      expect(next.filters).toHaveLength(2);
+      expect(next.filters[1]!.dimensionOrMeasure?.name).toBe('country');
+    });
+
+    it('assigns an id one greater than the last filter id', () => {
+      const prevState: FilterBuilderState = {
+        filters: [makeFilter({ id: 7, dimensionOrMeasure: makeDim('country') })],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
+
+      fireEvent.click(screen.getByTestId('add-option-country'));
+
+      const next = applyUpdater(defaultProps.setEmbeddableState, prevState);
+      expect(next.filters[1]!.id).toBe(8);
+    });
+  });
+
+  describe('handleClearAll', () => {
+    it('resets filters to a single empty filter when clear-all is clicked', () => {
+      const prevState: FilterBuilderState = {
+        filters: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'France',
+          }),
+          makeFilter({
+            id: 2,
+            dimensionOrMeasure: makeDim('revenue', 'number'),
+            operator: 'gte',
+            value: 100,
+          }),
+        ],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
+
+      fireEvent.click(screen.getByText('editors.filterBuilder.clearAll'));
+
+      const next = applyUpdater(defaultProps.setEmbeddableState, prevState);
+      expect(next.filters).toHaveLength(1);
+      expect(next.filters[0]!.dimensionOrMeasure).toBeNull();
+      expect(next.filters[0]!.operator).toBeNull();
+      expect(next.filters[0]!.value).toBeNull();
+    });
+  });
+
+  describe('onChange', () => {
+    it('calls onChange with null when filters are empty', () => {
+      render(<FilterBuilderPro {...defaultProps} />);
+      expect(defaultProps.onChange).toHaveBeenCalledWith(null);
+    });
+
+    it('calls onChange with a filter clause when a complete filter is present', () => {
+      const embeddableState: FilterBuilderState = {
+        filters: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'France',
+          }),
+        ],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
+      expect(defaultProps.onChange).toHaveBeenCalledWith(
+        expect.objectContaining({ operator: 'and', clauses: expect.any(Array) }),
+      );
+    });
+
+    it('does not call onChange again when the filter value has not changed', () => {
+      const embeddableState: FilterBuilderState = {
+        filters: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'France',
+          }),
+        ],
+      };
+      const { rerender } = render(
+        <FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />,
+      );
+      const callCount = defaultProps.onChange.mock.calls.length;
+
+      rerender(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
+
+      expect(defaultProps.onChange).toHaveBeenCalledTimes(callCount);
+    });
+  });
+
+  describe('scroll buttons', () => {
+    it('does not render scroll buttons when scrollRef is at rest (default jsdom)', () => {
+      render(<FilterBuilderPro {...defaultProps} />);
+      expect(screen.queryByTestId('icon-chevron-left')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('icon-chevron-right')).not.toBeInTheDocument();
+    });
+  });
+});
