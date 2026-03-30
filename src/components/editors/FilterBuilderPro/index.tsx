@@ -8,14 +8,12 @@ import { ActionIcon, SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { IconPlus, IconChevronRight, IconChevronLeft } from '@tabler/icons-react';
 import styles from './FilterBuilderPro.module.css';
 import {
-  FilterBuilderAndOrOperator,
   filterBuilderAndOrOperator,
   generateFilterValue,
   getSupportedDimensionsAndMeasures,
 } from './FilterBuilderPro.utils';
 import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
-import { FilterBuilderProAndOrButton } from './components/FilterBuilderProAndOrButton';
 import { resolveI18nProps } from '../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 
@@ -35,9 +33,6 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const { title, description, tooltip } = resolveI18nProps(props);
   const { dimensionsAndMeasures = [], setEmbeddableState, embeddableState, onChange } = props;
 
-  const [andOrOperator, setAndOrOperator] = useState<FilterBuilderAndOrOperator>(
-    filterBuilderAndOrOperator.AND,
-  );
   const [searchNew, setSearchNew] = useState('');
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -138,12 +133,12 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   };
 
   useEffect(() => {
-    const filterValue = generateFilterValue(andOrOperator, filters);
+    const filterValue = generateFilterValue(filterBuilderAndOrOperator.AND, filters);
     const serialized = JSON.stringify(filterValue);
     if (serialized === JSON.stringify(prevFilterValueRef.current)) return;
     prevFilterValueRef.current = filterValue;
     onChange?.(filterValue);
-  }, [filters, andOrOperator]);
+  }, [filters]);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -198,12 +193,13 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
                 onSearchValue={(search) => handleDimensionSearch(index, search)}
                 onDelete={() => handleDeleteFilter(index)}
               />
-              {index < filters.length - 1 && (
+              {/* TODO: in the future allow the AND/OR operator */}
+              {/* {index < filters.length - 1 && (
                 <FilterBuilderProAndOrButton
                   operator={andOrOperator}
                   onChange={(value) => setAndOrOperator(value)}
                 />
-              )}
+              )} */}
             </React.Fragment>
           ))}
         </div>
