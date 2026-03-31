@@ -8,12 +8,19 @@ import styles from '../FilterBuilderPro.module.css';
 import { i18n } from '../../../../theme/i18n/i18n';
 import { operatorNumber, operatorStringBoolean } from '../FilterBuilderPro.utils';
 
-const getOperatorsStringBoolean = () => [
+const getOperatorsString = () => [
   { value: operatorStringBoolean.is, label: i18n.t('editors.filterBuilder.is') },
   { value: operatorStringBoolean.isNot, label: i18n.t('editors.filterBuilder.isNot') },
   { value: operatorStringBoolean.isOneOf, label: i18n.t('editors.filterBuilder.isOneOf') },
   { value: operatorStringBoolean.isNotOneOf, label: i18n.t('editors.filterBuilder.isNotOneOf') },
   { value: operatorStringBoolean.contains, label: i18n.t('editors.filterBuilder.contains') },
+];
+
+const getOperatorsBoolean = () => [
+  { value: operatorStringBoolean.is, label: i18n.t('editors.filterBuilder.is') },
+  { value: operatorStringBoolean.isNot, label: i18n.t('editors.filterBuilder.isNot') },
+  { value: operatorStringBoolean.isOneOf, label: i18n.t('editors.filterBuilder.isOneOf') },
+  { value: operatorStringBoolean.isNotOneOf, label: i18n.t('editors.filterBuilder.isNotOneOf') },
 ];
 
 const getOperatorsNumber = () => [
@@ -43,10 +50,14 @@ const FilterBuilderItemOperatorValueFields = ({
   onSelectValue,
   onSearchValue,
 }: FilterBuilderItemOperatorValueFieldsProps) => {
-  const operatorOptions =
-    dimensionOrMeasure.nativeType === NativeDataType.number
-      ? getOperatorsNumber()
-      : getOperatorsStringBoolean();
+  let operatorOptions;
+  if (dimensionOrMeasure.nativeType === NativeDataType.number) {
+    operatorOptions = getOperatorsNumber();
+  } else if (dimensionOrMeasure.nativeType === NativeDataType.boolean) {
+    operatorOptions = getOperatorsBoolean();
+  } else {
+    operatorOptions = getOperatorsString();
+  }
 
   useEffect(() => {
     if (!filter.operator) {
