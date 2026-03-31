@@ -22,9 +22,9 @@ export const getBarStackedChartProData = (
   const { data = [], dimension, groupDimension, measure } = props;
 
   const uniqueAxis = [...new Set(data.map((d) => d[dimension.name]).filter((d) => d != null))];
-  const axis = props.axisOrder
-    ? props.axisOrder.filter((v) => uniqueAxis.includes(v))
-    : uniqueAxis.sort();
+  uniqueAxis.sort();
+
+  const axis = props.axisOrder ? props.axisOrder.filter((v) => uniqueAxis.includes(v)) : uniqueAxis;
   const groupDimensionName = `${groupDimension.name}${groupDimension.nativeType === CUBE_DIMENSION_TYPE_TIME && groupDimension.inputs?.granularity ? `.${groupDimension.inputs.granularity}` : ''}`;
   const groupBy = [...new Set(data.map((d) => d[groupDimensionName]))].filter((d) => d != null);
 

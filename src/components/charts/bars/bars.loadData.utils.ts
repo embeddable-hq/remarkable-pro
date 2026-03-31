@@ -1,4 +1,11 @@
-import { Dataset, Dimension, LoadDataRequest, Measure, OrderDirection } from '@embeddable.com/core';
+import {
+  DataResponse,
+  Dataset,
+  Dimension,
+  LoadDataRequest,
+  Measure,
+  OrderDirection,
+} from '@embeddable.com/core';
 
 const SORT_DIRECTION_MAP: Record<string, OrderDirection> = {
   Ascending: 'asc',
@@ -53,4 +60,18 @@ export const loadDataMainArgs = (
   }
 
   return base;
+};
+
+const EMPTY_RESULTS = { data: [], isLoading: false } as DataResponse;
+
+export const resolveResults = (
+  needsSortLimit: boolean,
+  axisItemsFresh: boolean,
+  axisItems: string[] | undefined,
+  loadResults: (axisItems?: string[]) => DataResponse,
+): DataResponse | undefined => {
+  if (!needsSortLimit) return loadResults();
+  if (!axisItemsFresh) return undefined;
+  if (!axisItems?.length) return EMPTY_RESULTS;
+  return loadResults(axisItems);
 };

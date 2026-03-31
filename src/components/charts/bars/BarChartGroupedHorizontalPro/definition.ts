@@ -11,7 +11,12 @@ import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
-import { hasSortOrLimit, loadDataTotalsArgs, loadDataMainArgs } from '../bars.loadData.utils';
+import {
+  hasSortOrLimit,
+  loadDataTotalsArgs,
+  loadDataMainArgs,
+  resolveResults,
+} from '../bars.loadData.utils';
 
 const meta = {
   name: 'BarChartGroupedHorizontalPro',
@@ -137,19 +142,17 @@ const props = (
   const axisItemsFresh =
     currentTotalsKey != null &&
     currentTotalsKey === state?.axisItemsKey &&
-    (state?.axisItems?.length ?? 0) > 0;
+    state?.axisItems != null;
 
   return {
     ...inputs,
     yAxis: yAxisWithGranularity,
     setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
     resultsTotals: totalsArgs ? loadData(totalsArgs) : undefined,
-    results: needsSortLimit
-      ? axisItemsFresh
-        ? loadDataResults(inputs, yAxisWithGranularity, state!.axisItems)
-        : undefined
-      : loadDataResults(inputs, yAxisWithGranularity),
-    axisItems: state?.axisItems,
+    results: resolveResults(needsSortLimit, axisItemsFresh, state?.axisItems, (items) =>
+      loadDataResults(inputs, yAxisWithGranularity, items),
+    ),
+    axisItems: axisItemsFresh ? state?.axisItems : undefined,
     currentTotalsKey,
     setAxisItems: (axisItems: string[], key: string) =>
       setState({ ...state, axisItems, axisItemsKey: key }),
