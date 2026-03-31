@@ -37,7 +37,7 @@ export const loadDataMainArgs = (
   groupBy: Dimension,
   measure: Measure,
   maxResults: number,
-  topAxisValues?: string[],
+  axisItems?: string[],
 ): LoadDataRequest => {
   const base: LoadDataRequest = {
     limit: maxResults,
@@ -45,10 +45,10 @@ export const loadDataMainArgs = (
     select: [axis, groupBy, measure],
   };
 
-  if (topAxisValues?.length) {
+  if (axisItems?.length) {
     return {
       ...base,
-      filters: [{ property: axis, operator: 'equals', value: topAxisValues }],
+      filters: [{ property: axis, operator: 'equals', value: axisItems }],
     };
   }
 

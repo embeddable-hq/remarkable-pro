@@ -127,9 +127,10 @@ const props = (
     inputs.limitAxisItems,
   );
 
-  const currentTotalsKey = needsSortLimit
-    ? JSON.stringify(loadDataResultsTotalsArgs(inputs, xAxisWithGranularity))
+  const totalsArgs = needsSortLimit
+    ? loadDataResultsTotalsArgs(inputs, xAxisWithGranularity)
     : undefined;
+  const currentTotalsKey = totalsArgs ? JSON.stringify(totalsArgs) : undefined;
 
   const axisItemsFresh =
     currentTotalsKey != null &&
@@ -140,7 +141,7 @@ const props = (
     ...inputs,
     xAxis: xAxisWithGranularity,
     setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
-    resultsTotals: needsSortLimit ? loadDataResultsTotals(inputs, xAxisWithGranularity) : undefined,
+    resultsTotals: totalsArgs ? loadData(totalsArgs) : undefined,
     results: needsSortLimit
       ? axisItemsFresh
         ? loadDataResults(inputs, xAxisWithGranularity, state!.axisItems)

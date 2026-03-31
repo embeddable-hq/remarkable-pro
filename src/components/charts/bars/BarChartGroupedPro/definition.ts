@@ -77,7 +77,7 @@ const preview = definePreview(Component, previewConfig);
 const loadDataResultsArgs = (
   inputs: Inputs<typeof meta>,
   xAxis?: Dimension,
-  topAxisValues?: string[],
+  axisItems?: string[],
 ): LoadDataRequest =>
   loadDataMainArgs(
     inputs.dataset,
@@ -85,14 +85,14 @@ const loadDataResultsArgs = (
     inputs.groupBy,
     inputs.measure,
     inputs.maxResults,
-    topAxisValues,
+    axisItems,
   );
 
 const loadDataResults = (
   inputs: Inputs<typeof meta>,
   xAxis: Dimension,
-  topAxisValues?: string[],
-): DataResponse => loadData(loadDataResultsArgs(inputs, xAxis, topAxisValues));
+  axisItems?: string[],
+): DataResponse => loadData(loadDataResultsArgs(inputs, xAxis, axisItems));
 
 const loadDataResultsTotalsArgs = (
   inputs: Inputs<typeof meta>,
@@ -126,9 +126,10 @@ const props = (
     inputs.limitAxisItems,
   );
 
-  const currentTotalsKey = needsSortLimit
-    ? JSON.stringify(loadDataResultsTotalsArgs(inputs, xAxisWithGranularity))
+  const totalsArgs = needsSortLimit
+    ? loadDataResultsTotalsArgs(inputs, xAxisWithGranularity)
     : undefined;
+  const currentTotalsKey = totalsArgs ? JSON.stringify(totalsArgs) : undefined;
 
   const axisItemsFresh =
     currentTotalsKey != null &&
@@ -139,7 +140,7 @@ const props = (
     ...inputs,
     xAxis: xAxisWithGranularity,
     setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
-    resultsTotals: needsSortLimit ? loadDataResultsTotals(inputs, xAxisWithGranularity) : undefined,
+    resultsTotals: totalsArgs ? loadData(totalsArgs) : undefined,
     results: needsSortLimit
       ? axisItemsFresh
         ? loadDataResults(inputs, xAxisWithGranularity, state!.axisItems)
