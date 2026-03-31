@@ -9,11 +9,16 @@ import { mergician } from 'mergician';
 import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
+import { useSyncAxisItems } from '../bars.hooks';
 
 export type BarChartStackedHorizontalProProps = {
   groupBy: Dimension;
   measure: Measure;
-  results: DataResponse;
+  results?: DataResponse;
+  resultsTotals?: DataResponse;
+  axisItems?: string[];
+  currentTotalsKey?: string;
+  setAxisItems?: (values: string[], key: string) => void;
   reverseYAxis?: boolean;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
@@ -55,8 +60,17 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
     onBarClicked,
   } = props;
 
+  useSyncAxisItems(
+    props.resultsTotals,
+    yAxis,
+    props.setAxisItems ?? (() => {}),
+    props.currentTotalsKey,
+  );
+
+  const resultsResponse = props.results ?? ({ isLoading: true, data: [] } as DataResponse);
+
   const results = useFillGaps({
-    results: props.results,
+    results: resultsResponse,
     dimension: props.yAxis,
   });
 
@@ -66,6 +80,7 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
       dimension: yAxis,
       groupDimension: groupBy,
       measure,
+      axisOrder: props.axisItems,
     },
     theme,
   );

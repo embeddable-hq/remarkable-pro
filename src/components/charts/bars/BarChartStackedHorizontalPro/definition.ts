@@ -11,6 +11,7 @@ import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
+import { hasSortOrLimit, loadDataTotalsArgs, loadDataMainArgs } from '../bars.loadData.utils';
 
 const meta = {
   name: 'BarChartStackedHorizontalPro',
@@ -29,6 +30,8 @@ const meta = {
     inputs.showTooltips,
     { ...inputs.showValueLabels, defaultValue: false },
     inputs.showLogarithmicScale,
+    inputs.sortByAxisTotal,
+    inputs.limitAxisItems,
     inputs.xAxisLabel,
     inputs.yAxisLabel,
     inputs.reverseYAxis,
@@ -58,6 +61,8 @@ const meta = {
 
 export type BarChartStackedHorizontalProState = {
   granularity?: Granularity;
+  axisItems?: string[];
+  axisItemsKey?: string;
 };
 
 const previewConfig = {
@@ -70,14 +75,40 @@ const previewConfig = {
 
 const preview = definePreview(Component, previewConfig);
 
-const loadDataResultsArgs = (inputs: Inputs<typeof meta>, yAxis?: Dimension): LoadDataRequest => ({
-  limit: inputs.maxResults,
-  from: inputs.dataset,
-  select: [yAxis ?? inputs.yAxis, inputs.groupBy, inputs.measure],
-});
+const loadDataResultsArgs = (
+  inputs: Inputs<typeof meta>,
+  yAxis?: Dimension,
+  topAxisValues?: string[],
+): LoadDataRequest =>
+  loadDataMainArgs(
+    inputs.dataset,
+    yAxis ?? inputs.yAxis,
+    inputs.groupBy,
+    inputs.measure,
+    inputs.maxResults,
+    topAxisValues,
+  );
 
-const loadDataResults = (inputs: Inputs<typeof meta>, yAxis: Dimension): DataResponse =>
-  loadData(loadDataResultsArgs(inputs, yAxis));
+const loadDataResults = (
+  inputs: Inputs<typeof meta>,
+  yAxis: Dimension,
+  topAxisValues?: string[],
+): DataResponse => loadData(loadDataResultsArgs(inputs, yAxis, topAxisValues));
+
+const loadDataResultsTotalsArgs = (
+  inputs: Inputs<typeof meta>,
+  yAxis: Dimension,
+): LoadDataRequest =>
+  loadDataTotalsArgs(
+    inputs.dataset,
+    yAxis,
+    inputs.measure,
+    inputs.sortByAxisTotal as string | undefined,
+    inputs.limitAxisItems,
+  );
+
+const loadDataResultsTotals = (inputs: Inputs<typeof meta>, yAxis: Dimension): DataResponse =>
+  loadData(loadDataResultsTotalsArgs(inputs, yAxis));
 
 const events = {
   onBarClicked: (value: { axisDimensionValue?: string; groupingDimensionValue?: string }) => ({
@@ -94,12 +125,34 @@ const props = (
   ],
 ) => {
   const yAxisWithGranularity = getDimensionWithGranularity(inputs.yAxis, state?.granularity);
+  const needsSortLimit = hasSortOrLimit(
+    inputs.sortByAxisTotal as string | undefined,
+    inputs.limitAxisItems,
+  );
+
+  const currentTotalsKey = needsSortLimit
+    ? JSON.stringify(loadDataResultsTotalsArgs(inputs, yAxisWithGranularity))
+    : undefined;
+
+  const axisItemsFresh =
+    currentTotalsKey != null &&
+    currentTotalsKey === state?.axisItemsKey &&
+    (state?.axisItems?.length ?? 0) > 0;
 
   return {
     ...inputs,
     yAxis: yAxisWithGranularity,
-    setGranularity: (granularity: Granularity) => setState({ granularity }),
-    results: loadDataResults(inputs, yAxisWithGranularity),
+    setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
+    resultsTotals: needsSortLimit ? loadDataResultsTotals(inputs, yAxisWithGranularity) : undefined,
+    results: needsSortLimit
+      ? axisItemsFresh
+        ? loadDataResults(inputs, yAxisWithGranularity, state!.axisItems)
+        : undefined
+      : loadDataResults(inputs, yAxisWithGranularity),
+    axisItems: state?.axisItems,
+    currentTotalsKey,
+    setAxisItems: (axisItems: string[], key: string) =>
+      setState({ ...state, axisItems, axisItemsKey: key }),
   };
 };
 
@@ -115,5 +168,9 @@ export const barChartStackedHorizontalPro = {
   results: {
     loadDataArgs: loadDataResultsArgs,
     loadData: loadDataResults,
+  },
+  resultsTotals: {
+    loadDataArgs: loadDataResultsTotalsArgs,
+    loadData: loadDataResultsTotals,
   },
 } as const;

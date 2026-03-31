@@ -6,6 +6,7 @@ import {
   timeDimensionWithGranularitySelectFieldSubInputs,
 } from './component.subinputs.constants';
 import ComparisonPeriodType from './types/ComparisonPeriod.type.emb';
+import SortDirectionType from './types/SortDirection.type.emb';
 import MarkdownType from '../editors/MarkdownEditor/Markdown.type.emb';
 
 /* -------------------- */
@@ -416,6 +417,21 @@ const yAxisMaxItems = {
   category: 'Axes Settings',
 } as const;
 
+const sortByAxisTotal = {
+  name: 'sortByAxisTotal',
+  type: SortDirectionType,
+  label: 'Sort by axis total',
+  category: 'Component Settings',
+} as const;
+
+const limitAxisItems = {
+  name: 'limitAxisItems',
+  type: 'number',
+  label: 'Limit axis items',
+  description: 'Load only the top or bottom categories, based on group totals',
+  category: 'Component Settings',
+} as const;
+
 const markdown = {
   name: 'markdown',
   type: MarkdownType,
@@ -472,6 +488,8 @@ export const inputs = {
   xAxisRangeMax,
   xAxisMaxItems,
   yAxisMaxItems,
+  sortByAxisTotal,
+  limitAxisItems,
   granularity,
   granularities,
   markdown,

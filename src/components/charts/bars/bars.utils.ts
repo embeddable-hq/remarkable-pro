@@ -14,13 +14,17 @@ export const getBarStackedChartProData = (
     dimension: Dimension;
     groupDimension: Dimension;
     measure: Measure;
+    axisOrder?: string[];
   },
   theme: Theme,
 ): ChartData<'bar'> => {
   const themeFormatter = getThemeFormatter(theme);
   const { data = [], dimension, groupDimension, measure } = props;
 
-  const axis = [...new Set(data.map((d) => d[dimension.name]).filter((d) => d != null))].sort();
+  const uniqueAxis = [...new Set(data.map((d) => d[dimension.name]).filter((d) => d != null))];
+  const axis = props.axisOrder
+    ? props.axisOrder.filter((v) => uniqueAxis.includes(v))
+    : uniqueAxis.sort();
   const groupDimensionName = `${groupDimension.name}${groupDimension.nativeType === CUBE_DIMENSION_TYPE_TIME && groupDimension.inputs?.granularity ? `.${groupDimension.inputs.granularity}` : ''}`;
   const groupBy = [...new Set(data.map((d) => d[groupDimensionName]))].filter((d) => d != null);
 

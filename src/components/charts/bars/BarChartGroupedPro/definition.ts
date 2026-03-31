@@ -11,6 +11,7 @@ import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
+import { hasSortOrLimit, loadDataTotalsArgs, loadDataMainArgs } from '../bars.loadData.utils';
 
 const meta = {
   name: 'BarChartGroupedPro',
@@ -29,6 +30,8 @@ const meta = {
     inputs.showTooltips,
     { ...inputs.showValueLabels, defaultValue: false },
     inputs.showLogarithmicScale,
+    inputs.sortByAxisTotal,
+    inputs.limitAxisItems,
     inputs.xAxisLabel,
     inputs.yAxisLabel,
     inputs.reverseXAxis,
@@ -57,6 +60,8 @@ const meta = {
 
 export type BarChartGroupedProState = {
   granularity?: Granularity;
+  axisItems?: string[];
+  axisItemsKey?: string;
 };
 
 const previewConfig = {
@@ -69,14 +74,40 @@ const previewConfig = {
 
 const preview = definePreview(Component, previewConfig);
 
-const loadDataResultsArgs = (inputs: Inputs<typeof meta>, xAxis?: Dimension): LoadDataRequest => ({
-  limit: inputs.maxResults,
-  from: inputs.dataset,
-  select: [xAxis ?? inputs.xAxis, inputs.groupBy, inputs.measure],
-});
+const loadDataResultsArgs = (
+  inputs: Inputs<typeof meta>,
+  xAxis?: Dimension,
+  topAxisValues?: string[],
+): LoadDataRequest =>
+  loadDataMainArgs(
+    inputs.dataset,
+    xAxis ?? inputs.xAxis,
+    inputs.groupBy,
+    inputs.measure,
+    inputs.maxResults,
+    topAxisValues,
+  );
 
-const loadDataResults = (inputs: Inputs<typeof meta>, xAxis: Dimension): DataResponse =>
-  loadData(loadDataResultsArgs(inputs, xAxis));
+const loadDataResults = (
+  inputs: Inputs<typeof meta>,
+  xAxis: Dimension,
+  topAxisValues?: string[],
+): DataResponse => loadData(loadDataResultsArgs(inputs, xAxis, topAxisValues));
+
+const loadDataResultsTotalsArgs = (
+  inputs: Inputs<typeof meta>,
+  xAxis: Dimension,
+): LoadDataRequest =>
+  loadDataTotalsArgs(
+    inputs.dataset,
+    xAxis,
+    inputs.measure,
+    inputs.sortByAxisTotal as string | undefined,
+    inputs.limitAxisItems,
+  );
+
+const loadDataResultsTotals = (inputs: Inputs<typeof meta>, xAxis: Dimension): DataResponse =>
+  loadData(loadDataResultsTotalsArgs(inputs, xAxis));
 
 const events = {
   onBarClicked: (value: { axisDimensionValue?: string; groupingDimensionValue?: string }) => ({
@@ -90,12 +121,34 @@ const props = (
   [state, setState]: [BarChartGroupedProState, (state: BarChartGroupedProState) => void],
 ) => {
   const xAxisWithGranularity = getDimensionWithGranularity(inputs.xAxis, state?.granularity);
+  const needsSortLimit = hasSortOrLimit(
+    inputs.sortByAxisTotal as string | undefined,
+    inputs.limitAxisItems,
+  );
+
+  const currentTotalsKey = needsSortLimit
+    ? JSON.stringify(loadDataResultsTotalsArgs(inputs, xAxisWithGranularity))
+    : undefined;
+
+  const axisItemsFresh =
+    currentTotalsKey != null &&
+    currentTotalsKey === state?.axisItemsKey &&
+    (state?.axisItems?.length ?? 0) > 0;
 
   return {
     ...inputs,
     xAxis: xAxisWithGranularity,
-    setGranularity: (granularity: Granularity) => setState({ granularity }),
-    results: loadDataResults(inputs, xAxisWithGranularity),
+    setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
+    resultsTotals: needsSortLimit ? loadDataResultsTotals(inputs, xAxisWithGranularity) : undefined,
+    results: needsSortLimit
+      ? axisItemsFresh
+        ? loadDataResults(inputs, xAxisWithGranularity, state!.axisItems)
+        : undefined
+      : loadDataResults(inputs, xAxisWithGranularity),
+    axisItems: state?.axisItems,
+    currentTotalsKey,
+    setAxisItems: (axisItems: string[], key: string) =>
+      setState({ ...state, axisItems, axisItemsKey: key }),
   };
 };
 
@@ -111,5 +164,9 @@ export const barChartGroupedPro = {
   results: {
     loadDataArgs: loadDataResultsArgs,
     loadData: loadDataResults,
+  },
+  resultsTotals: {
+    loadDataArgs: loadDataResultsTotalsArgs,
+    loadData: loadDataResultsTotals,
   },
 } as const;
