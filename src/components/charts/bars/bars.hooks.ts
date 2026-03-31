@@ -15,5 +15,6 @@ export function useSyncAxisItems(
       .filter((v): v is string => v != null);
 
     setAxisItems(values, currentTotalsKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setAxisItems is recreated each render; other deps always change together with resultsTotals
   }, [resultsTotals]);
 }

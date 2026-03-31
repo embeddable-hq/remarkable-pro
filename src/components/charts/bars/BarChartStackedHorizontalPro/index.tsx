@@ -67,7 +67,13 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
     props.currentTotalsKey,
   );
 
-  const resultsResponse = props.results ?? ({ isLoading: true, data: [] } as DataResponse);
+  const resultsResponse =
+    props.results ??
+    ({
+      isLoading: !props.resultsTotals?.error,
+      data: [],
+      error: props.resultsTotals?.error,
+    } as DataResponse);
 
   const results = useFillGaps({
     results: resultsResponse,
