@@ -1,6 +1,6 @@
 import { DataResponse, DimensionOrMeasure } from '@embeddable.com/core';
 import { useTheme } from '@embeddable.com/react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Theme } from '../../../theme/theme.types';
 import FilterBuilderItem from './components/FilterBuilderItem';
 import { FilterBuilderFilter, FilterBuilderState } from './definition';
@@ -38,12 +38,12 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const updateScrollState = () => {
+  const updateScrollState = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 1);
     setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
-    setCanScrollLeft(el.scrollLeft > 0);
-  };
+  }, []);
 
   const handleScrollRight = () => {
     scrollRef.current?.scrollBy({ left: 200, behavior: 'smooth' });
@@ -52,6 +52,19 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const handleScrollLeft = () => {
     scrollRef.current?.scrollBy({ left: -200, behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(updateScrollState);
+    ro.observe(el);
+    el.addEventListener('scroll', updateScrollState);
+    updateScrollState();
+    return () => {
+      ro.disconnect();
+      el.removeEventListener('scroll', updateScrollState);
+    };
+  }, [updateScrollState, embeddableState?.filters]);
 
   const prevFilterValueRef = useRef<unknown>(undefined);
 
@@ -63,6 +76,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   useEffect(() => {
     setTimeout(() => {
       scrollRef.current?.scrollTo({ left: scrollRef.current.scrollWidth, behavior: 'smooth' });
+      updateScrollState();
     }, 100);
   }, [lastFilterKey]);
 
@@ -140,19 +154,6 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     onChange?.(filterValue);
   }, [filters]);
 
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    updateScrollState();
-    el.addEventListener('scroll', updateScrollState);
-    const ro = new ResizeObserver(updateScrollState);
-    ro.observe(el);
-    return () => {
-      el.removeEventListener('scroll', updateScrollState);
-      ro.disconnect();
-    };
-  }, []);
-
   const supportedDimensionsAndMeasures = getSupportedDimensionsAndMeasures(dimensionsAndMeasures);
 
   const dimensionOptionsNew = getDimensionAndMeasureOptions({
@@ -193,22 +194,15 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
                 onSearchValue={(search) => handleDimensionSearch(index, search)}
                 onDelete={() => handleDeleteFilter(index)}
               />
-              {/* TODO: in the future allow the AND/OR operator */}
-              {/* {index < filters.length - 1 && (
-                <FilterBuilderProAndOrButton
-                  operator={andOrOperator}
-                  onChange={(value) => setAndOrOperator(value)}
-                />
-              )} */}
             </React.Fragment>
           ))}
         </div>
-
         {canScrollRight && (
           <button className={styles.scrollRightButton} onClick={handleScrollRight}>
             <IconChevronRight />
           </button>
         )}
+
         {filters[0]?.dimensionOrMeasure && (
           <SingleSelectField
             triggerComponent={<ActionIcon icon={IconPlus} />}

@@ -102,6 +102,7 @@ const stylesRemarkablePro = {
   '--em-filterbuilder-value-input-color': 'var(--em-sem-text--neutral)',
   '--em-filterbuilder-value-input-min-width': 'var(--em-core-size--1200)',
   '--em-filterbuilder-value-input-background': 'var(--em-sem-background--light)',
+  '--em-filterbuilder-value-input-background--hover': 'var(--em-sem-background--subtle)',
   '--em-filterbuilder-andor-button-height': 'var(--em-core-size--0800)',
   '--em-filterbuilder-andor-button-border-width': 'var(--em-core-border-width--000)',
   '--em-filterbuilder-andor-button-border-color': 'rgb(255 255 255 / 0%)',

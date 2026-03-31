@@ -8,7 +8,7 @@ const meta = {
   name: 'FilterBuilderPro',
   label: 'Filter Builder',
   category: 'Filters',
-  defaultWidth: 300,
+  defaultWidth: 600,
   defaultHeight: 120,
   inputs: [
     inputs.dataset,

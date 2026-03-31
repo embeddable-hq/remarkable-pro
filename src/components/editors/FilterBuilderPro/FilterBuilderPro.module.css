@@ -16,6 +16,7 @@
   gap: var(--em-filterbuilder-gap, 0.75rem);
   overflow-x: auto;
   scrollbar-width: none;
+  position: relative;
 }
 
 .scroll::-webkit-scrollbar {
@@ -204,6 +205,8 @@
 }
 
 .scrollRightButton {
+  flex-shrink: 0;
+  margin-left: calc(-1 * var(--em-filterbuilder-gap, 0.75rem));
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
@@ -235,6 +238,8 @@
 }
 
 .scrollLeftButton {
+  flex-shrink: 0;
+  margin-right: calc(-1 * var(--em-filterbuilder-gap, 0.75rem));
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
