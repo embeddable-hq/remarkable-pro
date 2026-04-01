@@ -7,55 +7,53 @@ import {
   OrderDirection,
 } from '@embeddable.com/core';
 
-const SORT_DIRECTION_MAP: Record<string, OrderDirection> = {
-  Ascending: 'asc',
-  Descending: 'desc',
+export const toOrderDirection = (value?: string): 'asc' | 'desc' | undefined => {
+  if (value === 'Ascending') return 'asc';
+  if (value === 'Descending') return 'desc';
+  return undefined;
 };
 
-export const parseSortDirection = (value?: string): OrderDirection | undefined =>
-  value ? SORT_DIRECTION_MAP[value] : undefined;
+export const getLimit = (limit?: number): number | undefined =>
+  typeof limit === 'number' && Number.isInteger(limit) && limit > 0 ? limit : undefined;
 
-export const isValidLimit = (limit?: number): limit is number =>
-  typeof limit === 'number' && Number.isInteger(limit) && limit > 0;
+export const shouldGetTopItems = (sortDirection?: string, limit?: number): boolean =>
+  toOrderDirection(sortDirection) != null || getLimit(limit) != null;
 
-export const hasSortOrLimit = (sortByAxisTotal?: string, limitAxisItems?: number): boolean =>
-  !!parseSortDirection(sortByAxisTotal) || isValidLimit(limitAxisItems);
-
-export const loadDataTotalsArgs = (
-  dataset: Dataset,
-  axis: Dimension,
-  measure: Measure,
-  sortByAxisTotal?: string,
-  limitAxisItems?: number,
-): LoadDataRequest => {
-  const direction = parseSortDirection(sortByAxisTotal) ?? 'desc';
+export const buildAxisOrderArgs = (opts: {
+  dataset: Dataset;
+  axis: Dimension;
+  measure: Measure;
+  sortDirection?: string;
+  limit?: number;
+}): LoadDataRequest => {
+  const direction: OrderDirection = toOrderDirection(opts.sortDirection) ?? 'desc';
 
   return {
-    from: dataset,
-    select: [axis, measure],
-    orderBy: [{ property: measure, direction }],
-    limit: isValidLimit(limitAxisItems) ? limitAxisItems : undefined,
+    from: opts.dataset,
+    select: [opts.axis, opts.measure],
+    orderBy: [{ property: opts.measure, direction }],
+    limit: getLimit(opts.limit),
   };
 };
 
-export const loadDataMainArgs = (
-  dataset: Dataset,
-  axis: Dimension,
-  groupBy: Dimension,
-  measure: Measure,
-  maxResults: number,
-  axisItems?: string[],
-): LoadDataRequest => {
+export const buildResultsArgs = (opts: {
+  dataset: Dataset;
+  axis: Dimension;
+  groupBy: Dimension;
+  measure: Measure;
+  maxResults: number;
+  axisOrder?: string[];
+}): LoadDataRequest => {
   const base: LoadDataRequest = {
-    limit: maxResults,
-    from: dataset,
-    select: [axis, groupBy, measure],
+    limit: opts.maxResults,
+    from: opts.dataset,
+    select: [opts.axis, opts.groupBy, opts.measure],
   };
 
-  if (axisItems?.length) {
+  if (opts.axisOrder?.length) {
     return {
       ...base,
-      filters: [{ property: axis, operator: 'equals', value: axisItems }],
+      filters: [{ property: opts.axis, operator: 'equals', value: opts.axisOrder }],
     };
   }
 
@@ -65,13 +63,13 @@ export const loadDataMainArgs = (
 const EMPTY_RESULTS = { data: [], isLoading: false } as DataResponse;
 
 export const resolveResults = (
-  needsSortLimit: boolean,
-  axisItemsFresh: boolean,
-  axisItems: string[] | undefined,
-  loadResults: (axisItems?: string[]) => DataResponse,
+  needsTopItems: boolean,
+  axisOrderFresh: boolean,
+  axisOrder: string[] | undefined,
+  loadResults: (axisOrder?: string[]) => DataResponse,
 ): DataResponse | undefined => {
-  if (!needsSortLimit) return loadResults();
-  if (!axisItemsFresh) return undefined;
-  if (!axisItems?.length) return EMPTY_RESULTS;
-  return loadResults(axisItems);
+  if (!needsTopItems) return loadResults();
+  if (!axisOrderFresh) return undefined;
+  if (!axisOrder?.length) return EMPTY_RESULTS;
+  return loadResults(axisOrder);
 };

@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import type { DataResponse, Dimension } from '@embeddable.com/core';
-import { useSyncAxisItems } from './bars.hooks';
+import { useUpdateAxisOrder } from './bars.hooks';
 
 const makeDimension = (name = 'country'): Dimension =>
   ({ name, title: 'Country', nativeType: 'string', inputs: {} }) as unknown as Dimension;
@@ -10,97 +10,165 @@ const makeDataResponse = (
   isLoading: boolean,
 ): DataResponse => ({ data, isLoading, error: undefined }) as unknown as DataResponse;
 
-describe('useSyncAxisItems', () => {
-  it('calls setAxisItems with values and key when totals data arrives', () => {
-    const setAxisItems = vi.fn();
-    const totals = makeDataResponse(
+describe('useUpdateAxisOrder', () => {
+  it('calls setAxisOrder with values and key when axis order data arrives', () => {
+    const setAxisOrder = vi.fn();
+    const resultsAxisOrder = makeDataResponse(
       [{ country: 'FR' }, { country: 'DE' }, { country: 'PL' }],
       false,
     );
 
-    renderHook(() => useSyncAxisItems(totals, makeDimension(), setAxisItems, 'key-1'));
+    renderHook(() =>
+      useUpdateAxisOrder({
+        resultsAxisOrder,
+        axisDimension: makeDimension(),
+        setAxisOrder,
+        currentAxisOrderKey: 'key-1',
+      }),
+    );
 
-    expect(setAxisItems).toHaveBeenCalledWith(['FR', 'DE', 'PL'], 'key-1');
+    expect(setAxisOrder).toHaveBeenCalledWith(['FR', 'DE', 'PL'], 'key-1');
   });
 
-  it('does not call setAxisItems while still loading', () => {
-    const setAxisItems = vi.fn();
-    const totals = makeDataResponse(undefined, true);
+  it('does not call setAxisOrder while still loading', () => {
+    const setAxisOrder = vi.fn();
+    const resultsAxisOrder = makeDataResponse(undefined, true);
 
-    renderHook(() => useSyncAxisItems(totals, makeDimension(), setAxisItems, 'key-1'));
+    renderHook(() =>
+      useUpdateAxisOrder({
+        resultsAxisOrder,
+        axisDimension: makeDimension(),
+        setAxisOrder,
+        currentAxisOrderKey: 'key-1',
+      }),
+    );
 
-    expect(setAxisItems).not.toHaveBeenCalled();
+    expect(setAxisOrder).not.toHaveBeenCalled();
   });
 
-  it('does not call setAxisItems when resultsTotals is undefined', () => {
-    const setAxisItems = vi.fn();
+  it('does not call setAxisOrder when resultsAxisOrder is undefined', () => {
+    const setAxisOrder = vi.fn();
 
-    renderHook(() => useSyncAxisItems(undefined, makeDimension(), setAxisItems, undefined));
+    renderHook(() =>
+      useUpdateAxisOrder({
+        resultsAxisOrder: undefined,
+        axisDimension: makeDimension(),
+        setAxisOrder,
+        currentAxisOrderKey: undefined,
+      }),
+    );
 
-    expect(setAxisItems).not.toHaveBeenCalled();
+    expect(setAxisOrder).not.toHaveBeenCalled();
   });
 
-  it('does not call setAxisItems when currentTotalsKey is undefined', () => {
-    const setAxisItems = vi.fn();
-    const totals = makeDataResponse([{ country: 'FR' }], false);
+  it('does not call setAxisOrder when currentAxisOrderKey is undefined', () => {
+    const setAxisOrder = vi.fn();
+    const resultsAxisOrder = makeDataResponse([{ country: 'FR' }], false);
 
-    renderHook(() => useSyncAxisItems(totals, makeDimension(), setAxisItems, undefined));
+    renderHook(() =>
+      useUpdateAxisOrder({
+        resultsAxisOrder,
+        axisDimension: makeDimension(),
+        setAxisOrder,
+        currentAxisOrderKey: undefined,
+      }),
+    );
 
-    expect(setAxisItems).not.toHaveBeenCalled();
+    expect(setAxisOrder).not.toHaveBeenCalled();
+  });
+
+  it('does not call when setAxisOrder is undefined (nullable)', () => {
+    const resultsAxisOrder = makeDataResponse([{ country: 'FR' }], false);
+
+    renderHook(() =>
+      useUpdateAxisOrder({
+        resultsAxisOrder,
+        axisDimension: makeDimension(),
+        setAxisOrder: undefined,
+        currentAxisOrderKey: 'key-1',
+      }),
+    );
   });
 
   it('filters out null values from axis data', () => {
-    const setAxisItems = vi.fn();
-    const totals = makeDataResponse(
+    const setAxisOrder = vi.fn();
+    const resultsAxisOrder = makeDataResponse(
       [{ country: 'FR' }, { country: null }, { country: 'DE' }],
       false,
     );
 
-    renderHook(() => useSyncAxisItems(totals, makeDimension(), setAxisItems, 'key-1'));
+    renderHook(() =>
+      useUpdateAxisOrder({
+        resultsAxisOrder,
+        axisDimension: makeDimension(),
+        setAxisOrder,
+        currentAxisOrderKey: 'key-1',
+      }),
+    );
 
-    expect(setAxisItems).toHaveBeenCalledWith(['FR', 'DE'], 'key-1');
+    expect(setAxisOrder).toHaveBeenCalledWith(['FR', 'DE'], 'key-1');
   });
 
   it('handles empty data array', () => {
-    const setAxisItems = vi.fn();
-    const totals = makeDataResponse([], false);
+    const setAxisOrder = vi.fn();
+    const resultsAxisOrder = makeDataResponse([], false);
 
-    renderHook(() => useSyncAxisItems(totals, makeDimension(), setAxisItems, 'key-1'));
+    renderHook(() =>
+      useUpdateAxisOrder({
+        resultsAxisOrder,
+        axisDimension: makeDimension(),
+        setAxisOrder,
+        currentAxisOrderKey: 'key-1',
+      }),
+    );
 
-    expect(setAxisItems).toHaveBeenCalledWith([], 'key-1');
+    expect(setAxisOrder).toHaveBeenCalledWith([], 'key-1');
   });
 
-  it('updates when totals data changes between renders', () => {
-    const setAxisItems = vi.fn();
+  it('updates when axis order data changes between renders', () => {
+    const setAxisOrder = vi.fn();
     const dim = makeDimension();
 
     const { rerender } = renderHook(
-      ({ totals, key }) => useSyncAxisItems(totals, dim, setAxisItems, key),
+      ({ resultsAxisOrder, key }) =>
+        useUpdateAxisOrder({
+          resultsAxisOrder,
+          axisDimension: dim,
+          setAxisOrder,
+          currentAxisOrderKey: key,
+        }),
       {
         initialProps: {
-          totals: makeDataResponse([{ country: 'FR' }], false),
+          resultsAxisOrder: makeDataResponse([{ country: 'FR' }], false),
           key: 'key-1',
         },
       },
     );
 
-    expect(setAxisItems).toHaveBeenCalledWith(['FR'], 'key-1');
-    setAxisItems.mockClear();
+    expect(setAxisOrder).toHaveBeenCalledWith(['FR'], 'key-1');
+    setAxisOrder.mockClear();
 
     rerender({
-      totals: makeDataResponse([{ country: 'DE' }, { country: 'PL' }], false),
+      resultsAxisOrder: makeDataResponse([{ country: 'DE' }, { country: 'PL' }], false),
       key: 'key-2',
     });
 
-    expect(setAxisItems).toHaveBeenCalledWith(['DE', 'PL'], 'key-2');
+    expect(setAxisOrder).toHaveBeenCalledWith(['DE', 'PL'], 'key-2');
   });
 
-  it('does not call setAxisItems when data is undefined but not loading', () => {
-    const setAxisItems = vi.fn();
-    const totals = makeDataResponse(undefined, false);
+  it('does not call setAxisOrder when data is undefined but not loading', () => {
+    const setAxisOrder = vi.fn();
+    const resultsAxisOrder = makeDataResponse(undefined, false);
 
-    renderHook(() => useSyncAxisItems(totals, makeDimension(), setAxisItems, 'key-1'));
+    renderHook(() =>
+      useUpdateAxisOrder({
+        resultsAxisOrder,
+        axisDimension: makeDimension(),
+        setAxisOrder,
+        currentAxisOrderKey: 'key-1',
+      }),
+    );
 
-    expect(setAxisItems).not.toHaveBeenCalled();
+    expect(setAxisOrder).not.toHaveBeenCalled();
   });
 });

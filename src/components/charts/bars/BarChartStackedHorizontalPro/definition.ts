@@ -12,9 +12,9 @@ import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 import {
-  hasSortOrLimit,
-  loadDataTotalsArgs,
-  loadDataMainArgs,
+  shouldGetTopItems,
+  buildAxisOrderArgs,
+  buildResultsArgs,
   resolveResults,
 } from '../bars.loadData.utils';
 
@@ -66,8 +66,8 @@ const meta = {
 
 export type BarChartStackedHorizontalProState = {
   granularity?: Granularity;
-  axisItems?: string[];
-  axisItemsKey?: string;
+  axisOrder?: string[];
+  axisOrderKey?: string;
 };
 
 const previewConfig = {
@@ -83,37 +83,37 @@ const preview = definePreview(Component, previewConfig);
 const loadDataResultsArgs = (
   inputs: Inputs<typeof meta>,
   yAxis?: Dimension,
-  axisItems?: string[],
+  axisOrder?: string[],
 ): LoadDataRequest =>
-  loadDataMainArgs(
-    inputs.dataset,
-    yAxis ?? inputs.yAxis,
-    inputs.groupBy,
-    inputs.measure,
-    inputs.maxResults,
-    axisItems,
-  );
+  buildResultsArgs({
+    dataset: inputs.dataset,
+    axis: yAxis ?? inputs.yAxis,
+    groupBy: inputs.groupBy,
+    measure: inputs.measure,
+    maxResults: inputs.maxResults,
+    axisOrder,
+  });
 
 const loadDataResults = (
   inputs: Inputs<typeof meta>,
   yAxis: Dimension,
-  axisItems?: string[],
-): DataResponse => loadData(loadDataResultsArgs(inputs, yAxis, axisItems));
+  axisOrder?: string[],
+): DataResponse => loadData(loadDataResultsArgs(inputs, yAxis, axisOrder));
 
-const loadDataResultsTotalsArgs = (
+const loadDataResultsAxisOrderArgs = (
   inputs: Inputs<typeof meta>,
   yAxis: Dimension,
 ): LoadDataRequest =>
-  loadDataTotalsArgs(
-    inputs.dataset,
-    yAxis,
-    inputs.measure,
-    inputs.sortByAxisTotal as string | undefined,
-    inputs.limitAxisItems,
-  );
+  buildAxisOrderArgs({
+    dataset: inputs.dataset,
+    axis: yAxis,
+    measure: inputs.measure,
+    sortDirection: inputs.sortByAxisTotal as string | undefined,
+    limit: inputs.limitAxisItems,
+  });
 
-const loadDataResultsTotals = (inputs: Inputs<typeof meta>, yAxis: Dimension): DataResponse =>
-  loadData(loadDataResultsTotalsArgs(inputs, yAxis));
+const loadDataResultsAxisOrder = (inputs: Inputs<typeof meta>, yAxis: Dimension): DataResponse =>
+  loadData(loadDataResultsAxisOrderArgs(inputs, yAxis));
 
 const events = {
   onBarClicked: (value: { axisDimensionValue?: string; groupingDimensionValue?: string }) => ({
@@ -130,33 +130,37 @@ const props = (
   ],
 ) => {
   const yAxisWithGranularity = getDimensionWithGranularity(inputs.yAxis, state?.granularity);
-  const needsSortLimit = hasSortOrLimit(
-    inputs.sortByAxisTotal as string | undefined,
-    inputs.limitAxisItems,
-  );
+  const sortDirection = inputs.sortByAxisTotal as string | undefined;
+  const needsTopItems = shouldGetTopItems(sortDirection, inputs.limitAxisItems);
 
-  const totalsArgs = needsSortLimit
-    ? loadDataResultsTotalsArgs(inputs, yAxisWithGranularity)
+  const axisOrderArgs = needsTopItems
+    ? buildAxisOrderArgs({
+        dataset: inputs.dataset,
+        axis: yAxisWithGranularity,
+        measure: inputs.measure,
+        sortDirection,
+        limit: inputs.limitAxisItems,
+      })
     : undefined;
-  const currentTotalsKey = totalsArgs ? JSON.stringify(totalsArgs) : undefined;
+  const currentAxisOrderKey = axisOrderArgs ? JSON.stringify(axisOrderArgs) : undefined;
 
-  const axisItemsFresh =
-    currentTotalsKey != null &&
-    currentTotalsKey === state?.axisItemsKey &&
-    state?.axisItems != null;
+  const axisOrderFresh =
+    currentAxisOrderKey != null &&
+    currentAxisOrderKey === state?.axisOrderKey &&
+    state?.axisOrder != null;
 
   return {
     ...inputs,
     yAxis: yAxisWithGranularity,
     setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
-    resultsTotals: totalsArgs ? loadData(totalsArgs) : undefined,
-    results: resolveResults(needsSortLimit, axisItemsFresh, state?.axisItems, (items) =>
-      loadDataResults(inputs, yAxisWithGranularity, items),
+    resultsAxisOrder: axisOrderArgs ? loadData(axisOrderArgs) : undefined,
+    results: resolveResults(needsTopItems, axisOrderFresh, state?.axisOrder, (order) =>
+      loadDataResults(inputs, yAxisWithGranularity, order),
     ),
-    axisItems: axisItemsFresh ? state?.axisItems : undefined,
-    currentTotalsKey,
-    setAxisItems: (axisItems: string[], key: string) =>
-      setState({ ...state, axisItems, axisItemsKey: key }),
+    axisOrder: axisOrderFresh ? state?.axisOrder : undefined,
+    currentAxisOrderKey,
+    setAxisOrder: (axisOrder: string[], key: string) =>
+      setState({ ...state, axisOrder, axisOrderKey: key }),
   };
 };
 
@@ -173,8 +177,8 @@ export const barChartStackedHorizontalPro = {
     loadDataArgs: loadDataResultsArgs,
     loadData: loadDataResults,
   },
-  resultsTotals: {
-    loadDataArgs: loadDataResultsTotalsArgs,
-    loadData: loadDataResultsTotals,
+  resultsAxisOrder: {
+    loadDataArgs: loadDataResultsAxisOrderArgs,
+    loadData: loadDataResultsAxisOrder,
   },
 } as const;

@@ -9,16 +9,16 @@ import { mergician } from 'mergician';
 import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { useSyncAxisItems } from '../bars.hooks';
+import { useUpdateAxisOrder } from '../bars.hooks';
 
 export type BarChartGroupedHorizontalProProps = {
   groupBy: Dimension;
   measure: Measure;
   results?: DataResponse;
-  resultsTotals?: DataResponse;
-  axisItems?: string[];
-  currentTotalsKey?: string;
-  setAxisItems?: (values: string[], key: string) => void;
+  resultsAxisOrder?: DataResponse;
+  axisOrder?: string[];
+  currentAxisOrderKey?: string;
+  setAxisOrder?: (values: string[], key: string) => void;
   reverseYAxis?: boolean;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
@@ -44,8 +44,8 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
   const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
 
   const {
-    yAxis,
     hideMenu,
+    yAxis,
     groupBy,
     measure,
     reverseYAxis,
@@ -58,21 +58,25 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
     xAxisRangeMin,
     setGranularity,
     onBarClicked,
+    axisOrder,
+    resultsAxisOrder,
+    currentAxisOrderKey,
+    setAxisOrder,
   } = props;
 
-  useSyncAxisItems(
-    props.resultsTotals,
-    yAxis,
-    props.setAxisItems ?? (() => {}),
-    props.currentTotalsKey,
-  );
+  useUpdateAxisOrder({
+    resultsAxisOrder,
+    axisDimension: yAxis,
+    setAxisOrder,
+    currentAxisOrderKey,
+  });
 
   const resultsResponse =
     props.results ??
     ({
-      isLoading: !props.resultsTotals?.error,
+      isLoading: !resultsAxisOrder?.error,
       data: [],
-      error: props.resultsTotals?.error,
+      error: resultsAxisOrder?.error,
     } as DataResponse);
 
   const results = useFillGaps({
@@ -86,7 +90,7 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
       dimension: yAxis,
       groupDimension: groupBy,
       measure,
-      axisOrder: props.axisItems,
+      axisOrder,
     },
     theme,
   );

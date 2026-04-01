@@ -9,16 +9,16 @@ import { mergician } from 'mergician';
 import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { useSyncAxisItems } from '../bars.hooks';
+import { useUpdateAxisOrder } from '../bars.hooks';
 
 export type BarChartGroupedProProps = {
   groupBy: Dimension;
   measure: Measure;
   results?: DataResponse;
-  resultsTotals?: DataResponse;
-  axisItems?: string[];
-  currentTotalsKey?: string;
-  setAxisItems?: (values: string[], key: string) => void;
+  resultsAxisOrder?: DataResponse;
+  axisOrder?: string[];
+  currentAxisOrderKey?: string;
+  setAxisOrder?: (values: string[], key: string) => void;
   reverseXAxis?: boolean;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
@@ -41,7 +41,10 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
+  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+
   const {
+    hideMenu,
     groupBy,
     measure,
     reverseXAxis,
@@ -55,30 +58,30 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
     yAxisRangeMin,
     setGranularity,
     onBarClicked,
+    axisOrder,
+    resultsAxisOrder,
+    currentAxisOrderKey,
+    setAxisOrder,
   } = props;
 
-  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
-
-  const { hideMenu } = props;
-
-  useSyncAxisItems(
-    props.resultsTotals,
-    xAxis,
-    props.setAxisItems ?? (() => {}),
-    props.currentTotalsKey,
-  );
+  useUpdateAxisOrder({
+    resultsAxisOrder,
+    axisDimension: xAxis,
+    setAxisOrder,
+    currentAxisOrderKey,
+  });
 
   const resultsResponse =
     props.results ??
     ({
-      isLoading: !props.resultsTotals?.error,
+      isLoading: !resultsAxisOrder?.error,
       data: [],
-      error: props.resultsTotals?.error,
+      error: resultsAxisOrder?.error,
     } as DataResponse);
 
   const results = useFillGaps({
     results: resultsResponse,
-    dimension: props.xAxis,
+    dimension: xAxis,
   });
 
   const data = getBarStackedChartProData(
@@ -87,7 +90,7 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
       dimension: xAxis,
       groupDimension: groupBy,
       measure,
-      axisOrder: props.axisItems,
+      axisOrder,
     },
     theme,
   );

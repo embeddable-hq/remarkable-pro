@@ -1,20 +1,28 @@
 import { useEffect } from 'react';
 import { DataResponse, Dimension } from '@embeddable.com/core';
 
-export function useSyncAxisItems(
-  resultsTotals: DataResponse | undefined,
-  axisDimension: Dimension,
-  setAxisItems: (values: string[], key: string) => void,
-  currentTotalsKey?: string,
-): void {
-  useEffect(() => {
-    if (!resultsTotals?.data || resultsTotals.isLoading || !currentTotalsKey) return;
+export function useUpdateAxisOrder(opts: {
+  resultsAxisOrder?: DataResponse;
+  axisDimension: Dimension;
+  setAxisOrder?: (values: string[], key: string) => void;
+  currentAxisOrderKey?: string;
+}): void {
+  const { resultsAxisOrder, axisDimension, setAxisOrder, currentAxisOrderKey } = opts;
 
-    const values = resultsTotals.data
+  useEffect(() => {
+    if (
+      !setAxisOrder ||
+      !resultsAxisOrder?.data ||
+      resultsAxisOrder.isLoading ||
+      !currentAxisOrderKey
+    )
+      return;
+
+    const values = resultsAxisOrder.data
       .map((d) => d[axisDimension.name])
       .filter((v): v is string => v != null);
 
-    setAxisItems(values, currentTotalsKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- setAxisItems is recreated each render; other deps always change together with resultsTotals
-  }, [resultsTotals]);
+    setAxisOrder(values, currentAxisOrderKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- setAxisOrder is recreated each render; other deps always change together with resultsAxisOrder
+  }, [resultsAxisOrder]);
 }

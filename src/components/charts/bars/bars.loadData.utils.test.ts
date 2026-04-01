@@ -1,10 +1,10 @@
 import type { Dataset, Dimension, Measure } from '@embeddable.com/core';
 import {
-  parseSortDirection,
-  isValidLimit,
-  hasSortOrLimit,
-  loadDataTotalsArgs,
-  loadDataMainArgs,
+  toOrderDirection,
+  getLimit,
+  shouldGetTopItems,
+  buildAxisOrderArgs,
+  buildResultsArgs,
 } from './bars.loadData.utils';
 
 const makeDataset = (): Dataset =>
@@ -16,93 +16,97 @@ const makeDimension = (name = 'category'): Dimension =>
 const makeMeasure = (name = 'revenue'): Measure =>
   ({ name, title: 'Revenue', nativeType: 'number', inputs: {} }) as unknown as Measure;
 
-describe('parseSortDirection', () => {
+describe('toOrderDirection', () => {
   it('maps "Ascending" to "asc"', () => {
-    expect(parseSortDirection('Ascending')).toBe('asc');
+    expect(toOrderDirection('Ascending')).toBe('asc');
   });
 
   it('maps "Descending" to "desc"', () => {
-    expect(parseSortDirection('Descending')).toBe('desc');
+    expect(toOrderDirection('Descending')).toBe('desc');
   });
 
-  it('returns undefined for undefined input', () => {
-    expect(parseSortDirection(undefined)).toBeUndefined();
+  it('returns undefined for undefined', () => {
+    expect(toOrderDirection(undefined)).toBeUndefined();
   });
 
   it('returns undefined for empty string', () => {
-    expect(parseSortDirection('')).toBeUndefined();
+    expect(toOrderDirection('')).toBeUndefined();
   });
 
-  it('returns undefined for unrecognized value', () => {
-    expect(parseSortDirection('random')).toBeUndefined();
-  });
-});
-
-describe('isValidLimit', () => {
-  it('returns true for a positive integer', () => {
-    expect(isValidLimit(5)).toBe(true);
-  });
-
-  it('returns true for 1', () => {
-    expect(isValidLimit(1)).toBe(true);
-  });
-
-  it('returns false for 0', () => {
-    expect(isValidLimit(0)).toBe(false);
-  });
-
-  it('returns false for negative numbers', () => {
-    expect(isValidLimit(-3)).toBe(false);
-  });
-
-  it('returns false for floats', () => {
-    expect(isValidLimit(2.5)).toBe(false);
-  });
-
-  it('returns false for undefined', () => {
-    expect(isValidLimit(undefined)).toBe(false);
-  });
-
-  it('returns false for NaN', () => {
-    expect(isValidLimit(NaN)).toBe(false);
+  it('returns undefined for unrecognized values', () => {
+    expect(toOrderDirection('random')).toBeUndefined();
   });
 });
 
-describe('hasSortOrLimit', () => {
-  it('returns true when sort direction is set', () => {
-    expect(hasSortOrLimit('Ascending', undefined)).toBe(true);
+describe('getLimit', () => {
+  it('returns the value for a positive integer', () => {
+    expect(getLimit(5)).toBe(5);
+  });
+
+  it('returns the value for 1', () => {
+    expect(getLimit(1)).toBe(1);
+  });
+
+  it('returns undefined for 0', () => {
+    expect(getLimit(0)).toBeUndefined();
+  });
+
+  it('returns undefined for negative numbers', () => {
+    expect(getLimit(-3)).toBeUndefined();
+  });
+
+  it('returns undefined for floats', () => {
+    expect(getLimit(2.5)).toBeUndefined();
+  });
+
+  it('returns undefined for undefined', () => {
+    expect(getLimit(undefined)).toBeUndefined();
+  });
+
+  it('returns undefined for NaN', () => {
+    expect(getLimit(NaN)).toBeUndefined();
+  });
+});
+
+describe('shouldGetTopItems', () => {
+  it('returns true when sort direction is Ascending', () => {
+    expect(shouldGetTopItems('Ascending', undefined)).toBe(true);
+  });
+
+  it('returns true when sort direction is Descending', () => {
+    expect(shouldGetTopItems('Descending', undefined)).toBe(true);
   });
 
   it('returns true when limit is set', () => {
-    expect(hasSortOrLimit(undefined, 5)).toBe(true);
+    expect(shouldGetTopItems(undefined, 5)).toBe(true);
   });
 
   it('returns true when both are set', () => {
-    expect(hasSortOrLimit('Descending', 10)).toBe(true);
+    expect(shouldGetTopItems('Descending', 10)).toBe(true);
   });
 
   it('returns false when neither is set', () => {
-    expect(hasSortOrLimit(undefined, undefined)).toBe(false);
+    expect(shouldGetTopItems(undefined, undefined)).toBe(false);
   });
 
   it('returns false for invalid sort and invalid limit', () => {
-    expect(hasSortOrLimit('', 0)).toBe(false);
+    expect(shouldGetTopItems('', 0)).toBe(false);
   });
 
   it('returns false for unrecognized sort and negative limit', () => {
-    expect(hasSortOrLimit('random', -1)).toBe(false);
+    expect(shouldGetTopItems('random', -1)).toBe(false);
   });
 });
 
-describe('loadDataTotalsArgs', () => {
-  it('builds correct request with sort and limit', () => {
-    const result = loadDataTotalsArgs(
-      makeDataset(),
-      makeDimension(),
-      makeMeasure(),
-      'Descending',
-      5,
-    );
+describe('buildAxisOrderArgs', () => {
+  it('builds correct request with Descending sort and limit', () => {
+    const result = buildAxisOrderArgs({
+      dataset: makeDataset(),
+      axis: makeDimension(),
+      measure: makeMeasure(),
+      sortDirection: 'Descending',
+      limit: 5,
+    });
 
     expect(result.from).toEqual(makeDataset());
     expect(result.select).toEqual([makeDimension(), makeMeasure()]);
@@ -111,47 +115,53 @@ describe('loadDataTotalsArgs', () => {
   });
 
   it('defaults to "desc" when only limit is provided', () => {
-    const result = loadDataTotalsArgs(makeDataset(), makeDimension(), makeMeasure(), undefined, 3);
+    const result = buildAxisOrderArgs({
+      dataset: makeDataset(),
+      axis: makeDimension(),
+      measure: makeMeasure(),
+      sortDirection: undefined,
+      limit: 3,
+    });
 
     expect(result.orderBy).toEqual([{ property: makeMeasure(), direction: 'desc' }]);
     expect(result.limit).toBe(3);
   });
 
-  it('uses sort direction with no limit', () => {
-    const result = loadDataTotalsArgs(
-      makeDataset(),
-      makeDimension(),
-      makeMeasure(),
-      'Ascending',
-      undefined,
-    );
+  it('maps Ascending to asc direction', () => {
+    const result = buildAxisOrderArgs({
+      dataset: makeDataset(),
+      axis: makeDimension(),
+      measure: makeMeasure(),
+      sortDirection: 'Ascending',
+      limit: undefined,
+    });
 
     expect(result.orderBy).toEqual([{ property: makeMeasure(), direction: 'asc' }]);
     expect(result.limit).toBeUndefined();
   });
 
   it('omits limit when limit is invalid', () => {
-    const result = loadDataTotalsArgs(
-      makeDataset(),
-      makeDimension(),
-      makeMeasure(),
-      'Descending',
-      -1,
-    );
+    const result = buildAxisOrderArgs({
+      dataset: makeDataset(),
+      axis: makeDimension(),
+      measure: makeMeasure(),
+      sortDirection: 'Descending',
+      limit: -1,
+    });
 
     expect(result.limit).toBeUndefined();
   });
 });
 
-describe('loadDataMainArgs', () => {
-  it('builds unfiltered request without topAxisValues', () => {
-    const result = loadDataMainArgs(
-      makeDataset(),
-      makeDimension('xAxis'),
-      makeDimension('groupBy'),
-      makeMeasure(),
-      1000,
-    );
+describe('buildResultsArgs', () => {
+  it('builds unfiltered request without axisOrder', () => {
+    const result = buildResultsArgs({
+      dataset: makeDataset(),
+      axis: makeDimension('xAxis'),
+      groupBy: makeDimension('groupBy'),
+      measure: makeMeasure(),
+      maxResults: 1000,
+    });
 
     expect(result.from).toEqual(makeDataset());
     expect(result.select).toEqual([
@@ -163,29 +173,29 @@ describe('loadDataMainArgs', () => {
     expect(result.filters).toBeUndefined();
   });
 
-  it('builds unfiltered request when topAxisValues is empty', () => {
-    const result = loadDataMainArgs(
-      makeDataset(),
-      makeDimension('xAxis'),
-      makeDimension('groupBy'),
-      makeMeasure(),
-      1000,
-      [],
-    );
+  it('builds unfiltered request when axisOrder is empty', () => {
+    const result = buildResultsArgs({
+      dataset: makeDataset(),
+      axis: makeDimension('xAxis'),
+      groupBy: makeDimension('groupBy'),
+      measure: makeMeasure(),
+      maxResults: 1000,
+      axisOrder: [],
+    });
 
     expect(result.filters).toBeUndefined();
   });
 
-  it('builds filtered request with topAxisValues', () => {
+  it('builds filtered request with axisOrder', () => {
     const axis = makeDimension('country');
-    const result = loadDataMainArgs(
-      makeDataset(),
+    const result = buildResultsArgs({
+      dataset: makeDataset(),
       axis,
-      makeDimension('region'),
-      makeMeasure(),
-      1000,
-      ['FR', 'DE', 'PL'],
-    );
+      groupBy: makeDimension('region'),
+      measure: makeMeasure(),
+      maxResults: 1000,
+      axisOrder: ['FR', 'DE', 'PL'],
+    });
 
     expect(result.filters).toEqual([
       { property: axis, operator: 'equals', value: ['FR', 'DE', 'PL'] },

@@ -9,16 +9,16 @@ import { mergician } from 'mergician';
 import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { useSyncAxisItems } from '../bars.hooks';
+import { useUpdateAxisOrder } from '../bars.hooks';
 
 export type BarChartStackedHorizontalProProps = {
   groupBy: Dimension;
   measure: Measure;
   results?: DataResponse;
-  resultsTotals?: DataResponse;
-  axisItems?: string[];
-  currentTotalsKey?: string;
-  setAxisItems?: (values: string[], key: string) => void;
+  resultsAxisOrder?: DataResponse;
+  axisOrder?: string[];
+  currentAxisOrderKey?: string;
+  setAxisOrder?: (values: string[], key: string) => void;
   reverseYAxis?: boolean;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
@@ -58,26 +58,30 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
     xAxisRangeMin,
     setGranularity,
     onBarClicked,
+    axisOrder,
+    resultsAxisOrder,
+    currentAxisOrderKey,
+    setAxisOrder,
   } = props;
 
-  useSyncAxisItems(
-    props.resultsTotals,
-    yAxis,
-    props.setAxisItems ?? (() => {}),
-    props.currentTotalsKey,
-  );
+  useUpdateAxisOrder({
+    resultsAxisOrder,
+    axisDimension: yAxis,
+    setAxisOrder,
+    currentAxisOrderKey,
+  });
 
   const resultsResponse =
     props.results ??
     ({
-      isLoading: !props.resultsTotals?.error,
+      isLoading: !resultsAxisOrder?.error,
       data: [],
-      error: props.resultsTotals?.error,
+      error: resultsAxisOrder?.error,
     } as DataResponse);
 
   const results = useFillGaps({
     results: resultsResponse,
-    dimension: props.yAxis,
+    dimension: yAxis,
   });
 
   const data = getBarStackedChartProData(
@@ -86,7 +90,7 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
       dimension: yAxis,
       groupDimension: groupBy,
       measure,
-      axisOrder: props.axisItems,
+      axisOrder,
     },
     theme,
   );
