@@ -34,7 +34,7 @@ const FilterBuilderItem = ({
   onDelete,
 }: FilterBuilderItemProps) => {
   const { dimensionOrMeasure } = filter;
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState<string>('');
 
   const supportedDimensionsAndMeasures = getSupportedDimensionsAndMeasures(dimensionsAndMeasures);
 
