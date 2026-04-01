@@ -35,7 +35,7 @@ const meta = {
     inputs.showTooltips,
     { ...inputs.showValueLabels, defaultValue: false },
     inputs.showLogarithmicScale,
-    inputs.sortByAxisTotal,
+    inputs.sortDirectionTopAxis,
     inputs.limitAxisItems,
     inputs.xAxisLabel,
     inputs.yAxisLabel,
@@ -108,7 +108,7 @@ const loadDataResultsAxisOrderArgs = (
     dataset: inputs.dataset,
     axis: yAxis,
     measure: inputs.measure,
-    sortDirection: inputs.sortByAxisTotal as string | undefined,
+    sortDirection: inputs.sortDirectionTopAxis as string | undefined,
     limit: inputs.limitAxisItems,
   });
 
@@ -130,7 +130,7 @@ const props = (
   ],
 ) => {
   const yAxisWithGranularity = getDimensionWithGranularity(inputs.yAxis, state?.granularity);
-  const sortDirection = inputs.sortByAxisTotal as string | undefined;
+  const sortDirection = inputs.sortDirectionTopAxis as string | undefined;
   const needsTopItems = shouldGetTopItems(sortDirection, inputs.limitAxisItems);
 
   const axisOrderArgs = needsTopItems

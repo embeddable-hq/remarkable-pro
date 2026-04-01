@@ -417,10 +417,10 @@ const yAxisMaxItems = {
   category: 'Axes Settings',
 } as const;
 
-const sortByAxisTotal = {
-  name: 'sortByAxisTotal',
+const sortDirectionTopAxis = {
+  name: 'sortDirectionTopAxis',
   type: SortDirectionType,
-  label: 'Sort by axis total',
+  label: 'Sort direction top axis',
   category: 'Component Settings',
 } as const;
 
@@ -488,7 +488,7 @@ export const inputs = {
   xAxisRangeMax,
   xAxisMaxItems,
   yAxisMaxItems,
-  sortByAxisTotal,
+  sortDirectionTopAxis,
   limitAxisItems,
   granularity,
   granularities,
