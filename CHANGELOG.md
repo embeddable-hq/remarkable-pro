@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.29
+
+### Patch Changes
+
+- 2b0e76c: Release new Remarkable UI version
+
 ## 0.1.28
 
 ### Patch Changes
