@@ -9,8 +9,35 @@ import FilterBuilderTextValueField from './FilterBuilderTextValueField';
 import styles from '../FilterBuilderPro.module.css';
 import { IconLoader2, IconX } from '@tabler/icons-react';
 import { operatorStringBoolean } from '../FilterBuilderPro.utils';
+import {
+  normalizeSelectedValues,
+  sortOptionsWithSelectedFirst,
+  getMultiSelectDisplayValue,
+} from './FilterBuilderItemValueField.utils';
 import clsx from 'clsx';
 import { useRef } from 'react';
+
+type ValueTriggerButtonProps = {
+  hasValue: boolean;
+  isLoading: boolean | undefined;
+  displayValue: string;
+  showClearIcon: boolean;
+  onClear: () => void;
+};
+
+const ValueTriggerButton = ({
+  hasValue,
+  isLoading,
+  displayValue,
+  showClearIcon,
+  onClear,
+  ...props
+}: ValueTriggerButtonProps) => (
+  <button className={clsx(styles.valueButton, !hasValue && styles.valueButtonEmpty)} {...props}>
+    {isLoading ? <IconLoader2 className={styles.loadingSpinner} /> : displayValue}
+    {showClearIcon && <IconX onClick={onClear} />}
+  </button>
+);
 
 export type FilterBuilderItemValueFieldProps = {
   filter: FilterBuilderFilter;
@@ -47,19 +74,9 @@ const FilterBuilderItemValueField = ({
 
   const getLabel = (value: string) => labelCache.current[value] ?? value;
 
-  let selectedValues: string[];
-  if (Array.isArray(filter.value)) {
-    selectedValues = filter.value as string[];
-  } else if (filter.value === null || filter.value === undefined) {
-    selectedValues = [];
-  } else {
-    selectedValues = [filter.value as string];
-  }
+  const selectedValues = normalizeSelectedValues(filter.value);
 
-  const options = [
-    ...rawOptions.filter((o) => selectedValues.includes(o.value)),
-    ...rawOptions.filter((o) => !selectedValues.includes(o.value)),
-  ];
+  const options = sortOptionsWithSelectedFirst(rawOptions, selectedValues);
 
   const isLoading = results?.isLoading;
   const showNoOptionsMessage = Boolean(!isLoading && (results?.data?.length ?? 0) === 0);
@@ -88,22 +105,18 @@ const FilterBuilderItemValueField = ({
   if (isMultiSelectField) {
     const filterValue = (filter.value as string[]) ?? [];
 
-    let displayValue: string;
-    if (filterValue.length === 0) {
-      displayValue = '...';
-    } else if (filterValue.length > 2) {
-      displayValue = `${filterValue.length} selected`;
-    } else {
-      displayValue = filterValue.map(getLabel).join(', ');
-    }
+    const displayValue = getMultiSelectDisplayValue(filterValue, getLabel);
 
     return (
       <MultiSelectField
         triggerComponent={
-          <button className={clsx(styles.valueButton, !hasValue && styles.valueButtonEmpty)}>
-            {isLoading ? <IconLoader2 className={styles.loadingSpinner} /> : displayValue}
-            {showClearIcon && <IconX onClick={() => onSelectValue(null)} />}
-          </button>
+          <ValueTriggerButton
+            hasValue={hasValue}
+            isLoading={isLoading}
+            displayValue={displayValue}
+            showClearIcon={showClearIcon}
+            onClear={() => onSelectValue(null)}
+          />
         }
         isSearchable
         isClearable
@@ -127,10 +140,13 @@ const FilterBuilderItemValueField = ({
     return (
       <SingleSelectField
         triggerComponent={
-          <button className={clsx(styles.valueButton, !hasValue && styles.valueButtonEmpty)}>
-            {isLoading ? <IconLoader2 className={styles.loadingSpinner} /> : displayValue}
-            {showClearIcon && <IconX onClick={() => onSelectValue(null)} />}
-          </button>
+          <ValueTriggerButton
+            hasValue={hasValue}
+            isLoading={isLoading}
+            displayValue={displayValue}
+            showClearIcon={showClearIcon}
+            onClear={() => onSelectValue(null)}
+          />
         }
         searchable
         clearable
