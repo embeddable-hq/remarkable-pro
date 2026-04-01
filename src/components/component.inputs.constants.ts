@@ -427,7 +427,7 @@ const sortDirectionTopAxis = {
 const limitAxisItems = {
   name: 'limitAxisItems',
   type: 'number',
-  label: 'Limit axis items',
+  label: 'Limit x-axis items',
   description: 'Load only the top or bottom categories, based on group totals',
   category: 'Component Settings',
 } as const;
