@@ -417,6 +417,40 @@ const yAxisMaxItems = {
   category: 'Axes Settings',
 } as const;
 
+// new
+const sortDirectionTopXAxis = {
+  name: 'sortDirectionTopXAxis',
+  type: SortDirectionType,
+  label: 'Sort by x-axis total',
+  category: 'Component Settings',
+} as const;
+
+// new
+const sortDirectionTopYAxis = {
+  name: 'sortDirectionTopYAxis',
+  type: SortDirectionType,
+  label: 'Sort by y-axis total',
+  category: 'Component Settings',
+} as const;
+
+// new
+const limitTopXAxis = {
+  name: 'limitTopXAxis',
+  type: 'number',
+  label: 'Limit top x-axis',
+  description: 'Load only the top or bottom categories, based on group totals',
+  category: 'Component Settings',
+} as const;
+
+// new
+const limitTopYAxis = {
+  name: 'limitTopYAxis',
+  type: 'number',
+  label: 'Limit top y-axis',
+  description: 'Load only the top or bottom categories, based on group totals',
+  category: 'Component Settings',
+} as const;
+
 const sortDirectionTopAxis = {
   name: 'sortDirectionTopAxis',
   type: SortDirectionType,
@@ -489,6 +523,10 @@ export const inputs = {
   xAxisMaxItems,
   yAxisMaxItems,
   sortDirectionTopAxis,
+  sortDirectionTopXAxis,
+  sortDirectionTopYAxis,
+  limitTopXAxis,
+  limitTopYAxis,
   limitAxisItems,
   granularity,
   granularities,
