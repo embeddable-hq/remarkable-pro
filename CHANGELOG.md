@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.30
+
+### Patch Changes
+
+- c80d4f9: Update sdk versions
+
 ## 0.1.29
 
 ### Patch Changes
