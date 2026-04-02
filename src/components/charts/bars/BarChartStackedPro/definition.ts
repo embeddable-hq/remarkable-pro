@@ -9,7 +9,7 @@ import {
   getCachedAxisOrder,
   loadDataResultsAxisOrder,
   loadDataResults,
-} from '../bars.loadData.utils.new';
+} from '../bars.loadData.utils';
 
 const meta = {
   name: 'BarChartStackedPro',

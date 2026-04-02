@@ -6,7 +6,7 @@ import {
   loadDataResultsArgs,
   getAxisOrderCacheKey,
   getCachedAxisOrder,
-} from './bars.loadData.utils.new';
+} from './bars.loadData.utils';
 
 const makeDataset = (): Dataset =>
   ({ embeddableId: 'e1', datasetId: 'ds1', inputName: 'dataset', variableValues: {} }) as Dataset;
