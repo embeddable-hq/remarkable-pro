@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.31
+
+### Patch Changes
+
+- 0fe4f9d: New FilterBuilder component
+
 ## 0.1.30
 
 ### Patch Changes
