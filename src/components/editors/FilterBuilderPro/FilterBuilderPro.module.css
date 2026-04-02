@@ -1,0 +1,318 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  gap: var(--em-filterbuilder-gap, 0.75rem);
+  padding-right: var(--em-filterbuilder-gap, 0.75rem);
+  font-family: var(--em-filterbuilder-font-family, Inter);
+  font-weight: var(--em-filterbuilder-font-weight, 500);
+  font-size: var(--em-filterbuilder-font-size, 0.75rem);
+}
+
+.scroll {
+  display: flex;
+  align-items: center;
+  gap: var(--em-filterbuilder-gap, 0.75rem);
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: relative;
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  gap: var(--em-filterbuilder-filter-gap, 0.125rem);
+}
+
+.addButton {
+  box-sizing: border-box;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--em-filterbuilder-add-button-height, 2rem);
+  gap: var(--em-filterbuilder-add-button-gap, 0.125rem);
+  border: var(--em-filterbuilder-add-button-border-width, 0rem) solid
+    var(--em-filterbuilder-add-button-border-color, rgba(255, 255, 255, 0));
+  background: var(--em-filterbuilder-add-button-background, #ededf1);
+  padding: var(--em-filterbuilder-add-button-padding-y, 0rem)
+    var(--em-filterbuilder-add-button-padding-x, 0.75rem);
+  border-radius: var(--em-filterbuilder-add-button-border-radius, 2rem);
+  color: var(--em-filterbuilder-add-button-color, #000000);
+}
+
+.addButton svg {
+  flex-shrink: 0;
+  width: var(--em-filterbuilder-add-button-icon-size, 1rem);
+  height: var(--em-filterbuilder-add-button-icon-size, 1rem);
+}
+
+.addButton:hover {
+  background: var(--em-filterbuilder-add-button-background--hover, #e4e4ea);
+}
+
+.memberButton {
+  box-sizing: border-box;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--em-filterbuilder-member-button-height, 2rem);
+  border: var(--em-filterbuilder-member-button-border-width, 0rem) solid
+    var(--em-filterbuilder-member-button-border-color, rgba(255, 255, 255, 0));
+  background: var(--em-filterbuilder-member-button-background, #ededf1);
+  padding: var(--em-filterbuilder-member-button-padding-y, 0rem)
+    var(--em-filterbuilder-member-button-padding-x, 0.75rem);
+  border-top-left-radius: var(--em-filterbuilder-member-button-border-left-radius, 2rem);
+  border-bottom-left-radius: var(--em-filterbuilder-member-button-border-left-radius, 2rem);
+  border-top-right-radius: var(--em-filterbuilder-member-button-border-right-radius, 0.25rem);
+  border-bottom-right-radius: var(--em-filterbuilder-member-button-border-right-radius, 0.25rem);
+}
+
+.memberButton:hover {
+  background: var(--em-filterbuilder-member-button-background--hover, #e4e4ea);
+}
+
+.deleteButton {
+  box-sizing: border-box;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--em-filterbuilder-delete-button-height, 2rem);
+  border: var(--em-filterbuilder-delete-button-border-width, 0rem) solid
+    var(--em-filterbuilder-delete-button-border-color, rgba(255, 255, 255, 0));
+  background: var(--em-filterbuilder-delete-button-background, #f7f7f8);
+  padding: var(--em-filterbuilder-delete-button-padding-y, 0.25rem)
+    var(--em-filterbuilder-delete-button-padding-x, 0.25rem);
+  color: var(--em-filterbuilder-delete-button-color, #5c5c66);
+
+  border-top-left-radius: var(--em-filterbuilder-delete-button-border-left-radius, 0.25rem);
+  border-bottom-left-radius: var(--em-filterbuilder-delete-button-border-left-radius, 0.25rem);
+  border-top-right-radius: var(--em-filterbuilder-delete-button-border-right-radius, 2rem);
+  border-bottom-right-radius: var(--em-filterbuilder-delete-button-border-right-radius, 2rem);
+}
+
+.deleteButton svg {
+  flex-shrink: 0;
+  width: var(--em-filterbuilder-delete-button-icon-size, 1rem);
+  height: var(--em-filterbuilder-delete-button-icon-size, 1rem);
+}
+
+.deleteButton:hover {
+  background: var(--em-filterbuilder-delete-button-background--hover, #e4e4ea);
+}
+
+.operatorButton {
+  box-sizing: border-box;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--em-filterbuilder-operator-button-height, 2rem);
+  border: var(--em-filterbuilder-operator-button-border-width, 0rem) solid
+    var(--em-filterbuilder-operator-button-border-color, rgba(255, 255, 255, 0));
+  background: var(--em-filterbuilder-operator-button-background, #f7f7f8);
+  padding: var(--em-filterbuilder-operator-button-padding-y, 0.25rem)
+    var(--em-filterbuilder-operator-button-padding-x, 0.25rem);
+  color: var(--em-filterbuilder-operator-button-color, #5c5c66);
+  border-top-left-radius: var(--em-filterbuilder-operator-button-border-left-radius, 0.25rem);
+  border-bottom-left-radius: var(--em-filterbuilder-operator-button-border-left-radius, 0.25rem);
+  border-top-right-radius: var(--em-filterbuilder-operator-button-border-right-radius, 0.25rem);
+  border-bottom-right-radius: var(--em-filterbuilder-operator-button-border-right-radius, 0.25rem);
+}
+
+.operatorButton:hover {
+  background: var(--em-filterbuilder-operator-button-background--hover, #e4e4ea);
+}
+
+.valueButton {
+  box-sizing: border-box;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  height: var(--em-filterbuilder-value-button-height, 2rem);
+  gap: var(--em-filterbuilder-value-button-gap, 0.125rem);
+  border: var(--em-filterbuilder-value-button-border-width, 0rem) solid
+    var(--em-filterbuilder-value-button-border-color, rgba(255, 255, 255, 0));
+  background: var(--em-filterbuilder-value-button-background, #ededf1);
+  padding: var(--em-filterbuilder-value-button-padding-y, 0rem)
+    var(--em-filterbuilder-value-button-padding-x, 0.75rem);
+  border-top-left-radius: var(--em-filterbuilder-value-button-border-left-radius, 0.25rem);
+  border-bottom-left-radius: var(--em-filterbuilder-value-button-border-left-radius, 0.25rem);
+  border-top-right-radius: var(--em-filterbuilder-value-button-border-right-radius, 0.25rem);
+  border-bottom-right-radius: var(--em-filterbuilder-value-button-border-right-radius, 0.25rem);
+  color: var(--em-filterbuilder-value-button-color, #000000);
+  min-width: var(--em-filterbuilder-value-button-min-width, 2.5rem);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.valueButton svg {
+  flex-shrink: 0;
+  width: var(--em-filterbuilder-value-button-icon-size, 1rem);
+  height: var(--em-filterbuilder-value-button-icon-size, 1rem);
+}
+
+.valueButton .loadingSpinner {
+  animation: spin 1s linear infinite;
+}
+
+.valueButton:hover {
+  background: var(--em-filterbuilder-value-button-background--hover, #e4e4ea);
+}
+
+.valueButton.valueButtonEmpty {
+  display: block;
+}
+
+.clearButton {
+  box-sizing: border-box;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  height: var(--em-filterbuilder-clear-button-height, 2rem);
+  border: var(--em-filterbuilder-clear-button-border-width, 0rem) solid
+    var(--em-filterbuilder-clear-button-border-color, rgba(255, 255, 255, 0));
+  background: var(--em-filterbuilder-clear-button-background, transparent);
+  padding: var(--em-filterbuilder-clear-button-padding-y, 0rem)
+    var(--em-filterbuilder-clear-button-padding-x, 0.75rem);
+  border-radius: var(--em-filterbuilder-clear-button-border-radius, 2rem);
+  color: var(--em-filterbuilder-clear-button-color, #5c5c66);
+}
+
+.clearButton:hover {
+  background: var(--em-filterbuilder-clear-button-background--hover, #ededf1);
+}
+
+.scrollRightButton {
+  flex-shrink: 0;
+  margin-left: calc(-1 * var(--em-filterbuilder-gap, 0.75rem));
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--em-filterbuilder-scroll-right-button-height, 2rem);
+  border: var(--em-filterbuilder-scroll-right-button-border-width, 0rem) solid
+    var(--em-filterbuilder-scroll-right-button-border-color, rgba(255, 255, 255, 0));
+  background: var(--em-filterbuilder-scroll-right-button-background, transparent);
+  padding: var(--em-filterbuilder-scroll-right-button-padding-y, 0rem)
+    var(--em-filterbuilder-scroll-right-button-padding-x, 0.75rem);
+  border-top-left-radius: var(--em-filterbuilder-scroll-right-button-border-left-radius, 0.25rem);
+  border-bottom-left-radius: var(
+    --em-filterbuilder-scroll-right-button-border-left-radius,
+    0.25rem
+  );
+  border-top-right-radius: var(--em-filterbuilder-scroll-right-button-border-right-radius, 2rem);
+  border-bottom-right-radius: var(--em-filterbuilder-scroll-right-button-border-right-radius, 2rem);
+  color: var(--em-filterbuilder-scroll-right-button-color, #000000);
+}
+
+.scrollRightButton svg {
+  flex-shrink: 0;
+  width: var(--em-filterbuilder-scroll-right-button-icon-size, 1rem);
+  height: var(--em-filterbuilder-scroll-right-button-icon-size, 1rem);
+}
+
+.scrollRightButton:hover {
+  background: var(--em-filterbuilder-scroll-right-button-background--hover, #ededf1);
+}
+
+.scrollLeftButton {
+  flex-shrink: 0;
+  margin-right: calc(-1 * var(--em-filterbuilder-gap, 0.75rem));
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--em-filterbuilder-scroll-left-button-height, 2rem);
+  border: var(--em-filterbuilder-scroll-left-button-border-width, 0rem) solid
+    var(--em-filterbuilder-scroll-left-button-border-color, rgba(255, 255, 255, 0));
+  background: var(--em-filterbuilder-scroll-left-button-background, transparent);
+  padding: var(--em-filterbuilder-scroll-left-button-padding-y, 0rem)
+    var(--em-filterbuilder-scroll-left-button-padding-x, 0.75rem);
+  border-top-right-radius: var(--em-filterbuilder-scroll-left-button-border-right-radius, 0.25rem);
+  border-bottom-right-radius: var(
+    --em-filterbuilder-scroll-left-button-border-right-radius,
+    0.25rem
+  );
+  border-top-left-radius: var(--em-filterbuilder-scroll-left-button-border-left-radius, 2rem);
+  border-bottom-left-radius: var(--em-filterbuilder-scroll-left-button-border-left-radius, 2rem);
+  color: var(--em-filterbuilder-scroll-left-button-color, #000000);
+}
+
+.scrollLeftButton svg {
+  flex-shrink: 0;
+  width: var(--em-filterbuilder-scroll-left-button-icon-size, 1rem);
+  height: var(--em-filterbuilder-scroll-left-button-icon-size, 1rem);
+}
+
+.scrollLeftButton:hover {
+  background: var(--em-filterbuilder-scroll-left-button-background--hover, #ededf1);
+}
+
+.valueInput {
+  box-sizing: border-box;
+  font: inherit;
+  height: var(--em-filterbuilder-value-input-height, 2rem);
+  border: var(--em-filterbuilder-value-input-border-width, 0rem) solid
+    var(--em-filterbuilder-value-input-border-color, rgba(255, 255, 255, 0));
+  padding: var(--em-filterbuilder-value-input-padding-y, 0rem)
+    var(--em-filterbuilder-value-input-padding-x, 0.75rem);
+  border-top-left-radius: var(--em-filterbuilder-value-input-border-left-radius, 0.25rem);
+  border-bottom-left-radius: var(--em-filterbuilder-value-input-border-left-radius, 0.25rem);
+  border-top-right-radius: var(--em-filterbuilder-value-input-border-right-radius, 0.25rem);
+  border-bottom-right-radius: var(--em-filterbuilder-value-input-border-right-radius, 0.25rem);
+  color: var(--em-filterbuilder-value-input-color, #000000);
+  min-width: var(--em-filterbuilder-value-input-min-width, 3rem);
+  background: var(--em-filterbuilder-value-input-background, #ededf1);
+  field-sizing: content;
+}
+
+.andOrButton {
+  box-sizing: border-box;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  height: var(--em-filterbuilder-andor-button-height, 2rem);
+  border: var(--em-filterbuilder-andor-button-border-width, 0rem) solid
+    var(--em-filterbuilder-andor-button-border-color, rgba(255, 255, 255, 0));
+  background: var(--em-filterbuilder-andor-button-background, #ededf1);
+  padding: var(--em-filterbuilder-andor-button-padding-y, 0rem)
+    var(--em-filterbuilder-andor-button-padding-x, 0.75rem);
+  border-radius: var(--em-filterbuilder-andor-button-border-radius, 2rem);
+  color: var(--em-filterbuilder-andor-button-color, #000000);
+}
+
+.andOrButton > span {
+  grid-area: 1 / 1;
+}
+
+.andOrButtonSizer {
+  visibility: hidden;
+}
+
+.andOrButton:hover {
+  background: var(--em-filterbuilder-andor-button-background--hover, #e4e4ea);
+}

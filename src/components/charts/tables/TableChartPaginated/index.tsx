@@ -30,7 +30,6 @@ export type TableChartPaginatedProState = {
   pageSize?: number;
   sort?: { id: string; direction: OrderDirection } | undefined;
   isLoadingDownloadData: boolean;
-  hasTotalResults: boolean;
 };
 
 export type TableChartPaginatedProProps = {
@@ -119,23 +118,6 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
       handleUpdateEmbeddableState({ pageSize });
     }
   }, [pageSize, handleUpdateEmbeddableState]);
-
-  // Sync total from results
-  useEffect(() => {
-    setState?.((prevState) => ({
-      ...prevState,
-      hasTotalResults: false,
-    }));
-  }, [dimensionsAndMeasures, pageSize]);
-
-  useEffect(() => {
-    if (totalResults?.total) {
-      setState?.((prevState) => ({
-        ...prevState,
-        hasTotalResults: true,
-      }));
-    }
-  }, [totalResults]);
 
   // Handle data download when allResults is ready
   useEffect(() => {

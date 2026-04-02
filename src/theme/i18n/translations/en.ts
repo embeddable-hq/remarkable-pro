@@ -39,6 +39,23 @@ export const en: ResourceLanguage = {
         apply: 'Apply',
         placeholder: 'Select date range',
       },
+      filterBuilder: {
+        clearAll: 'clear all',
+        addFilter: 'add filter',
+        betweenAnd: 'and',
+        and: 'and',
+        or: 'or',
+        is: 'is',
+        isNot: 'is not',
+        isOneOf: 'is one of',
+        isNotOneOf: 'is not one of',
+        contains: 'contains',
+        equals: 'Equals',
+        doesNotEqual: 'Does not equal',
+        greaterThanOrEqualTo: 'Greater than or equal to',
+        lessThanOrEqualTo: 'Less than or equal to',
+        between: 'Between',
+      },
     },
     defaults: {
       granularityOptions: {

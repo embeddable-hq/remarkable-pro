@@ -50,6 +50,23 @@ export const de: ResourceLanguage = {
         apply: 'Anwenden',
         placeholder: 'Datumsbereich auswählen',
       },
+      filterBuilder: {
+        clearAll: 'alle löschen',
+        addFilter: 'Filter hinzufügen',
+        betweenAnd: 'und',
+        and: 'und',
+        or: 'oder',
+        is: 'ist',
+        isNot: 'ist nicht',
+        isOneOf: 'ist eines von',
+        isNotOneOf: 'ist keines von',
+        contains: 'enthält',
+        equals: 'Gleich',
+        doesNotEqual: 'Ungleich',
+        greaterThanOrEqualTo: 'Größer als oder gleich',
+        lessThanOrEqualTo: 'Kleiner als oder gleich',
+        between: 'Zwischen',
+      },
     },
     defaults: {
       granularityOptions: {

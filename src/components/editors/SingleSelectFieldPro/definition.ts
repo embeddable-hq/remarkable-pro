@@ -107,11 +107,7 @@ const props = (
 });
 
 const events = {
-  onChange: (selectedValue: string) => {
-    if (selectedValue === '') {
-      return { value: Value.noFilter() };
-    }
-
+  onChange: (selectedValue: string | null) => {
     return {
       value: selectedValue ?? Value.noFilter(),
     };
