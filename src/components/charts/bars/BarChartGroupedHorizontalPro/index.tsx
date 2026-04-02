@@ -71,22 +71,14 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
     axisOrderCacheKey,
   });
 
-  const resultsResponse =
-    props.results ??
-    ({
-      isLoading: !resultsAxisOrder?.error,
-      data: [],
-      error: resultsAxisOrder?.error,
-    } as DataResponse);
-
   const results = useFillGaps({
-    results: resultsResponse,
+    results: props.results,
     dimension: yAxis,
   });
 
   const data = getBarStackedChartProData(
     {
-      data: results.data,
+      data: results?.data,
       dimension: yAxis,
       groupDimension: groupBy,
       measure,
@@ -109,7 +101,7 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
     <ChartCard
       data={results}
       dimensionsAndMeasures={[measure, yAxis, groupBy]}
-      errorMessage={results.error}
+      errorMessage={results?.error || resultsAxisOrder?.error}
       description={description}
       title={title}
       tooltip={tooltip}
