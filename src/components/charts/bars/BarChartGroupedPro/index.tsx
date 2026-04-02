@@ -17,8 +17,8 @@ export type BarChartGroupedProProps = {
   results?: DataResponse;
   resultsAxisOrder?: DataResponse;
   axisOrder?: string[];
-  currentAxisOrderKey?: string;
-  setAxisOrder?: (values: string[], key: string) => void;
+  axisOrderCacheKey?: string;
+  setAxisOrderAndCacheKey?: (values: string[], cacheKey: string) => void;
   reverseXAxis?: boolean;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
@@ -60,17 +60,20 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
     onBarClicked,
     axisOrder,
     resultsAxisOrder,
-    currentAxisOrderKey,
-    setAxisOrder,
+    axisOrderCacheKey,
+    setAxisOrderAndCacheKey,
   } = props;
 
   useUpdateAxisOrder({
     resultsAxisOrder,
     axisDimension: xAxis,
-    setAxisOrder,
-    currentAxisOrderKey,
+    setAxisOrder: setAxisOrderAndCacheKey,
+    // we can rename currentAxisOrderKey to axisOrderCacheKey to make it more clear that it's related to caching
+    currentAxisOrderKey: axisOrderCacheKey,
   });
 
+  // do we really need this *??*
+  // i guess if it is loading it is loading - no need to check if there is an error or not, but maybe we want to reset the axis order if there is an error?
   const resultsResponse =
     props.results ??
     ({
