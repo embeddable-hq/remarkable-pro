@@ -1,12 +1,22 @@
-import type { Dataset, Dimension, Measure } from '@embeddable.com/core';
+import type { DataResponse, Dataset, Dimension, Measure } from '@embeddable.com/core';
+import { vi } from 'vitest';
 import {
   getLimit,
   shouldGetTopItems,
   loadDataResultsAxisOrderArgs,
+  loadDataResultsAxisOrder,
   loadDataResultsArgs,
+  loadDataResults,
   getAxisOrderCacheKey,
   getCachedAxisOrder,
 } from './bars.loadData.utils';
+import { getDimensionWithGranularity } from '../utils/granularity.utils';
+
+const mockLoadData = vi.fn();
+vi.mock('@embeddable.com/core', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@embeddable.com/core')>();
+  return { ...actual, loadData: (...args: unknown[]) => mockLoadData(...args) };
+});
 
 const makeDataset = (): Dataset =>
   ({ embeddableId: 'e1', datasetId: 'ds1', inputName: 'dataset', variableValues: {} }) as Dataset;
@@ -239,5 +249,154 @@ describe('getCachedAxisOrder', () => {
 
   it('returns undefined when state is undefined', () => {
     expect(getCachedAxisOrder('key-1', undefined)).toBeUndefined();
+  });
+});
+
+describe('loadDataResultsAxisOrder', () => {
+  beforeEach(() => mockLoadData.mockReset());
+
+  it('returns undefined when no sort or limit is set', () => {
+    const result = loadDataResultsAxisOrder({
+      dataset: makeDataset(),
+      axis: makeDimension(),
+      measure: makeMeasure(),
+      sortDirection: undefined,
+      limitTopAxis: undefined,
+    });
+
+    expect(result).toBeUndefined();
+    expect(mockLoadData).not.toHaveBeenCalled();
+  });
+
+  it('calls loadData when sort direction is set', () => {
+    const fakeResponse = { data: [{ category: 'A' }], isLoading: false } as DataResponse;
+    mockLoadData.mockReturnValue(fakeResponse);
+
+    const result = loadDataResultsAxisOrder({
+      dataset: makeDataset(),
+      axis: makeDimension(),
+      measure: makeMeasure(),
+      sortDirection: 'desc',
+      limitTopAxis: 5,
+    });
+
+    expect(result).toBe(fakeResponse);
+    expect(mockLoadData).toHaveBeenCalledOnce();
+  });
+
+  it('calls loadData when only limit is set', () => {
+    const fakeResponse = { data: [], isLoading: false } as DataResponse;
+    mockLoadData.mockReturnValue(fakeResponse);
+
+    const result = loadDataResultsAxisOrder({
+      dataset: makeDataset(),
+      axis: makeDimension(),
+      measure: makeMeasure(),
+      sortDirection: undefined,
+      limitTopAxis: 3,
+    });
+
+    expect(result).toBe(fakeResponse);
+    expect(mockLoadData).toHaveBeenCalledOnce();
+  });
+});
+
+describe('loadDataResults', () => {
+  beforeEach(() => mockLoadData.mockReset());
+
+  const baseArgs = {
+    dataset: makeDataset(),
+    axis: makeDimension(),
+    groupBy: makeDimension('group'),
+    measure: makeMeasure(),
+  };
+
+  it('calls loadData directly when no sort or limit is set', () => {
+    const fakeResponse = { data: [{ category: 'A' }], isLoading: false } as DataResponse;
+    mockLoadData.mockReturnValue(fakeResponse);
+
+    const result = loadDataResults({
+      ...baseArgs,
+      sortDirection: undefined,
+      limitTopAxis: undefined,
+      maxResults: 1000,
+    });
+
+    expect(result).toBe(fakeResponse);
+    expect(mockLoadData).toHaveBeenCalledOnce();
+  });
+
+  it('returns undefined when top items needed but axisOrder is null', () => {
+    const result = loadDataResults({
+      ...baseArgs,
+      sortDirection: 'desc',
+      limitTopAxis: 3,
+      axisOrder: undefined,
+    });
+
+    expect(result).toBeUndefined();
+    expect(mockLoadData).not.toHaveBeenCalled();
+  });
+
+  it('returns empty results when axisOrder is an empty array', () => {
+    const result = loadDataResults({
+      ...baseArgs,
+      sortDirection: 'desc',
+      limitTopAxis: 3,
+      axisOrder: [],
+    });
+
+    expect(result).toEqual({ data: [], isLoading: false });
+    expect(mockLoadData).not.toHaveBeenCalled();
+  });
+
+  it('calls loadData with axis filter when axisOrder has values', () => {
+    const fakeResponse = { data: [{ category: 'A' }], isLoading: false } as DataResponse;
+    mockLoadData.mockReturnValue(fakeResponse);
+
+    const result = loadDataResults({
+      ...baseArgs,
+      sortDirection: 'desc',
+      limitTopAxis: 3,
+      maxResults: 1000,
+      axisOrder: ['A', 'B'],
+    });
+
+    expect(result).toBe(fakeResponse);
+    expect(mockLoadData).toHaveBeenCalledOnce();
+    const request = mockLoadData.mock.calls[0]?.[0];
+    expect(request?.filters).toEqual([
+      { property: baseArgs.axis, operator: 'equals', value: ['A', 'B'] },
+    ]);
+  });
+});
+
+describe('getDimensionWithGranularity', () => {
+  it('uses provided granularity over dimension default', () => {
+    const dim = makeDimension();
+    const result = getDimensionWithGranularity(
+      dim,
+      'month' as unknown as import('@embeddable.com/core').Granularity,
+    );
+
+    expect(result.name).toBe(dim.name);
+    expect(result.inputs?.granularity).toBe('month');
+  });
+
+  it('preserves dimension granularity when none is provided', () => {
+    const dim = {
+      ...makeDimension(),
+      inputs: { granularity: 'day' },
+    } as unknown as Dimension;
+    const result = getDimensionWithGranularity(dim);
+
+    expect(result.inputs?.granularity).toBe('day');
+  });
+
+  it('returns undefined granularity when neither is set', () => {
+    const dim = makeDimension();
+    const result = getDimensionWithGranularity(dim);
+
+    expect(result.inputs?.granularity).toBeUndefined();
   });
 });
