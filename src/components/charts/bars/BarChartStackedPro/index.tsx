@@ -18,8 +18,8 @@ export type BarChartStackedProProps = {
   results?: DataResponse;
   resultsAxisOrder?: DataResponse;
   axisOrder?: string[];
-  currentAxisOrderKey?: string;
-  setAxisOrder?: (values: string[], key: string) => void;
+  axisOrderCacheKey?: string;
+  setAxisOrderAndCacheKey?: (values: string[], cacheKey: string) => void;
   reverseXAxis?: boolean;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
@@ -60,15 +60,15 @@ const BarChartStackedPro = (props: BarChartStackedProProps) => {
     onBarClicked,
     axisOrder,
     resultsAxisOrder,
-    currentAxisOrderKey,
-    setAxisOrder,
+    axisOrderCacheKey,
+    setAxisOrderAndCacheKey,
   } = props;
 
   useUpdateAxisOrder({
     resultsAxisOrder,
     axisDimension: xAxis,
-    setAxisOrder,
-    currentAxisOrderKey,
+    setAxisOrder: setAxisOrderAndCacheKey,
+    axisOrderCacheKey,
   });
 
   const resultsResponse =

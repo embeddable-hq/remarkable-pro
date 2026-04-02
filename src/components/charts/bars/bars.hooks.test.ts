@@ -23,7 +23,7 @@ describe('useUpdateAxisOrder', () => {
         resultsAxisOrder,
         axisDimension: makeDimension(),
         setAxisOrder,
-        currentAxisOrderKey: 'key-1',
+        axisOrderCacheKey: 'key-1',
       }),
     );
 
@@ -39,7 +39,7 @@ describe('useUpdateAxisOrder', () => {
         resultsAxisOrder,
         axisDimension: makeDimension(),
         setAxisOrder,
-        currentAxisOrderKey: 'key-1',
+        axisOrderCacheKey: 'key-1',
       }),
     );
 
@@ -54,14 +54,14 @@ describe('useUpdateAxisOrder', () => {
         resultsAxisOrder: undefined,
         axisDimension: makeDimension(),
         setAxisOrder,
-        currentAxisOrderKey: undefined,
+        axisOrderCacheKey: undefined,
       }),
     );
 
     expect(setAxisOrder).not.toHaveBeenCalled();
   });
 
-  it('does not call setAxisOrder when currentAxisOrderKey is undefined', () => {
+  it('does not call setAxisOrder when axisOrderCacheKey is undefined', () => {
     const setAxisOrder = vi.fn();
     const resultsAxisOrder = makeDataResponse([{ country: 'FR' }], false);
 
@@ -70,7 +70,7 @@ describe('useUpdateAxisOrder', () => {
         resultsAxisOrder,
         axisDimension: makeDimension(),
         setAxisOrder,
-        currentAxisOrderKey: undefined,
+        axisOrderCacheKey: undefined,
       }),
     );
 
@@ -85,7 +85,7 @@ describe('useUpdateAxisOrder', () => {
         resultsAxisOrder,
         axisDimension: makeDimension(),
         setAxisOrder: undefined,
-        currentAxisOrderKey: 'key-1',
+        axisOrderCacheKey: 'key-1',
       }),
     );
   });
@@ -102,7 +102,7 @@ describe('useUpdateAxisOrder', () => {
         resultsAxisOrder,
         axisDimension: makeDimension(),
         setAxisOrder,
-        currentAxisOrderKey: 'key-1',
+        axisOrderCacheKey: 'key-1',
       }),
     );
 
@@ -118,7 +118,7 @@ describe('useUpdateAxisOrder', () => {
         resultsAxisOrder,
         axisDimension: makeDimension(),
         setAxisOrder,
-        currentAxisOrderKey: 'key-1',
+        axisOrderCacheKey: 'key-1',
       }),
     );
 
@@ -135,7 +135,7 @@ describe('useUpdateAxisOrder', () => {
           resultsAxisOrder,
           axisDimension: dim,
           setAxisOrder,
-          currentAxisOrderKey: key,
+          axisOrderCacheKey: key,
         }),
       {
         initialProps: {
@@ -165,7 +165,7 @@ describe('useUpdateAxisOrder', () => {
         resultsAxisOrder,
         axisDimension: makeDimension(),
         setAxisOrder,
-        currentAxisOrderKey: 'key-1',
+        axisOrderCacheKey: 'key-1',
       }),
     );
 

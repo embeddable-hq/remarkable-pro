@@ -17,8 +17,8 @@ export type BarChartGroupedHorizontalProProps = {
   results?: DataResponse;
   resultsAxisOrder?: DataResponse;
   axisOrder?: string[];
-  currentAxisOrderKey?: string;
-  setAxisOrder?: (values: string[], key: string) => void;
+  axisOrderCacheKey?: string;
+  setAxisOrderAndCacheKey?: (values: string[], cacheKey: string) => void;
   reverseYAxis?: boolean;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
@@ -60,15 +60,15 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
     onBarClicked,
     axisOrder,
     resultsAxisOrder,
-    currentAxisOrderKey,
-    setAxisOrder,
+    axisOrderCacheKey,
+    setAxisOrderAndCacheKey,
   } = props;
 
   useUpdateAxisOrder({
     resultsAxisOrder,
     axisDimension: yAxis,
-    setAxisOrder,
-    currentAxisOrderKey,
+    setAxisOrder: setAxisOrderAndCacheKey,
+    axisOrderCacheKey,
   });
 
   const resultsResponse =

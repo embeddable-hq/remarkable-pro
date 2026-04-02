@@ -417,7 +417,6 @@ const yAxisMaxItems = {
   category: 'Axes Settings',
 } as const;
 
-// new
 const sortDirectionTopXAxis = {
   name: 'sortDirectionTopXAxis',
   type: SortDirectionType,
@@ -425,7 +424,6 @@ const sortDirectionTopXAxis = {
   category: 'Component Settings',
 } as const;
 
-// new
 const sortDirectionTopYAxis = {
   name: 'sortDirectionTopYAxis',
   type: SortDirectionType,
@@ -433,7 +431,6 @@ const sortDirectionTopYAxis = {
   category: 'Component Settings',
 } as const;
 
-// new
 const limitTopXAxis = {
   name: 'limitTopXAxis',
   type: 'number',
@@ -442,26 +439,10 @@ const limitTopXAxis = {
   category: 'Component Settings',
 } as const;
 
-// new
 const limitTopYAxis = {
   name: 'limitTopYAxis',
   type: 'number',
   label: 'Limit top y-axis',
-  description: 'Load only the top or bottom categories, based on group totals',
-  category: 'Component Settings',
-} as const;
-
-const sortDirectionTopAxis = {
-  name: 'sortDirectionTopAxis',
-  type: SortDirectionType,
-  label: 'Sort direction top axis',
-  category: 'Component Settings',
-} as const;
-
-const limitAxisItems = {
-  name: 'limitAxisItems',
-  type: 'number',
-  label: 'Limit x-axis items',
   description: 'Load only the top or bottom categories, based on group totals',
   category: 'Component Settings',
 } as const;
@@ -522,12 +503,10 @@ export const inputs = {
   xAxisRangeMax,
   xAxisMaxItems,
   yAxisMaxItems,
-  sortDirectionTopAxis,
   sortDirectionTopXAxis,
   sortDirectionTopYAxis,
   limitTopXAxis,
   limitTopYAxis,
-  limitAxisItems,
   granularity,
   granularities,
   markdown,

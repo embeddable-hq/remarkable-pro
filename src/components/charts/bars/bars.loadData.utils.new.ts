@@ -22,9 +22,6 @@ export const shouldGetTopItems = (sortDirection?: OrderDirection, limit?: number
 
 const EMPTY_RESULTS = { data: [], isLoading: false } as DataResponse;
 
-// the idea is to reuse this across all the bar components
-// this is why the names are generic (e.g. axis instead of xAxis or yAxis) and why we pass the axis as
-
 // ---- Axis Order ----
 
 type LoadDataResultsAxisOrderArgs = {

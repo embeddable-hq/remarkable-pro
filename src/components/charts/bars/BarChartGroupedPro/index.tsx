@@ -68,12 +68,9 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
     resultsAxisOrder,
     axisDimension: xAxis,
     setAxisOrder: setAxisOrderAndCacheKey,
-    // we can rename currentAxisOrderKey to axisOrderCacheKey to make it more clear that it's related to caching
-    currentAxisOrderKey: axisOrderCacheKey,
+    axisOrderCacheKey,
   });
 
-  // do we really need this *??*
-  // i guess if it is loading it is loading - no need to check if there is an error or not, but maybe we want to reset the axis order if there is an error?
   const resultsResponse =
     props.results ??
     ({
