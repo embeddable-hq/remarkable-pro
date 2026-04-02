@@ -9,11 +9,16 @@ import { mergician } from 'mergician';
 import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
+import { useUpdateAxisOrderAndCacheKey } from '../bars.hooks';
 
 export type BarChartGroupedProProps = {
   groupBy: Dimension;
   measure: Measure;
-  results: DataResponse;
+  results?: DataResponse;
+  resultsAxisOrder?: DataResponse;
+  axisOrder?: string[];
+  axisOrderCacheKey?: string;
+  setAxisOrderAndCacheKey?: (values: string[], cacheKey: string) => void;
   reverseXAxis?: boolean;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
@@ -36,7 +41,10 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
+  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+
   const {
+    hideMenu,
     groupBy,
     measure,
     reverseXAxis,
@@ -50,23 +58,31 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
     yAxisRangeMin,
     setGranularity,
     onBarClicked,
+    axisOrder,
+    resultsAxisOrder,
+    axisOrderCacheKey,
+    setAxisOrderAndCacheKey,
   } = props;
 
-  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
-
-  const { hideMenu } = props;
+  useUpdateAxisOrderAndCacheKey({
+    resultsAxisOrder,
+    axisDimension: xAxis,
+    setAxisOrderAndCacheKey,
+    axisOrderCacheKey,
+  });
 
   const results = useFillGaps({
     results: props.results,
-    dimension: props.xAxis,
+    dimension: xAxis,
   });
 
   const data = getBarStackedChartProData(
     {
-      data: results.data,
+      data: results?.data,
       dimension: xAxis,
       groupDimension: groupBy,
       measure,
+      axisOrder,
     },
     theme,
   );
@@ -85,7 +101,7 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
     <ChartCard
       data={results}
       dimensionsAndMeasures={[measure, xAxis, groupBy]}
-      errorMessage={results.error}
+      errorMessage={results?.error || resultsAxisOrder?.error}
       description={description}
       title={title}
       tooltip={tooltip}

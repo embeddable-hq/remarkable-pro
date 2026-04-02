@@ -9,11 +9,16 @@ import { mergician } from 'mergician';
 import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
+import { useUpdateAxisOrderAndCacheKey } from '../bars.hooks';
 
 export type BarChartGroupedHorizontalProProps = {
   groupBy: Dimension;
   measure: Measure;
-  results: DataResponse;
+  results?: DataResponse;
+  resultsAxisOrder?: DataResponse;
+  axisOrder?: string[];
+  axisOrderCacheKey?: string;
+  setAxisOrderAndCacheKey?: (values: string[], cacheKey: string) => void;
   reverseYAxis?: boolean;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
@@ -39,8 +44,8 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
   const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
 
   const {
-    yAxis,
     hideMenu,
+    yAxis,
     groupBy,
     measure,
     reverseYAxis,
@@ -53,7 +58,18 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
     xAxisRangeMin,
     setGranularity,
     onBarClicked,
+    axisOrder,
+    resultsAxisOrder,
+    axisOrderCacheKey,
+    setAxisOrderAndCacheKey,
   } = props;
+
+  useUpdateAxisOrderAndCacheKey({
+    resultsAxisOrder,
+    axisDimension: yAxis,
+    setAxisOrderAndCacheKey,
+    axisOrderCacheKey,
+  });
 
   const results = useFillGaps({
     results: props.results,
@@ -62,10 +78,11 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
 
   const data = getBarStackedChartProData(
     {
-      data: results.data,
+      data: results?.data,
       dimension: yAxis,
       groupDimension: groupBy,
       measure,
+      axisOrder,
     },
     theme,
   );
@@ -84,7 +101,7 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
     <ChartCard
       data={results}
       dimensionsAndMeasures={[measure, yAxis, groupBy]}
-      errorMessage={results.error}
+      errorMessage={results?.error || resultsAxisOrder?.error}
       description={description}
       title={title}
       tooltip={tooltip}

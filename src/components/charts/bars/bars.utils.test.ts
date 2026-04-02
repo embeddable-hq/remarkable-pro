@@ -197,6 +197,82 @@ describe('getBarStackedChartProData', () => {
 
     expect(mockFormatter.data).toHaveBeenCalledWith(groupDimension, 'North');
   });
+
+  it('sorts axis alphabetically by default (no axisOrder)', () => {
+    const dimension = makeDimension({ name: 'category' });
+    const groupDimension = makeDimension({ name: 'region', nativeType: 'string' });
+    const measure = makeMeasure({ name: 'sales' });
+
+    const data = [
+      { category: 'C', region: 'North', sales: '30' },
+      { category: 'A', region: 'North', sales: '10' },
+      { category: 'B', region: 'North', sales: '20' },
+    ];
+
+    const result = getBarStackedChartProData(
+      { data, dimension, groupDimension, measure },
+      makeTheme(),
+    );
+
+    expect(result.labels).toEqual(['A', 'B', 'C']);
+  });
+
+  it('uses axisOrder when provided', () => {
+    const dimension = makeDimension({ name: 'category' });
+    const groupDimension = makeDimension({ name: 'region', nativeType: 'string' });
+    const measure = makeMeasure({ name: 'sales' });
+
+    const data = [
+      { category: 'A', region: 'North', sales: '10' },
+      { category: 'B', region: 'North', sales: '20' },
+      { category: 'C', region: 'North', sales: '30' },
+    ];
+
+    const result = getBarStackedChartProData(
+      { data, dimension, groupDimension, measure, axisOrder: ['C', 'A', 'B'] },
+      makeTheme(),
+    );
+
+    expect(result.labels).toEqual(['C', 'A', 'B']);
+  });
+
+  it('excludes axisOrder values not present in data', () => {
+    const dimension = makeDimension({ name: 'category' });
+    const groupDimension = makeDimension({ name: 'region', nativeType: 'string' });
+    const measure = makeMeasure({ name: 'sales' });
+
+    const data = [
+      { category: 'A', region: 'North', sales: '10' },
+      { category: 'C', region: 'North', sales: '30' },
+    ];
+
+    const result = getBarStackedChartProData(
+      { data, dimension, groupDimension, measure, axisOrder: ['C', 'B', 'A'] },
+      makeTheme(),
+    );
+
+    expect(result.labels).toEqual(['C', 'A']);
+  });
+
+  it('maps dataset values in axisOrder order', () => {
+    const dimension = makeDimension({ name: 'category' });
+    const groupDimension = makeDimension({ name: 'region', nativeType: 'string' });
+    const measure = makeMeasure({ name: 'sales' });
+
+    const data = [
+      { category: 'A', region: 'North', sales: '10' },
+      { category: 'B', region: 'North', sales: '20' },
+      { category: 'C', region: 'North', sales: '30' },
+    ];
+
+    const result = getBarStackedChartProData(
+      { data, dimension, groupDimension, measure, axisOrder: ['C', 'A'] },
+      makeTheme(),
+    );
+
+    expect(result.labels).toEqual(['C', 'A']);
+    expect(result.datasets[0]?.data).toEqual([30, 10]);
+  });
 });
 
 // ----------------------------------------------------------------------------
