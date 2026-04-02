@@ -9,7 +9,7 @@ import { mergician } from 'mergician';
 import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { useUpdateAxisOrder } from '../bars.hooks';
+import { useUpdateAxisOrderAndCacheKey } from '../bars.hooks';
 
 export type BarChartGroupedProProps = {
   groupBy: Dimension;
@@ -64,10 +64,10 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
     setAxisOrderAndCacheKey,
   } = props;
 
-  useUpdateAxisOrder({
+  useUpdateAxisOrderAndCacheKey({
     resultsAxisOrder,
     axisDimension: xAxis,
-    setAxisOrder: setAxisOrderAndCacheKey,
+    setAxisOrderAndCacheKey,
     axisOrderCacheKey,
   });
 
