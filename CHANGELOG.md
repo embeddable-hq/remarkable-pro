@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.1.32
+
+### Patch Changes
+
+- b6108d3: Added sort and limit functionality for Bar chart components
+
 ## 0.1.31
 
 ### Patch Changes
