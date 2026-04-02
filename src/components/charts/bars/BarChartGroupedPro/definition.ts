@@ -95,10 +95,15 @@ const props = (
   });
 
   const cachedAxisOrder = getCachedAxisOrder(axisOrderCacheKey, state);
+
   return {
     ...inputs,
     xAxis: xAxisWithGranularity,
+    axisOrder: cachedAxisOrder,
+    axisOrderCacheKey,
     setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
+    setAxisOrderAndCacheKey: (axisOrder: string[], cacheKey: string) =>
+      setState({ ...state, axisOrder, axisOrderCacheKey: cacheKey }),
     resultsAxisOrder: loadDataResultsAxisOrder({
       dataset: inputs.dataset,
       limitTopAxis: inputs.limitTopXAxis,
@@ -116,10 +121,6 @@ const props = (
       maxResults: inputs.maxResults,
       axisOrder: cachedAxisOrder,
     }),
-    axisOrder: cachedAxisOrder,
-    axisOrderCacheKey,
-    setAxisOrder: (axisOrder: string[], cacheKey: string) =>
-      setState({ ...state, axisOrder, axisOrderCacheKey: cacheKey }),
   };
 };
 

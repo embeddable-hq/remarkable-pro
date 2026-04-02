@@ -18,7 +18,7 @@ export type BarChartGroupedProProps = {
   resultsAxisOrder?: DataResponse;
   axisOrder?: string[];
   axisOrderCacheKey?: string;
-  setAxisOrder?: (values: string[], cacheKey: string) => void;
+  setAxisOrderAndCacheKey?: (values: string[], cacheKey: string) => void;
   reverseXAxis?: boolean;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
@@ -61,13 +61,13 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
     axisOrder,
     resultsAxisOrder,
     axisOrderCacheKey,
-    setAxisOrder,
+    setAxisOrderAndCacheKey,
   } = props;
 
   useUpdateAxisOrder({
     resultsAxisOrder,
     axisDimension: xAxis,
-    setAxisOrder,
+    setAxisOrder: setAxisOrderAndCacheKey,
     // we can rename currentAxisOrderKey to axisOrderCacheKey to make it more clear that it's related to caching
     currentAxisOrderKey: axisOrderCacheKey,
   });
