@@ -1,0 +1,65 @@
+.tabsContainer {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: var(--em-chart-selectfield-padding-bottom, 1rem);
+}
+
+.tabsScroll {
+  display: flex;
+  align-items: stretch;
+  gap: var(--em-tabbedlinechart-tabs-gap, 0);
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: relative;
+  width: 100%;
+}
+
+.tabsScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollLeftButton {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border: none;
+  background: var(--em-tabbedlinechart-scroll-button-background, transparent);
+  padding: var(--em-tabbedlinechart-scroll-button-padding, 0.25rem);
+  color: var(--em-tabbedlinechart-scroll-button-color, #5c5c66);
+}
+
+.scrollLeftButton:hover {
+  background: var(--em-tabbedlinechart-scroll-button-background--hover, #ededf1);
+}
+
+.scrollLeftButton svg {
+  flex-shrink: 0;
+  width: var(--em-tabbedlinechart-scroll-button-icon-size, 1rem);
+  height: var(--em-tabbedlinechart-scroll-button-icon-size, 1rem);
+}
+
+.scrollRightButton {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  border: none;
+  background: var(--em-tabbedlinechart-scroll-button-background, transparent);
+  padding: var(--em-tabbedlinechart-scroll-button-padding, 0.25rem);
+  color: var(--em-tabbedlinechart-scroll-button-color, #5c5c66);
+}
+
+.scrollRightButton:hover {
+  background: var(--em-tabbedlinechart-scroll-button-background--hover, #ededf1);
+}
+
+.scrollRightButton svg {
+  flex-shrink: 0;
+  width: var(--em-tabbedlinechart-scroll-button-icon-size, 1rem);
+  height: var(--em-tabbedlinechart-scroll-button-icon-size, 1rem);
+}

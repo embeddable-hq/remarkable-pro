@@ -1,0 +1,45 @@
+.tab {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  padding: var(--em-chart-tabs-padding, 0.75rem);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--em-chart-tabs-gap, 0.5rem);
+  border: var(--em-chart-tabs-border-width, 1px) solid transparent;
+  border-radius: var(--em-chart-tabs-border-radius, 0.75rem);
+  background: transparent;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.tab:hover {
+  background: var(--em-chart-tabs-background--hover, #f7f7f8);
+}
+
+.tabActive {
+  border: var(--em-chart-tabs-border-width, 1px) solid var(--em-chart-tabs-border-color--selected, #B8B8BD);
+}
+
+.tabActive:hover {
+  background: var(--em-chart-tabs-background--active-hover, #f7f7f8);
+}
+
+.tabTitle {
+  color: var(--em-chart-tabs-color, #000);
+  font-family: var(--em-chart-tabs-font-family, Inter);
+  font-size: var(--em-chart-tabs-title-font-size, 0.75rem);
+  font-style: normal;
+  font-weight: var(--em-chart-tabs-title-font-weight, 500);
+  line-height: var(--em-core-line-height--sm, 0.875rem);
+}
+
+.tabValue {
+  color: var(--em-chart-tabs-color, #000);
+  font-family: var(--em-chart-tabs-font-family, Inter);
+  font-size: var(--em-chart-tabs-value-font-size, 1.25rem);
+  font-style: normal;
+  font-weight: var(--em-chart-tabs-value-font-weight, 500);
+  line-height: var(--em-chart-tabs-value-line-height, 1.1875rem);
+}

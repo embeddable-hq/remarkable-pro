@@ -107,6 +107,12 @@ export * from './components/charts/lines/LineChartComparisonDefaultPro/LineChart
 export * from './components/charts/lines/LineChartDefaultPro/definition';
 export * from './components/charts/lines/LineChartGroupedPro/definition';
 export * from './components/charts/lines/LineChartComparisonDefaultPro/definition';
+export * as LineChartTabbedPro from './components/charts/lines/LineChartTabbedPro';
+export type {
+  LineChartTabbedProProps,
+  LineChartTabbedProPropsOnLineClicked,
+} from './components/charts/lines/LineChartTabbedPro';
+export * from './components/charts/lines/LineChartTabbedPro/definition';
 
 // Charts - Pies
 export * as DonutChartPro from './components/charts/pies/DonutChartPro';
