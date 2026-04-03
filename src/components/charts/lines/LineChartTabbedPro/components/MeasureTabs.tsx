@@ -3,7 +3,7 @@ import { DataResponse, Measure } from '@embeddable.com/core';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { Theme } from '../../../../../theme/theme.types';
 import { MeasureTab } from './MeasureTab';
-import { useHorizontalScroll } from './useHorizontalScroll';
+import { useHorizontalScroll } from '../../../../horizontalScroll.hooks';
 import styles from './MeasureTabs.module.css';
 
 type MeasureTabsProps = {

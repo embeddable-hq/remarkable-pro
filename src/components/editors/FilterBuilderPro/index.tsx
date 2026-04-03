@@ -1,6 +1,6 @@
 import { DataResponse, DimensionOrMeasure } from '@embeddable.com/core';
 import { useTheme } from '@embeddable.com/react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Theme } from '../../../theme/theme.types';
 import FilterBuilderItem from './components/FilterBuilderItem';
 import { FilterBuilderFilter, FilterBuilderState } from './definition';
@@ -16,6 +16,7 @@ import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
 import { resolveI18nProps } from '../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
+import { useHorizontalScroll } from '../../horizontalScroll.hooks';
 
 export type FilterBuilderProProps = {
   embeddableState?: FilterBuilderState;
@@ -34,37 +35,8 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const { dimensionsAndMeasures = [], setEmbeddableState, embeddableState, onChange } = props;
 
   const [searchNew, setSearchNew] = useState('');
-  const [canScrollRight, setCanScrollRight] = useState(false);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  const updateScrollState = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 1);
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
-  }, []);
-
-  const handleScrollRight = () => {
-    scrollRef.current?.scrollBy({ left: 200, behavior: 'smooth' });
-  };
-
-  const handleScrollLeft = () => {
-    scrollRef.current?.scrollBy({ left: -200, behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(updateScrollState);
-    ro.observe(el);
-    el.addEventListener('scroll', updateScrollState);
-    updateScrollState();
-    return () => {
-      ro.disconnect();
-      el.removeEventListener('scroll', updateScrollState);
-    };
-  }, [updateScrollState, embeddableState?.filters]);
+  const { scrollRef, canScrollLeft, canScrollRight, handleScrollLeft, handleScrollRight } =
+    useHorizontalScroll([embeddableState?.filters]);
 
   const prevFilterValueRef = useRef<unknown>(undefined);
 
@@ -76,7 +48,6 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   useEffect(() => {
     setTimeout(() => {
       scrollRef.current?.scrollTo({ left: scrollRef.current.scrollWidth, behavior: 'smooth' });
-      updateScrollState();
     }, 100);
   }, [lastFilterKey]);
 
