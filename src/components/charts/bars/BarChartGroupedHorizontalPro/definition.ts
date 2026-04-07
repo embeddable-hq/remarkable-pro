@@ -10,6 +10,8 @@ import {
   loadDataResultsAxisOrder,
   loadDataResults,
 } from '../bars.loadData.utils';
+import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
+import { ThemeClientContext } from '../../../../theme/theme.types';
 
 const meta = {
   name: 'BarChartGroupedHorizontalPro',
@@ -85,9 +87,11 @@ const props = (
     BarChartGroupedHorizontalProState,
     (state: BarChartGroupedHorizontalProState) => void,
   ],
+  clientContext: ThemeClientContext,
 ) => {
   const yAxisWithGranularity = getDimensionWithGranularity(inputs.yAxis, state?.granularity);
   const sortDirection = inputs.sortDirectionTopYAxis as OrderDirection | undefined;
+  const timezone = getClientContextTimezone(clientContext?.timezone);
 
   const axisOrderCacheKey = getAxisOrderCacheKey({
     dataset: inputs.dataset,
@@ -95,6 +99,7 @@ const props = (
     measure: inputs.measure,
     sortDirection,
     limit: inputs.limitTopYAxis,
+    timezone,
   });
 
   const cachedAxisOrder = getCachedAxisOrder(axisOrderCacheKey, state);
@@ -113,6 +118,7 @@ const props = (
       axis: yAxisWithGranularity,
       measure: inputs.measure,
       sortDirection,
+      timezone,
     }),
     results: loadDataResults({
       dataset: inputs.dataset,
@@ -123,6 +129,7 @@ const props = (
       limitTopAxis: inputs.limitTopYAxis,
       maxResults: inputs.maxResults,
       axisOrder: cachedAxisOrder,
+      timezone,
     }),
   };
 };

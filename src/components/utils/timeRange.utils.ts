@@ -14,7 +14,7 @@ export const getComparisonPeriodDateRange = (
   const primaryDateRangeRange = primaryDateRange?.relativeTimeString
     ? theme.defaults.dateRangesOptions
         .find((option) => option.value === primaryDateRange?.relativeTimeString)
-        ?.getRange()
+        ?.getRange(theme.clientContext.timezone)
     : primaryDateRange;
 
   const comparisonPeriodOption = theme.defaults.comparisonPeriodsOptions.find(

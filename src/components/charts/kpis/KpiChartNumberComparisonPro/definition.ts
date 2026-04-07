@@ -3,6 +3,8 @@ import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/re
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
+import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
+import { ThemeClientContext } from '../../../../theme/theme.types';
 
 const meta = {
   name: 'KpiChartNumberComparisonPro',
@@ -75,10 +77,14 @@ const previewConfig = {
 
 const preview = definePreview(Component, previewConfig);
 
-const loadDataResultsArgs = (inputs: Inputs<typeof meta>): LoadDataRequest => ({
+const loadDataResultsArgs = (
+  inputs: Inputs<typeof meta>,
+  clientContext?: ThemeClientContext,
+): LoadDataRequest => ({
   from: inputs.dataset,
   select: [inputs.measure],
   limit: 1,
+  timezone: getClientContextTimezone(clientContext?.timezone),
   filters:
     inputs.primaryDateRange && inputs.timeProperty
       ? [
@@ -91,16 +97,20 @@ const loadDataResultsArgs = (inputs: Inputs<typeof meta>): LoadDataRequest => ({
       : undefined,
 });
 
-const loadDataResults = (inputs: Inputs<typeof meta>): DataResponse =>
-  loadData(loadDataResultsArgs(inputs));
+const loadDataResults = (
+  inputs: Inputs<typeof meta>,
+  clientContext: ThemeClientContext,
+): DataResponse => loadData(loadDataResultsArgs(inputs, clientContext));
 
 const loadDataResultsComparisonArgs = (
   inputs: Inputs<typeof meta>,
   comparisonDateRange: TimeRange,
+  clientContext?: ThemeClientContext,
 ): LoadDataRequest => ({
   from: inputs.dataset,
   select: [inputs.measure],
   limit: 1,
+  timezone: getClientContextTimezone(clientContext?.timezone),
   filters: [
     {
       property: inputs.timeProperty,
@@ -113,9 +123,12 @@ const loadDataResultsComparisonArgs = (
 const loadDataResultsComparison = (
   inputs: Inputs<typeof meta>,
   state: KpiChartNumberComparisonProState,
+  clientContext: ThemeClientContext,
 ): DataResponse | undefined => {
   if (inputs.primaryDateRange && inputs.timeProperty && state?.comparisonDateRange) {
-    return loadData(loadDataResultsComparisonArgs(inputs, state.comparisonDateRange));
+    return loadData(
+      loadDataResultsComparisonArgs(inputs, state.comparisonDateRange, clientContext),
+    );
   }
   return undefined;
 };
@@ -126,13 +139,14 @@ const props = (
     KpiChartNumberComparisonProState,
     (state: KpiChartNumberComparisonProState) => void,
   ],
+  clientContext: ThemeClientContext,
 ) => ({
   ...inputs,
   comparisonPeriod: inputs.comparisonPeriod as string | undefined,
   comparisonDateRange: state?.comparisonDateRange,
   setComparisonDateRange: (comparisonDateRange: TimeRange) => setState({ comparisonDateRange }),
-  results: loadDataResults(inputs),
-  resultsComparison: loadDataResultsComparison(inputs, state),
+  results: loadDataResults(inputs, clientContext),
+  resultsComparison: loadDataResultsComparison(inputs, state, clientContext),
 });
 
 export const kpiChartNumberComparisonPro = {

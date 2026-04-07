@@ -58,12 +58,16 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
       return;
     }
     // Step 1: Convert relativeTimeString to actual time range (from/to)
-    const newTimeRange = getTimeRangeFromPresets(selectedValue, dateRangeOptions);
+    const newTimeRange = getTimeRangeFromPresets(
+      selectedValue,
+      dateRangeOptions,
+      theme.clientContext.timezone,
+    );
 
     if (!shallowEqual(newTimeRange, selectedValue)) {
       onChange(newTimeRange);
     }
-  }, [selectedValue, dayjsLocaleReady, onChange, dateRangeOptions]);
+  }, [selectedValue, dayjsLocaleReady, onChange, dateRangeOptions, theme.clientContext.timezone]);
 
   if (!dayjsLocaleReady) {
     return null;
@@ -71,12 +75,13 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
 
   const { description, placeholder, title, tooltip } = resolveI18nProps(props);
 
-  const options = getDateRangeSelectFieldProOptions(dateRangeOptions);
+  const options = getDateRangeSelectFieldProOptions(dateRangeOptions, theme.clientContext.timezone);
 
   const handleOptionChange = (newValue: string | undefined) => {
     const newTimeRange = getTimeRangeFromPresets(
       { relativeTimeString: newValue } as TimeRange,
       dateRangeOptions,
+      theme.clientContext.timezone,
     );
 
     onChange(newTimeRange);

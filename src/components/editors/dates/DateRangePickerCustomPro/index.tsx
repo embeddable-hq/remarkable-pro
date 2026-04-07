@@ -40,7 +40,12 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   };
 
   const dateRangeOptions = theme.defaults.dateRangesOptions;
-  const displayValue = getTimeRangeLabel(selectedValue, 'MMM DD', dateRangeOptions);
+  const displayValue = getTimeRangeLabel(
+    selectedValue,
+    'MMM DD',
+    dateRangeOptions,
+    theme.clientContext.timezone,
+  );
 
   const locale = theme.i18n.language ?? theme.formatter.locale;
 
@@ -53,7 +58,11 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
         placeholder={placeholder}
         displayValue={displayValue}
         numberOfMonths={showTwoMonths ? 2 : 1}
-        value={getDateRangeFromTimeRange(selectedValue, dateRangeOptions)}
+        value={getDateRangeFromTimeRange(
+          selectedValue,
+          dateRangeOptions,
+          theme.clientContext.timezone,
+        )}
         onChange={handleChange}
         submitLabel={i18n.t('editors.dateRangePicker.apply')}
         avoidCollisions={false}

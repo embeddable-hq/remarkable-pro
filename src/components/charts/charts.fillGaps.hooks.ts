@@ -51,7 +51,7 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
     const dateBounds = dateBoundsTmp?.relativeTimeString
       ? theme.defaults.dateRangesOptions
           .find((option) => option.value === dateBoundsTmp?.relativeTimeString)
-          ?.getRange()
+          ?.getRange(theme.clientContext.timezone)
       : dateBoundsTmp;
 
     if (dimension.nativeType !== 'time') return results;
