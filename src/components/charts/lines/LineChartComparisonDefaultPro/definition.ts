@@ -169,7 +169,7 @@ const loadDataResultsArgs = (
 const loadDataResults = (
   inputs: Inputs<typeof meta>,
   xAxis: Dimension,
-  clientContext?: ThemeClientContext,
+  clientContext: ThemeClientContext,
 ): DataResponse => loadData(loadDataResultsArgs(inputs, xAxis, clientContext));
 
 const loadDataResultsComparisonArgs = (
