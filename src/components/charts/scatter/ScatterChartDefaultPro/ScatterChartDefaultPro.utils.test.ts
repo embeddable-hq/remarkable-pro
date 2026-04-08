@@ -1,4 +1,9 @@
-import { CUBE_DIMENSION_TYPE_TIME, type Dimension, type Measure } from '@embeddable.com/core';
+import {
+  CUBE_DIMENSION_TYPE_TIME,
+  type DataResponse,
+  type Dimension,
+  type Measure,
+} from '@embeddable.com/core';
 import {
   getDimensionFieldName,
   getScatterChartProData,
@@ -69,6 +74,8 @@ describe('measureToNullableNumber', () => {
     expect(measureToNullableNumber(null)).toBeNull();
     expect(measureToNullableNumber(undefined)).toBeNull();
     expect(measureToNullableNumber(Number.NaN)).toBeNull();
+    expect(measureToNullableNumber(Number.POSITIVE_INFINITY)).toBeNull();
+    expect(measureToNullableNumber(Number.NEGATIVE_INFINITY)).toBeNull();
     expect(measureToNullableNumber('x')).toBeNull();
   });
 
@@ -98,6 +105,26 @@ describe('getScatterChartProData', () => {
     const result = getScatterChartProData(
       {
         data: [],
+        xMeasure: x,
+        yMeasure: y,
+        pointDimension: pointDim,
+        noValueLabel: 'NV',
+      },
+      makeTheme(),
+    );
+
+    expect(result.chartData.datasets[0]!.data).toEqual([]);
+    expect(result.rowIndexByPoint).toEqual([[]]);
+  });
+
+  it('treats undefined data like an empty array', () => {
+    const x = makeMeasure('x');
+    const y = makeMeasure('y');
+    const pointDim = makeDimension({ name: 'point' });
+
+    const result = getScatterChartProData(
+      {
+        data: undefined as unknown as DataResponse['data'],
         xMeasure: x,
         yMeasure: y,
         pointDimension: pointDim,
@@ -158,6 +185,32 @@ describe('getScatterChartProData', () => {
     expect(result.chartData.datasets).toHaveLength(3);
     expect(result.chartData.datasets.map((d) => d.label)).toEqual(['fmt:A', 'fmt:B', 'NV']);
     expect(result.rowIndexByPoint).toEqual([[2], [0], [1]]);
+  });
+
+  it('merges rows that share the same group into one dataset', () => {
+    const x = makeMeasure('x');
+    const y = makeMeasure('y');
+    const pointDim = makeDimension({ name: 'point' });
+    const groupDim = makeDimension({ name: 'g' });
+
+    const result = getScatterChartProData(
+      {
+        data: [
+          { point: 'P1', x: 1, y: 1, g: 'A' },
+          { point: 'P2', x: 2, y: 2, g: 'A' },
+        ],
+        xMeasure: x,
+        yMeasure: y,
+        pointDimension: pointDim,
+        groupByDimension: groupDim,
+        noValueLabel: 'NV',
+      },
+      makeTheme(),
+    );
+
+    expect(result.chartData.datasets).toHaveLength(1);
+    expect(result.chartData.datasets[0]!.data).toHaveLength(2);
+    expect(result.rowIndexByPoint).toEqual([[0, 1]]);
   });
 
   it('applies manual point color for a single series', () => {
