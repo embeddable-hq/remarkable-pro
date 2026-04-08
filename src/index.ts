@@ -111,6 +111,14 @@ export * as LineChartTabbedPro from './components/charts/lines/LineChartWithKpiT
 export * from './components/charts/lines/LineChartWithKpiTabsPro';
 export * from './components/charts/lines/LineChartWithKpiTabsPro/definition';
 
+// Charts - Scatter
+export * as ScatterChartDefaultPro from './components/charts/scatter/ScatterChartDefaultPro';
+export type {
+  ScatterChartDefaultProProps,
+  ScatterChartPointClickPayload,
+} from './components/charts/scatter/ScatterChartDefaultPro';
+export * from './components/charts/scatter/ScatterChartDefaultPro/definition';
+
 // Charts - Pies
 export * as DonutChartPro from './components/charts/pies/DonutChartPro';
 export type { DonutChartProProps } from './components/charts/pies/DonutChartPro';
