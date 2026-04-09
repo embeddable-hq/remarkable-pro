@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.2.0
+
+### Minor Changes
+
+- 9c324bd: Timezone support via client context
+
 ## 0.1.32
 
 ### Patch Changes
