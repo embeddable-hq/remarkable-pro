@@ -30,6 +30,7 @@ type LoadDataResultsAxisOrderArgs = {
   measure: Measure;
   sortDirection?: OrderDirection;
   limit?: number;
+  timezone?: string;
 };
 
 export const loadDataResultsAxisOrderArgs = ({
@@ -38,6 +39,7 @@ export const loadDataResultsAxisOrderArgs = ({
   measure,
   sortDirection,
   limit,
+  timezone,
 }: LoadDataResultsAxisOrderArgs): LoadDataRequest => {
   return {
     from: dataset,
@@ -49,6 +51,7 @@ export const loadDataResultsAxisOrderArgs = ({
       },
     ],
     limit: getLimit(limit),
+    timezone,
   };
 };
 
@@ -58,6 +61,7 @@ type LoadDataResultsAxisOrder = {
   measure: Measure;
   limitTopAxis?: number;
   sortDirection?: OrderDirection;
+  timezone?: string;
 };
 
 export const loadDataResultsAxisOrder = ({
@@ -66,6 +70,7 @@ export const loadDataResultsAxisOrder = ({
   measure,
   limitTopAxis,
   sortDirection,
+  timezone,
 }: LoadDataResultsAxisOrder): DataResponse | undefined => {
   const needsTopItems = shouldGetTopItems(sortDirection, limitTopAxis);
 
@@ -78,6 +83,7 @@ export const loadDataResultsAxisOrder = ({
       measure,
       sortDirection,
       limit: limitTopAxis,
+      timezone,
     }),
   );
 };
@@ -88,10 +94,11 @@ export const getAxisOrderCacheKey = ({
   measure,
   sortDirection,
   limit,
+  timezone,
 }: LoadDataResultsAxisOrderArgs): string | undefined => {
   if (!shouldGetTopItems(sortDirection, limit)) return undefined;
   return JSON.stringify(
-    loadDataResultsAxisOrderArgs({ dataset, axis, measure, sortDirection, limit }),
+    loadDataResultsAxisOrderArgs({ dataset, axis, measure, sortDirection, limit, timezone }),
   );
 };
 
@@ -112,6 +119,7 @@ type LoadDataResultsArgs = {
   measure: Measure;
   limit?: number;
   axisOrder?: string[];
+  timezone?: string;
 };
 
 export const loadDataResultsArgs = ({
@@ -121,11 +129,13 @@ export const loadDataResultsArgs = ({
   measure,
   limit,
   axisOrder,
+  timezone,
 }: LoadDataResultsArgs): LoadDataRequest => {
   const request: LoadDataRequest = {
     from: dataset,
     select: [axis, groupBy, measure],
     limit: getLimit(limit),
+    timezone,
   };
   if (axisOrder?.length) {
     request['filters'] = [{ property: axis, operator: 'equals', value: axisOrder }];
@@ -143,6 +153,7 @@ type LoadDataResults = {
   limitTopAxis?: number;
   maxResults?: number;
   axisOrder?: string[];
+  timezone?: string;
 };
 
 export const loadDataResults = ({
@@ -155,6 +166,7 @@ export const loadDataResults = ({
   limitTopAxis,
   maxResults,
   axisOrder,
+  timezone,
 }: LoadDataResults): DataResponse | undefined => {
   const needsTopItems = shouldGetTopItems(sortDirection, limitTopAxis);
   const axisWithGranularity = getDimensionWithGranularity(axis, granularity);
@@ -166,6 +178,7 @@ export const loadDataResults = ({
         groupBy,
         measure,
         limit: maxResults,
+        timezone,
       }),
     );
   }
@@ -179,6 +192,7 @@ export const loadDataResults = ({
       measure,
       limit: maxResults,
       axisOrder,
+      timezone,
     }),
   );
 };

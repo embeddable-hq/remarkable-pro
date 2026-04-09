@@ -2,9 +2,11 @@ import { TimeRange, TimeRangeDeserializedValue } from '@embeddable.com/core';
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek.js';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear.js';
+import timezone from 'dayjs/plugin/timezone.js';
 import utc from 'dayjs/plugin/utc.js';
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 dayjs.extend(isoWeek);
 dayjs.extend(quarterOfYear);
 
@@ -18,6 +20,10 @@ export type ComparisonPeriodOption = {
 /*--------------------*/
 /*------Helpers-------*/
 /*--------------------*/
+const getLocalDateString = (date: Date): string => {
+  return dayjs.utc(date).format('YYYY-MM-DD');
+};
+
 function toUtcStartOfDay(d: Date): Date {
   return dayjs.utc(d).startOf('day').toDate();
 }
@@ -78,8 +84,8 @@ const getPreviousPeriodRange = (primaryDateRange: TimeRange) => {
   const { from: primaryFrom, to: primaryTo } = primaryDateRange as TimeRangeDeserializedValue;
   if (!primaryFrom || !primaryTo) return undefined;
 
-  const dateFrom = dayjs.utc(primaryFrom);
-  const gapDays = dayjs.utc(primaryTo).diff(dateFrom, 'day') + 1;
+  const dateFrom = dayjs.utc(getLocalDateString(primaryFrom));
+  const gapDays = dayjs.utc(getLocalDateString(primaryTo)).diff(dateFrom, 'day') + 1;
 
   const prevTo = dateFrom.subtract(1, 'day');
   const prevFrom = prevTo.subtract(gapDays - 1, 'day');
@@ -95,7 +101,7 @@ const getPreviousWeekRange = (primaryDateRange: TimeRange) => {
   const { from: primaryFrom } = primaryDateRange as TimeRangeDeserializedValue;
   if (!primaryFrom) return undefined;
 
-  const dateFrom = dayjs.utc(primaryFrom);
+  const dateFrom = dayjs.utc(getLocalDateString(primaryFrom));
   const prevWeekStart = dateFrom.startOf('isoWeek').subtract(1, 'week');
   const prevWeekEnd = prevWeekStart.endOf('isoWeek');
 
@@ -110,7 +116,7 @@ const getPreviousMonthRange = (primaryDateRange: TimeRange) => {
   const { from: primaryFrom } = primaryDateRange as TimeRangeDeserializedValue;
   if (!primaryFrom) return undefined;
 
-  const dateFrom = dayjs.utc(primaryFrom);
+  const dateFrom = dayjs.utc(getLocalDateString(primaryFrom));
   const prevMonthStart = dateFrom.startOf('month').subtract(1, 'month');
   const prevMonthEnd = prevMonthStart.endOf('month');
 
@@ -125,7 +131,7 @@ const getPreviousQuarterRange = (primaryDateRange: TimeRange) => {
   const { from: primaryFrom } = primaryDateRange as TimeRangeDeserializedValue;
   if (!primaryFrom) return undefined;
 
-  const dateFrom = dayjs.utc(primaryFrom);
+  const dateFrom = dayjs.utc(getLocalDateString(primaryFrom));
   const prevQuarterStart = dateFrom.startOf('quarter').subtract(1, 'quarter');
   const prevQuarterEnd = prevQuarterStart.endOf('quarter');
 
@@ -140,7 +146,7 @@ const getPreviousYearRange = (primaryDateRange: TimeRange) => {
   const { from: primaryFrom } = primaryDateRange as TimeRangeDeserializedValue;
   if (!primaryFrom) return undefined;
 
-  const dateFrom = dayjs.utc(primaryFrom);
+  const dateFrom = dayjs.utc(getLocalDateString(primaryFrom));
   const prevYearStart = dateFrom.startOf('year').subtract(1, 'year');
   const prevYearEnd = prevYearStart.endOf('year');
 

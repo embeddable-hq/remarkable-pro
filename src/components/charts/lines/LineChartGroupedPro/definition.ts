@@ -12,6 +12,8 @@ import { LineChartProOptionsClickArg } from '../lines.utils';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
+import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
+import { ThemeClientContext } from '../../../../theme/theme.types';
 
 const meta = {
   name: 'LineChartGroupedPro',
@@ -88,14 +90,22 @@ const previewConfig = {
 
 const preview = definePreview(Component, previewConfig);
 
-const loadDataResultsArgs = (inputs: Inputs<typeof meta>, xAxis?: Dimension): LoadDataRequest => ({
+const loadDataResultsArgs = (
+  inputs: Inputs<typeof meta>,
+  xAxis?: Dimension,
+  clientContext?: ThemeClientContext,
+): LoadDataRequest => ({
   limit: inputs.maxResults,
   from: inputs.dataset,
   select: [xAxis ?? inputs.xAxis, inputs.groupBy, inputs.measure],
+  timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
-const loadDataResults = (inputs: Inputs<typeof meta>, xAxis: Dimension): DataResponse =>
-  loadData(loadDataResultsArgs(inputs, xAxis));
+const loadDataResults = (
+  inputs: Inputs<typeof meta>,
+  xAxis: Dimension,
+  clientContext: ThemeClientContext,
+): DataResponse => loadData(loadDataResultsArgs(inputs, xAxis, clientContext));
 
 const events = {
   onLineClicked: (value: LineChartProOptionsClickArg) => ({
@@ -107,6 +117,7 @@ const events = {
 const props = (
   inputs: Inputs<typeof meta>,
   [state, setState]: [LineChartGroupedProState, (state: LineChartGroupedProState) => void],
+  clientContext: ThemeClientContext,
 ) => {
   const xAxisWithGranularity = getDimensionWithGranularity(inputs.xAxis, state?.granularity);
 
@@ -114,7 +125,7 @@ const props = (
     ...inputs,
     xAxis: xAxisWithGranularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
-    results: loadDataResults(inputs, xAxisWithGranularity),
+    results: loadDataResults(inputs, xAxisWithGranularity, clientContext),
   };
 };
 

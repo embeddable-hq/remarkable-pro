@@ -48,6 +48,7 @@ const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
   const primaryDateRange = getTimeRangeFromPresets(
     props.primaryDateRange,
     theme.defaults.dateRangesOptions,
+    theme.clientContext.timezone,
   );
 
   if (!dayjsLocaleReady) {

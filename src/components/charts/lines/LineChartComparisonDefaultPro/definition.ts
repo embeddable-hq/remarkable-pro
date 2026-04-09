@@ -15,6 +15,8 @@ import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
+import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
+import { ThemeClientContext } from '../../../../theme/theme.types';
 
 const meta = {
   name: 'LineChartComparisonDefaultPro',
@@ -141,7 +143,11 @@ const previewConfig = {
 
 const preview = definePreview(Component, previewConfig);
 
-const loadDataResultsArgs = (inputs: Inputs<typeof meta>, xAxis?: Dimension): LoadDataRequest => {
+const loadDataResultsArgs = (
+  inputs: Inputs<typeof meta>,
+  xAxis?: Dimension,
+  clientContext?: ThemeClientContext,
+): LoadDataRequest => {
   const resolvedXAxis = xAxis ?? inputs.xAxis;
   const orderBy: OrderBy[] = [{ property: resolvedXAxis, direction: 'asc' }];
   const timeProperty =
@@ -156,16 +162,21 @@ const loadDataResultsArgs = (inputs: Inputs<typeof meta>, xAxis?: Dimension): Lo
       inputs.primaryDateRange && timeProperty
         ? [{ property: timeProperty, operator: 'inDateRange', value: inputs.primaryDateRange }]
         : undefined,
+    timezone: getClientContextTimezone(clientContext?.timezone),
   };
 };
 
-const loadDataResults = (inputs: Inputs<typeof meta>, xAxis: Dimension): DataResponse =>
-  loadData(loadDataResultsArgs(inputs, xAxis));
+const loadDataResults = (
+  inputs: Inputs<typeof meta>,
+  xAxis: Dimension,
+  clientContext: ThemeClientContext,
+): DataResponse => loadData(loadDataResultsArgs(inputs, xAxis, clientContext));
 
 const loadDataResultsComparisonArgs = (
   inputs: Inputs<typeof meta>,
   xAxis: Dimension,
   comparisonDateRange: TimeRange,
+  clientContext: ThemeClientContext,
 ): LoadDataRequest => {
   const orderBy: OrderBy[] = [{ property: xAxis, direction: 'asc' }];
   const timeProperty =
@@ -177,6 +188,7 @@ const loadDataResultsComparisonArgs = (
     select: [...inputs.measures, xAxis],
     orderBy,
     filters: [{ property: timeProperty, operator: 'inDateRange', value: comparisonDateRange }],
+    timezone: getClientContextTimezone(clientContext?.timezone),
   };
 };
 
@@ -184,12 +196,15 @@ const loadDataResultsComparison = (
   inputs: Inputs<typeof meta>,
   xAxis: Dimension,
   state: LineChartComparisonDefaultProState,
+  clientContext: ThemeClientContext,
 ): DataResponse | undefined => {
   const timeProperty =
     xAxis.nativeType === 'time' ? xAxis : inputs.timePropertyForNonTimeDimensions;
 
   if (inputs.primaryDateRange && timeProperty && state?.comparisonDateRange) {
-    return loadData(loadDataResultsComparisonArgs(inputs, xAxis, state.comparisonDateRange));
+    return loadData(
+      loadDataResultsComparisonArgs(inputs, xAxis, state.comparisonDateRange, clientContext),
+    );
   }
   return undefined;
 };
@@ -206,6 +221,7 @@ const props = (
     LineChartComparisonDefaultProState,
     (state: LineChartComparisonDefaultProState) => void,
   ],
+  clientContext: ThemeClientContext,
 ) => {
   const xAxisWithGranularity = getDimensionWithGranularity(inputs.xAxis, state?.granularity);
 
@@ -216,8 +232,13 @@ const props = (
     comparisonDateRange: state?.comparisonDateRange,
     setComparisonDateRange: (comparisonDateRange: TimeRange) =>
       setState({ ...state, comparisonDateRange }),
-    results: loadDataResults(inputs, xAxisWithGranularity),
-    resultsComparison: loadDataResultsComparison(inputs, xAxisWithGranularity, state),
+    results: loadDataResults(inputs, xAxisWithGranularity, clientContext),
+    resultsComparison: loadDataResultsComparison(
+      inputs,
+      xAxisWithGranularity,
+      state,
+      clientContext,
+    ),
   };
 };
 

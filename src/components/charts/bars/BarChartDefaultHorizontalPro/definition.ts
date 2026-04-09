@@ -12,6 +12,8 @@ import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 import { subInputs } from '../../../component.subinputs.constants';
+import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
+import { ThemeClientContext } from '../../../../theme/theme.types';
 
 const meta = {
   name: 'BarChartDefaultHorizontalPro',
@@ -70,14 +72,19 @@ const preview = definePreview(Component, previewConfig);
 const loadDataResultsArgs = (
   inputs: Inputs<typeof meta>,
   dimension?: Dimension,
+  clientContext?: ThemeClientContext,
 ): LoadDataRequest => ({
   from: inputs.dataset,
   select: [...inputs.measures, dimension ?? inputs.dimension],
   limit: inputs.maxResults,
+  timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
-const loadDataResults = (inputs: Inputs<typeof meta>, dimension: Dimension): DataResponse =>
-  loadData(loadDataResultsArgs(inputs, dimension));
+const loadDataResults = (
+  inputs: Inputs<typeof meta>,
+  dimension: Dimension,
+  clientContext: ThemeClientContext,
+): DataResponse => loadData(loadDataResultsArgs(inputs, dimension, clientContext));
 
 const events = {
   onBarClicked: (value: { axisDimensionValue?: string }) => ({
@@ -91,6 +98,7 @@ const props = (
     BarChartDefaultHorizontalProState,
     (state: BarChartDefaultHorizontalProState) => void,
   ],
+  clientContext: ThemeClientContext,
 ) => {
   const dimensionWithGranularity = getDimensionWithGranularity(
     inputs.dimension,
@@ -101,7 +109,7 @@ const props = (
     ...inputs,
     dimension: dimensionWithGranularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
-    results: loadDataResults(inputs, dimensionWithGranularity),
+    results: loadDataResults(inputs, dimensionWithGranularity, clientContext),
   };
 };
 

@@ -9,6 +9,7 @@ dayjs.extend(utc);
 export const getTimeRangeFromPresets = (
   receivedTimeRange: TimeRange,
   options?: DateRangeOption[],
+  timezone?: string,
 ): TimeRange => {
   if (options?.length === 0) {
     return receivedTimeRange;
@@ -17,7 +18,7 @@ export const getTimeRangeFromPresets = (
   if (receivedTimeRange?.relativeTimeString) {
     const selectedOption = options
       ?.find((dateRange) => dateRange.value === receivedTimeRange?.relativeTimeString)
-      ?.getRange();
+      ?.getRange(timezone);
 
     const { from, to } = selectedOption || {};
 
@@ -33,8 +34,9 @@ export const getTimeRangeLabel = (
   range: TimeRange,
   dateFormat: string,
   options?: DateRangeOption[],
+  timezone?: string,
 ): string => {
-  const dateRange = getDateRangeFromTimeRange(range, options);
+  const dateRange = getDateRangeFromTimeRange(range, options, timezone);
 
   if (!dateRange) {
     return '';
@@ -62,6 +64,7 @@ export const getTimeRangeLabel = (
 export const getDateRangeFromTimeRange = (
   timeRange: TimeRange,
   options?: DateRangeOption[],
+  timezone?: string,
 ): DateRange | undefined => {
   if (!timeRange) {
     return timeRange;
@@ -69,8 +72,8 @@ export const getDateRangeFromTimeRange = (
 
   let finalTimeRange: TimeRange = timeRange;
   if ((!timeRange?.from || !timeRange?.to) && timeRange?.relativeTimeString && options?.length) {
-    const option = options.find((opt) => opt.value === timeRange!.relativeTimeString);
-    finalTimeRange = option?.getRange() as TimeRange;
+    const option = options.find((opt) => opt.value === timeRange.relativeTimeString);
+    finalTimeRange = option?.getRange(timezone);
   }
 
   return finalTimeRange;

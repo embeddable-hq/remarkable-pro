@@ -4,6 +4,8 @@ import { defaultDateRangeOptions } from './defaults.DateRanges.constants';
 // Fixed reference point: Thursday 2024-02-15 at noon UTC
 const FIXED_NOW = new Date('2024-02-15T12:00:00.000Z');
 
+const getOption = (value: string) => defaultDateRangeOptions.find((o) => o.value === value)!;
+
 describe('defaultDateRangeOptions', () => {
   it('has 22 options', () => {
     expect(defaultDateRangeOptions).toHaveLength(22);
@@ -27,11 +29,6 @@ describe('defaultDateRangeOptions', () => {
     afterEach(() => {
       vi.useRealTimers();
     });
-
-    const getOption = (value: string) => {
-      const opt = defaultDateRangeOptions.find((o) => o.value === value)!;
-      return opt;
-    };
 
     it('Today', () => {
       const { from, to } = getOption('Today').getRange() as TimeRangeDeserializedValue;
@@ -163,6 +160,84 @@ describe('defaultDateRangeOptions', () => {
       const { from, to } = getOption('Year to date').getRange() as TimeRangeDeserializedValue;
       expect(from).toEqual(new Date('2024-01-01T00:00:00.000Z'));
       expect(to).toEqual(new Date('2024-02-15T23:59:59.999Z'));
+    });
+  });
+
+  describe('getRange() with timezone — day boundary crossing (UTC+13)', () => {
+    // 2024-02-15T15:00:00Z is Thursday Feb 15 in UTC,
+    // but Friday Feb 16 in Pacific/Auckland (UTC+13).
+    const FIXED_TZ_NOW = new Date('2024-02-15T15:00:00.000Z');
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(FIXED_TZ_NOW);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('Today anchors to local date (Feb 16, not Feb 15)', () => {
+      const { from, to } = getOption('Today').getRange(
+        'Pacific/Auckland',
+      ) as TimeRangeDeserializedValue;
+      expect(from).toEqual(new Date('2024-02-16T00:00:00.000Z'));
+      expect(to).toEqual(new Date('2024-02-16T23:59:59.999Z'));
+    });
+
+    it('Yesterday is Feb 15, not Feb 14', () => {
+      const { from, to } = getOption('Yesterday').getRange(
+        'Pacific/Auckland',
+      ) as TimeRangeDeserializedValue;
+      expect(from).toEqual(new Date('2024-02-15T00:00:00.000Z'));
+      expect(to).toEqual(new Date('2024-02-15T23:59:59.999Z'));
+    });
+
+    it('Week to date ends on local today (Mon Feb 12 – Fri Feb 16)', () => {
+      const { from, to } = getOption('Week to date').getRange(
+        'Pacific/Auckland',
+      ) as TimeRangeDeserializedValue;
+      expect(from).toEqual(new Date('2024-02-12T00:00:00.000Z'));
+      expect(to).toEqual(new Date('2024-02-16T23:59:59.999Z'));
+    });
+  });
+
+  describe('getRange() with timezone — month boundary crossing (UTC-1)', () => {
+    // 2024-03-01T00:30:00Z is Friday Mar 1 in UTC,
+    // but Thursday Feb 29 in Atlantic/Cape_Verde (UTC-1).
+    const FIXED_MONTH_BOUNDARY = new Date('2024-03-01T00:30:00.000Z');
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(FIXED_MONTH_BOUNDARY);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('Today is Feb 29, not Mar 1', () => {
+      const { from, to } = getOption('Today').getRange(
+        'Atlantic/Cape_Verde',
+      ) as TimeRangeDeserializedValue;
+      expect(from).toEqual(new Date('2024-02-29T00:00:00.000Z'));
+      expect(to).toEqual(new Date('2024-02-29T23:59:59.999Z'));
+    });
+
+    it('This month is February (leap year), not March', () => {
+      const { from, to } = getOption('This month').getRange(
+        'Atlantic/Cape_Verde',
+      ) as TimeRangeDeserializedValue;
+      expect(from).toEqual(new Date('2024-02-01T00:00:00.000Z'));
+      expect(to).toEqual(new Date('2024-02-29T23:59:59.999Z'));
+    });
+
+    it('Last month is January, not February', () => {
+      const { from, to } = getOption('Last month').getRange(
+        'Atlantic/Cape_Verde',
+      ) as TimeRangeDeserializedValue;
+      expect(from).toEqual(new Date('2024-01-01T00:00:00.000Z'));
+      expect(to).toEqual(new Date('2024-01-31T23:59:59.999Z'));
     });
   });
 });
