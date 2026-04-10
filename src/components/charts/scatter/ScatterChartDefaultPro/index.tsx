@@ -9,6 +9,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup, i18n } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
+import { getScatterChartProMeasureFormattingProps } from './ScatterChartDefaultPro.chartOptions';
 import { getDimensionFieldName, getScatterChartProData } from './ScatterChartDefaultPro.utils';
 
 export type ScatterChartPointClickPayload = {
@@ -29,7 +30,6 @@ export type ScatterChartDefaultProProps = {
   showTooltips?: boolean;
   showPointLabels?: boolean;
   showValueLabels?: boolean;
-  showGrid?: boolean;
   showLogarithmicScale?: boolean;
   xAxisLabel?: string;
   yAxisLabel?: string;
@@ -62,7 +62,6 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
     showTooltips,
     showPointLabels,
     showValueLabels,
-    showGrid,
     showLogarithmicScale,
     xAxisLabel,
     yAxisLabel,
@@ -123,6 +122,11 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
     });
   };
 
+  const measureFormatting = useMemo(
+    () => getScatterChartProMeasureFormattingProps({ xMeasure, yMeasure }, theme),
+    [xMeasure, yMeasure, theme],
+  );
+
   const mergedOptions = useMemo(
     () =>
       mergician(
@@ -151,11 +155,12 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
         data={chartData}
         options={mergedOptions}
         nullBandLabel={noValueLabel}
+        formatAxisTick={measureFormatting.formatAxisTick}
+        formatMeasureValue={measureFormatting.formatMeasureValue}
         showLegend={showLegend}
         showTooltips={showTooltips}
         showPointLabels={showPointLabels}
         showValueLabels={showValueLabels}
-        showGrid={showGrid}
         showLogarithmicScale={showLogarithmicScale}
         xAxisLabel={xAxisLabel}
         yAxisLabel={yAxisLabel}

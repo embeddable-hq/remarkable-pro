@@ -5,14 +5,6 @@ import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
 
-const showGrid = {
-  ...inputs.boolean,
-  name: 'showGrid',
-  label: 'Show grid',
-  defaultValue: false,
-  category: 'Component Settings',
-} as const;
-
 const showPointLabels = {
   ...inputs.boolean,
   name: 'showPointLabels',
@@ -45,7 +37,7 @@ const meta = {
     {
       ...inputs.dimension,
       name: 'groupByDimension',
-      label: 'Group by',
+      label: 'Group by (optional)',
       required: false,
     },
     {
@@ -61,7 +53,6 @@ const meta = {
     inputs.showTooltips,
     showPointLabels,
     inputs.showValueLabels,
-    showGrid,
     inputs.showLogarithmicScale,
     inputs.xAxisLabel,
     inputs.yAxisLabel,
