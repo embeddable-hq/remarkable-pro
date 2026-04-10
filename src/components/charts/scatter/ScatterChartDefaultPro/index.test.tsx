@@ -26,16 +26,13 @@ vi.mock('@embeddable.com/react', () => ({
   })),
 }));
 
-vi.mock('@embeddable.com/remarkable-ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@embeddable.com/remarkable-ui')>();
-  return {
-    ...actual,
-    ScatterChart: (props: Record<string, unknown>) => {
-      lastScatterProps = props;
-      return <div data-testid="scatter-chart" />;
-    },
-  };
-});
+vi.mock('@embeddable.com/remarkable-ui', () => ({
+  getChartColors: vi.fn(() => ['#111111', '#222222']),
+  ScatterChart: (props: Record<string, unknown>) => {
+    lastScatterProps = props;
+    return <div data-testid="scatter-chart" />;
+  },
+}));
 
 vi.mock('../../shared/ChartCard/ChartCard', () => ({
   ChartCard: ({ children }: { children: React.ReactNode }) => (
