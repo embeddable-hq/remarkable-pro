@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.2.1
+
+### Patch Changes
+
+- 7a8dc59: Fix ScrollableTable markdown scroll
+
 ## 0.2.0
 
 ### Minor Changes
