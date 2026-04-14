@@ -23,6 +23,12 @@ export type ThemeChartsColorMap = {
 };
 
 export type ThemeCharts = {
+  // Formatting
+  avoidFormattingOnTooltip?: boolean;
+  avoidFormattingOnLabels?: boolean;
+  avoidFormattingOnDatalabels?: boolean;
+  avoidFormattingOnExport?: boolean;
+
   // Color mapping
   backgroundColorMap?: ThemeChartsColorMap;
   borderColorMap?: ThemeChartsColorMap;

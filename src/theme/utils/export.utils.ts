@@ -28,12 +28,16 @@ const formatData = (
   const themeFormatter = getThemeFormatter(theme);
 
   const headers = dimensionsAndMeasures.map((dm) => {
-    return themeFormatter.dimensionOrMeasureTitle(dm);
+    return theme.charts.avoidFormattingOnExport
+      ? dm.title
+      : themeFormatter.dimensionOrMeasureTitle(dm);
   });
   const body = data!.map((dataRow) => {
     const row: Array<string> = [];
     dimensionsAndMeasures.forEach((dimensionOrMeasure) => {
-      const value = themeFormatter.data(dimensionOrMeasure, dataRow[dimensionOrMeasure.name]);
+      const value = theme.charts.avoidFormattingOnExport
+        ? dataRow[dimensionOrMeasure.name]
+        : themeFormatter.data(dimensionOrMeasure, dataRow[dimensionOrMeasure.name]);
       if (value !== undefined && value !== null) {
         row.push(String(value));
       } else {

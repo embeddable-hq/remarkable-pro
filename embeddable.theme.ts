@@ -6,7 +6,17 @@ import { getClientContextTimezone } from './src/theme/utils/clientContext.utils'
 const themeProvider = (clientContext: any): Theme => {
   const timezone = getClientContextTimezone(clientContext?.timezone);
 
-  return { ...remarkableTheme, clientContext: { ...clientContext, timezone } };
+  return {
+    ...remarkableTheme,
+    clientContext: { ...clientContext, timezone },
+    charts: {
+      ...remarkableTheme.charts,
+      avoidFormattingOnTooltip: true,
+      avoidFormattingOnDatalabels: true,
+      avoidFormattingOnLabels: true,
+      avoidFormattingOnExport: true,
+    },
+  };
 };
 
 export default themeProvider;

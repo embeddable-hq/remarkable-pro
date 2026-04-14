@@ -58,13 +58,15 @@ export const getPieChartProData = (
   return {
     labels: groupedData.map((item) => {
       const value = item[props.dimension.name];
-      const formattedValue = themeFormatter.data(props.dimension, value);
+      const displayValue = theme.charts.avoidFormattingOnLabels
+        ? value
+        : themeFormatter.data(props.dimension, value);
 
       // If formatter did not work, try i18n translation
-      if (value === formattedValue) {
+      if (value === displayValue) {
         return i18n.t(value);
       }
-      return formattedValue;
+      return displayValue;
     }),
     datasets: [
       {
@@ -90,14 +92,20 @@ export const getPieChartProOptions = (
           if (measure.inputs?.showValueAsPercentage) {
             return getDatalabelPercentage(Number(value), context.dataset.data);
           }
-          return themeFormatter.data(measure, value);
+          const displayValue = theme.charts.avoidFormattingOnDatalabels
+            ? value
+            : themeFormatter.data(measure, Number(value));
+          return displayValue;
         },
       },
       tooltip: {
         callbacks: {
           label(context) {
             const raw = context.raw as number;
-            return `${themeFormatter.data(measure, raw)} (${getDatalabelPercentage(raw, context.dataset.data)})`;
+            const displayValue = theme.charts.avoidFormattingOnTooltip
+              ? raw
+              : themeFormatter.data(measure, raw);
+            return `${displayValue} (${getDatalabelPercentage(raw, context.dataset.data)})`;
           },
         },
       },
