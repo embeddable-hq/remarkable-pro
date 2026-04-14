@@ -2,7 +2,7 @@ import { FilterOperator, NativeDataType } from '@embeddable.com/core';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
 import {
   filterBuilderAndOrOperator,
-  generateFilterValue,
+  filtersToClause,
   getSupportedDimensionsAndMeasures,
   operatorNumber,
   operatorStringBoolean,
@@ -33,8 +33,8 @@ const makeFilter = (overrides: Partial<FilterBuilderFilter> = {}): FilterBuilder
   ...overrides,
 });
 
-const generate = (...args: Parameters<typeof generateFilterValue>): ClauseGroup | null =>
-  generateFilterValue(...args) as ClauseGroup | null;
+const generate = (...args: Parameters<typeof filtersToClause>): ClauseGroup | null =>
+  filtersToClause(...args) as ClauseGroup | null;
 
 // ---------------------------------------------------------------------------
 // getSupportedDimensionsAndMeasures
@@ -69,10 +69,10 @@ describe('getSupportedDimensionsAndMeasures', () => {
 });
 
 // ---------------------------------------------------------------------------
-// generateFilterValue
+// filtersToClause
 // ---------------------------------------------------------------------------
 
-describe('generateFilterValue', () => {
+describe('filtersToClause', () => {
   it('returns null when filters array is empty', () => {
     expect(generate(filterBuilderAndOrOperator.AND, [])).toBeNull();
   });

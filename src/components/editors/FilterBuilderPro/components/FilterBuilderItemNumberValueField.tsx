@@ -18,8 +18,12 @@ const FilterBuilderItemNumberValueField = ({
   onSelectValue,
 }: FilterBuilderItemNumberValueFieldProps) => {
   const [value, setValue] = useState<number | null>((filter?.value as number) ?? null);
-  const [min, setMin] = useState<number | null>(null);
-  const [max, setMax] = useState<number | null>(null);
+  const [min, setMin] = useState<number | null>(
+    Array.isArray(filter.value) ? ((filter.value as number[])[0] ?? null) : null,
+  );
+  const [max, setMax] = useState<number | null>(
+    Array.isArray(filter.value) ? ((filter.value as number[])[1] ?? null) : null,
+  );
   const firstInputRef = useRef<HTMLInputElement>(null);
 
   const debouncedSelectValue = useDebounce((value: number | number[] | null) => {
