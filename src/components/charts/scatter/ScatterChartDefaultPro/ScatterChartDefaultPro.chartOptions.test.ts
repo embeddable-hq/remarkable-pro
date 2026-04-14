@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { DimensionOrMeasure, Measure } from '@embeddable.com/core';
-import { getScatterChartProMeasureFormattingProps } from './ScatterChartDefaultPro.chartOptions';
+import { getScatterChartProOptions } from './ScatterChartDefaultPro.chartOptions';
 import {
   getThemeFormatter,
   type GetThemeFormatter,
 } from '../../../../theme/formatter/formatter.utils';
 import type { Theme } from '../../../../theme/theme.types';
+import type { TooltipItem } from 'chart.js';
+import type { ScatterDatasetWithOriginal } from '@embeddable.com/remarkable-ui';
 
 vi.mock('../../../../theme/formatter/formatter.utils', async (importOriginal) => {
   const actual =
@@ -18,8 +20,9 @@ vi.mock('../../../../theme/formatter/formatter.utils', async (importOriginal) =>
 
 const xMeasure = { name: 'x', title: 'X', nativeType: 'number', inputs: {} } as unknown as Measure;
 const yMeasure = { name: 'y', title: 'Y', nativeType: 'number', inputs: {} } as unknown as Measure;
+const NO_VALUE = 'No value';
 
-describe('getScatterChartProMeasureFormattingProps', () => {
+describe('getScatterChartProOptions', () => {
   let dataFn: GetThemeFormatter['data'];
 
   beforeEach(() => {
@@ -37,42 +40,76 @@ describe('getScatterChartProMeasureFormattingProps', () => {
     vi.mocked(getThemeFormatter).mockReturnValue(formatter);
   });
 
-  it('formats axis ticks with full measure formatting via themeFormatter.data (same as values)', () => {
-    const { formatAxisTick, formatMeasureValue } = getScatterChartProMeasureFormattingProps(
-      { xMeasure, yMeasure },
-      {} as Theme,
-    );
+  describe('tick callbacks', () => {
+    it('formats x axis ticks using themeFormatter.data with xMeasure', () => {
+      const opts = getScatterChartProOptions({ xMeasure, yMeasure }, {} as Theme, NO_VALUE);
+      const xCb = opts.scales?.x?.ticks?.callback as (v: string | number) => string;
 
-    expect(formatAxisTick('x', 1_000_000)).toBe('data:x:1000000');
-    expect(vi.mocked(dataFn)).toHaveBeenCalledWith(xMeasure, 1_000_000);
+      expect(xCb(1_000_000)).toBe('data:x:1000000');
+      expect(vi.mocked(dataFn)).toHaveBeenCalledWith(xMeasure, 1_000_000);
+    });
 
-    formatMeasureValue('x', 99, 'NV');
-    expect(vi.mocked(dataFn)).toHaveBeenCalledWith(xMeasure, 99);
+    it('formats y axis ticks using themeFormatter.data with yMeasure', () => {
+      const opts = getScatterChartProOptions({ xMeasure, yMeasure }, {} as Theme, NO_VALUE);
+      const yCb = opts.scales?.y?.ticks?.callback as (v: string | number) => string;
+
+      expect(yCb(2)).toBe('data:y:2');
+      expect(vi.mocked(dataFn)).toHaveBeenCalledWith(yMeasure, 2);
+    });
+
+    it('uses the measure formatter for currency measures', () => {
+      const xUsd = {
+        name: 'revenue',
+        title: 'Revenue',
+        nativeType: 'number',
+        inputs: { currency: 'USD' },
+      } as unknown as Measure;
+
+      const opts = getScatterChartProOptions({ xMeasure: xUsd, yMeasure }, {} as Theme, NO_VALUE);
+      const xCb = opts.scales?.x?.ticks?.callback as (v: string | number) => string;
+
+      expect(xCb(25_000)).toBe('data:revenue:25000');
+      expect(vi.mocked(dataFn)).toHaveBeenCalledWith(xUsd, 25_000);
+    });
   });
 
-  it('uses the x measure data formatter for x axis ticks when measure has currency', () => {
-    const xUsd = {
-      name: 'revenue',
-      title: 'Revenue',
-      nativeType: 'number',
-      inputs: { currency: 'USD' },
-    } as unknown as Measure;
+  describe('tooltip label', () => {
+    it('formats tooltip using originalData when available', () => {
+      const opts = getScatterChartProOptions({ xMeasure, yMeasure }, {} as Theme, NO_VALUE);
+      const labelFn = opts.plugins?.tooltip?.callbacks?.label as (
+        ctx: TooltipItem<'scatter'>,
+      ) => string;
 
-    const { formatAxisTick } = getScatterChartProMeasureFormattingProps(
-      { xMeasure: xUsd, yMeasure },
-      {} as Theme,
-    );
+      const ctx = {
+        dataset: {
+          label: 'Series A',
+          originalData: [{ x: 10, y: 20 }],
+          data: [],
+        } as unknown as ScatterDatasetWithOriginal,
+        dataIndex: 0,
+        parsed: { x: 10, y: 20 },
+      } as unknown as TooltipItem<'scatter'>;
 
-    expect(formatAxisTick('x', 25_000)).toBe('data:revenue:25000');
-    expect(vi.mocked(dataFn)).toHaveBeenCalledWith(xUsd, 25_000);
-  });
+      expect(labelFn(ctx)).toBe('Series A: (data:x:10, data:y:20)');
+    });
 
-  it('uses nullLabel for null measure values in formatMeasureValue', () => {
-    const { formatMeasureValue } = getScatterChartProMeasureFormattingProps(
-      { xMeasure, yMeasure },
-      {} as Theme,
-    );
-    expect(formatMeasureValue('x', null, 'NV')).toBe('NV');
-    expect(formatMeasureValue('y', undefined, 'NV')).toBe('NV');
+    it('returns noValueLabel for null measure values in tooltip', () => {
+      const opts = getScatterChartProOptions({ xMeasure, yMeasure }, {} as Theme, NO_VALUE);
+      const labelFn = opts.plugins?.tooltip?.callbacks?.label as (
+        ctx: TooltipItem<'scatter'>,
+      ) => string;
+
+      const ctx = {
+        dataset: {
+          label: '',
+          originalData: [{ x: null, y: null }],
+          data: [],
+        } as unknown as ScatterDatasetWithOriginal,
+        dataIndex: 0,
+        parsed: { x: 0, y: 0 },
+      } as unknown as TooltipItem<'scatter'>;
+
+      expect(labelFn(ctx)).toBe(`(${NO_VALUE}, ${NO_VALUE})`);
+    });
   });
 });

@@ -33,7 +33,7 @@ export const getScatterChartProData = (
     groupByDimension?: Dimension | null;
     noValueLabel: string;
     /** Single-series override; when set, all points use this color */
-    pointColor?: string | null;
+    pointColor?: string;
   },
   theme: Theme,
 ): ScatterChartProDataResult => {

@@ -135,7 +135,7 @@ const events = {
 
 const props = (inputs: Inputs<typeof meta>) => ({
   ...inputs,
-  pointColor: inputs.pointColor as string | null | undefined,
+  pointColor: inputs.pointColor as string | undefined,
   results: loadDataResults(inputs),
 });
 

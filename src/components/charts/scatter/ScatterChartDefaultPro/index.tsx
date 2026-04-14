@@ -1,7 +1,6 @@
 import { useTheme } from '@embeddable.com/react';
 import { ScatterChart } from '@embeddable.com/remarkable-ui';
 import type { ScatterPointClickHit } from '@embeddable.com/remarkable-ui';
-import { ChartOptions } from 'chart.js';
 import { mergician } from 'mergician';
 import { useMemo } from 'react';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
@@ -9,10 +8,10 @@ import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup, i18n } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
-import { getScatterChartProMeasureFormattingProps } from './ScatterChartDefaultPro.chartOptions';
+import { getScatterChartProOptions } from './ScatterChartDefaultPro.chartOptions';
 import { getDimensionFieldName, getScatterChartProData } from './ScatterChartDefaultPro.utils';
 
-export type ScatterChartPointClickPayload = {
+export type ScatterChartPointClickArgs = {
   xMeasureValue: string;
   yMeasureValue: string;
   pointDimensionValue: string;
@@ -23,9 +22,9 @@ export type ScatterChartDefaultProProps = {
   xMeasure: Measure;
   yMeasure: Measure;
   pointDimension: Dimension;
-  groupByDimension?: Dimension | null;
+  groupByDimension?: Dimension;
   results: DataResponse;
-  pointColor?: string | null;
+  pointColor?: string;
   showLegend?: boolean;
   showTooltips?: boolean;
   showPointLabels?: boolean;
@@ -38,7 +37,7 @@ export type ScatterChartDefaultProProps = {
   yAxisRangeMin?: number;
   yAxisRangeMax?: number;
   reverseXAxis?: boolean;
-  onPointClick?: (payload: ScatterChartPointClickPayload) => void;
+  onPointClick?: (payload: ScatterChartPointClickArgs) => void;
 } & ChartCardHeaderProps;
 
 const serializeCellValue = (value: unknown): string => {
@@ -84,9 +83,9 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
           xMeasure,
           yMeasure,
           pointDimension,
-          groupByDimension: groupByDimension ?? undefined,
+          groupByDimension,
           noValueLabel,
-          pointColor: pointColor ?? undefined,
+          pointColor,
         },
         theme,
       ),
@@ -103,14 +102,14 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
   );
 
   const pointField = getDimensionFieldName(pointDimension);
-  const groupField = groupByDimension ? getDimensionFieldName(groupByDimension) : undefined;
-
   const handlePointClick = (hit: ScatterPointClickHit | undefined) => {
     if (!onPointClick || !hit) return;
     const rowIdx = rowIndexByPoint[hit.datasetIndex]?.[hit.index];
     if (rowIdx === undefined) return;
     const row = results.data?.[rowIdx] as Record<string, unknown> | undefined;
     if (!row) return;
+
+    const groupField = groupByDimension ? getDimensionFieldName(groupByDimension) : undefined;
 
     onPointClick({
       xMeasureValue: serializeCellValue(row[xMeasure.name]),
@@ -120,18 +119,13 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
     });
   };
 
-  const measureFormatting = useMemo(
-    () => getScatterChartProMeasureFormattingProps({ xMeasure, yMeasure }, theme),
-    [xMeasure, yMeasure, theme],
-  );
-
   const mergedOptions = useMemo(
     () =>
       mergician(
-        {} as Partial<ChartOptions<'scatter'>>,
+        getScatterChartProOptions({ xMeasure, yMeasure }, theme, noValueLabel),
         theme.charts.scatterChartDefaultPro?.options ?? {},
       ),
-    [theme],
+    [xMeasure, yMeasure, theme, noValueLabel],
   );
 
   return (
@@ -153,8 +147,6 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
         data={chartData}
         options={mergedOptions}
         nullBandLabel={noValueLabel}
-        formatAxisTick={measureFormatting.formatAxisTick}
-        formatMeasureValue={measureFormatting.formatMeasureValue}
         showLegend={showLegend}
         showTooltips={showTooltips}
         showPointLabels={showPointLabels}

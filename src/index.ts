@@ -115,7 +115,7 @@ export * from './components/charts/lines/LineChartWithKpiTabsPro/definition';
 export * as ScatterChartDefaultPro from './components/charts/scatter/ScatterChartDefaultPro';
 export type {
   ScatterChartDefaultProProps,
-  ScatterChartPointClickPayload,
+  ScatterChartPointClickArgs,
 } from './components/charts/scatter/ScatterChartDefaultPro';
 export * from './components/charts/scatter/ScatterChartDefaultPro/definition';
 
