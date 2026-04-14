@@ -63,8 +63,6 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
     showPointLabels,
     showValueLabels,
     showLogarithmicScale,
-    xAxisLabel,
-    yAxisLabel,
     xAxisRangeMin,
     xAxisRangeMax,
     yAxisRangeMin,
@@ -74,7 +72,7 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
     hideMenu,
   } = props;
 
-  const { title, description, tooltip } = resolveI18nProps(props);
+  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
 
   const noValueLabel = i18n.t('charts.scatterChart.noValue');
 
