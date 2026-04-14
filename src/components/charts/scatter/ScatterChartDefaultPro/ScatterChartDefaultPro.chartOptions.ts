@@ -62,7 +62,7 @@ export const getScatterChartProOptions = (
                   | { x: number | null; y: number | null }
                   | undefined);
               if (!raw) return '';
-              return `${formatValue(xMeasure, raw.x)}, ${formatValue(yMeasure, raw.y)}`;
+              return `(${formatValue(xMeasure, raw.x)}, ${formatValue(yMeasure, raw.y)})`;
             },
           },
         },
