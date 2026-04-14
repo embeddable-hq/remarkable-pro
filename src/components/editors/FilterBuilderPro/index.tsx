@@ -54,7 +54,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   // the variable feedback loop (inputs: ['defaultFilters']) from overwriting user edits
   // mid-session when the platform re-sends props with the previous clause value.
   useEffect(() => {
-    if (!defaultFilters) {
+    if (!defaultFilters || !dimensionsAndMeasures?.length) {
       return;
     }
 
@@ -74,7 +74,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     setTimeout(() => {
       disableAutoScroll.current = false;
     }, 100);
-  }, [defaultFilters]);
+  }, [defaultFilters, dimensionsAndMeasures]);
 
   const updateScrollState = useCallback(() => {
     const el = scrollRef.current;
