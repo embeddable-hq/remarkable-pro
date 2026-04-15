@@ -95,7 +95,7 @@ export const filtersToClause = (
   return { operator, clauses };
 };
 
-const clauseToFilter = (
+export const clauseToFilter = (
   clause: FilterBuilderClause,
   dimensionsAndMeasures: DimensionOrMeasure[],
   id: number,
