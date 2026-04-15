@@ -95,20 +95,20 @@ export const getPieChartProOptions = (
           if (measure.inputs?.showValueAsPercentage) {
             return getDatalabelPercentage(Number(value), context.dataset.data);
           }
-          const displayValue = theme.disableFormatting?.chart?.datalabels
-            ? value
-            : themeFormatter.data(measure, Number(value));
-          return displayValue;
+          if (theme.disableFormatting?.chart?.datalabels) {
+            return value;
+          }
+          return themeFormatter.data(measure, Number(value));
         },
       },
       tooltip: {
         callbacks: {
           label(context) {
             const raw = context.raw as number;
-            const displayValue = theme.disableFormatting?.chart?.tooltip
-              ? raw
-              : themeFormatter.data(measure, raw);
-            return `${displayValue} (${getDatalabelPercentage(raw, context.dataset.data)})`;
+            if (theme.disableFormatting?.chart?.tooltip) {
+              return `${raw} (${getDatalabelPercentage(raw, context.dataset.data)})`;
+            }
+            return `${themeFormatter.data(measure, raw)} (${getDatalabelPercentage(raw, context.dataset.data)})`;
           },
         },
       },

@@ -41,8 +41,12 @@ export const getPivotDimension = (
   return {
     key: props.dimension.name,
     label: themeFormatter.dimensionOrMeasureTitle(props.dimension),
-    formatValue: (value: string) =>
-      props.disableFormatting ? value : themeFormatter.data(props.dimension, value),
+    formatValue: (value: string) => {
+      if (props.disableFormatting) {
+        return value;
+      }
+      return themeFormatter.data(props.dimension, value);
+    },
   };
 };
 

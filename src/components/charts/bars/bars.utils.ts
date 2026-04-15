@@ -48,12 +48,15 @@ export const getBarStackedChartProData = (
       chartColors,
     });
 
-    const displayLabel = theme.disableFormatting?.chart?.labels
-      ? groupByItem
-      : themeFormatter.data(groupDimension, groupByItem);
+    let label: string;
+    if (theme.disableFormatting?.chart?.labels) {
+      label = groupByItem;
+    } else {
+      label = themeFormatter.data(groupDimension, groupByItem);
+    }
 
     return {
-      label: displayLabel,
+      label,
       rawLabel: groupByItem,
       backgroundColor,
       borderColor,
@@ -163,11 +166,12 @@ export const getBarChartProOptions = (
         labels: {
           total: {
             formatter: (_value: string | number, context: Context) => {
-              return getBarChartProDatalabelTotalFormatter(context, (value: number) =>
-                theme.disableFormatting?.chart?.datalabels
-                  ? value.toString()
-                  : themeFormatter.data(measures[0]!, value),
-              );
+              return getBarChartProDatalabelTotalFormatter(context, (value: number) => {
+                if (theme.disableFormatting?.chart?.datalabels) {
+                  return value.toString();
+                }
+                return themeFormatter.data(measures[0]!, value);
+              });
             },
           },
           value: {
@@ -177,11 +181,10 @@ export const getBarChartProOptions = (
               if (measure.inputs?.showValueAsPercentage) {
                 return getDatalabelPercentage(Number(value), context.dataset.data);
               }
-              const displayValue = theme.disableFormatting?.chart?.datalabels
-                ? value
-                : themeFormatter.data(measure, value);
-
-              return displayValue;
+              if (theme.disableFormatting?.chart?.datalabels) {
+                return value;
+              }
+              return themeFormatter.data(measure, value);
             },
           },
         },
@@ -190,22 +193,29 @@ export const getBarChartProOptions = (
         callbacks: {
           title: (context) => {
             const label = context[0]?.label;
-            const displayValue = theme.disableFormatting?.chart?.tooltip
-              ? label
-              : themeFormatter.data(dimension, label);
-            return displayValue;
+            if (theme.disableFormatting?.chart?.tooltip) {
+              return label;
+            }
+            return themeFormatter.data(dimension, label);
           },
 
           label: (context) => {
             const measure = measures[context.datasetIndex % measures.length]!;
             const raw = context.raw as number;
 
-            const dimensionLabel = theme.disableFormatting?.chart?.tooltip
-              ? context.dataset.label
-              : themeFormatter.data(dimension, context.dataset.label) || '';
-            const measureValue = theme.disableFormatting?.chart?.labels
-              ? raw
-              : themeFormatter.data(measure, raw);
+            let dimensionLabel: string;
+            if (theme.disableFormatting?.chart?.tooltip) {
+              dimensionLabel = context.dataset.label ?? '';
+            } else {
+              dimensionLabel = themeFormatter.data(dimension, context.dataset.label) || '';
+            }
+
+            let measureValue: string | number;
+            if (theme.disableFormatting?.chart?.labels) {
+              measureValue = raw;
+            } else {
+              measureValue = themeFormatter.data(measure, raw);
+            }
 
             let percentage = '';
             if (measure.inputs?.showValueAsPercentage) {
@@ -221,19 +231,19 @@ export const getBarChartProOptions = (
         ticks: {
           callback: (value) => {
             if (horizontal) {
-              const displayValue = theme.disableFormatting?.chart?.xAxis
-                ? value
-                : themeFormatter.data(measures[0]!, value);
-              return displayValue;
+              if (theme.disableFormatting?.chart?.xAxis) {
+                return value;
+              }
+              return themeFormatter.data(measures[0]!, value);
             }
 
             if (!data || !data.labels) return undefined;
 
             const label = data.labels[Number(value)] as string;
-            const displayValue = theme.disableFormatting?.chart?.xAxis
-              ? label
-              : themeFormatter.data(dimension, label);
-            return displayValue;
+            if (theme.disableFormatting?.chart?.xAxis) {
+              return label;
+            }
+            return themeFormatter.data(dimension, label);
           },
         },
       },
@@ -241,17 +251,17 @@ export const getBarChartProOptions = (
         ticks: {
           callback: (value) => {
             if (!horizontal) {
-              const displayValue = theme.disableFormatting?.chart?.yAxis
-                ? value
-                : themeFormatter.data(measures[0]!, value);
-              return displayValue;
+              if (theme.disableFormatting?.chart?.yAxis) {
+                return value;
+              }
+              return themeFormatter.data(measures[0]!, value);
             }
             if (!data || !data.labels) return undefined;
             const label = data.labels[Number(value)] as string;
-            const displayValue = theme.disableFormatting?.chart?.yAxis
-              ? label
-              : themeFormatter.data(dimension, label);
-            return displayValue;
+            if (theme.disableFormatting?.chart?.yAxis) {
+              return label;
+            }
+            return themeFormatter.data(dimension, label);
           },
         },
       },

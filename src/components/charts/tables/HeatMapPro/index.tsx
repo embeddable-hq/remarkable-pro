@@ -42,9 +42,10 @@ export const getHeatMeasure = (
     key: props.measure.name,
     label: themeFormatter.dimensionOrMeasureTitle(props.measure),
     format: (value) => {
-      return theme.disableFormatting?.table?.values
-        ? value.toString()
-        : themeFormatter.data(props.measure, value);
+      if (theme.disableFormatting?.table?.values) {
+        return value.toString();
+      }
+      return themeFormatter.data(props.measure, value);
     },
   };
 };
@@ -60,8 +61,12 @@ export const getHeatDimension = (
     key: props.dimension.name,
     label: themeFormatter.dimensionOrMeasureTitle(props.dimension),
 
-    format: (value: string) =>
-      props.disableFormatting ? value : themeFormatter.data(props.dimension, value),
+    format: (value: string) => {
+      if (props.disableFormatting) {
+        return value;
+      }
+      return themeFormatter.data(props.dimension, value);
+    },
   };
 };
 

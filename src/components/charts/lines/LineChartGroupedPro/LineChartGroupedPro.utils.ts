@@ -44,13 +44,16 @@ export const getLineChartGroupedProData = (
       index,
     });
 
-    const displayLabel = theme.disableFormatting?.chart?.labels
-      ? groupByItem
-      : themeFormatter.data(groupDimension, groupByItem);
+    let label: string;
+    if (theme.disableFormatting?.chart?.labels) {
+      label = groupByItem;
+    } else {
+      label = themeFormatter.data(groupDimension, groupByItem);
+    }
 
     const dataset = {
       clip: hasMinMaxYAxisRange,
-      label: displayLabel,
+      label,
       rawLabel: groupByItem,
       backgroundColor: setColorAlpha(backgroundColor, 0.5),
       pointBackgroundColor: backgroundColor,
@@ -91,10 +94,10 @@ export const getLineChartGroupedProOptions = (
         labels: {
           value: {
             formatter: (value: string | number) => {
-              const displayValue = theme.disableFormatting?.chart?.datalabels
-                ? value
-                : themeFormatter.data(measure, value);
-              return displayValue;
+              if (theme.disableFormatting?.chart?.datalabels) {
+                return value;
+              }
+              return themeFormatter.data(measure, value);
             },
           },
         },
@@ -103,17 +106,17 @@ export const getLineChartGroupedProOptions = (
         callbacks: {
           title: (context) => {
             const label = context[0]?.label;
-            const displayValue = theme.disableFormatting?.chart?.tooltip
-              ? label
-              : themeFormatter.data(dimension, label);
-            return displayValue;
+            if (theme.disableFormatting?.chart?.tooltip) {
+              return label;
+            }
+            return themeFormatter.data(dimension, label);
           },
           label: (context) => {
             const raw = context.raw as number;
-            const displayValue = theme.disableFormatting?.chart?.tooltip
-              ? raw
-              : themeFormatter.data(measure, raw);
-            return `${context.dataset.label}: ${displayValue}`;
+            if (theme.disableFormatting?.chart?.tooltip) {
+              return `${context.dataset.label}: ${raw}`;
+            }
+            return `${context.dataset.label}: ${themeFormatter.data(measure, raw)}`;
           },
         },
       },
@@ -125,20 +128,20 @@ export const getLineChartGroupedProOptions = (
             if (!data || !data.labels) return undefined;
 
             const label = data.labels[Number(value)] as string;
-            const displayValue = theme.disableFormatting?.chart?.xAxis
-              ? label
-              : themeFormatter.data(dimension, label);
-            return displayValue;
+            if (theme.disableFormatting?.chart?.xAxis) {
+              return label;
+            }
+            return themeFormatter.data(dimension, label);
           },
         },
       },
       y: {
         ticks: {
           callback: (value) => {
-            const displayValue = theme.disableFormatting?.chart?.yAxis
-              ? value
-              : themeFormatter.data(measure, value);
-            return displayValue;
+            if (theme.disableFormatting?.chart?.yAxis) {
+              return value;
+            }
+            return themeFormatter.data(measure, value);
           },
         },
       },

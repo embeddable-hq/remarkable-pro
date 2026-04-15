@@ -110,16 +110,19 @@ export const getLineChartProOptions = (
         callbacks: {
           title: (context) => {
             const label = context[0]?.label;
-            const displayValue = theme.disableFormatting?.chart?.tooltip
-              ? label
-              : themeFormatter.data(dimension, label);
-            return displayValue;
+            if (theme.disableFormatting?.chart?.tooltip) {
+              return label;
+            }
+            return themeFormatter.data(dimension, label);
           },
           label: (context) => {
             const measure = measures[context.datasetIndex]!;
             const raw = context.raw as number;
 
-            return `${theme.disableFormatting?.chart?.tooltip ? context.dataset.label : themeFormatter.data(dimension, context.dataset.label) || ''}: ${theme.disableFormatting?.chart?.tooltip ? raw : themeFormatter.data(measure, raw)}`;
+            if (theme.disableFormatting?.chart?.tooltip) {
+              return `${context.dataset.label ?? ''}: ${raw}`;
+            }
+            return `${themeFormatter.data(dimension, context.dataset.label) || ''}: ${themeFormatter.data(measure, raw)}`;
           },
         },
       },
@@ -131,20 +134,20 @@ export const getLineChartProOptions = (
             if (!data || !data.labels) return undefined;
 
             const label = data.labels[Number(value)] as string;
-            const displayValue = theme.disableFormatting?.chart?.xAxis
-              ? label
-              : themeFormatter.data(dimension, label);
-            return displayValue;
+            if (theme.disableFormatting?.chart?.xAxis) {
+              return label;
+            }
+            return themeFormatter.data(dimension, label);
           },
         },
       },
       y: {
         ticks: {
           callback: (value) => {
-            const displayValue = theme.disableFormatting?.chart?.yAxis
-              ? value
-              : themeFormatter.data(measures[0]!, value);
-            return displayValue;
+            if (theme.disableFormatting?.chart?.yAxis) {
+              return value;
+            }
+            return themeFormatter.data(measures[0]!, value);
           },
         },
       },

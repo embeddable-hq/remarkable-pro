@@ -201,18 +201,18 @@ const getLineChartComparisonNonTimeOptions = (
             const label = context[0]?.label;
             if (!label) return '';
 
-            const displayValue = theme.disableFormatting?.chart?.tooltip
-              ? label
-              : themeFormatter.data(dimension, label);
-            return displayValue;
+            if (theme.disableFormatting?.chart?.tooltip) {
+              return label;
+            }
+            return themeFormatter.data(dimension, label);
           },
           label: (context) => {
             const measure = measures[context.datasetIndex % measures.length]!;
             const raw = context.raw as number;
-            const displayValue = theme.disableFormatting?.chart?.tooltip
-              ? raw
-              : themeFormatter.data(measure, raw);
-            return `${context.dataset.label}: ${displayValue}`;
+            if (theme.disableFormatting?.chart?.tooltip) {
+              return `${context.dataset.label}: ${raw}`;
+            }
+            return `${context.dataset.label}: ${themeFormatter.data(measure, raw)}`;
           },
         },
       },
@@ -232,10 +232,10 @@ const getLineChartComparisonNonTimeOptions = (
           ...getChartjsAxisOptionsScalesTicksDefault(),
           callback(index) {
             const label = data.labels?.[index as number];
-            const displayValue = theme.disableFormatting?.chart?.xAxis
-              ? (label as string)
-              : themeFormatter.data(dimension, label);
-            return displayValue;
+            if (theme.disableFormatting?.chart?.xAxis) {
+              return label as string;
+            }
+            return themeFormatter.data(dimension, label);
           },
         },
       },
@@ -245,10 +245,10 @@ const getLineChartComparisonNonTimeOptions = (
       y: {
         ticks: {
           callback: (value) => {
-            const displayValue = theme.disableFormatting?.chart?.yAxis
-              ? value
-              : themeFormatter.data(measures[0]!, value);
-            return displayValue;
+            if (theme.disableFormatting?.chart?.yAxis) {
+              return value;
+            }
+            return themeFormatter.data(measures[0]!, value);
           },
         },
       },
