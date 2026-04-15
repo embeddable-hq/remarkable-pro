@@ -83,11 +83,23 @@ const PivotTablePro = (props: PivotTableProProps) => {
   const cardContentRef = useRef<HTMLDivElement>(null);
 
   const pivotMeasures = getPivotMeasures({ measures, displayNullAs }, theme);
-  const pivotRowDimension = getPivotDimension({ dimension: rowDimension }, theme);
+  const pivotRowDimension = getPivotDimension(
+    { dimension: rowDimension, disableFormatting: theme.disableFormatting?.table?.rowLabels },
+    theme,
+  );
   const pivotSubRowDimension = subRowDimension
-    ? getPivotDimension({ dimension: subRowDimension }, theme)
+    ? getPivotDimension(
+        {
+          dimension: subRowDimension,
+          disableFormatting: theme.disableFormatting?.table?.rowLabels,
+        },
+        theme,
+      )
     : undefined;
-  const pivotColumnDimension = getPivotDimension({ dimension: columnDimension }, theme);
+  const pivotColumnDimension = getPivotDimension(
+    { dimension: columnDimension, disableFormatting: theme.disableFormatting?.table?.columnLabels },
+    theme,
+  );
   const pivotColumnTotalsFor = getPivotColumnTotalsFor(measures);
   const pivotRowTotalsFor = getPivotRowTotalsFor(measures);
 

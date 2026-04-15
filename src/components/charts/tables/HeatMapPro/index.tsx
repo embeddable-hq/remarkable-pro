@@ -32,7 +32,7 @@ export type HeatMapProProps = {
 } & ChartCardHeaderProps;
 
 export const getHeatMeasure = (
-  props: { measure: Measure; allowFormatting?: boolean },
+  props: { measure: Measure },
   theme: Theme,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): HeatMapPropsMeasure<any> => {
@@ -42,13 +42,15 @@ export const getHeatMeasure = (
     key: props.measure.name,
     label: themeFormatter.dimensionOrMeasureTitle(props.measure),
     format: (value) => {
-      return props.allowFormatting ? themeFormatter.data(props.measure, value) : value.toString();
+      return theme.disableFormatting?.table?.values
+        ? value.toString()
+        : themeFormatter.data(props.measure, value);
     },
   };
 };
 
 export const getHeatDimension = (
-  props: { dimension: Dimension; allowFormatting?: boolean },
+  props: { dimension: Dimension; disableFormatting?: boolean },
   theme: Theme,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): HeatMapPropsDimension<any> => {
@@ -59,7 +61,7 @@ export const getHeatDimension = (
     label: themeFormatter.dimensionOrMeasureTitle(props.dimension),
 
     format: (value: string) =>
-      props.allowFormatting ? themeFormatter.data(props.dimension, value) : value,
+      props.disableFormatting ? value : themeFormatter.data(props.dimension, value),
   };
 };
 
@@ -113,18 +115,15 @@ const HeatMapPro = (props: HeatMapProProps) => {
     measures: [measure],
   });
 
-  const pivotMeasures = getHeatMeasure(
-    { measure, allowFormatting: !theme.disableFormatting?.table?.values },
-    theme,
-  );
+  const pivotMeasures = getHeatMeasure({ measure }, theme);
   const pivotRowDimension = getHeatDimension(
-    { dimension: rowDimension, allowFormatting: !theme.disableFormatting?.table?.rowLabels },
+    { dimension: rowDimension, disableFormatting: theme.disableFormatting?.table?.rowLabels },
     theme,
   );
   const pivotColumnDimension = getHeatDimension(
     {
       dimension: columnDimension,
-      allowFormatting: !theme.disableFormatting?.table?.columnLabels,
+      disableFormatting: theme.disableFormatting?.table?.columnLabels,
     },
     theme,
   );

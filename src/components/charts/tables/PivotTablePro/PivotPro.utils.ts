@@ -6,7 +6,7 @@ import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export const getPivotMeasures = (
-  props: { measures: Measure[]; displayNullAs?: string; allowFormatting?: boolean },
+  props: { measures: Measure[]; displayNullAs?: string; disableFormatting?: boolean },
   theme: Theme,
 ): PivotTableProps<any>['measures'] => {
   const themeFormatter = getThemeFormatter(theme);
@@ -20,7 +20,7 @@ export const getPivotMeasures = (
       accessor: (row) => {
         const value = row[measure.name];
 
-        if (!props.allowFormatting) {
+        if (theme.disableFormatting?.table?.values) {
           return value;
         }
 
@@ -33,7 +33,7 @@ export const getPivotMeasures = (
 };
 
 export const getPivotDimension = (
-  props: { dimension: Dimension; allowFormatting?: boolean },
+  props: { dimension: Dimension; disableFormatting?: boolean },
   theme: Theme,
 ): PivotTableProps<any>['rowDimension' | 'columnDimension'] => {
   const themeFormatter = getThemeFormatter(theme);
@@ -42,7 +42,7 @@ export const getPivotDimension = (
     key: props.dimension.name,
     label: themeFormatter.dimensionOrMeasureTitle(props.dimension),
     formatValue: (value: string) =>
-      props.allowFormatting ? themeFormatter.data(props.dimension, value) : value,
+      props.disableFormatting ? value : themeFormatter.data(props.dimension, value),
   };
 };
 
