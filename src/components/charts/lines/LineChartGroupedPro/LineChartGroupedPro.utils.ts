@@ -44,7 +44,7 @@ export const getLineChartGroupedProData = (
       index,
     });
 
-    const displayLabel = theme.charts.avoidFormattingOnLabels
+    const displayLabel = theme.disableFormatting?.chart?.labels
       ? groupByItem
       : themeFormatter.data(groupDimension, groupByItem);
 
@@ -91,7 +91,7 @@ export const getLineChartGroupedProOptions = (
         labels: {
           value: {
             formatter: (value: string | number) => {
-              const displayValue = theme.charts.avoidFormattingOnDatalabels
+              const displayValue = theme.disableFormatting?.chart?.datalabels
                 ? value
                 : themeFormatter.data(measure, value);
               return displayValue;
@@ -103,14 +103,14 @@ export const getLineChartGroupedProOptions = (
         callbacks: {
           title: (context) => {
             const label = context[0]?.label;
-            const displayValue = theme.charts.avoidFormattingOnTooltip
+            const displayValue = theme.disableFormatting?.chart?.tooltip
               ? label
               : themeFormatter.data(dimension, label);
             return displayValue;
           },
           label: (context) => {
             const raw = context.raw as number;
-            const displayValue = theme.charts.avoidFormattingOnTooltip
+            const displayValue = theme.disableFormatting?.chart?.tooltip
               ? raw
               : themeFormatter.data(measure, raw);
             return `${context.dataset.label}: ${displayValue}`;
@@ -125,7 +125,7 @@ export const getLineChartGroupedProOptions = (
             if (!data || !data.labels) return undefined;
 
             const label = data.labels[Number(value)] as string;
-            const displayValue = theme.charts.avoidFormattingOnXAxis
+            const displayValue = theme.disableFormatting?.chart?.xAxis
               ? label
               : themeFormatter.data(dimension, label);
             return displayValue;
@@ -135,7 +135,7 @@ export const getLineChartGroupedProOptions = (
       y: {
         ticks: {
           callback: (value) => {
-            const displayValue = theme.charts.avoidFormattingOnYAxis
+            const displayValue = theme.disableFormatting?.chart?.yAxis
               ? value
               : themeFormatter.data(measure, value);
             return displayValue;

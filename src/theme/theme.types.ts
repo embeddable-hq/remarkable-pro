@@ -22,19 +22,26 @@ export type ThemeChartsColorMap = {
   measure?: Record<string, string>;
 };
 
-export type ThemeCharts = {
-  // Formatting
-  avoidFormattingOnTooltip?: boolean;
-  avoidFormattingOnLabels?: boolean;
-  avoidFormattingOnDatalabels?: boolean;
-  avoidFormattingOnExport?: boolean;
-  avoidFormattingOnXAxis?: boolean;
-  avoidFormattingOnYAxis?: boolean;
-  avoidFormattingOnKpi?: boolean;
-  avoidFormattingOnTableColumnLabels?: boolean;
-  avoidFormattingOnTableRowLabels?: boolean;
-  avoidFormattingOnTableValues?: boolean;
+export type ThemeDisableFormatting = {
+  export?: boolean;
+  chart?: {
+    tooltip?: boolean;
+    labels?: boolean;
+    datalabels?: boolean;
+    xAxis?: boolean;
+    yAxis?: boolean;
+  };
+  kpi?: {
+    value?: boolean;
+  };
+  table?: {
+    columnLabels?: boolean;
+    rowLabels?: boolean;
+    values?: boolean;
+  };
+};
 
+export type ThemeCharts = {
   // Color mapping
   backgroundColorMap?: ThemeChartsColorMap;
   borderColorMap?: ThemeChartsColorMap;
@@ -76,4 +83,5 @@ export type Theme = {
   defaults: ThemeDefaults;
   fonts?: ThemeFonts;
   clientContext: ThemeClientContext;
+  disableFormatting?: ThemeDisableFormatting;
 };

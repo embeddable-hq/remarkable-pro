@@ -68,7 +68,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
 
   const themeFormatter = getThemeFormatter(theme);
   const valueFormatter = (valueToFormat: number) =>
-    theme.charts.avoidFormattingOnKpi
+    theme.disableFormatting?.kpi?.value
       ? valueToFormat.toString()
       : themeFormatter.data(measure, valueToFormat);
   const comparisonLabel = `vs ${getComparisonPeriodLabel(comparisonPeriod, theme).toLowerCase()}`;

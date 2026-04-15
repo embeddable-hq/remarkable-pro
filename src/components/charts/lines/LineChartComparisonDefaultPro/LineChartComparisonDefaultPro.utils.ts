@@ -186,7 +186,7 @@ const getLineChartComparisonNonTimeOptions = (
         labels: {
           value: {
             formatter: (value: string | number, context) => {
-              if (theme.charts.avoidFormattingOnDatalabels) {
+              if (theme.disableFormatting?.chart?.datalabels) {
                 return value;
               }
               const measure = measures[context.datasetIndex % measures.length]!;
@@ -201,7 +201,7 @@ const getLineChartComparisonNonTimeOptions = (
             const label = context[0]?.label;
             if (!label) return '';
 
-            const displayValue = theme.charts.avoidFormattingOnTooltip
+            const displayValue = theme.disableFormatting?.chart?.tooltip
               ? label
               : themeFormatter.data(dimension, label);
             return displayValue;
@@ -209,7 +209,7 @@ const getLineChartComparisonNonTimeOptions = (
           label: (context) => {
             const measure = measures[context.datasetIndex % measures.length]!;
             const raw = context.raw as number;
-            const displayValue = theme.charts.avoidFormattingOnTooltip
+            const displayValue = theme.disableFormatting?.chart?.tooltip
               ? raw
               : themeFormatter.data(measure, raw);
             return `${context.dataset.label}: ${displayValue}`;
@@ -232,7 +232,7 @@ const getLineChartComparisonNonTimeOptions = (
           ...getChartjsAxisOptionsScalesTicksDefault(),
           callback(index) {
             const label = data.labels?.[index as number];
-            const displayValue = theme.charts.avoidFormattingOnXAxis
+            const displayValue = theme.disableFormatting?.chart?.xAxis
               ? (label as string)
               : themeFormatter.data(dimension, label);
             return displayValue;
@@ -245,7 +245,7 @@ const getLineChartComparisonNonTimeOptions = (
       y: {
         ticks: {
           callback: (value) => {
-            const displayValue = theme.charts.avoidFormattingOnYAxis
+            const displayValue = theme.disableFormatting?.chart?.yAxis
               ? value
               : themeFormatter.data(measures[0]!, value);
             return displayValue;

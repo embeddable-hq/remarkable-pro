@@ -116,19 +116,18 @@ const HeatMapPro = (props: HeatMapProProps) => {
     measures: [measure],
   });
 
-  console.log('avoidFormattingOnTableValues', theme.charts.avoidFormattingOnTableValues);
   const pivotMeasures = getHeatMeasure(
-    { measure, allowFormatting: !theme.charts.avoidFormattingOnTableValues },
+    { measure, allowFormatting: !theme.disableFormatting?.table?.values },
     theme,
   );
   const pivotRowDimension = getHeatDimension(
-    { dimension: rowDimension, allowFormatting: !theme.charts.avoidFormattingOnTableRowLabels },
+    { dimension: rowDimension, allowFormatting: !theme.disableFormatting?.table?.rowLabels },
     theme,
   );
   const pivotColumnDimension = getHeatDimension(
     {
       dimension: columnDimension,
-      allowFormatting: !theme.charts.avoidFormattingOnTableColumnLabels,
+      allowFormatting: !theme.disableFormatting?.table?.columnLabels,
     },
     theme,
   );

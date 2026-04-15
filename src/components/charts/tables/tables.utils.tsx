@@ -63,14 +63,14 @@ export const getTableHeaders = (
 
     return {
       id: dimOrMeas.name,
-      title: theme.charts.avoidFormattingOnTableColumnLabels
+      title: theme.disableFormatting?.table?.columnLabels
         ? dimOrMeas.title
         : themeFormatter.dimensionOrMeasureTitle(dimOrMeas),
       minWidth: getTableHeaderMinWidth(dimOrMeas),
       align: getTableHeaderAlign(dimOrMeas),
       accessor: (row) => {
         const value = row[dimOrMeas.name];
-        if (theme.charts.avoidFormattingOnTableValues) {
+        if (theme.disableFormatting?.table?.values) {
           return value;
         }
         const updatedDimOrMeas = {
