@@ -63,9 +63,7 @@ export const getTableHeaders = (
 
     return {
       id: dimOrMeas.name,
-      title: theme.disableFormatting?.table?.columnLabels
-        ? dimOrMeas.title
-        : themeFormatter.dimensionOrMeasureTitle(dimOrMeas),
+      title: themeFormatter.dimensionOrMeasureTitle(dimOrMeas),
       minWidth: getTableHeaderMinWidth(dimOrMeas),
       align: getTableHeaderAlign(dimOrMeas),
       accessor: (row) => {

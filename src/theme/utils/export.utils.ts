@@ -28,7 +28,7 @@ const formatData = (
   const themeFormatter = getThemeFormatter(theme);
 
   const headers = dimensionsAndMeasures.map((dm) => {
-    return theme.disableFormatting?.export ? dm.title : themeFormatter.dimensionOrMeasureTitle(dm);
+    return themeFormatter.dimensionOrMeasureTitle(dm);
   });
   const body = data!.map((dataRow) => {
     const row: Array<string> = [];

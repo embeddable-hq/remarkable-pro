@@ -14,9 +14,7 @@ export const getPivotMeasures = (
   return props.measures.map((measure) => {
     return {
       key: measure.name,
-      label: props.allowFormatting
-        ? themeFormatter.dimensionOrMeasureTitle(measure)
-        : measure.title,
+      label: themeFormatter.dimensionOrMeasureTitle(measure),
       showAsPercentage: Boolean(measure.inputs?.showAsPercentage),
       percentageDecimalPlaces: measure.inputs?.decimalPlaces ?? 1,
       accessor: (row) => {
@@ -42,9 +40,7 @@ export const getPivotDimension = (
 
   return {
     key: props.dimension.name,
-    label: props.allowFormatting
-      ? themeFormatter.dimensionOrMeasureTitle(props.dimension)
-      : props.dimension.title,
+    label: themeFormatter.dimensionOrMeasureTitle(props.dimension),
     formatValue: (value: string) =>
       props.allowFormatting ? themeFormatter.data(props.dimension, value) : value,
   };

@@ -40,9 +40,7 @@ export const getHeatMeasure = (
 
   return {
     key: props.measure.name,
-    label: props.allowFormatting
-      ? themeFormatter.dimensionOrMeasureTitle(props.measure)
-      : props.measure.title,
+    label: themeFormatter.dimensionOrMeasureTitle(props.measure),
     format: (value) => {
       return props.allowFormatting ? themeFormatter.data(props.measure, value) : value.toString();
     },
@@ -58,9 +56,8 @@ export const getHeatDimension = (
 
   return {
     key: props.dimension.name,
-    label: props.allowFormatting
-      ? themeFormatter.dimensionOrMeasureTitle(props.dimension)
-      : props.dimension.title,
+    label: themeFormatter.dimensionOrMeasureTitle(props.dimension),
+
     format: (value: string) =>
       props.allowFormatting ? themeFormatter.data(props.dimension, value) : value,
   };
