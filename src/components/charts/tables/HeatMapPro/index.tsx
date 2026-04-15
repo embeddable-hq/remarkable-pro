@@ -32,7 +32,7 @@ export type HeatMapProProps = {
 } & ChartCardHeaderProps;
 
 export const getHeatMeasure = (
-  props: { measure: Measure },
+  props: { measure: Measure; allowFormatting?: boolean },
   theme: Theme,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): HeatMapPropsMeasure<any> => {
@@ -40,15 +40,17 @@ export const getHeatMeasure = (
 
   return {
     key: props.measure.name,
-    label: themeFormatter.dimensionOrMeasureTitle(props.measure),
+    label: props.allowFormatting
+      ? themeFormatter.dimensionOrMeasureTitle(props.measure)
+      : props.measure.title,
     format: (value) => {
-      return themeFormatter.data(props.measure, value);
+      return props.allowFormatting ? themeFormatter.data(props.measure, value) : value.toString();
     },
   };
 };
 
 export const getHeatDimension = (
-  props: { dimension: Dimension },
+  props: { dimension: Dimension; allowFormatting?: boolean },
   theme: Theme,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): HeatMapPropsDimension<any> => {
@@ -56,8 +58,11 @@ export const getHeatDimension = (
 
   return {
     key: props.dimension.name,
-    label: themeFormatter.dimensionOrMeasureTitle(props.dimension),
-    format: (value: string) => themeFormatter.data(props.dimension, value),
+    label: props.allowFormatting
+      ? themeFormatter.dimensionOrMeasureTitle(props.dimension)
+      : props.dimension.title,
+    format: (value: string) =>
+      props.allowFormatting ? themeFormatter.data(props.dimension, value) : value,
   };
 };
 
@@ -111,9 +116,22 @@ const HeatMapPro = (props: HeatMapProProps) => {
     measures: [measure],
   });
 
-  const pivotMeasures = getHeatMeasure({ measure }, theme);
-  const pivotRowDimension = getHeatDimension({ dimension: rowDimension }, theme);
-  const pivotColumnDimension = getHeatDimension({ dimension: columnDimension }, theme);
+  console.log('avoidFormattingOnTableValues', theme.charts.avoidFormattingOnTableValues);
+  const pivotMeasures = getHeatMeasure(
+    { measure, allowFormatting: !theme.charts.avoidFormattingOnTableValues },
+    theme,
+  );
+  const pivotRowDimension = getHeatDimension(
+    { dimension: rowDimension, allowFormatting: !theme.charts.avoidFormattingOnTableRowLabels },
+    theme,
+  );
+  const pivotColumnDimension = getHeatDimension(
+    {
+      dimension: columnDimension,
+      allowFormatting: !theme.charts.avoidFormattingOnTableColumnLabels,
+    },
+    theme,
+  );
 
   return (
     <ChartCard

@@ -97,6 +97,9 @@ export const getLineChartProOptions = (
         labels: {
           value: {
             formatter: (value: string | number, context) => {
+              if (theme.charts.avoidFormattingOnLabels) {
+                return value;
+              }
               const measure = measures[context.datasetIndex]!;
               return themeFormatter.data(measure, value);
             },
@@ -107,12 +110,16 @@ export const getLineChartProOptions = (
         callbacks: {
           title: (context) => {
             const label = context[0]?.label;
-            return themeFormatter.data(dimension, label);
+            const displayValue = theme.charts.avoidFormattingOnTooltip
+              ? label
+              : themeFormatter.data(dimension, label);
+            return displayValue;
           },
           label: (context) => {
             const measure = measures[context.datasetIndex]!;
             const raw = context.raw as number;
-            return `${themeFormatter.data(dimension, context.dataset.label) || ''}: ${themeFormatter.data(measure, raw)}`;
+
+            return `${theme.charts.avoidFormattingOnTooltip ? context.dataset.label : themeFormatter.data(dimension, context.dataset.label) || ''}: ${theme.charts.avoidFormattingOnTooltip ? raw : themeFormatter.data(measure, raw)}`;
           },
         },
       },
@@ -124,14 +131,20 @@ export const getLineChartProOptions = (
             if (!data || !data.labels) return undefined;
 
             const label = data.labels[Number(value)] as string;
-            return themeFormatter.data(dimension, label);
+            const displayValue = theme.charts.avoidFormattingOnXAxis
+              ? label
+              : themeFormatter.data(dimension, label);
+            return displayValue;
           },
         },
       },
       y: {
         ticks: {
           callback: (value) => {
-            return themeFormatter.data(measures[0]!, value);
+            const displayValue = theme.charts.avoidFormattingOnYAxis
+              ? value
+              : themeFormatter.data(measures[0]!, value);
+            return displayValue;
           },
         },
       },

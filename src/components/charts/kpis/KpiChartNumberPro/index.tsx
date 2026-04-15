@@ -25,7 +25,11 @@ const KpiChartNumberPro = (props: KpiChartNumberProProp) => {
   const value = results.data?.[0]?.[measure.name];
 
   const themeFormatter = getThemeFormatter(theme);
-  const valueFormatter = (valueToFormat: number) => themeFormatter.data(measure, valueToFormat);
+
+  const valueFormatter = (valueToFormat: number) =>
+    theme.charts.avoidFormattingOnKpi
+      ? valueToFormat.toString()
+      : themeFormatter.data(measure, valueToFormat);
 
   const resultsWithNullsHandled = getKpiResults(results, measure, Boolean(displayNullAs));
 

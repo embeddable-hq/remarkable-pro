@@ -48,8 +48,12 @@ export const getBarStackedChartProData = (
       chartColors,
     });
 
+    const displayLabel = theme.charts.avoidFormattingOnLabels
+      ? groupByItem
+      : themeFormatter.data(groupDimension, groupByItem);
+
     return {
-      label: themeFormatter.data(groupDimension, groupByItem),
+      label: displayLabel,
       rawLabel: groupByItem,
       backgroundColor,
       borderColor,
@@ -158,10 +162,13 @@ export const getBarChartProOptions = (
       datalabels: {
         labels: {
           total: {
-            formatter: (_value: string | number, context: Context) =>
-              getBarChartProDatalabelTotalFormatter(context, (value: number) =>
-                themeFormatter.data(measures[0]!, value),
-              ),
+            formatter: (_value: string | number, context: Context) => {
+              return getBarChartProDatalabelTotalFormatter(context, (value: number) =>
+                theme.charts.avoidFormattingOnDatalabels
+                  ? value.toString()
+                  : themeFormatter.data(measures[0]!, value),
+              );
+            },
           },
           value: {
             formatter: (value: string | number, context) => {
@@ -170,7 +177,11 @@ export const getBarChartProOptions = (
               if (measure.inputs?.showValueAsPercentage) {
                 return getDatalabelPercentage(Number(value), context.dataset.data);
               }
-              return themeFormatter.data(measure, value);
+              const displayValue = theme.charts.avoidFormattingOnDatalabels
+                ? value
+                : themeFormatter.data(measure, value);
+
+              return displayValue;
             },
           },
         },
@@ -179,15 +190,22 @@ export const getBarChartProOptions = (
         callbacks: {
           title: (context) => {
             const label = context[0]?.label;
-            return themeFormatter.data(dimension, label);
+            const displayValue = theme.charts.avoidFormattingOnTooltip
+              ? label
+              : themeFormatter.data(dimension, label);
+            return displayValue;
           },
 
           label: (context) => {
             const measure = measures[context.datasetIndex % measures.length]!;
             const raw = context.raw as number;
 
-            const dimensionLabel = themeFormatter.data(dimension, context.dataset.label) || '';
-            const measureValue = themeFormatter.data(measure, raw);
+            const dimensionLabel = theme.charts.avoidFormattingOnTooltip
+              ? context.dataset.label
+              : themeFormatter.data(dimension, context.dataset.label) || '';
+            const measureValue = theme.charts.avoidFormattingOnLabels
+              ? raw
+              : themeFormatter.data(measure, raw);
 
             let percentage = '';
             if (measure.inputs?.showValueAsPercentage) {
@@ -203,14 +221,19 @@ export const getBarChartProOptions = (
         ticks: {
           callback: (value) => {
             if (horizontal) {
-              return themeFormatter.data(measures[0]!, value);
+              const displayValue = theme.charts.avoidFormattingOnXAxis
+                ? value
+                : themeFormatter.data(measures[0]!, value);
+              return displayValue;
             }
 
             if (!data || !data.labels) return undefined;
 
             const label = data.labels[Number(value)] as string;
-
-            return themeFormatter.data(dimension, label);
+            const displayValue = theme.charts.avoidFormattingOnXAxis
+              ? label
+              : themeFormatter.data(dimension, label);
+            return displayValue;
           },
         },
       },
@@ -218,11 +241,17 @@ export const getBarChartProOptions = (
         ticks: {
           callback: (value) => {
             if (!horizontal) {
-              return themeFormatter.data(measures[0]!, value);
+              const displayValue = theme.charts.avoidFormattingOnYAxis
+                ? value
+                : themeFormatter.data(measures[0]!, value);
+              return displayValue;
             }
             if (!data || !data.labels) return undefined;
             const label = data.labels[Number(value)] as string;
-            return themeFormatter.data(dimension, label);
+            const displayValue = theme.charts.avoidFormattingOnYAxis
+              ? label
+              : themeFormatter.data(dimension, label);
+            return displayValue;
           },
         },
       },

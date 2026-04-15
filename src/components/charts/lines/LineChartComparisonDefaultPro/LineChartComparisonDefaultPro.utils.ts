@@ -186,6 +186,9 @@ const getLineChartComparisonNonTimeOptions = (
         labels: {
           value: {
             formatter: (value: string | number, context) => {
+              if (theme.charts.avoidFormattingOnDatalabels) {
+                return value;
+              }
               const measure = measures[context.datasetIndex % measures.length]!;
               return themeFormatter.data(measure, value);
             },
@@ -195,14 +198,21 @@ const getLineChartComparisonNonTimeOptions = (
       tooltip: {
         callbacks: {
           title: (context) => {
-            if (!context[0]) return '';
+            const label = context[0]?.label;
+            if (!label) return '';
 
-            return themeFormatter.data(dimension, context[0].label);
+            const displayValue = theme.charts.avoidFormattingOnTooltip
+              ? label
+              : themeFormatter.data(dimension, label);
+            return displayValue;
           },
           label: (context) => {
             const measure = measures[context.datasetIndex % measures.length]!;
             const raw = context.raw as number;
-            return `${context.dataset.label}: ${themeFormatter.data(measure, raw)}`;
+            const displayValue = theme.charts.avoidFormattingOnTooltip
+              ? raw
+              : themeFormatter.data(measure, raw);
+            return `${context.dataset.label}: ${displayValue}`;
           },
         },
       },
@@ -221,7 +231,11 @@ const getLineChartComparisonNonTimeOptions = (
         ticks: {
           ...getChartjsAxisOptionsScalesTicksDefault(),
           callback(index) {
-            return themeFormatter.data(dimension, data.labels?.[index as number]);
+            const label = data.labels?.[index as number];
+            const displayValue = theme.charts.avoidFormattingOnXAxis
+              ? (label as string)
+              : themeFormatter.data(dimension, label);
+            return displayValue;
           },
         },
       },
@@ -231,7 +245,10 @@ const getLineChartComparisonNonTimeOptions = (
       y: {
         ticks: {
           callback: (value) => {
-            return themeFormatter.data(measures[0]!, value);
+            const displayValue = theme.charts.avoidFormattingOnYAxis
+              ? value
+              : themeFormatter.data(measures[0]!, value);
+            return displayValue;
           },
         },
       },

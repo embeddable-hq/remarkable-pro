@@ -63,15 +63,21 @@ export const getTableHeaders = (
 
     return {
       id: dimOrMeas.name,
-      title: themeFormatter.dimensionOrMeasureTitle(dimOrMeas),
+      title: theme.charts.avoidFormattingOnTableColumnLabels
+        ? dimOrMeas.title
+        : themeFormatter.dimensionOrMeasureTitle(dimOrMeas),
       minWidth: getTableHeaderMinWidth(dimOrMeas),
       align: getTableHeaderAlign(dimOrMeas),
       accessor: (row) => {
+        const value = row[dimOrMeas.name];
+        if (theme.charts.avoidFormattingOnTableValues) {
+          return value;
+        }
         const updatedDimOrMeas = {
           ...dimOrMeas,
           inputs: { ...dimOrMeas.inputs, displayNullAs: props.displayNullAs },
         };
-        return themeFormatter.data(updatedDimOrMeas, row[dimOrMeas.name]);
+        return themeFormatter.data(updatedDimOrMeas, value);
       },
       cellStyle: (value) => {
         const tableCellStyle = dimOrMeas.inputs?.tableCellStyle;

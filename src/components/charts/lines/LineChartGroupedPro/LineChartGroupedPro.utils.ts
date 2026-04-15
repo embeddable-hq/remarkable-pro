@@ -44,9 +44,13 @@ export const getLineChartGroupedProData = (
       index,
     });
 
+    const displayLabel = theme.charts.avoidFormattingOnLabels
+      ? groupByItem
+      : themeFormatter.data(groupDimension, groupByItem);
+
     const dataset = {
       clip: hasMinMaxYAxisRange,
-      label: themeFormatter.data(groupDimension, groupByItem),
+      label: displayLabel,
       rawLabel: groupByItem,
       backgroundColor: setColorAlpha(backgroundColor, 0.5),
       pointBackgroundColor: backgroundColor,
@@ -87,7 +91,10 @@ export const getLineChartGroupedProOptions = (
         labels: {
           value: {
             formatter: (value: string | number) => {
-              return themeFormatter.data(measure, value);
+              const displayValue = theme.charts.avoidFormattingOnDatalabels
+                ? value
+                : themeFormatter.data(measure, value);
+              return displayValue;
             },
           },
         },
@@ -96,11 +103,17 @@ export const getLineChartGroupedProOptions = (
         callbacks: {
           title: (context) => {
             const label = context[0]?.label;
-            return themeFormatter.data(dimension, label);
+            const displayValue = theme.charts.avoidFormattingOnTooltip
+              ? label
+              : themeFormatter.data(dimension, label);
+            return displayValue;
           },
           label: (context) => {
             const raw = context.raw as number;
-            return `${context.dataset.label}: ${themeFormatter.data(measure, raw)}`;
+            const displayValue = theme.charts.avoidFormattingOnTooltip
+              ? raw
+              : themeFormatter.data(measure, raw);
+            return `${context.dataset.label}: ${displayValue}`;
           },
         },
       },
@@ -112,14 +125,20 @@ export const getLineChartGroupedProOptions = (
             if (!data || !data.labels) return undefined;
 
             const label = data.labels[Number(value)] as string;
-            return themeFormatter.data(dimension, label);
+            const displayValue = theme.charts.avoidFormattingOnXAxis
+              ? label
+              : themeFormatter.data(dimension, label);
+            return displayValue;
           },
         },
       },
       y: {
         ticks: {
           callback: (value) => {
-            return themeFormatter.data(measure, value);
+            const displayValue = theme.charts.avoidFormattingOnYAxis
+              ? value
+              : themeFormatter.data(measure, value);
+            return displayValue;
           },
         },
       },

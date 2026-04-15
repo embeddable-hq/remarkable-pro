@@ -28,6 +28,12 @@ export type ThemeCharts = {
   avoidFormattingOnLabels?: boolean;
   avoidFormattingOnDatalabels?: boolean;
   avoidFormattingOnExport?: boolean;
+  avoidFormattingOnXAxis?: boolean;
+  avoidFormattingOnYAxis?: boolean;
+  avoidFormattingOnKpi?: boolean;
+  avoidFormattingOnTableColumnLabels?: boolean;
+  avoidFormattingOnTableRowLabels?: boolean;
+  avoidFormattingOnTableValues?: boolean;
 
   // Color mapping
   backgroundColorMap?: ThemeChartsColorMap;
