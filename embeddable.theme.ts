@@ -9,13 +9,6 @@ const themeProvider = (clientContext: any): Theme => {
   return {
     ...remarkableTheme,
     clientContext: { ...clientContext, timezone },
-    charts: {
-      ...remarkableTheme.charts,
-      avoidFormattingOnTooltip: true,
-      avoidFormattingOnDatalabels: true,
-      avoidFormattingOnLabels: true,
-      avoidFormattingOnExport: true,
-    },
   };
 };
 
