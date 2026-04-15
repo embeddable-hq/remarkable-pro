@@ -58,9 +58,12 @@ export const getPieChartProData = (
   return {
     labels: groupedData.map((item) => {
       const value = item[props.dimension.name];
-      const displayValue = theme.disableFormatting?.chart?.labels
-        ? value
-        : themeFormatter.data(props.dimension, value);
+
+      if (theme.disableFormatting?.chart?.labels) {
+        return value;
+      }
+
+      const displayValue = themeFormatter.data(props.dimension, value);
 
       // If formatter did not work, try i18n translation
       if (value === displayValue) {
