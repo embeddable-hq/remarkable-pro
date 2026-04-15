@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.2.2
+
+### Patch Changes
+
+- b556933: Improve FilterBuilder by allowing default values
+
 ## 0.2.1
 
 ### Patch Changes
