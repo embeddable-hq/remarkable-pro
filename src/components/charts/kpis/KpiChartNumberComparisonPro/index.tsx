@@ -5,13 +5,12 @@ import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { KpiChart } from '@embeddable.com/remarkable-ui';
-import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { useEffect } from 'react';
 import {
   getComparisonPeriodDateRange,
   getComparisonPeriodLabel,
 } from '../../../utils/timeRange.utils';
-import { getKpiResults } from '../kpis.utils';
+import { getKpiResults, getKpiValueFormatter } from '../kpis.utils';
 
 export type KpiChartNumberComparisonProProp = {
   changeFontSize?: number;
@@ -66,13 +65,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
     ? resultsComparison?.data?.[0]?.[measure.name]
     : undefined;
 
-  const themeFormatter = getThemeFormatter(theme);
-  const valueFormatter = (valueToFormat: number) => {
-    if (theme.disableFormatting?.kpi?.value) {
-      return valueToFormat.toString();
-    }
-    return themeFormatter.data(measure, valueToFormat);
-  };
+  const valueFormatter = getKpiValueFormatter({ measure }, theme);
   const comparisonLabel = `vs ${getComparisonPeriodLabel(comparisonPeriod, theme).toLowerCase()}`;
 
   const resultsCombined: DataResponse = {

@@ -1,13 +1,60 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { DataResponse, Measure } from '@embeddable.com/core';
-import { getKpiResults } from './kpis.utils';
+import {
+  getThemeFormatter,
+  type GetThemeFormatter,
+} from '../../../theme/formatter/formatter.utils';
+import { getKpiResults, getKpiValueFormatter } from './kpis.utils';
+import { Theme } from '../../../theme/theme.types';
 
-const measure = { name: 'revenue' } as Measure;
+const measure = { name: 'revenue', nativeType: 'number' } as Measure;
 
 const results: DataResponse = {
   isLoading: false,
   data: [{ revenue: '1000' }],
 };
+
+vi.mock('../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
+
+describe('getKpiValueFormatter', () => {
+  const mockThemeFormatter = {
+    data: vi.fn((_: Measure, value: number) => `formatted:${value}`),
+  } as unknown as GetThemeFormatter;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getThemeFormatter).mockReturnValue(mockThemeFormatter);
+  });
+
+  it('returns value.toString() when disableFormattingKpiValue is true', () => {
+    const formatter = getKpiValueFormatter({ measure }, {
+      disableFormatting: { kpi: { value: true } },
+    } as Theme);
+    expect(formatter(42)).toBe('42');
+    expect(mockThemeFormatter.data).not.toHaveBeenCalled();
+  });
+
+  it('calls themeFormatter.data when disableFormattingKpiValue is false', () => {
+    const formatter = getKpiValueFormatter({ measure }, {
+      disableFormatting: { kpi: { value: false } },
+    } as Theme);
+    expect(formatter(42)).toBe('formatted:42');
+    expect(mockThemeFormatter.data).toHaveBeenCalledWith(measure, 42);
+  });
+
+  it('calls themeFormatter.data when disableFormattingKpiValue is undefined', () => {
+    const formatter = getKpiValueFormatter({ measure }, {} as Theme);
+    expect(formatter(100)).toBe('formatted:100');
+    expect(mockThemeFormatter.data).toHaveBeenCalledWith(measure, 100);
+  });
+
+  it('passes the correct measure to themeFormatter.data', () => {
+    const cost = { name: 'cost', nativeType: 'number' } as Measure;
+    const formatter = getKpiValueFormatter({ measure: cost }, {} as Theme);
+    formatter(99);
+    expect(mockThemeFormatter.data).toHaveBeenCalledWith(cost, 99);
+  });
+});
 
 describe('getKpiResults', () => {
   it('returns results unchanged when hasDisplayNullAs is false', () => {

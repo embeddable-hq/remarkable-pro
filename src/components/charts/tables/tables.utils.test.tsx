@@ -141,6 +141,33 @@ describe('getTableHeaders', () => {
     expect(formatter.data).toHaveBeenCalledWith(expect.anything(), 42);
   });
 
+  it('accessor returns raw value and skips formatter when disableFormatting.table.values is true', () => {
+    const dim = makeDimOrMeas({ name: 'amount', nativeType: 'number' });
+    const disabledTheme = {
+      ...theme,
+      disableFormatting: { table: { values: true } },
+    } as unknown as Theme;
+    const [header] = getTableHeaders({ dimensionsAndMeasures: [dim] }, disabledTheme);
+
+    const result = header?.accessor!({ amount: 99 });
+
+    expect(result).toBe(99);
+    expect(formatter.data).not.toHaveBeenCalled();
+  });
+
+  it('accessor calls formatter when disableFormatting.table.values is false', () => {
+    const dim = makeDimOrMeas({ name: 'amount', nativeType: 'number' });
+    const enabledTheme = {
+      ...theme,
+      disableFormatting: { table: { values: false } },
+    } as unknown as Theme;
+    const [header] = getTableHeaders({ dimensionsAndMeasures: [dim] }, enabledTheme);
+
+    header?.accessor!({ amount: 99 });
+
+    expect(formatter.data).toHaveBeenCalledWith(expect.anything(), 99);
+  });
+
   describe('cellStyle', () => {
     it('returns undefined when no tableCellStyle input', () => {
       const dim = makeDimOrMeas({ inputs: {} });

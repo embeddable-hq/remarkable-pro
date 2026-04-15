@@ -47,6 +47,9 @@ describe('exportCSV', () => {
       val == null ? '' : String(val),
     );
 
+    mockFormatter.dimensionOrMeasureTitle.mockClear();
+    mockFormatter.data.mockClear();
+
     createObjectURL = vi.fn(() => 'blob:csv-url');
     vi.stubGlobal('URL', { createObjectURL, revokeObjectURL: vi.fn() });
 
@@ -117,15 +120,31 @@ describe('exportCSV', () => {
     const blob = createObjectURL.mock.calls[0]?.[0] as Blob;
     expect(await blob.text()).toBe('"Value"\r\n""');
   });
+
+  it('uses raw row values and skips data formatter when disableFormatting.export is true', async () => {
+    mockFormatter.data.mockReturnValue('FORMATTED_VALUE');
+
+    const dims = [dim('city', 'City'), dim('revenue', 'Revenue')];
+    const rows = [{ city: 'London', revenue: 1000 }];
+    const theme = { disableFormatting: { export: true } } as unknown as Theme;
+
+    exportCSV({ title: 'test', data: rows, dimensionsAndMeasures: dims, theme });
+
+    const blob = createObjectURL.mock.calls[0]?.[0] as Blob;
+    // body uses raw data values — NOT 'FORMATTED_VALUE'
+    expect(await blob.text()).toBe('"City","Revenue"\r\n"London","1000"');
+  });
 });
 
 // ─── exportXLSX ───────────────────────────────────────────────────────────────
 describe('exportXLSX', () => {
   beforeEach(() => {
     (getThemeFormatter as Mock).mockReturnValue(mockFormatter);
+    mockFormatter.dimensionOrMeasureTitle.mockClear();
     mockFormatter.dimensionOrMeasureTitle.mockImplementation(
       (dm: Dimension) => dm.title ?? dm.name,
     );
+    mockFormatter.data.mockClear();
     mockFormatter.data.mockImplementation((_: Dimension, val: unknown) =>
       val == null ? '' : String(val),
     );
@@ -160,6 +179,22 @@ describe('exportXLSX', () => {
       expect.anything(),
       'Sheet1',
     );
+  });
+
+  it('uses raw row values and skips data formatter when disableFormatting.export is true', () => {
+    mockFormatter.data.mockReturnValue('FORMATTED_VALUE');
+
+    const dims = [dim('city', 'City'), dim('revenue', 'Revenue')];
+    const rows = [{ city: 'London', revenue: 1000 }];
+    const theme = { disableFormatting: { export: true } } as unknown as Theme;
+
+    exportXLSX({ title: 'test', data: rows, dimensionsAndMeasures: dims, theme });
+
+    // body uses raw data values — NOT 'FORMATTED_VALUE'
+    expect(XLSX.utils.aoa_to_sheet).toHaveBeenCalledWith([
+      ['City', 'Revenue'],
+      ['London', '1000'],
+    ]);
   });
 });
 

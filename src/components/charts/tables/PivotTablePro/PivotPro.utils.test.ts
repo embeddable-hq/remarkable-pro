@@ -119,6 +119,27 @@ describe('getPivotMeasures', () => {
       expect(result?.accessor!({ myMeasure: 42 })).toBe('fmt:42');
       expect(fmt.data).toHaveBeenCalledWith(expect.objectContaining({ name: 'myMeasure' }), 42);
     });
+
+    it('returns raw value when theme.disableFormatting.table.values is true', () => {
+      const fmt = makeFormatter();
+      vi.mocked(getThemeFormatter).mockReturnValue(fmt as any);
+      const theme = { disableFormatting: { table: { values: true } } } as any;
+
+      const [result] = getPivotMeasures({ measures: [measure()] }, theme);
+
+      expect(result?.accessor!({ myMeasure: 42 })).toBe(42);
+      expect(fmt.data).not.toHaveBeenCalled();
+    });
+
+    it('formats value normally when theme.disableFormatting.table.values is false', () => {
+      const fmt = makeFormatter();
+      vi.mocked(getThemeFormatter).mockReturnValue(fmt as any);
+      const theme = { disableFormatting: { table: { values: false } } } as any;
+
+      const [result] = getPivotMeasures({ measures: [measure()] }, theme);
+
+      expect(result?.accessor!({ myMeasure: 42 })).toBe('fmt:42');
+    });
   });
 
   it('maps multiple measures independently', () => {
@@ -162,6 +183,33 @@ describe('getPivotDimension', () => {
     const formatted = result.formatValue!('raw-value');
 
     expect(fmt.data).toHaveBeenCalledWith(expect.objectContaining({ name: 'myDim' }), 'raw-value');
+    expect(formatted).toBe('fmt:raw-value');
+  });
+
+  it('formatValue returns raw value when disableFormatting is true', () => {
+    const fmt = makeFormatter();
+    vi.mocked(getThemeFormatter).mockReturnValue(fmt as any);
+
+    const result = getPivotDimension(
+      { dimension: dimension(), disableFormatting: true },
+      mockTheme,
+    );
+    const formatted = result.formatValue!('raw-value');
+
+    expect(formatted).toBe('raw-value');
+    expect(fmt.data).not.toHaveBeenCalled();
+  });
+
+  it('formatValue formats via themeFormatter when disableFormatting is false', () => {
+    const fmt = makeFormatter();
+    vi.mocked(getThemeFormatter).mockReturnValue(fmt as any);
+
+    const result = getPivotDimension(
+      { dimension: dimension(), disableFormatting: false },
+      mockTheme,
+    );
+    const formatted = result.formatValue!('raw-value');
+
     expect(formatted).toBe('fmt:raw-value');
   });
 });

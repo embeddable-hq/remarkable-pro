@@ -4,13 +4,8 @@ import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
-import {
-  getStyle,
-  HeatMap,
-  HeatMapPropsDimension,
-  HeatMapPropsMeasure,
-} from '@embeddable.com/remarkable-ui';
-import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
+import { getStyle, HeatMap } from '@embeddable.com/remarkable-ui';
+import { getHeatMeasure, getHeatDimension } from './HeatMapPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { useGetTableSortedResults } from '../tables.hooks';
 
@@ -30,45 +25,6 @@ export type HeatMapProProps = {
   rowDimension: Dimension;
   showValues?: boolean;
 } & ChartCardHeaderProps;
-
-export const getHeatMeasure = (
-  props: { measure: Measure },
-  theme: Theme,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): HeatMapPropsMeasure<any> => {
-  const themeFormatter = getThemeFormatter(theme);
-
-  return {
-    key: props.measure.name,
-    label: themeFormatter.dimensionOrMeasureTitle(props.measure),
-    format: (value) => {
-      if (theme.disableFormatting?.table?.values) {
-        return value.toString();
-      }
-      return themeFormatter.data(props.measure, value);
-    },
-  };
-};
-
-export const getHeatDimension = (
-  props: { dimension: Dimension; disableFormatting?: boolean },
-  theme: Theme,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): HeatMapPropsDimension<any> => {
-  const themeFormatter = getThemeFormatter(theme);
-
-  return {
-    key: props.dimension.name,
-    label: themeFormatter.dimensionOrMeasureTitle(props.dimension),
-
-    format: (value: string) => {
-      if (props.disableFormatting) {
-        return value;
-      }
-      return themeFormatter.data(props.dimension, value);
-    },
-  };
-};
 
 const HeatMapPro = (props: HeatMapProProps) => {
   const theme = useTheme() as Theme;

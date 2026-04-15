@@ -36,6 +36,20 @@ const makeMeasure = (overrides: Record<string, any> = {}): Measure =>
 
 const makeTheme = () => ({ charts: { legendPosition: 'bottom' } }) as never;
 
+const makeDisableFormattingTheme = (
+  flags: {
+    labels?: boolean;
+    datalabels?: boolean;
+    tooltip?: boolean;
+    xAxis?: boolean;
+    yAxis?: boolean;
+  } = {},
+) =>
+  ({
+    charts: { legendPosition: 'bottom' },
+    disableFormatting: { chart: flags },
+  }) as never;
+
 const makeMockFormatter = () => ({
   data: vi.fn((_, value) => `fmt:${value}`),
   dimensionOrMeasureTitle: vi.fn((m: Measure) => m.title ?? m.name),
@@ -196,6 +210,22 @@ describe('getBarStackedChartProData', () => {
     getBarStackedChartProData({ data, dimension, groupDimension, measure }, makeTheme());
 
     expect(mockFormatter.data).toHaveBeenCalledWith(groupDimension, 'North');
+  });
+
+  it('uses raw groupByItem as dataset label when disableFormatting.chart.labels is true', () => {
+    const dimension = makeDimension({ name: 'category' });
+    const groupDimension = makeDimension({ name: 'region', nativeType: 'string' });
+    const measure = makeMeasure({ name: 'sales' });
+
+    const data = [{ category: 'A', region: 'North', sales: '10' }];
+
+    const result = getBarStackedChartProData(
+      { data, dimension, groupDimension, measure },
+      makeDisableFormattingTheme({ labels: true }),
+    );
+
+    expect(result.datasets[0]?.label).toBe('North');
+    expect(mockFormatter.data).not.toHaveBeenCalled();
   });
 
   it('sorts axis alphabetically by default (no axisOrder)', () => {
@@ -446,6 +476,27 @@ describe('getBarChartProOptions', () => {
 
       expect(mockFormatter.data).toHaveBeenCalledWith(measures[0], 10);
     });
+
+    it('returns value.toString() without formatting when disableFormatting.chart.datalabels is true', () => {
+      const data = makeChartData(
+        ['A', 'B'],
+        [
+          [10, 20],
+          [5, 15],
+        ],
+      );
+      const options = getBarChartProOptions(
+        { measures, dimension, horizontal: false, data: data as never },
+        makeDisableFormattingTheme({ datalabels: true }),
+      );
+
+      const context = { dataIndex: 0, chart: { data } } as unknown as Context;
+      const formatter = options.plugins!.datalabels!.labels!.total!.formatter!;
+      const result = formatter(0, context);
+
+      expect(mockFormatter.data).not.toHaveBeenCalled();
+      expect(result).toBe('15');
+    });
   });
 
   // -- datalabels.labels.value ------------------------------------------------
@@ -499,6 +550,20 @@ describe('getBarChartProOptions', () => {
       expect(getDatalabelPercentage).toHaveBeenCalledWith(50, [50]);
       expect(result).toBe('50%');
     });
+
+    it('returns the raw value without formatting when disableFormatting.chart.datalabels is true', () => {
+      const data = makeChartData(['A'], [[42]]);
+      const options = getBarChartProOptions(
+        { measures, dimension, horizontal: false, data: data as never },
+        makeDisableFormattingTheme({ datalabels: true }),
+      );
+
+      const context = { datasetIndex: 0, dataset: { data: [42] } } as never;
+      const result = options.plugins!.datalabels!.labels!.value!.formatter!(42, context);
+
+      expect(mockFormatter.data).not.toHaveBeenCalled();
+      expect(result).toBe(42);
+    });
   });
 
   // -- tooltip ---------------------------------------------------------------
@@ -515,6 +580,20 @@ describe('getBarChartProOptions', () => {
       options.plugins!.tooltip!.callbacks!.title!.call({} as never, context);
 
       expect(mockFormatter.data).toHaveBeenCalledWith(dimension, 'Widget');
+    });
+
+    it('title callback returns raw label without formatting when disableFormatting.chart.tooltip is true', () => {
+      const data = makeChartData(['Widget'], [[100]]);
+      const options = getBarChartProOptions(
+        { measures, dimension, horizontal: false, data: data as never },
+        makeDisableFormattingTheme({ tooltip: true }),
+      );
+
+      const context = [{ label: 'Widget' }] as never;
+      const result = options.plugins!.tooltip!.callbacks!.title!.call({} as never, context);
+
+      expect(mockFormatter.data).not.toHaveBeenCalled();
+      expect(result).toBe('Widget');
     });
 
     it('label callback formats the dataset label and measure value', () => {
@@ -534,6 +613,39 @@ describe('getBarChartProOptions', () => {
       options.plugins!.tooltip!.callbacks!.label!.call({} as never, context);
 
       expect(mockFormatter.data).toHaveBeenCalledWith(measures[0], 50);
+    });
+
+    it('label callback uses raw dataset.label as dimensionLabel when disableFormatting.chart.tooltip is true', () => {
+      const data = makeChartData(['A'], [[50]]);
+      const options = getBarChartProOptions(
+        { measures, dimension, horizontal: false, data: data as never },
+        makeDisableFormattingTheme({ tooltip: true }),
+      );
+
+      mockFormatter.data.mockImplementation((_, value) => `fmt:${value}`);
+
+      const context = { datasetIndex: 0, raw: 50, dataset: { label: 'Revenue' } } as never;
+      const result = options.plugins!.tooltip!.callbacks!.label!.call({} as never, context);
+
+      expect(mockFormatter.data).not.toHaveBeenCalledWith(dimension, 'Revenue');
+      expect(result).toBe('Revenue: fmt:50 ');
+    });
+
+    it('label callback uses raw measure value when disableFormatting.chart.labels is true', () => {
+      const data = makeChartData(['A'], [[50]]);
+      const options = getBarChartProOptions(
+        { measures, dimension, horizontal: false, data: data as never },
+        makeDisableFormattingTheme({ labels: true }),
+      );
+
+      mockFormatter.data.mockImplementation((_, value) => `fmt:${value}`);
+
+      const context = { datasetIndex: 0, raw: 50, dataset: { label: 'Revenue' } } as never;
+      const result = options.plugins!.tooltip!.callbacks!.label!.call({} as never, context);
+
+      expect(mockFormatter.data).toHaveBeenCalledWith(dimension, 'Revenue');
+      expect(mockFormatter.data).not.toHaveBeenCalledWith(measures[0], 50);
+      expect(result).toBe('fmt:Revenue: 50 ');
     });
 
     it('appends percentage to label when showValueAsPercentage is true', () => {
@@ -589,6 +701,32 @@ describe('getBarChartProOptions', () => {
 
       expect(mockFormatter.data).toHaveBeenCalledWith(dimension, 'A');
     });
+
+    it('returns raw value without formatting when horizontal and disableFormatting.chart.xAxis is true', () => {
+      const data = makeChartData(['A', 'B'], [[10, 20]]);
+      const options = getBarChartProOptions(
+        { measures, dimension, horizontal: true, data: data as never },
+        makeDisableFormattingTheme({ xAxis: true }),
+      );
+
+      const result = options.scales!.x!.ticks!.callback!.call({} as never, 10, 0, []);
+
+      expect(mockFormatter.data).not.toHaveBeenCalled();
+      expect(result).toBe(10);
+    });
+
+    it('returns raw label without formatting when not horizontal and disableFormatting.chart.xAxis is true', () => {
+      const data = makeChartData(['A', 'B'], [[10, 20]]);
+      const options = getBarChartProOptions(
+        { measures, dimension, horizontal: false, data: data as never },
+        makeDisableFormattingTheme({ xAxis: true }),
+      );
+
+      const result = options.scales!.x!.ticks!.callback!.call({} as never, 0, 0, []);
+
+      expect(mockFormatter.data).not.toHaveBeenCalled();
+      expect(result).toBe('A');
+    });
   });
 
   describe('scales.y.ticks.callback (non-horizontal)', () => {
@@ -614,6 +752,32 @@ describe('getBarChartProOptions', () => {
       options.scales!.y!.ticks!.callback!.call({} as never, 1, 1, []);
 
       expect(mockFormatter.data).toHaveBeenCalledWith(dimension, 'B');
+    });
+
+    it('returns raw value without formatting when not horizontal and disableFormatting.chart.yAxis is true', () => {
+      const data = makeChartData(['A'], [[100]]);
+      const options = getBarChartProOptions(
+        { measures, dimension, horizontal: false, data: data as never },
+        makeDisableFormattingTheme({ yAxis: true }),
+      );
+
+      const result = options.scales!.y!.ticks!.callback!.call({} as never, 100, 0, []);
+
+      expect(mockFormatter.data).not.toHaveBeenCalled();
+      expect(result).toBe(100);
+    });
+
+    it('returns raw label without formatting when horizontal and disableFormatting.chart.yAxis is true', () => {
+      const data = makeChartData(['A', 'B'], [[10, 20]]);
+      const options = getBarChartProOptions(
+        { measures, dimension, horizontal: true, data: data as never },
+        makeDisableFormattingTheme({ yAxis: true }),
+      );
+
+      const result = options.scales!.y!.ticks!.callback!.call({} as never, 1, 1, []);
+
+      expect(mockFormatter.data).not.toHaveBeenCalled();
+      expect(result).toBe('B');
     });
   });
 

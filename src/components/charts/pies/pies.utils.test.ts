@@ -44,7 +44,10 @@ const makeDimension = (name = 'category'): Dimension =>
 const makeMeasure = (name = 'value'): Measure =>
   ({ name, __type__: 'measure', inputs: {} }) as unknown as Measure;
 
-const makeTheme = (charts: Record<string, unknown> = {}) => ({ charts }) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+const makeTheme = (
+  charts: Record<string, unknown> = {},
+  disableFormatting?: { chart?: { labels?: boolean; datalabels?: boolean; tooltip?: boolean } },
+) => ({ charts, disableFormatting }) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
 // ----------------------------------------------------------------------------
 
@@ -121,6 +124,17 @@ describe('getPieChartProData', () => {
     expect(colorTypes).toContain('border');
   });
 
+  it('returns raw value for labels when disableFormatting.chart.labels is true', () => {
+    vi.mocked(i18n.t).mockClear();
+    const data = [{ category: 'some_key', value: 5 }];
+    const disabledTheme = makeTheme({}, { chart: { labels: true } });
+
+    const result = getPieChartProData({ data, dimension, measure }, disabledTheme);
+
+    expect(result.labels?.[0]).toBe('some_key');
+    expect(vi.mocked(i18n.t)).not.toHaveBeenCalled();
+  });
+
   it('passes maxLegendItems to groupTailAsOther', () => {
     const data = [{ category: 'A', value: 1 }];
 
@@ -154,6 +168,31 @@ describe('getPieChartProOptions', () => {
     formatter(42);
 
     expect(dataFn).toHaveBeenCalledWith(measure, 42);
+  });
+
+  it('datalabels formatter returns raw value when disableFormatting.chart.datalabels is true', () => {
+    const dataFn = vi.fn();
+    vi.mocked(getThemeFormatter).mockReturnValueOnce({ data: dataFn } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    const options = getPieChartProOptions(measure, makeTheme({}, { chart: { datalabels: true } }));
+    const formatter = options.plugins?.datalabels?.formatter as (
+      v: unknown,
+      ctx: unknown,
+    ) => unknown;
+    const result = formatter(99, { dataset: { data: [99] } });
+
+    expect(result).toBe(99);
+    expect(dataFn).not.toHaveBeenCalled();
+  });
+
+  it('tooltip label returns raw value and percentage when disableFormatting.chart.tooltip is true', () => {
+    const options = getPieChartProOptions(measure, makeTheme({}, { chart: { tooltip: true } }));
+    const labelFn = options.plugins?.tooltip?.callbacks?.label as (ctx: any) => string; // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    // raw = 25, total = 100 → 25%
+    const result = labelFn({ raw: 25, dataset: { data: [25, 25, 25, 25] } });
+
+    expect(result).toBe('25 (25%)');
   });
 
   it('tooltip label formats raw value and shows percentage', () => {
