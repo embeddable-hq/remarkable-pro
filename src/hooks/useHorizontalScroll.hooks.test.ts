@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { useHorizontalScroll } from './horizontalScroll.hooks';
+import { useHorizontalScroll } from './useHorizontalScroll.hooks';
 
 const mockObserve = vi.fn();
 const mockDisconnect = vi.fn();

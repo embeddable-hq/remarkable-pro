@@ -1,38 +1,25 @@
 import { useState } from 'react';
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
-import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
+import { DataResponse } from '@embeddable.com/core';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
-import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
-import { getLineChartProData, getLineChartProOptions } from './LineChartTabbedPro.utils';
+import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { LineChartProOptionsClick } from '../lines.utils';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { MeasureTabs } from './components/MeasureTabs';
+import { KpiTabs } from '../../shared/KpiTabs/KpiTabs';
+import {
+  getLineChartProData,
+  getLineChartProOptions,
+} from '../LineChartDefaultPro/LineChartDefaultPro.utils';
+import { LineChartProProps } from '../LineChartDefaultPro';
 
-export type LineChartTabbedProPropsOnLineClicked = { axisDimensionValue: string | null };
+export type LineChartWithKpiTabsProProps = LineChartProProps & {
+  resultsKpis: DataResponse;
+};
 
-export type LineChartTabbedProProps = {
-  xAxis: Dimension;
-  measures: Measure[];
-  results: DataResponse;
-  resultsTotals: DataResponse;
-  reverseXAxis?: boolean;
-  showLegend?: boolean;
-  showLogarithmicScale?: boolean;
-  showTooltips?: boolean;
-  showValueLabels?: boolean;
-  xAxisLabel?: string;
-  yAxisLabel?: string;
-  yAxisRangeMax?: number;
-  yAxisRangeMin?: number;
-  setGranularity?: (granularity: Granularity) => void;
-  onLineClicked?: LineChartProOptionsClick;
-} & ChartCardHeaderProps;
-
-const LineChartTabbedPro = (props: LineChartTabbedProProps) => {
+const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
@@ -50,13 +37,11 @@ const LineChartTabbedPro = (props: LineChartTabbedProProps) => {
     yAxisRangeMin,
     setGranularity,
     onLineClicked,
-    resultsTotals,
+    resultsKpis,
   } = props;
 
-  const [activeMeasureIndex, setActiveMeasureIndex] = useState(0);
-
-  const safeIndex = Math.min(activeMeasureIndex, measures.length - 1);
-  const activeMeasure = measures[safeIndex]!;
+  const [activeMeasureName, setActiveMeasureName] = useState(measures[0]!.name);
+  const activeMeasure = measures.find((m) => m.name === activeMeasureName) ?? measures[0]!;
 
   const results = useFillGaps({
     results: props.results,
@@ -90,12 +75,11 @@ const LineChartTabbedPro = (props: LineChartTabbedProProps) => {
       tooltip={tooltip}
       hideMenu={hideMenu}
     >
-      <MeasureTabs
+      <KpiTabs
         measures={measures}
-        resultsTotals={resultsTotals}
-        activeMeasureIndex={safeIndex}
-        onTabClick={setActiveMeasureIndex}
-        theme={theme}
+        kpiValues={resultsKpis?.data?.[0]}
+        activeMeasureName={activeMeasureName}
+        onChange={setActiveMeasureName}
       />
       {setGranularity && (
         <ChartGranularitySelectField
@@ -121,4 +105,4 @@ const LineChartTabbedPro = (props: LineChartTabbedProProps) => {
   );
 };
 
-export default LineChartTabbedPro;
+export default LineChartWithKpiTabsPro;

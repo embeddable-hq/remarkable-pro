@@ -32,16 +32,6 @@
   color: var(--em-tabbedlinechart-scroll-button-color, #5c5c66);
 }
 
-.scrollLeftButton:hover {
-  background: var(--em-tabbedlinechart-scroll-button-background--hover, #ededf1);
-}
-
-.scrollLeftButton svg {
-  flex-shrink: 0;
-  width: var(--em-tabbedlinechart-scroll-button-icon-size, 1rem);
-  height: var(--em-tabbedlinechart-scroll-button-icon-size, 1rem);
-}
-
 .scrollRightButton {
   flex-shrink: 0;
   box-sizing: border-box;
@@ -52,14 +42,4 @@
   background: var(--em-tabbedlinechart-scroll-button-background, transparent);
   padding: var(--em-tabbedlinechart-scroll-button-padding, 0.25rem);
   color: var(--em-tabbedlinechart-scroll-button-color, #5c5c66);
-}
-
-.scrollRightButton:hover {
-  background: var(--em-tabbedlinechart-scroll-button-background--hover, #ededf1);
-}
-
-.scrollRightButton svg {
-  flex-shrink: 0;
-  width: var(--em-tabbedlinechart-scroll-button-icon-size, 1rem);
-  height: var(--em-tabbedlinechart-scroll-button-icon-size, 1rem);
 }

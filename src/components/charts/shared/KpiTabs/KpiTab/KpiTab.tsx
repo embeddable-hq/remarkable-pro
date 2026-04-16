@@ -1,30 +1,25 @@
 import { FC } from 'react';
 import { Measure } from '@embeddable.com/core';
+import styles from './KpiTab.module.css';
+import clsx from 'clsx';
 import { Theme } from '../../../../../theme/theme.types';
 import { getThemeFormatter } from '../../../../../theme/formatter/formatter.utils';
-import styles from './MeasureTab.module.css';
-import clsx from 'clsx';
+import { useTheme } from '@embeddable.com/react';
 
-type MeasureTabProps = {
+type KpiTabProps = {
   measure: Measure;
   value: number | undefined;
+  //comparisonValue?: number | undefined; // TODO: for trend indicator
   isActive: boolean;
-  isLoading: boolean;
   onClick: () => void;
-  theme: Theme;
 };
 
-export const MeasureTab: FC<MeasureTabProps> = ({
-  measure,
-  value,
-  isActive,
-  isLoading,
-  onClick,
-  theme,
-}) => {
+export const KpiTab: FC<KpiTabProps> = ({ measure, value, isActive, onClick }) => {
+  const theme = useTheme() as Theme;
   const themeFormatter = getThemeFormatter(theme);
+
   const title = themeFormatter.dimensionOrMeasureTitle(measure);
-  const formattedValue = value != null ? themeFormatter.data(measure, value) : '';
+  const formattedValue = value === undefined ? '-' : themeFormatter.data(measure, value);
 
   return (
     <button
@@ -33,7 +28,8 @@ export const MeasureTab: FC<MeasureTabProps> = ({
       type="button"
     >
       <span className={styles.tabTitle}>{title}</span>
-      {!isLoading && <span className={styles.tabValue}>{formattedValue}</span>}
+      <span className={styles.tabValue}>{formattedValue}</span>
+      {/* TODO: add trend indicator from RUI lib */}
     </button>
   );
 };
