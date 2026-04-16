@@ -102,7 +102,7 @@ describe('getDateRangeFromTimeRange', () => {
     expect(getDateRangeFromTimeRange(input, [])).toBe(input);
   });
 
-  it('returns timeRange as-is when relativeTimeString does not match any option', () => {
+  it('returns undefined when relativeTimeString does not match any option', () => {
     const input: TimeRange = { relativeTimeString: 'unknown', from: undefined, to: undefined };
     const opt = makeOption('jan', jan);
     const result = getDateRangeFromTimeRange(input, [opt]);

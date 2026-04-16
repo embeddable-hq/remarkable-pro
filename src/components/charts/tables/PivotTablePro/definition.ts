@@ -4,6 +4,8 @@ import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
+import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
+import { ThemeClientContext } from '../../../../theme/theme.types';
 
 const meta = {
   name: 'PivotTablePro',
@@ -91,24 +93,32 @@ const previewConfig = {
 
 const preview = definePreview(Component, previewConfig);
 
-const loadDataResultsArgs = (inputs: Inputs<typeof meta>): LoadDataRequest => ({
+const loadDataResultsArgs = (
+  inputs: Inputs<typeof meta>,
+  clientContext?: ThemeClientContext,
+): LoadDataRequest => ({
   from: inputs.dataset,
   select: [inputs.rowDimension, inputs.columnDimension, ...inputs.measures],
   limit: inputs.maxResults,
   countRows: true,
+  timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
-const loadDataResults = (inputs: Inputs<typeof meta>): DataResponse =>
-  loadData(loadDataResultsArgs(inputs));
+const loadDataResults = (
+  inputs: Inputs<typeof meta>,
+  clientContext?: ThemeClientContext,
+): DataResponse => loadData(loadDataResultsArgs(inputs, clientContext));
 
 const loadDataResultsSubRowsArgs = (
   inputs: Inputs<typeof meta>,
   expandedRowKeys: string[],
+  clientContext?: ThemeClientContext,
 ): LoadDataRequest => ({
   from: inputs.dataset,
   select: [inputs.rowDimension, inputs.subRowDimension, inputs.columnDimension, ...inputs.measures],
   limit: inputs.maxResults,
   countRows: true,
+  timezone: getClientContextTimezone(clientContext?.timezone),
   filters: [
     {
       property: inputs.rowDimension,
@@ -121,9 +131,10 @@ const loadDataResultsSubRowsArgs = (
 const loadDataResultsSubRows = (
   inputs: Inputs<typeof meta>,
   expandedRowKeys: string[],
+  clientContext?: ThemeClientContext,
 ): DataResponse | undefined => {
   if (expandedRowKeys.length > 0) {
-    return loadData(loadDataResultsSubRowsArgs(inputs, expandedRowKeys));
+    return loadData(loadDataResultsSubRowsArgs(inputs, expandedRowKeys, clientContext));
   }
   return undefined;
 };
@@ -131,6 +142,7 @@ const loadDataResultsSubRows = (
 const props = (
   inputs: Inputs<typeof meta>,
   [state, setState]: [PivotTableProState, (state: PivotTableProState) => void],
+  clientContext: ThemeClientContext,
 ) => {
   const expandedRowKeys = state?.expandedRowKeys ?? [];
 
@@ -140,8 +152,8 @@ const props = (
     expandedRowKeys,
     setExpandedRowKey: (rowKey: string) =>
       setState({ expandedRowKeys: [...expandedRowKeys, rowKey] }),
-    results: loadDataResults(inputs),
-    resultsSubRows: loadDataResultsSubRows(inputs, expandedRowKeys),
+    results: loadDataResults(inputs, clientContext),
+    resultsSubRows: loadDataResultsSubRows(inputs, expandedRowKeys, clientContext),
   };
 };
 

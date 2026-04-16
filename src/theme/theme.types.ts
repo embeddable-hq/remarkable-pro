@@ -53,6 +53,9 @@ export type ThemeDefaults = {
   tableCellStyleOptions?: TableCellStyleOption[];
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ThemeClientContext = Record<string, any> & { timezone?: string };
+
 export type Theme = {
   i18n: ThemeI18n;
   charts: ThemeCharts;
@@ -60,4 +63,5 @@ export type Theme = {
   formatter: ThemeFormatter;
   defaults: ThemeDefaults;
   fonts?: ThemeFonts;
+  clientContext: ThemeClientContext;
 };

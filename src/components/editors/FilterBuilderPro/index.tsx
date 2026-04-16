@@ -1,6 +1,6 @@
 import { DataResponse, DimensionOrMeasure } from '@embeddable.com/core';
 import { useTheme } from '@embeddable.com/react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Theme } from '../../../theme/theme.types';
 import FilterBuilderItem from './components/FilterBuilderItem';
 import { FilterBuilderFilter, FilterBuilderState } from './definition';
@@ -9,14 +9,16 @@ import { IconPlus, IconChevronRight, IconChevronLeft } from '@tabler/icons-react
 import styles from './FilterBuilderPro.module.css';
 import {
   filterBuilderAndOrOperator,
-  generateFilterValue,
+  filtersToClause,
   getSupportedDimensionsAndMeasures,
+  clauseToFilters,
+  FilterBuilderClause,
 } from './FilterBuilderPro.utils';
 import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
 import { resolveI18nProps } from '../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
-import { useHorizontalScroll } from '../../horizontalScroll.hooks';
+// import { useHorizontalScroll } from '../../horizontalScroll.hooks';
 
 export type FilterBuilderProProps = {
   embeddableState?: FilterBuilderState;
@@ -25,6 +27,7 @@ export type FilterBuilderProProps = {
   ) => void;
   dimensionsAndMeasures?: DimensionOrMeasure[];
   onChange?: (value: unknown) => void;
+  defaultFilters?: FilterBuilderClause;
 } & EditorCardHeaderProps;
 
 const FilterBuilderPro = (props: FilterBuilderProProps) => {
@@ -32,20 +35,87 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   i18nSetup(theme);
 
   const { title, description, tooltip } = resolveI18nProps(props);
-  const { dimensionsAndMeasures = [], setEmbeddableState, embeddableState, onChange } = props;
+  const {
+    dimensionsAndMeasures = [],
+    setEmbeddableState,
+    embeddableState,
+    onChange,
+    defaultFilters,
+  } = props;
 
   const [searchNew, setSearchNew] = useState('');
-  const { scrollRef, canScrollLeft, canScrollRight, handleScrollLeft, handleScrollRight } =
-    useHorizontalScroll([embeddableState?.filters]);
+  // const { scrollRef, canScrollLeft, canScrollRight, handleScrollLeft, handleScrollRight } =
+  //   useHorizontalScroll([embeddableState?.filters]);
 
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const prevFilterValueRef = useRef<unknown>(undefined);
+  const disableAutoScroll = useRef(true);
+
+  // Update embeddableState.filters from defaultFilters if any, but only when there
+  // is no existing filter state (i.e. on initial mount / after a remount). This prevents
+  // the variable feedback loop (inputs: ['defaultFilters']) from overwriting user edits
+  // mid-session when the platform re-sends props with the previous clause value.
+  useEffect(() => {
+    if (!defaultFilters || !dimensionsAndMeasures?.length) {
+      return;
+    }
+
+    const newFilters = clauseToFilters(defaultFilters, dimensionsAndMeasures);
+
+    if (newFilters.length > 0) {
+      setEmbeddableState?.((prev) => {
+        if (prev?.filters?.length) {
+          return prev;
+        }
+
+        return { ...prev, filters: newFilters };
+      });
+    }
+
+    // Auto-scroll reactivated after initial load or when defaultFilters change
+    setTimeout(() => {
+      disableAutoScroll.current = false;
+    }, 100);
+  }, [defaultFilters, dimensionsAndMeasures]);
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 1);
+    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  }, []);
+
+  const handleScrollRight = () => {
+    scrollRef.current?.scrollBy({ left: 200, behavior: 'smooth' });
+  };
+
+  const handleScrollLeft = () => {
+    scrollRef.current?.scrollBy({ left: -200, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(updateScrollState);
+    ro.observe(el);
+    el.addEventListener('scroll', updateScrollState);
+    updateScrollState();
+    return () => {
+      ro.disconnect();
+      el.removeEventListener('scroll', updateScrollState);
+    };
+  }, [updateScrollState, embeddableState?.filters]);
 
   const lastFilterId = embeddableState?.filters?.[embeddableState.filters.length - 1]?.id ?? 0;
-
   const lastFilter = embeddableState?.filters?.[embeddableState.filters.length - 1];
   const lastFilterKey = `${lastFilter?.id}-${lastFilter?.dimensionOrMeasure?.name}-${lastFilter?.operator}-${JSON.stringify(lastFilter?.value)}`;
 
   useEffect(() => {
+    if (disableAutoScroll.current) {
+      return;
+    }
     setTimeout(() => {
       scrollRef.current?.scrollTo({ left: scrollRef.current.scrollWidth, behavior: 'smooth' });
     }, 100);
@@ -118,7 +188,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   };
 
   useEffect(() => {
-    const filterValue = generateFilterValue(filterBuilderAndOrOperator.AND, filters);
+    const filterValue = filtersToClause(filterBuilderAndOrOperator.AND, filters);
     const serialized = JSON.stringify(filterValue);
     if (serialized === JSON.stringify(prevFilterValueRef.current)) return;
     prevFilterValueRef.current = filterValue;

@@ -456,6 +456,14 @@ const markdown = {
   category: 'Component Settings',
 } as const;
 
+const filters = {
+  type: 'filters',
+  name: 'filters',
+  label: 'Filters',
+  category: 'Pre-configured variables',
+  defaultValue: null,
+} as const;
+
 export const inputs = {
   boolean,
   timeRange,
@@ -510,4 +518,5 @@ export const inputs = {
   granularity,
   granularities,
   markdown,
+  filters,
 } as const;

@@ -1,8 +1,10 @@
 import { FilterOperator, NativeDataType } from '@embeddable.com/core';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
 import {
+  clauseToFilter,
+  clauseToFilters,
   filterBuilderAndOrOperator,
-  generateFilterValue,
+  filtersToClause,
   getSupportedDimensionsAndMeasures,
   operatorNumber,
   operatorStringBoolean,
@@ -33,8 +35,8 @@ const makeFilter = (overrides: Partial<FilterBuilderFilter> = {}): FilterBuilder
   ...overrides,
 });
 
-const generate = (...args: Parameters<typeof generateFilterValue>): ClauseGroup | null =>
-  generateFilterValue(...args) as ClauseGroup | null;
+const generate = (...args: Parameters<typeof filtersToClause>): ClauseGroup | null =>
+  filtersToClause(...args) as ClauseGroup | null;
 
 // ---------------------------------------------------------------------------
 // getSupportedDimensionsAndMeasures
@@ -69,10 +71,10 @@ describe('getSupportedDimensionsAndMeasures', () => {
 });
 
 // ---------------------------------------------------------------------------
-// generateFilterValue
+// filtersToClause
 // ---------------------------------------------------------------------------
 
-describe('generateFilterValue', () => {
+describe('filtersToClause', () => {
   it('returns null when filters array is empty', () => {
     expect(generate(filterBuilderAndOrOperator.AND, [])).toBeNull();
   });
@@ -263,5 +265,305 @@ describe('generateFilterValue', () => {
     });
     const result = generate(filterBuilderAndOrOperator.OR, [f1, f2]);
     expect(result?.clauses).toHaveLength(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// clauseToFilter
+// ---------------------------------------------------------------------------
+
+describe('clauseToFilter', () => {
+  const dims = [
+    makeDim(NativeDataType.string, 'name'),
+    makeDim(NativeDataType.number, 'age'),
+    makeDim(NativeDataType.boolean, 'active'),
+  ];
+
+  // -------------------------------------------------------------------------
+  // leaf clauses — string / boolean operators
+  // -------------------------------------------------------------------------
+
+  it('maps FilterOperator.equals to "is" for a string dimension', () => {
+    const clause: FilterBuilderClause = {
+      property: 'name',
+      operator: FilterOperator.equals,
+      value: 'Alice',
+    };
+    const result = clauseToFilter(clause, dims, 1);
+    expect(result).toEqual({
+      id: 1,
+      dimensionOrMeasure: dims[0],
+      search: '',
+      operator: operatorStringBoolean.is,
+      value: 'Alice',
+    });
+  });
+
+  it('maps FilterOperator.notEquals to "isNot" for a string dimension', () => {
+    const clause: FilterBuilderClause = {
+      property: 'name',
+      operator: FilterOperator.notEquals,
+      value: 'Bob',
+    };
+    const result = clauseToFilter(clause, dims, 2);
+    expect(result?.operator).toBe(operatorStringBoolean.isNot);
+  });
+
+  it('maps FilterOperator.contains with an array value to "isOneOf"', () => {
+    const clause: FilterBuilderClause = {
+      property: 'name',
+      operator: FilterOperator.contains,
+      value: ['Alice', 'Bob'],
+    };
+    const result = clauseToFilter(clause, dims, 1);
+    expect(result?.operator).toBe(operatorStringBoolean.isOneOf);
+  });
+
+  it('maps FilterOperator.contains with a scalar value to "contains"', () => {
+    const clause: FilterBuilderClause = {
+      property: 'name',
+      operator: FilterOperator.contains,
+      value: 'Ali',
+    };
+    const result = clauseToFilter(clause, dims, 1);
+    expect(result?.operator).toBe(operatorStringBoolean.contains);
+  });
+
+  it('maps FilterOperator.notContains to "isNotOneOf"', () => {
+    const clause: FilterBuilderClause = {
+      property: 'name',
+      operator: FilterOperator.notContains,
+      value: ['x'],
+    };
+    const result = clauseToFilter(clause, dims, 1);
+    expect(result?.operator).toBe(operatorStringBoolean.isNotOneOf);
+  });
+
+  // -------------------------------------------------------------------------
+  // leaf clauses — number operators
+  // -------------------------------------------------------------------------
+
+  it('maps FilterOperator.equals to operatorNumber.equals for a number dimension', () => {
+    const clause: FilterBuilderClause = {
+      property: 'age',
+      operator: FilterOperator.equals,
+      value: 30,
+    };
+    const result = clauseToFilter(clause, dims, 1);
+    expect(result?.operator).toBe(operatorNumber.equals);
+  });
+
+  it('maps FilterOperator.notEquals to operatorNumber.notEquals for a number dimension', () => {
+    const clause: FilterBuilderClause = {
+      property: 'age',
+      operator: FilterOperator.notEquals,
+      value: 0,
+    };
+    const result = clauseToFilter(clause, dims, 1);
+    expect(result?.operator).toBe(operatorNumber.notEquals);
+  });
+
+  it('maps FilterOperator.gte to operatorNumber.gte', () => {
+    const clause: FilterBuilderClause = {
+      property: 'age',
+      operator: FilterOperator.gte,
+      value: 18,
+    };
+    const result = clauseToFilter(clause, dims, 1);
+    expect(result?.operator).toBe(operatorNumber.gte);
+  });
+
+  it('maps FilterOperator.lte to operatorNumber.lte', () => {
+    const clause: FilterBuilderClause = {
+      property: 'age',
+      operator: FilterOperator.lte,
+      value: 65,
+    };
+    const result = clauseToFilter(clause, dims, 1);
+    expect(result?.operator).toBe(operatorNumber.lte);
+  });
+
+  it('sets dimensionOrMeasure to null when property is not in dimensionsAndMeasures', () => {
+    const clause: FilterBuilderClause = {
+      property: 'unknown',
+      operator: FilterOperator.equals,
+      value: 'x',
+    };
+    const result = clauseToFilter(clause, dims, 1);
+    expect(result?.dimensionOrMeasure).toBeNull();
+  });
+
+  it('sets operator to null for an unrecognised FilterOperator on a non-number dimension', () => {
+    const clause: FilterBuilderClause = {
+      property: 'name',
+      operator: FilterOperator.gte,
+      value: 'x',
+    };
+    const result = clauseToFilter(clause, dims, 1);
+    expect(result?.operator).toBeNull();
+  });
+
+  it('preserves the id passed in', () => {
+    const clause: FilterBuilderClause = {
+      property: 'name',
+      operator: FilterOperator.equals,
+      value: 'v',
+    };
+    expect(clauseToFilter(clause, dims, 7)?.id).toBe(7);
+  });
+
+  // -------------------------------------------------------------------------
+  // group clauses (between)
+  // -------------------------------------------------------------------------
+
+  it('converts an AND group with gte+lte on the same property to a "between" filter', () => {
+    const clause: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [
+        { property: 'age', operator: FilterOperator.gte, value: 18 },
+        { property: 'age', operator: FilterOperator.lte, value: 65 },
+      ],
+    };
+    const result = clauseToFilter(clause, dims, 3);
+    expect(result).toEqual({
+      id: 3,
+      dimensionOrMeasure: dims[1],
+      search: '',
+      operator: operatorNumber.between,
+      value: [18, 65],
+    });
+  });
+
+  it('returns null for an OR group', () => {
+    const clause: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.OR,
+      clauses: [
+        { property: 'age', operator: FilterOperator.gte, value: 18 },
+        { property: 'age', operator: FilterOperator.lte, value: 65 },
+      ],
+    };
+    expect(clauseToFilter(clause, dims, 1)).toBeNull();
+  });
+
+  it('returns null for an AND group with only one sub-clause', () => {
+    const clause: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [{ property: 'age', operator: FilterOperator.gte, value: 18 }],
+    };
+    expect(clauseToFilter(clause, dims, 1)).toBeNull();
+  });
+
+  it('returns null for an AND group where sub-clauses have different properties', () => {
+    const clause: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [
+        { property: 'age', operator: FilterOperator.gte, value: 18 },
+        { property: 'name', operator: FilterOperator.lte, value: 65 },
+      ],
+    };
+    expect(clauseToFilter(clause, dims, 1)).toBeNull();
+  });
+
+  it('returns null for an AND group where operators are not gte+lte', () => {
+    const clause: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [
+        { property: 'age', operator: FilterOperator.equals, value: 18 },
+        { property: 'age', operator: FilterOperator.equals, value: 65 },
+      ],
+    };
+    expect(clauseToFilter(clause, dims, 1)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// clauseToFilters
+// ---------------------------------------------------------------------------
+
+describe('clauseToFilters', () => {
+  const dims = [makeDim(NativeDataType.string, 'name'), makeDim(NativeDataType.number, 'age')];
+
+  it('returns an empty array for null input', () => {
+    expect(clauseToFilters(null, dims)).toEqual([]);
+  });
+
+  it('returns an empty array for a leaf clause (no sub-clauses)', () => {
+    const leaf: FilterBuilderClause = {
+      property: 'name',
+      operator: FilterOperator.equals,
+      value: 'x',
+    };
+    expect(clauseToFilters(leaf, dims)).toEqual([]);
+  });
+
+  it('maps each sub-clause to a FilterBuilderFilter', () => {
+    const clause: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [
+        { property: 'name', operator: FilterOperator.equals, value: 'Alice' },
+        { property: 'age', operator: FilterOperator.gte, value: 18 },
+      ],
+    };
+    const result = clauseToFilters(clause, dims);
+    expect(result).toHaveLength(2);
+    expect(result[0]!.operator).toBe(operatorStringBoolean.is);
+    expect(result[1]!.operator).toBe(operatorNumber.gte);
+  });
+
+  it('assigns sequential ids starting from 1', () => {
+    const clause: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [
+        { property: 'name', operator: FilterOperator.equals, value: 'A' },
+        { property: 'name', operator: FilterOperator.equals, value: 'B' },
+      ],
+    };
+    const result = clauseToFilters(clause, dims);
+    expect(result.map((f) => f.id)).toEqual([1, 2]);
+  });
+
+  it('drops sub-clauses that clauseToFilter cannot convert (returns null)', () => {
+    // An OR group inside the top-level clause cannot be round-tripped back.
+    const clause: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [
+        { property: 'name', operator: FilterOperator.equals, value: 'Alice' },
+        // OR group → clauseToFilter returns null
+        {
+          operator: filterBuilderAndOrOperator.OR,
+          clauses: [{ property: 'age', operator: FilterOperator.gte, value: 5 }],
+        },
+      ],
+    };
+    const result = clauseToFilters(clause, dims);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.value).toBe('Alice');
+  });
+
+  it('converts a between sub-clause back to a "between" filter', () => {
+    const clause: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [
+        {
+          operator: filterBuilderAndOrOperator.AND,
+          clauses: [
+            { property: 'age', operator: FilterOperator.gte, value: 20 },
+            { property: 'age', operator: FilterOperator.lte, value: 40 },
+          ],
+        },
+      ],
+    };
+    const result = clauseToFilters(clause, dims);
+    expect(result).toHaveLength(1);
+    expect(result[0]!.operator).toBe(operatorNumber.between);
+    expect(result[0]!.value).toEqual([20, 40]);
+  });
+
+  it('returns an empty array when all sub-clauses produce null', () => {
+    const clause: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [{ operator: filterBuilderAndOrOperator.OR, clauses: [] }],
+    };
+    expect(clauseToFilters(clause, dims)).toEqual([]);
   });
 });

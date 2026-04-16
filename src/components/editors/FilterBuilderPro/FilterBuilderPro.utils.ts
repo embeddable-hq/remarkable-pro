@@ -82,7 +82,7 @@ const filterToClause = (f: FilterBuilderFilter): FilterBuilderClause[] => {
   return [{ property: f.dimensionOrMeasure!.name, operator: mappedOperator, value: f.value }];
 };
 
-export const generateFilterValue = (
+export const filtersToClause = (
   operator: FilterBuilderAndOrOperator,
   filters: FilterBuilderFilter[],
 ): FilterBuilderClause | null => {
@@ -93,4 +93,83 @@ export const generateFilterValue = (
   if (clauses.length === 0) return null;
 
   return { operator, clauses };
+};
+
+export const clauseToFilter = (
+  clause: FilterBuilderClause,
+  dimensionsAndMeasures: DimensionOrMeasure[],
+  id: number,
+): FilterBuilderFilter | null => {
+  if ('clauses' in clause) {
+    const first = clause.clauses[0];
+    const second = clause.clauses[1];
+    if (
+      clause.operator === filterBuilderAndOrOperator.AND &&
+      clause.clauses.length === 2 &&
+      first != null &&
+      second != null &&
+      'property' in first &&
+      'property' in second &&
+      first.property === second.property &&
+      first.operator === FilterOperator.gte &&
+      second.operator === FilterOperator.lte
+    ) {
+      const dimensionOrMeasure =
+        dimensionsAndMeasures.find((d) => d.name === first.property) ?? null;
+      return {
+        id,
+        dimensionOrMeasure,
+        search: '',
+        operator: operatorNumber.between,
+        value: [first.value as number, second.value as number],
+      };
+    }
+    return null;
+  }
+
+  const { property, operator, value } = clause;
+  const dimensionOrMeasure = dimensionsAndMeasures.find((d) => d.name === property) ?? null;
+
+  let uiOperator: string | null = null;
+
+  if (dimensionOrMeasure?.nativeType === NativeDataType.number) {
+    const reverseMap: Record<string, string> = {
+      [FilterOperator.equals]: operatorNumber.equals,
+      [FilterOperator.notEquals]: operatorNumber.notEquals,
+      [FilterOperator.gte]: operatorNumber.gte,
+      [FilterOperator.lte]: operatorNumber.lte,
+    };
+    uiOperator = reverseMap[operator] ?? null;
+  } else if (operator === FilterOperator.contains) {
+    uiOperator = Array.isArray(value)
+      ? operatorStringBoolean.isOneOf
+      : operatorStringBoolean.contains;
+  } else {
+    const reverseMap: Record<string, string> = {
+      [FilterOperator.equals]: operatorStringBoolean.is,
+      [FilterOperator.notEquals]: operatorStringBoolean.isNot,
+      [FilterOperator.notContains]: operatorStringBoolean.isNotOneOf,
+    };
+    uiOperator = reverseMap[operator] ?? null;
+  }
+
+  return { id, dimensionOrMeasure, search: '', operator: uiOperator, value };
+};
+
+export const clauseToFilters = (
+  clause: FilterBuilderClause | null,
+  dimensionsAndMeasures: DimensionOrMeasure[],
+): FilterBuilderFilter[] => {
+  if (!clause) return [];
+
+  if (!('clauses' in clause)) return [];
+
+  const filters: FilterBuilderFilter[] = [];
+
+  clause.clauses.forEach((subClause, i) => {
+    const filter = clauseToFilter(subClause, dimensionsAndMeasures, i + 1);
+    if (filter) filters.push(filter);
+  });
+
+  return filters.length ? filters : [];
 };

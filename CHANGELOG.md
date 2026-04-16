@@ -1,5 +1,23 @@
 # @embeddable/remarkable-ui
 
+## 0.2.2
+
+### Patch Changes
+
+- b556933: Improve FilterBuilder by allowing default values
+
+## 0.2.1
+
+### Patch Changes
+
+- 7a8dc59: Fix ScrollableTable markdown scroll
+
+## 0.2.0
+
+### Minor Changes
+
+- 9c324bd: Timezone support via client context
+
 ## 0.1.32
 
 ### Patch Changes

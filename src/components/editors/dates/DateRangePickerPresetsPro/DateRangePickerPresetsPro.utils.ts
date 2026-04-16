@@ -5,10 +5,11 @@ import { getTimeRangeLabel } from '../dates.utils';
 
 export const getDateRangeSelectFieldProOptions = (
   dateRangeSelectFieldProOptions: DateRangeSelectFieldProOption[],
+  timezone?: string,
 ): SelectListOptionProps[] => {
   return dateRangeSelectFieldProOptions.map((option) => {
     return {
-      rightLabel: getTimeRangeLabel(option.getRange(), option.dateFormat),
+      rightLabel: getTimeRangeLabel(option.getRange(timezone), option.dateFormat),
       value: option.value,
       label: resolveI18nString(option.label),
     };

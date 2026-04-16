@@ -100,7 +100,9 @@ export const getTableHeaders = (
               <TableBodyCellWithCopy value={value}>
                 {displayFormat === DisplayFormatTypeOptions.MARKDOWN ? (
                   // Markdown
-                  <Markdown content={currentValue} />
+                  <div>
+                    <Markdown content={currentValue} />
+                  </div>
                 ) : (
                   // JSON
                   <pre>{currentValue}</pre>
