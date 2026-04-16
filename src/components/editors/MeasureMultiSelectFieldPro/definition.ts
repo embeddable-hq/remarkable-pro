@@ -18,8 +18,7 @@ const meta = {
     inputs.tooltip,
     { ...inputs.placeholder, defaultValue: 'Select values...' },
     {
-      ...inputs.measure,
-      array: true,
+      ...inputs.measures,
       name: 'selectedMeasures',
       label: 'Selected measures',
       category: 'Pre-configured Variables',
