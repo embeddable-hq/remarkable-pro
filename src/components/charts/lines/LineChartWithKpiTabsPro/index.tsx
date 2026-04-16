@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { DataResponse } from '@embeddable.com/core';
@@ -6,14 +6,14 @@ import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { LineChart } from '@embeddable.com/remarkable-ui';
+import { ChartTabs, ChartTabsProps, LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { KpiTabs } from '../../shared/KpiTabs/KpiTabs';
 import {
   getLineChartProData,
   getLineChartProOptions,
 } from '../LineChartDefaultPro/LineChartDefaultPro.utils';
 import { LineChartProProps } from '../LineChartDefaultPro';
+import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 
 export type LineChartWithKpiTabsProProps = LineChartProProps & {
   resultsKpis: DataResponse;
@@ -43,6 +43,11 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
   const [activeMeasureName, setActiveMeasureName] = useState(measures[0]!.name);
   const activeMeasure = measures.find((m) => m.name === activeMeasureName) ?? measures[0]!;
 
+  useEffect(() => {
+    if (measures.some((m) => m.name === activeMeasureName)) return;
+    setActiveMeasureName(measures[0]!.name);
+  }, [measures, activeMeasureName]);
+
   const results = useFillGaps({
     results: props.results,
     dimension: xAxis,
@@ -65,6 +70,17 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
 
+  const themeFormatter = getThemeFormatter(theme);
+
+  const chartTabsItems: ChartTabsProps['items'] = measures.map((measure) => ({
+    id: measure.name,
+    label: themeFormatter.dimensionOrMeasureTitle(measure),
+    value:
+      resultsKpis?.data?.[0]?.[measure.name] == null
+        ? '-'
+        : themeFormatter.data(measure, resultsKpis.data[0][measure.name]),
+  }));
+
   return (
     <ChartCard
       data={results}
@@ -75,12 +91,7 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
       tooltip={tooltip}
       hideMenu={hideMenu}
     >
-      <KpiTabs
-        measures={measures}
-        kpiValues={resultsKpis?.data?.[0]}
-        activeMeasureName={activeMeasureName}
-        onChange={setActiveMeasureName}
-      />
+      <ChartTabs items={chartTabsItems} value={activeMeasureName} onChange={setActiveMeasureName} />
       {setGranularity && (
         <ChartGranularitySelectField
           hasMarginTop={granularitySelectorHasMarginTop}
