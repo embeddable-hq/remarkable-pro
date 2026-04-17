@@ -1,0 +1,10 @@
+.markdownCell p,
+.markdownCell h1,
+.markdownCell h2,
+.markdownCell h3,
+.markdownCell h4,
+.markdownCell h5,
+.markdownCell h6 {
+  margin-block-start: 0;
+  margin-block-end: 0;
+}

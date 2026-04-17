@@ -40,10 +40,11 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
     resultsKpis,
   } = props;
 
-  const [activeMeasureName, setActiveMeasureName] = useState(measures[0]!.name);
-  const activeMeasure = measures.find((m) => m.name === activeMeasureName) ?? measures[0]!;
+  const [activeMeasureName, setActiveMeasureName] = useState(measures[0]?.name ?? '');
+  const activeMeasure = measures.find((m) => m.name === activeMeasureName);
 
   useEffect(() => {
+    if (measures.length === 0) return;
     if (measures.some((m) => m.name === activeMeasureName)) return;
     setActiveMeasureName(measures[0]!.name);
   }, [measures, activeMeasureName]);
@@ -57,14 +58,14 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
     {
       data: results.data,
       dimension: xAxis,
-      measures: [activeMeasure],
+      measures: activeMeasure ? [activeMeasure] : [],
       hasMinMaxYAxisRange: Boolean(yAxisRangeMin != null || yAxisRangeMax != null),
     },
     theme,
   );
 
   const options = getLineChartProOptions(
-    { data, dimension: xAxis, measures: [activeMeasure], onLineClicked },
+    { data, dimension: xAxis, measures: activeMeasure ? [activeMeasure] : [], onLineClicked },
     theme,
   );
 
