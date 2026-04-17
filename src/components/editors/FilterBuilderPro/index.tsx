@@ -18,6 +18,7 @@ import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
 import { resolveI18nProps } from '../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
+// import { useHorizontalScroll } from '../../horizontalScroll.hooks';
 
 export type FilterBuilderProProps = {
   embeddableState?: FilterBuilderState;
@@ -43,6 +44,9 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   } = props;
 
   const [searchNew, setSearchNew] = useState('');
+  // const { scrollRef, canScrollLeft, canScrollRight, handleScrollLeft, handleScrollRight } =
+  //   useHorizontalScroll([embeddableState?.filters]);
+
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -114,7 +118,6 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     }
     setTimeout(() => {
       scrollRef.current?.scrollTo({ left: scrollRef.current.scrollWidth, behavior: 'smooth' });
-      updateScrollState();
     }, 100);
   }, [lastFilterKey]);
 

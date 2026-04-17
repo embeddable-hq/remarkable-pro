@@ -92,8 +92,6 @@ const props = (
     return acc;
   }, {});
 
-  console.log('filterResults', filterResults);
-
   return {
     ...inputs,
     embeddableState: state,

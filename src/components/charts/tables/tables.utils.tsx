@@ -9,6 +9,7 @@ import {
   TableHeaderItemAlign,
 } from '@embeddable.com/remarkable-ui';
 import { DisplayFormatTypeOptions } from '../../types/DisplayFormat.type.emb';
+import styles from './tables.module.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const getTableHeaderAlign = (dimOrMeas: DimensionOrMeasure): TableHeaderItemAlign => {
@@ -100,9 +101,9 @@ export const getTableHeaders = (
               <TableBodyCellWithCopy value={value}>
                 {displayFormat === DisplayFormatTypeOptions.MARKDOWN ? (
                   // Markdown
-                  <div>
+                  <span className={styles.markdownCell}>
                     <Markdown content={currentValue} />
-                  </div>
+                  </span>
                 ) : (
                   // JSON
                   <pre>{currentValue}</pre>
