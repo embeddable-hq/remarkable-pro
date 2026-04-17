@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.2.3
+
+### Patch Changes
+
+- df0a7be: Bug fix: Scrollable table fails to display a dimension column when the first data row is missing that key
+
 ## 0.2.2
 
 ### Patch Changes
