@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.2.4
+
+### Patch Changes
+
+- 72ae402: Add LineChartTabbedPro component
+
 ## 0.2.3
 
 ### Patch Changes
