@@ -77,8 +77,8 @@
     "xlsx": "npm:@e965/xlsx@^0.20.3"
   },
   "devDependencies": {
-    "@embeddable.com/sdk-core": "4.3.3",
-    "@embeddable.com/sdk-react": "4.3.5",
+    "@embeddable.com/sdk-core": "4.4.0",
+    "@embeddable.com/sdk-react": "4.3.6",
     "@eslint/css": "^0.13.0",
     "@stencil/core": "^4.43.2",
     "@testing-library/react": "^16.3.2",

@@ -235,6 +235,12 @@ describe('getTableRows', () => {
     expect(result).toEqual([{ city: 'Paris', revenue: 100 }]);
   });
 
+  it('returns rows as-is when clickDimension key exists in a later row but not the first', () => {
+    const dim = { name: 'manufacturer' } as Dimension;
+    const rows = [{ count: '0' }, { manufacturer: 'IGT', count: '295' }];
+    expect(getTableRows({ clickDimension: dim, rows })).toBe(rows);
+  });
+
   it('does not mutate original rows when removing clickDimension', () => {
     const dim = { name: 'id' } as Dimension;
     const rows = [{ city: 'Paris', id: 1 }];
