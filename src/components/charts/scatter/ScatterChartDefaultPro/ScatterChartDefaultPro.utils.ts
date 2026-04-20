@@ -77,7 +77,7 @@ export const getScatterChartProData = (
       rowIndexByPoint[0]!.push(rowIndex);
     });
 
-    const bg = props.pointColor?.trim()
+    const pointBackgroundColor = props.pointColor?.trim()
       ? props.pointColor
       : getDimensionMeasureColor({
           dimensionOrMeasure: props.xMeasure,
@@ -88,7 +88,7 @@ export const getScatterChartProData = (
           chartColors,
         });
 
-    const border = props.pointColor?.trim()
+    const pointBorderColor = props.pointColor?.trim()
       ? props.pointColor
       : getDimensionMeasureColor({
           dimensionOrMeasure: props.xMeasure,
@@ -105,8 +105,8 @@ export const getScatterChartProData = (
           {
             label: themeFormatter.dimensionOrMeasureTitle(props.yMeasure),
             data: points,
-            pointBackgroundColor: bg,
-            pointBorderColor: border,
+            pointBackgroundColor,
+            pointBorderColor,
           },
         ],
       },
@@ -119,15 +119,14 @@ export const getScatterChartProData = (
 
   const bucket = new Map<string, { points: ScatterChartInputPoint[]; rowIndices: number[] }>();
 
-  data.forEach((row, rowIndex) => {
-    const r = row as Record<string, unknown>;
-    const rawG = r[groupField];
+  (data as Record<string, unknown>[]).forEach((row, rowIndex) => {
+    const rawG = row[groupField];
     const key = rawG === null || rawG === undefined ? NULL_GROUP_KEY : String(rawG);
     if (!bucket.has(key)) {
       bucket.set(key, { points: [], rowIndices: [] });
     }
     const b = bucket.get(key)!;
-    b.points.push(buildPoint(r));
+    b.points.push(buildPoint(row));
     b.rowIndices.push(rowIndex);
   });
 
@@ -139,8 +138,8 @@ export const getScatterChartProData = (
 
   const datasets = sortedKeys.map((key, index) => {
     const { points, rowIndices } = bucket.get(key)!;
-    const firstRow = data[rowIndices[0]!] as Record<string, unknown>;
-    const rawG = key === NULL_GROUP_KEY ? null : firstRow[groupField];
+    const firstRow = (data as Record<string, unknown>[])[rowIndices[0]!];
+    const rawG = key === NULL_GROUP_KEY ? null : firstRow?.[groupField];
 
     const seriesLabel =
       key === NULL_GROUP_KEY
