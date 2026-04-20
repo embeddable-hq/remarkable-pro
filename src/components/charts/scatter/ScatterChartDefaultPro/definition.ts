@@ -19,16 +19,8 @@ const meta = {
   category: 'Scatter Charts',
   inputs: [
     inputs.dataset,
-    {
-      ...inputs.measure,
-      name: 'xMeasure',
-      label: 'X-axis measure',
-    },
-    {
-      ...inputs.measure,
-      name: 'yMeasure',
-      label: 'Y-axis measure',
-    },
+    inputs.xMeasure,
+    inputs.yMeasure,
     {
       ...inputs.dimension,
       name: 'pointDimension',
