@@ -115,13 +115,9 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
     });
   };
 
-  const mergedOptions = useMemo(
-    () =>
-      mergician(
-        getScatterChartProOptions({ xMeasure, yMeasure }, theme, noValueLabel),
-        theme.charts.scatterChartDefaultPro?.options ?? {},
-      ),
-    [xMeasure, yMeasure, theme, noValueLabel],
+  const chartOptions = mergician(
+    getScatterChartProOptions({ xMeasure, yMeasure }, theme, noValueLabel),
+    theme.charts.scatterChartDefaultPro?.options ?? {},
   );
 
   return (
@@ -141,7 +137,7 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
     >
       <ScatterChart
         data={chartData}
-        options={mergedOptions}
+        options={chartOptions}
         nullBandLabel={noValueLabel}
         showLegend={showLegend}
         showTooltips={showTooltips}
