@@ -32,102 +32,70 @@ export const getScatterChartProData = (
     pointDimension: Dimension;
     groupByDimension?: Dimension | null;
     noValueLabel: string;
-    /** Single-series override; when set, all points use this color */
     pointColor?: string;
   },
   theme: Theme,
 ): ScatterChartProDataResult => {
   const themeFormatter = getThemeFormatter(theme);
   const chartColors = getChartColors();
-  const data = props.data ?? [];
+  const data = (props.data ?? []) as Record<string, unknown>[];
   const pointField = getDimensionFieldName(props.pointDimension);
-  const xName = props.xMeasure.name;
-  const yName = props.yMeasure.name;
+  const overrideColor = props.pointColor?.trim();
 
   if (!data.length) {
-    return {
-      chartData: { datasets: [{ label: '', data: [] }] },
-      rowIndexByPoint: [[]],
-    };
+    return { chartData: { datasets: [{ label: '', data: [] }] }, rowIndexByPoint: [[]] };
   }
 
+  const getColor = (
+    color: 'background' | 'border',
+    dimensionOrMeasure: Dimension | Measure,
+    value: string,
+    index: number,
+  ) =>
+    overrideColor ??
+    getDimensionMeasureColor({ dimensionOrMeasure, theme, color, value, index, chartColors });
+
   const buildPoint = (row: Record<string, unknown>): ScatterChartInputPoint => {
-    const x = measureToNullableNumber(row[xName]);
-    const y = measureToNullableNumber(row[yName]);
     const rawPoint = row[pointField];
     const pointLabel =
-      rawPoint === null || rawPoint === undefined
+      rawPoint == null
         ? props.noValueLabel
         : String(themeFormatter.data(props.pointDimension, rawPoint as string | number | boolean));
-
     return {
-      x,
-      y,
+      x: measureToNullableNumber(row[props.xMeasure.name]),
+      y: measureToNullableNumber(row[props.yMeasure.name]),
       pointLabel,
       label: pointLabel,
     };
   };
 
   if (!props.groupByDimension) {
-    const points: ScatterChartInputPoint[] = [];
-    const rowIndexByPoint: number[][] = [[]];
-
-    data.forEach((row, rowIndex) => {
-      points.push(buildPoint(row as Record<string, unknown>));
-      rowIndexByPoint[0]!.push(rowIndex);
-    });
-
-    const pointBackgroundColor = props.pointColor?.trim()
-      ? props.pointColor
-      : getDimensionMeasureColor({
-          dimensionOrMeasure: props.xMeasure,
-          theme,
-          color: 'background',
-          value: props.xMeasure.name,
-          index: 0,
-          chartColors,
-        });
-
-    const pointBorderColor = props.pointColor?.trim()
-      ? props.pointColor
-      : getDimensionMeasureColor({
-          dimensionOrMeasure: props.xMeasure,
-          theme,
-          color: 'border',
-          value: props.xMeasure.name,
-          index: 0,
-          chartColors,
-        });
-
     return {
       chartData: {
         datasets: [
           {
             label: themeFormatter.dimensionOrMeasureTitle(props.yMeasure),
-            data: points,
-            pointBackgroundColor,
-            pointBorderColor,
+            data: data.map(buildPoint),
+            pointBackgroundColor: getColor('background', props.xMeasure, props.xMeasure.name, 0),
+            pointBorderColor: getColor('border', props.xMeasure, props.xMeasure.name, 0),
           },
         ],
       },
-      rowIndexByPoint,
+      rowIndexByPoint: [data.map((_, i) => i)],
     };
   }
 
   const groupDim = props.groupByDimension;
   const groupField = getDimensionFieldName(groupDim);
-
   const bucket = new Map<string, { points: ScatterChartInputPoint[]; rowIndices: number[] }>();
 
-  (data as Record<string, unknown>[]).forEach((row, rowIndex) => {
+  data.forEach((row, rowIndex) => {
     const rawG = row[groupField];
-    const key = rawG === null || rawG === undefined ? NULL_GROUP_KEY : String(rawG);
-    if (!bucket.has(key)) {
-      bucket.set(key, { points: [], rowIndices: [] });
-    }
-    const b = bucket.get(key)!;
-    b.points.push(buildPoint(row));
-    b.rowIndices.push(rowIndex);
+    const key = rawG == null ? NULL_GROUP_KEY : String(rawG);
+    if (!bucket.has(key)) bucket.set(key, { points: [], rowIndices: [] });
+    const group = bucket.get(key)!;
+    group.points.push(buildPoint(row));
+    group.rowIndices.push(rowIndex);
   });
 
   const sortedKeys = [...bucket.keys()].sort((a, b) => {
@@ -138,47 +106,23 @@ export const getScatterChartProData = (
 
   const datasets = sortedKeys.map((key, index) => {
     const { points, rowIndices } = bucket.get(key)!;
-    const firstRow = (data as Record<string, unknown>[])[rowIndices[0]!];
-    const rawG = key === NULL_GROUP_KEY ? null : firstRow?.[groupField];
-
+    const rawG = key === NULL_GROUP_KEY ? null : data[rowIndices[0]!]?.[groupField];
     const seriesLabel =
       key === NULL_GROUP_KEY
         ? props.noValueLabel
         : themeFormatter.data(groupDim, rawG as string | number | boolean);
-
     const colorKey = key === NULL_GROUP_KEY ? `${groupDim.name}.null` : `${groupDim.name}.${key}`;
 
-    const bg = getDimensionMeasureColor({
-      dimensionOrMeasure: groupDim,
-      theme,
-      color: 'background',
-      value: colorKey,
-      index,
-      chartColors,
-    });
-
-    const border = getDimensionMeasureColor({
-      dimensionOrMeasure: groupDim,
-      theme,
-      color: 'border',
-      value: colorKey,
-      index,
-      chartColors,
-    });
-
-    const manual = props.pointColor?.trim();
     return {
       label: seriesLabel,
       data: points,
-      pointBackgroundColor: manual ? manual : bg,
-      pointBorderColor: manual ? manual : border,
+      pointBackgroundColor: getColor('background', groupDim, colorKey, index),
+      pointBorderColor: getColor('border', groupDim, colorKey, index),
     };
   });
 
-  const rowIndexByPoint = sortedKeys.map((key) => bucket.get(key)!.rowIndices);
-
   return {
     chartData: { datasets },
-    rowIndexByPoint,
+    rowIndexByPoint: sortedKeys.map((key) => bucket.get(key)!.rowIndices),
   };
 };
