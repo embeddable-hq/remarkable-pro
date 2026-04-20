@@ -1,10 +1,13 @@
 import { ChartData } from 'chart.js';
-import { CUBE_DIMENSION_TYPE_TIME, DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import type { ScatterChartInputPoint } from '@embeddable.com/remarkable-ui';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
+import { getDimensionFieldName } from '../../charts.utils';
+
+export { getDimensionFieldName };
 
 const NULL_GROUP_KEY = '__scatter_null_group__';
 
@@ -14,9 +17,6 @@ export const measureToNullableNumber = (value: unknown): number | null => {
   const n = Number(value);
   return Number.isFinite(n) ? n : null;
 };
-
-export const getDimensionFieldName = (d: Dimension): string =>
-  `${d.name}${d.nativeType === CUBE_DIMENSION_TYPE_TIME && d.inputs?.granularity ? `.${d.inputs.granularity}` : ''}`;
 
 export type ScatterChartProDataResult = {
   chartData: ChartData<'scatter', ScatterChartInputPoint[]>;
