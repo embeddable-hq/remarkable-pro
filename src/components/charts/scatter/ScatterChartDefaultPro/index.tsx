@@ -11,12 +11,8 @@ import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCar
 import { getScatterChartProOptions } from './ScatterChartDefaultPro.chartOptions';
 import { getDimensionFieldName, getScatterChartProData } from './ScatterChartDefaultPro.utils';
 
-export type ScatterChartPointClickArgs = {
-  xMeasureValue: string;
-  yMeasureValue: string;
-  pointDimensionValue: string;
-  groupByDimensionValue: string | null;
-};
+import type { PointClickArgs } from '../../charts.types';
+export type ScatterChartPointClickArgs = PointClickArgs;
 
 export type ScatterChartDefaultProProps = {
   xMeasure: Measure;
