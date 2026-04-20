@@ -1,6 +1,6 @@
 import { useTheme } from '@embeddable.com/react';
 import { ScatterChart } from '@embeddable.com/remarkable-ui';
-import type { ScatterPointClickHit } from '@embeddable.com/remarkable-ui';
+import type { ChartPointClicked } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
 import { useMemo } from 'react';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
@@ -102,7 +102,7 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
   );
 
   const pointField = getDimensionFieldName(pointDimension);
-  const handlePointClick = (hit: ScatterPointClickHit | undefined) => {
+  const handlePointClick = (hit: ChartPointClicked | undefined) => {
     if (!onPointClick || !hit) return;
     const rowIdx = rowIndexByPoint[hit.datasetIndex]?.[hit.index];
     if (rowIdx === undefined) return;

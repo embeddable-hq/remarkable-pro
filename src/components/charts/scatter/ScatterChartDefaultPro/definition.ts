@@ -4,6 +4,8 @@ import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
+import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
+import { ThemeClientContext } from '../../../../theme/theme.types';
 
 const showPointLabels = {
   ...inputs.boolean,
@@ -97,7 +99,10 @@ const previewConfig = {
 
 const preview = definePreview(Component, previewConfig);
 
-const loadDataResultsArgs = (inputs: Inputs<typeof meta>): LoadDataRequest => ({
+const loadDataResultsArgs = (
+  inputs: Inputs<typeof meta>,
+  clientContext?: ThemeClientContext,
+): LoadDataRequest => ({
   limit: inputs.maxResults,
   from: inputs.dataset,
   select: [
@@ -106,10 +111,13 @@ const loadDataResultsArgs = (inputs: Inputs<typeof meta>): LoadDataRequest => ({
     inputs.pointDimension,
     ...(inputs.groupByDimension ? [inputs.groupByDimension] : []),
   ],
+  timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
-const loadDataResults = (inputs: Inputs<typeof meta>): DataResponse =>
-  loadData(loadDataResultsArgs(inputs));
+const loadDataResults = (
+  inputs: Inputs<typeof meta>,
+  clientContext: ThemeClientContext,
+): DataResponse => loadData(loadDataResultsArgs(inputs, clientContext));
 
 const events = {
   onPointClick: (value: {
@@ -125,10 +133,14 @@ const events = {
   }),
 };
 
-const props = (inputs: Inputs<typeof meta>) => ({
+const props = (
+  inputs: Inputs<typeof meta>,
+  _state: unknown,
+  clientContext: ThemeClientContext,
+) => ({
   ...inputs,
   pointColor: inputs.pointColor as string | undefined,
-  results: loadDataResults(inputs),
+  results: loadDataResults(inputs, clientContext),
 });
 
 export const scatterChartDefaultPro = {
