@@ -417,18 +417,23 @@ const yAxisMaxItems = {
   category: 'Axes Settings',
 } as const;
 
-const sortDirectionTopXAxis = {
-  name: 'sortDirectionTopXAxis',
+const sortDirection = {
+  name: 'sortDirection',
   type: SortDirectionType,
-  label: 'Sort by x-axis total',
+  label: 'Sort direction',
   category: 'Component Settings',
 } as const;
 
+const sortDirectionTopXAxis = {
+  ...sortDirection,
+  name: 'sortDirectionTopXAxis',
+  label: 'Sort by x-axis total',
+} as const;
+
 const sortDirectionTopYAxis = {
+  ...sortDirection,
   name: 'sortDirectionTopYAxis',
-  type: SortDirectionType,
   label: 'Sort by y-axis total',
-  category: 'Component Settings',
 } as const;
 
 const limitTopXAxis = {
@@ -511,6 +516,7 @@ export const inputs = {
   xAxisRangeMax,
   xAxisMaxItems,
   yAxisMaxItems,
+  sortDirection,
   sortDirectionTopXAxis,
   sortDirectionTopYAxis,
   limitTopXAxis,
