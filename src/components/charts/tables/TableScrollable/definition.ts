@@ -54,7 +54,7 @@ const meta = {
       required: false,
     },
     {
-      ...inputs.dimensionOrMeasure,
+      ...inputs.sortDimensionOrMeasure,
       name: 'sortColumn',
       label: 'Default sort column',
       category: 'Component Settings',

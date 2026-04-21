@@ -191,6 +191,17 @@ const dimensionOrMeasure = {
   inputs: dimensionMeasureSubInputs,
 } as const;
 
+const sortDimensionOrMeasure = {
+  name: 'sortDimensionOrMeasure',
+  type: 'dimensionOrMeasure',
+  label: 'Sort dimension or measure',
+  config: {
+    dataset: 'dataset',
+  },
+  category: 'Component Data',
+  inputs: undefined, // No need to show the sub-inputs in the UI for this input
+} as const;
+
 const dimensionsAndMeasures = {
   name: 'dimensionsAndMeasures',
   type: 'dimensionOrMeasure',
@@ -493,6 +504,7 @@ export const inputs = {
   measureOptions,
   dimensionOptions,
   dimensionAndMeasureOptions,
+  sortDimensionOrMeasure,
   comparisonPeriod,
   maxResults,
   placeholder,
