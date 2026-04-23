@@ -9,6 +9,14 @@ import { getDimensionFieldName } from '../../charts.utils';
 
 export { getDimensionFieldName };
 
+export type CellValue = string | number | boolean | null | undefined;
+
+export const serializeCellValue = (value: CellValue): string => {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'object') return JSON.stringify(value);
+  return String(value);
+};
+
 const NULL_GROUP_KEY = '__scatter_null_group__';
 
 export const measureToNullableNumber = (value: unknown): number | null => {

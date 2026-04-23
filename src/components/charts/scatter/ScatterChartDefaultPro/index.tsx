@@ -9,7 +9,12 @@ import { i18nSetup, i18n } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { getScatterChartProOptions } from './ScatterChartDefaultPro.chartOptions';
-import { getDimensionFieldName, getScatterChartProData } from './ScatterChartDefaultPro.utils';
+import {
+  getDimensionFieldName,
+  getScatterChartProData,
+  serializeCellValue,
+  type CellValue,
+} from './ScatterChartDefaultPro.utils';
 
 import type { PointClickArgs } from '../../charts.types';
 export type ScatterChartPointClickArgs = PointClickArgs;
@@ -35,12 +40,6 @@ export type ScatterChartDefaultProProps = {
   reverseXAxis?: boolean;
   onPointClick?: (payload: ScatterChartPointClickArgs) => void;
 } & ChartCardHeaderProps;
-
-const serializeCellValue = (value: unknown): string => {
-  if (value === null || value === undefined) return '';
-  if (typeof value === 'object') return JSON.stringify(value);
-  return String(value);
-};
 
 const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
   const theme = useTheme() as Theme;
@@ -102,7 +101,7 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
     if (!onPointClick || !hit) return;
     const rowIdx = rowIndexByPoint[hit.datasetIndex]?.[hit.index];
     if (rowIdx === undefined) return;
-    const row = results.data?.[rowIdx] as Record<string, unknown> | undefined;
+    const row = results.data?.[rowIdx] as Record<string, CellValue> | undefined;
     if (!row) return;
 
     const groupField = groupByDimension ? getDimensionFieldName(groupByDimension) : undefined;
