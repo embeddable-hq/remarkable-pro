@@ -39,7 +39,7 @@ const DonutChartPro = (props: DonutChartProProps) => {
   );
 
   const options = mergician(
-    getPieChartProOptions(measure, theme),
+    getPieChartProOptions({ measure, dimension }, theme),
     theme.charts.donutChartPro?.options ?? {},
   );
 

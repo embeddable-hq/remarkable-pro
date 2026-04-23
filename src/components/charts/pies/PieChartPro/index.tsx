@@ -35,7 +35,7 @@ const PieChartPro = (props: PieChartProProps) => {
   );
 
   const options = mergician(
-    getPieChartProOptions(measure, theme),
+    getPieChartProOptions({ measure, dimension }, theme),
     theme.charts.pieChartPro?.options ?? {},
   );
 

@@ -134,14 +134,18 @@ describe('getPieChartProData', () => {
 
 describe('getPieChartProOptions', () => {
   const measure = makeMeasure('revenue');
+  const dimension = makeDimension('total');
 
   it('uses legendPosition from theme', () => {
-    const options = getPieChartProOptions(measure, makeTheme({ legendPosition: 'right' }));
+    const options = getPieChartProOptions(
+      { measure, dimension },
+      makeTheme({ legendPosition: 'right' }),
+    );
     expect(options.plugins?.legend?.position).toBe('right');
   });
 
   it('defaults legendPosition to "bottom" when theme does not specify one', () => {
-    const options = getPieChartProOptions(measure, makeTheme({}));
+    const options = getPieChartProOptions({ measure, dimension }, makeTheme({}));
     expect(options.plugins?.legend?.position).toBe('bottom');
   });
 
@@ -149,7 +153,7 @@ describe('getPieChartProOptions', () => {
     const dataFn = vi.fn(() => '42');
     vi.mocked(getThemeFormatter).mockReturnValueOnce({ data: dataFn } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
-    const options = getPieChartProOptions(measure, makeTheme());
+    const options = getPieChartProOptions({ measure, dimension }, makeTheme());
     const formatter = options.plugins?.datalabels?.formatter as (v: unknown) => string;
     formatter(42);
 
@@ -161,7 +165,7 @@ describe('getPieChartProOptions', () => {
       data: vi.fn((_m: unknown, v: unknown) => `$${v}`),
     } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
-    const options = getPieChartProOptions(measure, makeTheme());
+    const options = getPieChartProOptions({ measure, dimension }, makeTheme());
     const labelFn = options.plugins?.tooltip?.callbacks?.label as (ctx: any) => string; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     // raw = 25, total = 100 → 25 %
@@ -175,7 +179,7 @@ describe('getPieChartProOptions', () => {
       data: vi.fn((_m: unknown, v: unknown) => String(v)),
     } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
-    const options = getPieChartProOptions(measure, makeTheme());
+    const options = getPieChartProOptions({ measure, dimension }, makeTheme());
     const labelFn = options.plugins?.tooltip?.callbacks?.label as (ctx: any) => string; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     // 1 / 3 = 33.33… → rounds to 33 %

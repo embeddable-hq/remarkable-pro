@@ -6,7 +6,7 @@ export type LineChartProOptionsClickArg = {
 };
 export type LineChartProOptionsClick = (arg: LineChartProOptionsClickArg) => void;
 
-type LineDataset = ChartDataset<'line'> & {
+export type LineDataset = ChartDataset<'line'> & {
   rawLabel?: string;
 };
 

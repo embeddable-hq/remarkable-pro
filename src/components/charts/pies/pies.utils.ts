@@ -1,12 +1,15 @@
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { ChartData, ChartOptions } from 'chart.js';
-import { getDatalabelPercentage, groupTailAsOther } from '../charts.utils';
+import {
+  getDatalabelPercentage,
+  getDimensionWithoutTruncation,
+  groupTailAsOther,
+} from '../charts.utils';
 import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
-import { i18n } from '../../../theme/i18n/i18n';
 
 export const getPieChartProData = (
   props: {
@@ -17,8 +20,6 @@ export const getPieChartProData = (
   },
   theme: Theme = remarkableTheme,
 ): ChartData<'pie'> => {
-  const themeFormatter = getThemeFormatter(theme);
-
   if (!props.data)
     return {
       labels: [],
@@ -57,14 +58,14 @@ export const getPieChartProData = (
 
   return {
     labels: groupedData.map((item) => {
-      const value = item[props.dimension.name];
-      const formattedValue = themeFormatter.data(props.dimension, value);
+      return item[props.dimension.name];
+      // const formattedValue = themeFormatter.data(props.dimension, value);
 
-      // If formatter did not work, try i18n translation
-      if (value === formattedValue) {
-        return i18n.t(value);
-      }
-      return formattedValue;
+      // // If formatter did not work, try i18n translation
+      // if (value === formattedValue) {
+      //   return i18n.t(value);
+      // }
+      // return formattedValue;
     }),
     datasets: [
       {
@@ -77,14 +78,34 @@ export const getPieChartProData = (
 };
 
 export const getPieChartProOptions = (
-  measure: Measure,
+  props: { measure: Measure; dimension: Dimension },
   theme: Theme = remarkableTheme,
 ): Partial<ChartOptions<'pie'>> => {
+  const { dimension, measure } = props;
   const themeFormatter = getThemeFormatter(theme);
 
   return {
     plugins: {
-      legend: { position: theme.charts.legendPosition ?? 'bottom' },
+      legend: {
+        position: theme.charts.legendPosition ?? 'bottom',
+        labels: {
+          generateLabels: (chart) => {
+            const labels = chart.data.labels ?? [];
+            return labels.map((label, i) => {
+              const meta = chart.getDatasetMeta(0);
+              const style = meta.controller.getStyle(i, false);
+              return {
+                text: themeFormatter.data(dimension, label as string),
+                fillStyle: style.backgroundColor as string,
+                strokeStyle: style.borderColor as string,
+                lineWidth: style.borderWidth,
+                hidden: !chart.getDataVisibility(i),
+                index: i,
+              };
+            });
+          },
+        },
+      },
       datalabels: {
         formatter: (value: string | number, context) => {
           if (measure.inputs?.showValueAsPercentage) {
@@ -95,6 +116,10 @@ export const getPieChartProOptions = (
       },
       tooltip: {
         callbacks: {
+          title: (context) => {
+            const label = context[0]?.label;
+            return themeFormatter.data(getDimensionWithoutTruncation(dimension), label);
+          },
           label(context) {
             const raw = context.raw as number;
             return `${themeFormatter.data(measure, raw)} (${getDatalabelPercentage(raw, context.dataset.data)})`;
