@@ -81,9 +81,9 @@ export const getScatterChartProOptions = (
   };
 };
 
-export type CellValue = string | number | boolean | null | undefined;
+type CellValue = string | number | boolean | null | undefined;
 
-export const serializeCellValue = (value: CellValue): string => {
+const getCellValue = (value: CellValue): string => {
   if (value === null || value === undefined) return '';
   if (typeof value === 'object') return JSON.stringify(value);
   return String(value);
@@ -107,10 +107,10 @@ export const getPointClickData = (
   const groupField = groupByDimension ? getDimensionFieldName(groupByDimension) : undefined;
 
   return {
-    xMeasureValue: serializeCellValue(row[xMeasure.name]),
-    yMeasureValue: serializeCellValue(row[yMeasure.name]),
-    pointDimensionValue: serializeCellValue(row[pointField]),
-    groupByDimensionValue: groupField ? serializeCellValue(row[groupField]) : null,
+    xMeasureValue: getCellValue(row[xMeasure.name]),
+    yMeasureValue: getCellValue(row[yMeasure.name]),
+    pointDimensionValue: getCellValue(row[pointField]),
+    groupByDimensionValue: groupField ? getCellValue(row[groupField]) : null,
   };
 };
 
