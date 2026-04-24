@@ -10,12 +10,7 @@ import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { i18nSetup, i18n } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
-import {
-  getDimensionFieldName,
-  getScatterChartProData,
-  serializeCellValue,
-  type CellValue,
-} from './ScatterChartDefaultPro.utils';
+import { getPointClickData, getScatterChartProData } from './ScatterChartDefaultPro.utils';
 
 import type { PointClickArgs } from '../../charts.types';
 export type ScatterChartPointClickArgs = PointClickArgs;
@@ -164,22 +159,18 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
     ],
   );
 
-  const pointField = getDimensionFieldName(pointDimension);
-  const handlePointClick = (hit: ChartPointClicked | undefined) => {
-    if (!onPointClick || !hit) return;
-    const rowIdx = rowIndexByPoint[hit.datasetIndex]?.[hit.index];
-    if (rowIdx === undefined) return;
-    const row = results.data?.[rowIdx] as Record<string, CellValue> | undefined;
-    if (!row) return;
-
-    const groupField = groupByDimension ? getDimensionFieldName(groupByDimension) : undefined;
-
-    onPointClick({
-      xMeasureValue: serializeCellValue(row[xMeasure.name]),
-      yMeasureValue: serializeCellValue(row[yMeasure.name]),
-      pointDimensionValue: serializeCellValue(row[pointField]),
-      groupByDimensionValue: groupField ? serializeCellValue(row[groupField]) : null,
-    });
+  const handlePointClick = (point: ChartPointClicked | undefined) => {
+    if (!onPointClick || !point) return;
+    const clickData = getPointClickData(
+      point,
+      rowIndexByPoint,
+      results.data,
+      xMeasure,
+      yMeasure,
+      pointDimension,
+      groupByDimension,
+    );
+    if (clickData) onPointClick(clickData);
   };
 
   const chartOptions = mergician(

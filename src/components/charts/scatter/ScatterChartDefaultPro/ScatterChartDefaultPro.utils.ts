@@ -3,9 +3,10 @@ import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
-import type { ScatterChartInputPoint } from '@embeddable.com/remarkable-ui';
+import type { ChartPointClicked, ScatterChartInputPoint } from '@embeddable.com/remarkable-ui';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import { getDimensionFieldName } from '../../../../utils/data.utils';
+import type { PointClickArgs } from '../../charts.types';
 
 export { getDimensionFieldName };
 
@@ -15,6 +16,31 @@ export const serializeCellValue = (value: CellValue): string => {
   if (value === null || value === undefined) return '';
   if (typeof value === 'object') return JSON.stringify(value);
   return String(value);
+};
+
+export const getPointClickData = (
+  point: ChartPointClicked,
+  rowIndexByPoint: number[][],
+  data: DataResponse['data'],
+  xMeasure: Measure,
+  yMeasure: Measure,
+  pointDimension: Dimension,
+  groupByDimension?: Dimension,
+): PointClickArgs | null => {
+  const rowIdx = rowIndexByPoint[point.datasetIndex]?.[point.index];
+  if (rowIdx === undefined) return null;
+  const row = data?.[rowIdx] as Record<string, CellValue> | undefined;
+  if (!row) return null;
+
+  const pointField = getDimensionFieldName(pointDimension);
+  const groupField = groupByDimension ? getDimensionFieldName(groupByDimension) : undefined;
+
+  return {
+    xMeasureValue: serializeCellValue(row[xMeasure.name]),
+    yMeasureValue: serializeCellValue(row[yMeasure.name]),
+    pointDimensionValue: serializeCellValue(row[pointField]),
+    groupByDimensionValue: groupField ? serializeCellValue(row[groupField]) : null,
+  };
 };
 
 const NULL_GROUP_KEY = '__scatter_null_group__';
