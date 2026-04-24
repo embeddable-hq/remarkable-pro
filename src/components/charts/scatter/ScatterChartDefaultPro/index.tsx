@@ -2,7 +2,6 @@ import { useTheme } from '@embeddable.com/react';
 import { ScatterChart } from '@embeddable.com/remarkable-ui';
 import type { ChartPointClicked } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
-import { useMemo } from 'react';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup, i18n } from '../../../../theme/i18n/i18n';
@@ -68,30 +67,17 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
 
   const noValueLabel = i18n.t('charts.scatterChart.noValue');
 
-  const chartData = useMemo(
-    () =>
-      getScatterChartProData(
-        {
-          data: results.data,
-          xMeasure,
-          yMeasure,
-          pointDimension,
-          groupByDimension,
-          noValueLabel,
-          pointColor,
-        },
-        theme,
-      ),
-    [
-      results.data,
+  const chartData = getScatterChartProData(
+    {
+      data: results.data,
       xMeasure,
       yMeasure,
       pointDimension,
       groupByDimension,
       noValueLabel,
       pointColor,
-      theme,
-    ],
+    },
+    theme,
   );
 
   const handlePointClick = (point: ChartPointClicked | undefined) => {
