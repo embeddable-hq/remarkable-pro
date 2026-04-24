@@ -94,7 +94,7 @@ const previewConfig = {
   xMeasure: previewData.measure,
   yMeasure: previewData.measureVariant,
   pointDimension: previewData.dimension,
-  results: previewData.resultsScatterXY,
+  results: previewData.results2Measures1Dimension,
   showLegend: true,
   hideMenu: true,
 };

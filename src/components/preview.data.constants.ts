@@ -74,8 +74,7 @@ const results1Measure2DimensionsVariant = mockDataResponse(
   ],
 );
 
-/** Point dimension + two measures (X/Y) for scatter preview */
-const resultsScatterXY = mockDataResponse(
+const results2Measures1Dimension = mockDataResponse(
   [dimensionName, measureName, measureVariantName],
   [
     ['US', 120, 1.5],
@@ -86,7 +85,7 @@ const resultsScatterXY = mockDataResponse(
   ],
 );
 
-const resultsScatterXYGroup = mockDataResponse(
+const results2Measures2Dimensions = mockDataResponse(
   [dimensionName, dimensionGroupName, measureName, measureVariantName],
   [
     ['US', 'Cat 1', 120, 1.5],
@@ -121,6 +120,6 @@ export const previewData = {
   results1Measure1DimensionVariant,
   results1Measure2Dimensions,
   results1Measure2DimensionsVariant,
-  resultsScatterXY,
-  resultsScatterXYGroup,
+  results2Measures1Dimension,
+  results2Measures2Dimensions,
 } as const;
