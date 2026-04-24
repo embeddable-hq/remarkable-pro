@@ -121,8 +121,7 @@ describe('getScatterChartProData', () => {
       makeTheme(),
     );
 
-    expect(result.chartData.datasets[0]!.data).toEqual([]);
-    expect(result.rowIndexByPoint).toEqual([[]]);
+    expect(result.datasets[0]!.data).toEqual([]);
   });
 
   it('treats undefined data like an empty array', () => {
@@ -141,8 +140,7 @@ describe('getScatterChartProData', () => {
       makeTheme(),
     );
 
-    expect(result.chartData.datasets[0]!.data).toEqual([]);
-    expect(result.rowIndexByPoint).toEqual([[]]);
+    expect(result.datasets[0]!.data).toEqual([]);
   });
 
   it('maps null measures and null point dimension to labels', () => {
@@ -161,11 +159,11 @@ describe('getScatterChartProData', () => {
       makeTheme(),
     );
 
-    const pt = result.chartData.datasets[0]!.data[0]!;
+    const pt = result.datasets[0]!.data[0]!;
     expect(pt?.x).toBeNull();
     expect(pt?.y).toBe(2);
     expect(pt?.pointLabel).toBe('NV');
-    expect(result.rowIndexByPoint[0]).toEqual([0]);
+    expect(pt?.rowIndex).toBe(0);
   });
 
   it('splits rows into datasets by group-by and places null group last in order', () => {
@@ -190,9 +188,11 @@ describe('getScatterChartProData', () => {
       makeTheme(),
     );
 
-    expect(result.chartData.datasets).toHaveLength(3);
-    expect(result.chartData.datasets.map((d) => d.label)).toEqual(['fmt:A', 'fmt:B', 'NV']);
-    expect(result.rowIndexByPoint).toEqual([[2], [0], [1]]);
+    expect(result.datasets).toHaveLength(3);
+    expect(result.datasets.map((d) => d.label)).toEqual(['fmt:A', 'fmt:B', 'NV']);
+    expect(result.datasets[0]!.data[0]!.rowIndex).toBe(2);
+    expect(result.datasets[1]!.data[0]!.rowIndex).toBe(0);
+    expect(result.datasets[2]!.data[0]!.rowIndex).toBe(1);
   });
 
   it('merges rows that share the same group into one dataset', () => {
@@ -216,9 +216,10 @@ describe('getScatterChartProData', () => {
       makeTheme(),
     );
 
-    expect(result.chartData.datasets).toHaveLength(1);
-    expect(result.chartData.datasets[0]!.data).toHaveLength(2);
-    expect(result.rowIndexByPoint).toEqual([[0, 1]]);
+    expect(result.datasets).toHaveLength(1);
+    expect(result.datasets[0]!.data).toHaveLength(2);
+    expect(result.datasets[0]!.data[0]!.rowIndex).toBe(0);
+    expect(result.datasets[0]!.data[1]!.rowIndex).toBe(1);
   });
 
   it('applies manual point color for a single series', () => {
@@ -240,8 +241,8 @@ describe('getScatterChartProData', () => {
       makeTheme(),
     );
 
-    expect(result.chartData.datasets[0]!.pointBackgroundColor).toBe('#abc');
-    expect(result.chartData.datasets[0]!.pointBorderColor).toBe('#abc');
+    expect(result.datasets[0]!.pointBackgroundColor).toBe('#abc');
+    expect(result.datasets[0]!.pointBorderColor).toBe('#abc');
     expect(getDimensionMeasureColor).not.toHaveBeenCalled();
   });
 
@@ -267,8 +268,8 @@ describe('getScatterChartProData', () => {
       makeTheme(),
     );
 
-    expect(result.chartData.datasets[0]!.pointBackgroundColor).toBe('#fed');
-    expect(result.chartData.datasets[1]!.pointBackgroundColor).toBe('#fed');
+    expect(result.datasets[0]!.pointBackgroundColor).toBe('#fed');
+    expect(result.datasets[1]!.pointBackgroundColor).toBe('#fed');
   });
 
   it('uses getDimensionMeasureColor from xMeasure when pointColor is absent', () => {
@@ -346,7 +347,7 @@ describe('getScatterChartProData', () => {
     );
 
     expect(mockFormatter.dimensionOrMeasureTitle).toHaveBeenCalledWith(y);
-    expect(result.chartData.datasets[0]!.label).toBe('Units sold');
+    expect(result.datasets[0]!.label).toBe('Units sold');
   });
 
   it('formats non-null point dimension values via themeFormatter.data', () => {
@@ -366,8 +367,8 @@ describe('getScatterChartProData', () => {
     );
 
     expect(mockFormatter.data).toHaveBeenCalledWith(pointDim, 'US');
-    expect(result.chartData.datasets[0]!.data[0]!.pointLabel).toBe('fmt:US');
-    expect(result.chartData.datasets[0]!.data[0]!.label).toBe('fmt:US');
+    expect(result.datasets[0]!.data[0]!.pointLabel).toBe('fmt:US');
+    expect(result.datasets[0]!.data[0]!.label).toBe('fmt:US');
   });
 
   it('passes group color keys region.<key> and region.null to getDimensionMeasureColor', () => {

@@ -68,7 +68,7 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
 
   const noValueLabel = i18n.t('charts.scatterChart.noValue');
 
-  const { chartData, rowIndexByPoint } = useMemo(
+  const chartData = useMemo(
     () =>
       getScatterChartProData(
         {
@@ -98,7 +98,7 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
     if (!onPointClick || !point) return;
     const clickData = getPointClickData(
       point,
-      rowIndexByPoint,
+      chartData.datasets,
       results.data,
       xMeasure,
       yMeasure,
