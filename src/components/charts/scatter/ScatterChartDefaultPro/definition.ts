@@ -87,6 +87,8 @@ const meta = {
   ],
 } as const satisfies EmbeddedComponentMeta;
 
+export type ScatterChartDefaultProState = Record<string, never>;
+
 const previewConfig = {
   dataset: previewData.dataset,
   xMeasure: previewData.measure,
@@ -135,7 +137,7 @@ const events = {
 
 const props = (
   inputs: Inputs<typeof meta>,
-  _state: unknown,
+  [_state, _setState]: [ScatterChartDefaultProState, (state: ScatterChartDefaultProState) => void],
   clientContext: ThemeClientContext,
 ) => ({
   ...inputs,
