@@ -74,7 +74,7 @@ export const getScatterChartProData = (
   const chartColors = getChartColors();
   const data = (props.data ?? []) as Record<string, unknown>[];
   const pointField = getDimensionFieldName(props.pointDimension);
-  const overrideColor = props.pointColor?.trim();
+  const overrideColor = props.pointColor?.trim() || undefined;
 
   if (!data.length) {
     return { chartData: { datasets: [{ label: '', data: [] }] }, rowIndexByPoint: [[]] };
