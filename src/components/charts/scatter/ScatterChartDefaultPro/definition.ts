@@ -64,22 +64,22 @@ const meta = {
       properties: [
         {
           name: 'xMeasureValue',
-          label: 'X measure value',
+          label: 'Clicked X measure value',
           type: 'string',
         },
         {
           name: 'yMeasureValue',
-          label: 'Y measure value',
+          label: 'Clicked Y measure value',
           type: 'string',
         },
         {
           name: 'pointDimensionValue',
-          label: 'Point dimension value',
+          label: 'Clicked point dimension value',
           type: 'string',
         },
         {
           name: 'groupByDimensionValue',
-          label: 'Group by value',
+          label: 'Clicked group by value',
           type: 'string',
         },
       ],
