@@ -98,12 +98,11 @@ export const getScatterChartProData = (
   const bucket = new Map<string, { points: ScatterChartInputPoint[]; rowIndices: number[] }>();
 
   data.forEach((row, rowIndex) => {
-    const rawG = row[groupField];
-    const key = rawG == null ? NULL_GROUP_KEY : String(rawG);
-    if (!bucket.has(key)) bucket.set(key, { points: [], rowIndices: [] });
-    const group = bucket.get(key)!;
+    const key = row[groupField] == null ? NULL_GROUP_KEY : String(row[groupField]);
+    const group = bucket.get(key) ?? { points: [], rowIndices: [] };
     group.points.push(buildPoint(row));
     group.rowIndices.push(rowIndex);
+    bucket.set(key, group);
   });
 
   const sortedKeys = [...bucket.keys()].sort((a, b) => {
@@ -114,11 +113,11 @@ export const getScatterChartProData = (
 
   const datasets = sortedKeys.map((key, index) => {
     const { points, rowIndices } = bucket.get(key)!;
-    const rawG = key === NULL_GROUP_KEY ? null : data[rowIndices[0]!]?.[groupField];
+    const groupValue = key === NULL_GROUP_KEY ? null : data[rowIndices[0]!]?.[groupField];
     const seriesLabel =
       key === NULL_GROUP_KEY
         ? props.noValueLabel
-        : themeFormatter.data(groupDim, rawG as string | number | boolean);
+        : themeFormatter.data(groupDim, groupValue as string | number | boolean);
     const colorKey = key === NULL_GROUP_KEY ? `${groupDim.name}.null` : `${groupDim.name}.${key}`;
 
     return {
