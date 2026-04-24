@@ -3,6 +3,7 @@ import {
   Dimension,
   Granularity,
   LoadDataRequest,
+  TimeRange,
   Value,
   loadData,
 } from '@embeddable.com/core';
@@ -51,6 +52,11 @@ const meta = {
           label: 'Clicked axis dimension value',
           type: 'string',
         },
+        {
+          name: 'axisDimensionTimeRange',
+          label: 'Clicked axis dimension time range',
+          type: 'timeRange',
+        },
       ],
     },
   ],
@@ -87,8 +93,9 @@ const loadDataResults = (
 ): DataResponse => loadData(loadDataResultsArgs(inputs, dimension, clientContext));
 
 const events = {
-  onBarClicked: (value: { axisDimensionValue?: string }) => ({
+  onBarClicked: (value: { axisDimensionValue?: string; axisDimensionTimeRange?: TimeRange }) => ({
     axisDimensionValue: value.axisDimensionValue ?? Value.noFilter(),
+    axisDimensionTimeRange: value.axisDimensionTimeRange ?? Value.noFilter(),
   }),
 };
 

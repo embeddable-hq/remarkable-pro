@@ -6,7 +6,7 @@ import { resolveI18nProps } from '../../../component.utils';
 import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarChartProData, getBarChartProOptions } from '../bars.utils';
 import { mergician } from 'mergician';
-import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
+import { DataResponse, Dimension, Granularity, Measure, TimeRange } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 
@@ -25,7 +25,7 @@ export type BarChartDefaultHorizontalProProps = {
   yAxisLabel?: string;
   yAxisMaxItems?: number;
   setGranularity?: (granularity: Granularity) => void;
-  onBarClicked?: (args: { axisDimensionValue: string | null }) => void;
+  onBarClicked?: (args: { axisDimensionValue: string | null; axisDimensionTimeRange: TimeRange | null }) => void;
 } & ChartCardHeaderProps;
 
 const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) => {

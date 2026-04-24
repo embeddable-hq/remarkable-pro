@@ -1,4 +1,4 @@
-import { Granularity, OrderDirection, Value } from '@embeddable.com/core';
+import { Granularity, OrderDirection, TimeRange, Value } from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
@@ -50,6 +50,11 @@ const meta = {
           type: 'string',
         },
         {
+          name: 'axisDimensionTimeRange',
+          label: 'Clicked axis dimension time range',
+          type: 'timeRange',
+        },
+        {
           name: 'groupingDimensionValue',
           label: 'Clicked grouping dimension value',
           type: 'string',
@@ -76,8 +81,9 @@ const previewConfig = {
 const preview = definePreview(Component, previewConfig);
 
 const events = {
-  onBarClicked: (value: { axisDimensionValue?: string; groupingDimensionValue?: string }) => ({
+  onBarClicked: (value: { axisDimensionValue?: string; axisDimensionTimeRange?: TimeRange; groupingDimensionValue?: string }) => ({
     axisDimensionValue: value.axisDimensionValue ?? Value.noFilter(),
+    axisDimensionTimeRange: value.axisDimensionTimeRange ?? Value.noFilter(),
     groupingDimensionValue: value.groupingDimensionValue ?? Value.noFilter(),
   }),
 };
