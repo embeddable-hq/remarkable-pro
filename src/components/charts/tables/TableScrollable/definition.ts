@@ -152,7 +152,9 @@ const props = (
 ) => {
   const mergedState: TableScrollableProState = { ...defaultTableScrollableState(inputs), ...state };
 
-  const sortColumn = inputs.dimensionsAndMeasures.find((x) => x.name === mergedState.sort?.id);
+  const sortColumn =
+    inputs.dimensionsAndMeasures.find((x) => x.name === mergedState.sort?.id) ??
+    (inputs.sortColumn?.name === mergedState.sort?.id ? inputs.sortColumn : undefined);
   const orderBy: OrderBy[] =
     sortColumn && mergedState.sort
       ? [{ property: sortColumn, direction: mergedState.sort.direction }]
@@ -164,10 +166,9 @@ const props = (
 
   const dimensionsAndMeasuresToLoad = [
     ...inputs.dimensionsAndMeasures,
-    ...(hasClickDimension ? [] : [inputs.clickDimension]),
+    ...(inputs.clickDimension && !hasClickDimension ? [inputs.clickDimension] : []),
   ];
 
-  console.log('order by', orderBy);
   return {
     ...inputs,
     state: mergedState,
