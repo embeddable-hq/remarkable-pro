@@ -15,9 +15,12 @@ import type { PointClickArgs } from '../../charts.types';
 export { getDimensionFieldName };
 
 export const getScatterChartProOptions = (
-  { xMeasure, yMeasure }: { xMeasure: Measure; yMeasure: Measure },
+  {
+    xMeasure,
+    yMeasure,
+    noValueLabel,
+  }: { xMeasure: Measure; yMeasure: Measure; noValueLabel: string },
   theme: Theme,
-  noValueLabel: string,
 ): Partial<ChartOptions<'scatter'>> => {
   const themeFormatter = getThemeFormatter(theme);
 

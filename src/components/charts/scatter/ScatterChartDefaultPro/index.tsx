@@ -109,7 +109,7 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
   };
 
   const chartOptions = mergician(
-    getScatterChartProOptions({ xMeasure, yMeasure }, theme, noValueLabel),
+    getScatterChartProOptions({ xMeasure, yMeasure, noValueLabel }, theme),
     theme.charts.scatterChartDefaultPro?.options ?? {},
   );
 

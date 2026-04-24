@@ -439,7 +439,10 @@ describe('getScatterChartProOptions', () => {
 
   describe('tick callbacks', () => {
     it('formats x axis ticks using themeFormatter.data with xMeasure', () => {
-      const opts = getScatterChartProOptions({ xMeasure, yMeasure }, {} as Theme, NO_VALUE);
+      const opts = getScatterChartProOptions(
+        { xMeasure, yMeasure, noValueLabel: NO_VALUE },
+        {} as Theme,
+      );
       const xCb = opts.scales?.x?.ticks?.callback as (v: string | number) => string;
 
       expect(xCb(1_000_000)).toBe('data:x:1000000');
@@ -447,7 +450,10 @@ describe('getScatterChartProOptions', () => {
     });
 
     it('formats y axis ticks using themeFormatter.data with yMeasure', () => {
-      const opts = getScatterChartProOptions({ xMeasure, yMeasure }, {} as Theme, NO_VALUE);
+      const opts = getScatterChartProOptions(
+        { xMeasure, yMeasure, noValueLabel: NO_VALUE },
+        {} as Theme,
+      );
       const yCb = opts.scales?.y?.ticks?.callback as (v: string | number) => string;
 
       expect(yCb(2)).toBe('data:y:2');
@@ -462,7 +468,10 @@ describe('getScatterChartProOptions', () => {
         inputs: { currency: 'USD' },
       } as unknown as Measure;
 
-      const opts = getScatterChartProOptions({ xMeasure: xUsd, yMeasure }, {} as Theme, NO_VALUE);
+      const opts = getScatterChartProOptions(
+        { xMeasure: xUsd, yMeasure, noValueLabel: NO_VALUE },
+        {} as Theme,
+      );
       const xCb = opts.scales?.x?.ticks?.callback as (v: string | number) => string;
 
       expect(xCb(25_000)).toBe('data:revenue:25000');
@@ -472,7 +481,10 @@ describe('getScatterChartProOptions', () => {
 
   describe('tooltip label', () => {
     it('formats tooltip using originalData when available', () => {
-      const opts = getScatterChartProOptions({ xMeasure, yMeasure }, {} as Theme, NO_VALUE);
+      const opts = getScatterChartProOptions(
+        { xMeasure, yMeasure, noValueLabel: NO_VALUE },
+        {} as Theme,
+      );
       const labelFn = opts.plugins?.tooltip?.callbacks?.label as (
         ctx: TooltipItem<'scatter'>,
       ) => string;
@@ -491,7 +503,10 @@ describe('getScatterChartProOptions', () => {
     });
 
     it('returns noValueLabel for null measure values in tooltip', () => {
-      const opts = getScatterChartProOptions({ xMeasure, yMeasure }, {} as Theme, NO_VALUE);
+      const opts = getScatterChartProOptions(
+        { xMeasure, yMeasure, noValueLabel: NO_VALUE },
+        {} as Theme,
+      );
       const labelFn = opts.plugins?.tooltip?.callbacks?.label as (
         ctx: TooltipItem<'scatter'>,
       ) => string;
