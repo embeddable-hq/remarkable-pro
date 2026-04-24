@@ -179,7 +179,7 @@ export const getScatterChartProData = (
       datasets: [
         {
           label: themeFormatter.dimensionOrMeasureTitle(props.yMeasure),
-          data: data.map(buildPoint),
+          data: data.map((row, i) => buildPoint(row, i)),
           pointBackgroundColor: getColor('background', props.xMeasure, props.xMeasure.name, 0),
           pointBorderColor: getColor('border', props.xMeasure, props.xMeasure.name, 0),
         },
