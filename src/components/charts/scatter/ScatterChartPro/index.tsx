@@ -11,12 +11,12 @@ import {
   getPointClickData,
   getScatterChartProData,
   getScatterChartProOptions,
-} from './ScatterChartDefaultPro.utils';
+} from './ScatterChartPro.utils';
 
 import type { PointClickArgs } from '../../charts.types';
 export type ScatterChartPointClickArgs = PointClickArgs;
 
-export type ScatterChartDefaultProProps = {
+export type ScatterChartProProps = {
   xMeasure: Measure;
   yMeasure: Measure;
   pointDimension: Dimension;
@@ -38,7 +38,7 @@ export type ScatterChartDefaultProProps = {
   onPointClick?: (payload: ScatterChartPointClickArgs) => void;
 } & ChartCardHeaderProps;
 
-const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
+const ScatterChartPro = (props: ScatterChartProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
@@ -96,7 +96,7 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
 
   const chartOptions = mergician(
     getScatterChartProOptions({ xMeasure, yMeasure, noValueLabel }, theme),
-    theme.charts.scatterChartDefaultPro?.options ?? {},
+    theme.charts.scatterChartPro?.options ?? {},
   );
 
   return (
@@ -136,4 +136,4 @@ const ScatterChartDefaultPro = (props: ScatterChartDefaultProProps) => {
   );
 };
 
-export default ScatterChartDefaultPro;
+export default ScatterChartPro;

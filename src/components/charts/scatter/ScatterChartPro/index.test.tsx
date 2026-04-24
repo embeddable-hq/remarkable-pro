@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
 import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
-import ScatterChartDefaultPro from './index';
+import ScatterChartPro from './index';
 
 let lastScatterProps: Record<string, unknown> | null = null;
 
@@ -65,7 +65,7 @@ const makeMeasure = (name: string, overrides: Record<string, any> = {}): Measure
     ...overrides,
   }) as unknown as Measure;
 
-describe('ScatterChartDefaultPro', () => {
+describe('ScatterChartPro', () => {
   beforeEach(() => {
     lastScatterProps = null;
   });
@@ -79,7 +79,7 @@ describe('ScatterChartDefaultPro', () => {
     };
 
     render(
-      <ScatterChartDefaultPro
+      <ScatterChartPro
         xMeasure={makeMeasure('x')}
         yMeasure={makeMeasure('y')}
         pointDimension={makeDimension({ name: 'point' })}

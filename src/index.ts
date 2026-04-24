@@ -112,12 +112,12 @@ export * from './components/charts/lines/LineChartWithKpiTabsPro';
 export * from './components/charts/lines/LineChartWithKpiTabsPro/definition';
 
 // Charts - Scatter
-export * as ScatterChartDefaultPro from './components/charts/scatter/ScatterChartDefaultPro';
+export * as ScatterChartPro from './components/charts/scatter/ScatterChartPro';
 export type {
-  ScatterChartDefaultProProps,
+  ScatterChartProProps,
   ScatterChartPointClickArgs,
-} from './components/charts/scatter/ScatterChartDefaultPro';
-export * from './components/charts/scatter/ScatterChartDefaultPro/definition';
+} from './components/charts/scatter/ScatterChartPro';
+export * from './components/charts/scatter/ScatterChartPro/definition';
 
 // Charts - Pies
 export * as DonutChartPro from './components/charts/pies/DonutChartPro';

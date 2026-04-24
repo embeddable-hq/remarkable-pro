@@ -16,7 +16,7 @@ const showPointLabels = {
 } as const;
 
 const meta = {
-  name: 'ScatterChartDefaultPro',
+  name: 'ScatterChartPro',
   label: 'Scatter Chart',
   category: 'Scatter Charts',
   inputs: [
@@ -87,7 +87,7 @@ const meta = {
   ],
 } as const satisfies EmbeddedComponentMeta;
 
-export type ScatterChartDefaultProState = Record<string, never>;
+export type ScatterChartProState = Record<string, never>;
 
 const previewConfig = {
   dataset: previewData.dataset,
@@ -137,7 +137,7 @@ const events = {
 
 const props = (
   inputs: Inputs<typeof meta>,
-  [_state, _setState]: [ScatterChartDefaultProState, (state: ScatterChartDefaultProState) => void],
+  [_state, _setState]: [ScatterChartProState, (state: ScatterChartProState) => void],
   clientContext: ThemeClientContext,
 ) => ({
   ...inputs,
@@ -145,7 +145,7 @@ const props = (
   results: loadDataResults(inputs, clientContext),
 });
 
-export const scatterChartDefaultPro = {
+export const scatterChartPro = {
   Component,
   meta,
   preview,

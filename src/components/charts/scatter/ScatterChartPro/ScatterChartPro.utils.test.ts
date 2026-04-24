@@ -9,7 +9,7 @@ import {
   getScatterChartProData,
   getScatterChartProOptions,
   measureToNullableNumber,
-} from './ScatterChartDefaultPro.utils';
+} from './ScatterChartPro.utils';
 import {
   getThemeFormatter,
   type GetThemeFormatter,
