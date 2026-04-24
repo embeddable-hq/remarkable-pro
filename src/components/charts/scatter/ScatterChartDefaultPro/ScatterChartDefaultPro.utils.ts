@@ -5,7 +5,7 @@ import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import type { ScatterChartInputPoint } from '@embeddable.com/remarkable-ui';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
-import { getDimensionFieldName } from '../../charts.utils';
+import { getDimensionFieldName } from '../../../../utils/data.utils';
 
 export { getDimensionFieldName };
 

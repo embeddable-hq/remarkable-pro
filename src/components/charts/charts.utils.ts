@@ -1,4 +1,4 @@
-import { CUBE_DIMENSION_TYPE_TIME, DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { i18n } from '../../theme/i18n/i18n';
 
 export const groupTailAsOther = (
@@ -25,9 +25,6 @@ export const groupTailAsOther = (
 
   return [...head, aggregatedRow];
 };
-
-export const getDimensionFieldName = (d: Dimension): string =>
-  `${d.name}${d.nativeType === CUBE_DIMENSION_TYPE_TIME && d.inputs?.granularity ? `.${d.inputs.granularity}` : ''}`;
 
 export const getDatalabelPercentage = (value: number, data: unknown[]): string => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
