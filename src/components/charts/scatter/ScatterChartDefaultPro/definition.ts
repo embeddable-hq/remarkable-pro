@@ -139,6 +139,7 @@ const props = (
   clientContext: ThemeClientContext,
 ) => ({
   ...inputs,
+  pointColor: inputs.pointColor as string | undefined,
   results: loadDataResults(inputs, clientContext),
 });
 

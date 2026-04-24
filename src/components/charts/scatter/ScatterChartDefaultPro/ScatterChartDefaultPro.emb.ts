@@ -8,6 +8,5 @@ export const meta = scatterChartDefaultPro.meta;
 export default defineComponent(
   scatterChartDefaultPro.Component,
   meta,
-  // @ts-expect-error - to be fixed in @embeddable.com/react
   scatterChartDefaultPro.config,
 );
