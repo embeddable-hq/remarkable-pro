@@ -9,7 +9,9 @@ import {
   Dimension,
   DimensionOrMeasure,
   OrderDirection,
+  TimeRange,
 } from '@embeddable.com/core';
+import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { TableScrollable, TableScrollableHandle, TableSort } from '@embeddable.com/remarkable-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getTableHeaders, getTableRows } from '../tables.utils';
@@ -20,7 +22,10 @@ import { deepEqual } from 'fast-equals';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 let downloadData: (data: DataResponse['data']) => void;
 
-export type TableScrollableProOnRowClickArg = string | null;
+export type TableScrollableProOnRowClickArg = {
+  dimensionValue: string | null;
+  dimensionTimeRange: TimeRange | undefined;
+};
 export type TableScrollableProState = {
   page: number;
   pageSize?: number;
@@ -130,8 +135,13 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   const handleRowIndexClick = (rowIndex: number) => {
     if (!clickDimension) return;
 
-    const rowDimensionValue = rowsToDisplay[rowIndex]?.[clickDimension.name];
-    onRowClicked?.(rowDimensionValue);
+    const dimensionValue = rowsToDisplay[rowIndex]?.[clickDimension.name];
+    const dimensionTimeRange = getTimeRangeFromDimensionValue({
+      value: dimensionValue ?? undefined,
+      dimension: clickDimension,
+    });
+
+    onRowClicked?.({ dimensionValue, dimensionTimeRange });
   };
 
   // Handle data download when allResults is ready

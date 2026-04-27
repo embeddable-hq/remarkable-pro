@@ -69,6 +69,11 @@ const meta = {
           label: 'Clicked row dimension value',
           type: 'string',
         },
+        {
+          name: 'rowDimensionTimeRange',
+          label: 'Clicked row dimension time range',
+          type: 'timeRange',
+        },
       ],
     },
   ],
@@ -161,8 +166,9 @@ const loadDataAllResults = (inputs: Inputs<typeof meta>, orderBy: OrderBy[]): Da
   loadData(loadDataAllResultsArgs(inputs, orderBy));
 
 const events = {
-  onRowClicked: (rowDimensionValue: TableChartPaginatedProOnRowClickArg) => ({
-    rowDimensionValue: rowDimensionValue === undefined ? Value.noFilter() : rowDimensionValue,
+  onRowClicked: (value: TableChartPaginatedProOnRowClickArg) => ({
+    rowDimensionValue: value.dimensionValue ?? Value.noFilter(),
+    rowDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
   }),
 };
 

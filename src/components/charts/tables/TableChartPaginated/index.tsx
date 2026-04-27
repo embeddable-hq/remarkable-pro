@@ -3,7 +3,14 @@ import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
-import { DataResponse, Dimension, DimensionOrMeasure, OrderDirection } from '@embeddable.com/core';
+import {
+  DataResponse,
+  Dimension,
+  DimensionOrMeasure,
+  OrderDirection,
+  TimeRange,
+} from '@embeddable.com/core';
+import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import {
   getStyleNumber,
   getTableTotalPages,
@@ -24,7 +31,10 @@ const footerHeight = getStyleNumber('--em-tablechart-pagination-height', '3rem')
 
 let downloadData: (data: DataResponse['data']) => void;
 
-export type TableChartPaginatedProOnRowClickArg = string | null;
+export type TableChartPaginatedProOnRowClickArg = {
+  dimensionValue: string | null;
+  dimensionTimeRange: TimeRange | undefined;
+};
 export type TableChartPaginatedProState = {
   page: number;
   pageSize?: number;
@@ -108,8 +118,13 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
   const handleRowIndexClick = (rowIndex: number) => {
     if (!onRowClicked || !clickDimension) return;
 
-    const rowDimensionValue = rows[rowIndex]?.[clickDimension.name];
-    onRowClicked(rowDimensionValue);
+    const dimensionValue = rows[rowIndex]?.[clickDimension.name];
+    const dimensionTimeRange = getTimeRangeFromDimensionValue({
+      value: dimensionValue ?? undefined,
+      dimension: clickDimension,
+    });
+
+    onRowClicked({ dimensionValue, dimensionTimeRange });
   };
 
   // Sync page size changes to embeddable state
