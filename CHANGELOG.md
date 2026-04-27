@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.2.7
+
+### Patch Changes
+
+- ba3dcc4: Avoid formatting in tooltips and export
+
 ## 0.2.6
 
 ### Patch Changes
