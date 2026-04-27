@@ -30,6 +30,9 @@ export const en: ResourceLanguage = {
         noPreviousData: 'No previous data',
         equalComparison: 'No change',
       },
+      scatterChart: {
+        noValue: 'No value',
+      },
     },
     editors: {
       errorTitle: 'Something went wrong.',

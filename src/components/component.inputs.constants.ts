@@ -480,6 +480,18 @@ const filters = {
   defaultValue: null,
 } as const;
 
+const xMeasure = {
+  ...measure,
+  name: 'xMeasure',
+  label: 'X-axis measure',
+} as const;
+
+const yMeasure = {
+  ...measure,
+  name: 'yMeasure',
+  label: 'Y-axis measure',
+} as const;
+
 export const inputs = {
   boolean,
   timeRange,
@@ -500,6 +512,8 @@ export const inputs = {
   dimensionOrMeasure,
   dimensionsAndMeasures,
   measure,
+  xMeasure,
+  yMeasure,
   measures,
   measureOptions,
   dimensionOptions,
