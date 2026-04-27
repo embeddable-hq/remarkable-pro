@@ -2,6 +2,8 @@ import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { getPieChartProOptions, getPieChartProData } from '../pies.utils';
 import { DefaultPieChartProps } from '../pies.types';
+import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import { getElementAtEvent } from 'react-chartjs-2';
 import { DataResponse, Measure } from '@embeddable.com/core';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
@@ -42,11 +44,21 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
     theme,
   );
 
-  const handleSegmentClick = (index: number | undefined) => {
-    if (!onSegmentClick) return;
+  const handleClick = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+    chartRef?: React.RefObject<null>,
+  ) => {
+    if (!onSegmentClick || !chartRef?.current) return;
+
+    const element = getElementAtEvent(chartRef.current, event)[0];
+    const dimensionValue =
+      element === undefined
+        ? undefined
+        : (results.data?.[element.index]?.[dimension.name] as string | undefined);
 
     onSegmentClick({
-      dimensionValue: index === undefined ? undefined : results.data?.[index]?.[dimension.name],
+      dimensionValue,
+      dimensionTimeRange: getTimeRangeFromDimensionValue({ value: dimensionValue, dimension }),
     });
   };
 
@@ -78,7 +90,7 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
         showLegend={showLegend}
         showTooltips={showTooltips}
         showValueLabels={showValueLabels}
-        onSegmentClick={handleSegmentClick}
+        onClick={handleClick}
       />
     </ChartCard>
   );

@@ -647,7 +647,7 @@ describe('getBarChartProOptions', () => {
         datasets: [{ data: [100], rawLabel: 'North' }],
       };
       const options = getBarChartProOptions(
-        { onBarClicked, measures, dimension, horizontal: false, data: data as never },
+        { measures, dimension, horizontal: false, data: data as never },
         makeTheme(),
       );
 
@@ -666,7 +666,7 @@ describe('getBarChartProOptions', () => {
       const onBarClicked = vi.fn();
       const data = makeChartData(['Widget'], [[100]]);
       const options = getBarChartProOptions(
-        { onBarClicked, measures, dimension, horizontal: false, data: data as never },
+        { measures, dimension, horizontal: false, data: data as never },
         makeTheme(),
       );
 
