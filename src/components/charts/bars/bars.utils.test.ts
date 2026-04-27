@@ -1,5 +1,10 @@
 import type { Dimension, Measure } from '@embeddable.com/core';
-import { getBarStackedChartProData, getBarChartProData, getBarChartProOptions } from './bars.utils';
+import {
+  getBarStackedChartProData,
+  getBarChartProData,
+  getBarChartProOptions,
+  getBarStackedChartProOptions,
+} from './bars.utils';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { getDatalabelPercentage, groupTailAsOther } from '../charts.utils';
 import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
@@ -684,5 +689,141 @@ describe('getBarChartProOptions', () => {
     );
 
     expect(options.plugins!.legend!.position).toBe('top');
+  });
+});
+
+// ----------------------------------------------------------------------------
+
+describe('getBarStackedChartProOptions', () => {
+  let mockFormatter: ReturnType<typeof makeMockFormatter>;
+
+  const measures = [makeMeasure({ name: 'revenue', title: 'Revenue' })];
+  const dimension = makeDimension({ name: 'product' });
+  const groupDimension = makeDimension({ name: 'region' });
+
+  const makeChartData = (labels: string[], datasetValues: number[][]) => ({
+    labels,
+    datasets: datasetValues.map((vals) => ({ data: vals })),
+  });
+
+  beforeEach(() => {
+    mockFormatter = makeMockFormatter();
+    vi.mocked(getThemeFormatter).mockReturnValue(mockFormatter as never);
+  });
+
+  // -- tooltip.label ----------------------------------------------------------
+
+  describe('tooltip.label', () => {
+    it('uses rawLabel formatted via groupDimension as the prefix', () => {
+      const data = makeChartData(['A'], [[50]]);
+      const options = getBarStackedChartProOptions(
+        { measures, dimension, groupDimension, horizontal: false, data: data as never },
+        makeTheme(),
+      );
+
+      const context = {
+        datasetIndex: 0,
+        raw: 50,
+        dataset: { label: 'Should not appear', rawLabel: 'North', data: [50] },
+      } as never;
+      options.plugins!.tooltip!.callbacks!.label!.call({} as never, context);
+
+      expect(mockFormatter.data).toHaveBeenCalledWith(groupDimension, 'North');
+    });
+
+    it('formats the measure value and returns "groupLabel: measureValue "', () => {
+      mockFormatter.data.mockImplementation((_, value) => `fmt:${value}`);
+
+      const data = makeChartData(['A'], [[50]]);
+      const options = getBarStackedChartProOptions(
+        { measures, dimension, groupDimension, horizontal: false, data: data as never },
+        makeTheme(),
+      );
+
+      const context = {
+        datasetIndex: 0,
+        raw: 50,
+        dataset: { rawLabel: 'North', data: [50] },
+      } as never;
+      const result = options.plugins!.tooltip!.callbacks!.label!.call({} as never, context);
+
+      expect(result).toBe('fmt:North: fmt:50 ');
+    });
+
+    it('appends percentage when showValueAsPercentage is true', () => {
+      vi.mocked(getDatalabelPercentage).mockReturnValue('33%');
+      mockFormatter.data.mockImplementation((_, value) => `fmt:${value}`);
+
+      const measureWithPct = makeMeasure({
+        name: 'revenue',
+        inputs: { showValueAsPercentage: true },
+      });
+      const data = makeChartData(['A'], [[50]]);
+      const options = getBarStackedChartProOptions(
+        {
+          measures: [measureWithPct],
+          dimension,
+          groupDimension,
+          horizontal: false,
+          data: data as never,
+        },
+        makeTheme(),
+      );
+
+      const context = {
+        datasetIndex: 0,
+        raw: 50,
+        dataset: { rawLabel: 'North', data: [50] },
+      } as never;
+      const result = options.plugins!.tooltip!.callbacks!.label!.call({} as never, context);
+
+      expect(getDatalabelPercentage).toHaveBeenCalledWith(50, [50]);
+      expect(result).toBe('fmt:North: fmt:50 (33%)');
+    });
+
+    it('wraps measure index using modulo when multiple measures', () => {
+      const measures2 = [makeMeasure({ name: 'revenue' }), makeMeasure({ name: 'cost' })];
+      const data = makeChartData(['A'], [[10], [20], [30]]);
+      const options = getBarStackedChartProOptions(
+        { measures: measures2, dimension, groupDimension, horizontal: false, data: data as never },
+        makeTheme(),
+      );
+
+      // datasetIndex 3, measures.length 2 → index 1
+      const context = {
+        datasetIndex: 3,
+        raw: 30,
+        dataset: { rawLabel: 'East', data: [30] },
+      } as never;
+      options.plugins!.tooltip!.callbacks!.label!.call({} as never, context);
+
+      expect(mockFormatter.data).toHaveBeenCalledWith(measures2[1], 30);
+    });
+  });
+
+  // -- inherited from base ----------------------------------------------------
+
+  it('preserves the tooltip title callback from the base', () => {
+    const data = makeChartData(['Widget'], [[100]]);
+    const options = getBarStackedChartProOptions(
+      { measures, dimension, groupDimension, horizontal: false, data: data as never },
+      makeTheme(),
+    );
+
+    const context = [{ label: 'Widget' }] as never;
+    options.plugins!.tooltip!.callbacks!.title!.call({} as never, context);
+
+    expect(mockFormatter.data).toHaveBeenCalledWith(dimension, 'Widget');
+  });
+
+  it('retains base scales and onClick from getBarChartProOptions', () => {
+    const data = makeChartData(['A'], [[10]]);
+    const options = getBarStackedChartProOptions(
+      { measures, dimension, groupDimension, horizontal: false, data: data as never },
+      makeTheme(),
+    );
+
+    expect(options.scales).toBeDefined();
+    expect(options.onClick).toBeDefined();
   });
 });
