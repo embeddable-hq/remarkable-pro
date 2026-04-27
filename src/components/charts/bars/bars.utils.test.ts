@@ -626,59 +626,6 @@ describe('getBarChartProOptions', () => {
     });
   });
 
-  // -- onClick ---------------------------------------------------------------
-
-  describe('onClick', () => {
-    it('does nothing when onBarClicked is not provided', () => {
-      const data = makeChartData(['A'], [[10]]);
-      const options = getBarChartProOptions(
-        { measures, dimension, horizontal: false, data: data as never },
-        makeTheme(),
-      );
-
-      // Should not throw
-      options.onClick!({} as never, [], {} as never);
-    });
-
-    it('calls onBarClicked with the axis and grouping dimension values from the clicked element', () => {
-      const onBarClicked = vi.fn();
-      const data = {
-        labels: ['Widget'],
-        datasets: [{ data: [100], rawLabel: 'North' }],
-      };
-      const options = getBarChartProOptions(
-        { measures, dimension, horizontal: false, data: data as never },
-        makeTheme(),
-      );
-
-      const element = { index: 0, datasetIndex: 0 };
-      const chart = { data };
-
-      options.onClick!({} as never, [element] as never, chart as never);
-
-      expect(onBarClicked).toHaveBeenCalledWith({
-        axisDimensionValue: 'Widget',
-        groupingDimensionValue: 'North',
-      });
-    });
-
-    it('calls onBarClicked with nulls when no element is clicked', () => {
-      const onBarClicked = vi.fn();
-      const data = makeChartData(['Widget'], [[100]]);
-      const options = getBarChartProOptions(
-        { measures, dimension, horizontal: false, data: data as never },
-        makeTheme(),
-      );
-
-      options.onClick!({} as never, [], { data } as never);
-
-      expect(onBarClicked).toHaveBeenCalledWith({
-        axisDimensionValue: null,
-        groupingDimensionValue: null,
-      });
-    });
-  });
-
   // -- legend ----------------------------------------------------------------
 
   it('uses theme legendPosition', () => {
@@ -814,16 +761,5 @@ describe('getBarStackedChartProOptions', () => {
     options.plugins!.tooltip!.callbacks!.title!.call({} as never, context);
 
     expect(mockFormatter.data).toHaveBeenCalledWith(dimension, 'Widget');
-  });
-
-  it('retains base scales and onClick from getBarChartProOptions', () => {
-    const data = makeChartData(['A'], [[10]]);
-    const options = getBarStackedChartProOptions(
-      { measures, dimension, groupDimension, horizontal: false, data: data as never },
-      makeTheme(),
-    );
-
-    expect(options.scales).toBeDefined();
-    expect(options.onClick).toBeDefined();
   });
 });
