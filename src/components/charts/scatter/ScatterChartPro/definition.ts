@@ -1,4 +1,5 @@
 import { DataResponse, LoadDataRequest, Value, loadData } from '@embeddable.com/core';
+import type { ScatterChartProOptionsClickArg } from '../scatter.types';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
@@ -82,6 +83,16 @@ const meta = {
           label: 'Clicked group by value',
           type: 'string',
         },
+        {
+          name: 'pointDimensionTimeRange',
+          label: 'Clicked point dimension time range',
+          type: 'timeRange',
+        },
+        {
+          name: 'groupByDimensionTimeRange',
+          label: 'Clicked group by time range',
+          type: 'timeRange',
+        },
       ],
     },
   ],
@@ -122,12 +133,7 @@ const loadDataResults = (
 ): DataResponse => loadData(loadDataResultsArgs(inputs, clientContext));
 
 const events = {
-  onPointClick: (value: {
-    xMeasureValue?: string;
-    yMeasureValue?: string;
-    pointDimensionValue?: string;
-    groupByDimensionValue?: string | null;
-  }) => ({
+  onPointClick: (value: ScatterChartProOptionsClickArg) => ({
     xMeasureValue: value.xMeasureValue ?? Value.noFilter(),
     yMeasureValue: value.yMeasureValue ?? Value.noFilter(),
     pointDimensionValue: value.pointDimensionValue ?? Value.noFilter(),

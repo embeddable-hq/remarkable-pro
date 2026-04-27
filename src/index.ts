@@ -110,10 +110,7 @@ export * from './components/charts/lines/LineChartWithKpiTabsPro/definition';
 
 // Charts - Scatter
 export * as ScatterChartPro from './components/charts/scatter/ScatterChartPro';
-export type {
-  ScatterChartProProps,
-  ScatterChartPointClickArgs,
-} from './components/charts/scatter/ScatterChartPro';
+export type { ScatterChartProProps } from './components/charts/scatter/ScatterChartPro';
 export * from './components/charts/scatter/ScatterChartPro/definition';
 
 // Charts - Pies

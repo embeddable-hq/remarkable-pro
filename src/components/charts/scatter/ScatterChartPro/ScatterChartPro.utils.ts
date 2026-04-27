@@ -1,18 +1,16 @@
 import { ChartData, type ChartOptions } from 'chart.js';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { Theme } from '../../../../theme/theme.types';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import type {
-  ChartPointClicked,
   ScatterChartInputPoint,
   ScatterDatasetWithOriginal,
 } from '@embeddable.com/remarkable-ui';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
+import type { ScatterChartProOptionsClickArg } from '../scatter.types';
 import { getDimensionFieldName } from '../../../../utils/data.utils';
-import type { PointClickArgs } from '../../charts.types';
-
-export { getDimensionFieldName };
 
 export const getScatterChartProOptions = (
   {
@@ -95,14 +93,14 @@ const getCellValue = (value: CellValue): string => {
 export type ScatterPoint = ScatterChartInputPoint & { rowIndex: number };
 
 export const getPointClickData = (
-  point: ChartPointClicked,
+  point: { datasetIndex: number; index: number },
   datasets: ChartData<'scatter', ScatterPoint[]>['datasets'],
   data: DataResponse['data'],
   xMeasure: Measure,
   yMeasure: Measure,
   pointDimension: Dimension,
   groupByDimension?: Dimension,
-): PointClickArgs | null => {
+): ScatterChartProOptionsClickArg | null => {
   const rowIdx = datasets[point.datasetIndex]?.data[point.index]?.rowIndex;
   if (rowIdx === undefined) return null;
   const row = data?.[rowIdx] as Record<string, CellValue> | undefined;
@@ -111,11 +109,22 @@ export const getPointClickData = (
   const pointField = getDimensionFieldName(pointDimension);
   const groupField = groupByDimension ? getDimensionFieldName(groupByDimension) : undefined;
 
+  const pointDimensionValue = getCellValue(row[pointField]);
+  const groupByDimensionValue = groupField ? getCellValue(row[groupField]) : null;
+
   return {
     xMeasureValue: getCellValue(row[xMeasure.name]),
     yMeasureValue: getCellValue(row[yMeasure.name]),
-    pointDimensionValue: getCellValue(row[pointField]),
-    groupByDimensionValue: groupField ? getCellValue(row[groupField]) : null,
+    pointDimensionValue,
+    groupByDimensionValue,
+    pointDimensionTimeRange: getTimeRangeFromDimensionValue({
+      value: pointDimensionValue,
+      dimension: pointDimension,
+    }),
+    groupByDimensionTimeRange: getTimeRangeFromDimensionValue({
+      value: groupByDimensionValue ?? undefined,
+      dimension: groupByDimension,
+    }),
   };
 };
 

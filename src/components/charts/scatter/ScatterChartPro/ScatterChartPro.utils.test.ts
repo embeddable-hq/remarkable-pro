@@ -5,7 +5,6 @@ import {
   type Measure,
 } from '@embeddable.com/core';
 import {
-  getDimensionFieldName,
   getScatterChartProData,
   getScatterChartProOptions,
   measureToNullableNumber,
@@ -20,6 +19,7 @@ import type { Theme } from '../../../../theme/theme.types';
 import type { TooltipItem } from 'chart.js';
 import type { ScatterDatasetWithOriginal } from '@embeddable.com/remarkable-ui';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
+import { getDimensionFieldName } from '../../../../utils/data.utils';
 
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
 vi.mock('../../../../theme/styles/styles.utils', () => ({ getDimensionMeasureColor: vi.fn() }));
