@@ -74,6 +74,28 @@ const results1Measure2DimensionsVariant = mockDataResponse(
   ],
 );
 
+const results2Measures1Dimension = mockDataResponse(
+  [dimensionName, measureName, measureVariantName],
+  [
+    ['US', 120, 1.5],
+    ['GER', 100, 2.0],
+    ['UK', 80, 1.3],
+    ['FRA', null, 1.8],
+    ['SPA', 55, 1.1],
+  ],
+);
+
+const results2Measures2Dimensions = mockDataResponse(
+  [dimensionName, dimensionGroupName, measureName, measureVariantName],
+  [
+    ['US', 'Cat 1', 120, 1.5],
+    ['GER', 'Cat 2', 100, 2.0],
+    ['UK', 'Cat 1', 80, 1.3],
+    ['FRA', 'Cat 1', null, 1.8],
+    ['SPA', 'Cat 2', 55, 1.1],
+  ],
+);
+
 const results1Measure = mockDataResponse([measureName], [[120]]);
 const results2Measures = mockDataResponse([measureName, measureVariantName], [[120, 100]]);
 const results1MeasureVariant = mockDataResponse([measureName], [[100]]);
@@ -98,4 +120,6 @@ export const previewData = {
   results1Measure1DimensionVariant,
   results1Measure2Dimensions,
   results1Measure2DimensionsVariant,
+  results2Measures1Dimension,
+  results2Measures2Dimensions,
 } as const;

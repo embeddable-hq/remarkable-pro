@@ -1,5 +1,11 @@
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+
 import { i18n } from '../../theme/i18n/i18n';
+
+export const getDimensionWithoutTruncation = (dimension: Dimension): Dimension => ({
+  ...dimension,
+  inputs: { ...dimension.inputs, maxCharacters: null },
+});
 
 export const groupTailAsOther = (
   data: DataResponse['data'] = [],

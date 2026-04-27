@@ -25,7 +25,10 @@ export type BarChartDefaultProProps = {
   showValueLabels?: boolean;
   reverseXAxis?: boolean;
   setGranularity?: (granularity: Granularity) => void;
-  onBarClicked?: (args: { axisDimensionValue: string | null; axisDimensionTimeRange: TimeRange | null }) => void;
+  onBarClicked?: (args: {
+    axisDimensionValue: string | null;
+    axisDimensionTimeRange: TimeRange | null;
+  }) => void;
 } & ChartCardHeaderProps;
 
 const BarChartDefaultPro = (props: BarChartDefaultProProps) => {

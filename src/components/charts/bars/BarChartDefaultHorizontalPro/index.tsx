@@ -25,7 +25,10 @@ export type BarChartDefaultHorizontalProProps = {
   yAxisLabel?: string;
   yAxisMaxItems?: number;
   setGranularity?: (granularity: Granularity) => void;
-  onBarClicked?: (args: { axisDimensionValue: string | null; axisDimensionTimeRange: TimeRange | null }) => void;
+  onBarClicked?: (args: {
+    axisDimensionValue: string | null;
+    axisDimensionTimeRange: TimeRange | null;
+  }) => void;
 } & ChartCardHeaderProps;
 
 const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) => {

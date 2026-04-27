@@ -73,7 +73,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
     theme,
   );
   const options = getLineChartGroupedProOptions(
-    { data, dimension: xAxis, measure, onLineClicked },
+    { data, dimension: xAxis, groupDimension: groupBy, measure, onLineClicked },
     theme,
   );
 

@@ -4,7 +4,7 @@ import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { BarChart } from '@embeddable.com/remarkable-ui';
-import { getBarChartProOptions, getBarStackedChartProData } from '../bars.utils';
+import { getBarStackedChartProData, getBarStackedChartProOptions } from '../bars.utils';
 import { mergician } from 'mergician';
 import { DataResponse, Dimension, Granularity, Measure, TimeRange } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
@@ -89,8 +89,15 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
   );
 
   const options = mergician(
-    getBarChartProOptions(
-      { measures: [measure], horizontal: false, onBarClicked, data, dimension: xAxis },
+    getBarStackedChartProOptions(
+      {
+        measures: [measure],
+        horizontal: false,
+        onBarClicked,
+        data,
+        dimension: xAxis,
+        groupDimension: groupBy,
+      },
       theme,
     ),
     theme.charts?.barChartGroupedPro?.options ?? {},

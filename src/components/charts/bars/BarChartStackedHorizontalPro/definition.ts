@@ -81,7 +81,11 @@ const previewConfig = {
 const preview = definePreview(Component, previewConfig);
 
 const events = {
-  onBarClicked: (value: { axisDimensionValue?: string; axisDimensionTimeRange?: TimeRange; groupingDimensionValue?: string }) => ({
+  onBarClicked: (value: {
+    axisDimensionValue?: string;
+    axisDimensionTimeRange?: TimeRange;
+    groupingDimensionValue?: string;
+  }) => ({
     axisDimensionValue: value.axisDimensionValue ?? Value.noFilter(),
     axisDimensionTimeRange: value.axisDimensionTimeRange ?? Value.noFilter(),
     groupingDimensionValue: value.groupingDimensionValue ?? Value.noFilter(),

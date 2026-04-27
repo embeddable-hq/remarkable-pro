@@ -33,7 +33,7 @@ const formatData = (
   const body = data!.map((dataRow) => {
     const row: Array<string> = [];
     dimensionsAndMeasures.forEach((dimensionOrMeasure) => {
-      const value = themeFormatter.data(dimensionOrMeasure, dataRow[dimensionOrMeasure.name]);
+      const value = dataRow[dimensionOrMeasure.name];
       if (value !== undefined && value !== null) {
         row.push(String(value));
       } else {

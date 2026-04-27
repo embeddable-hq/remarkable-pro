@@ -13,6 +13,7 @@ import { i18n } from '../../../../theme/i18n/i18n';
 import { mergician } from 'mergician';
 import { isColorValid, setColorAlpha } from '../../../../utils/color.utils';
 import { getLineChartProOptionsOnClick, LineChartProOptionsClick } from '../lines.utils';
+import { getDimensionWithoutTruncation } from '../../charts.utils';
 
 const AXIS_ID_MAIN = 'mainAxis';
 const AXIS_ID_COMPARISON = 'comparisonAxis';
@@ -197,7 +198,10 @@ const getLineChartComparisonNonTimeOptions = (
           title: (context) => {
             if (!context[0]) return '';
 
-            return themeFormatter.data(dimension, context[0].label);
+            return themeFormatter.data(
+              { ...dimension, inputs: { ...dimension.inputs, maxCharacters: null } }, // tooltips titles do not truncate labels
+              context[0].label,
+            );
           },
           label: (context) => {
             const measure = measures[context.datasetIndex % measures.length]!;
@@ -283,7 +287,10 @@ const getLineChartComparisonTimeOptions = (
             const contextItem = context[0];
 
             if (!showDataComparison && contextItem) {
-              return themeFormatter.data(dimension, contextItem.label);
+              return themeFormatter.data(
+                getDimensionWithoutTruncation(dimension),
+                contextItem.label,
+              );
             }
 
             const dataIndex = contextItem?.dataIndex;
@@ -292,10 +299,16 @@ const getLineChartComparisonTimeOptions = (
 
             const main =
               mainDimensionLabels[dataIndex] &&
-              themeFormatter.data(dimension, mainDimensionLabels[dataIndex]);
+              themeFormatter.data(
+                getDimensionWithoutTruncation(dimension),
+                mainDimensionLabels[dataIndex],
+              );
             const comparison =
               comparisonDimensionLabels[dataIndex] &&
-              themeFormatter.data(dimension, comparisonDimensionLabels[dataIndex]);
+              themeFormatter.data(
+                getDimensionWithoutTruncation(dimension),
+                comparisonDimensionLabels[dataIndex],
+              );
 
             return `${main ?? '-'} vs ${comparison ?? '-'}`;
           },

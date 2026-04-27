@@ -1,9 +1,20 @@
-import { CUBE_DIMENSION_TYPE_TIME, DataResponse, Dimension, Measure, TimeRange } from '@embeddable.com/core';
+import {
+  CUBE_DIMENSION_TYPE_TIME,
+  DataResponse,
+  Dimension,
+  Measure,
+  TimeRange,
+} from '@embeddable.com/core';
 import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
 import { ChartData, ChartOptions } from 'chart.js';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { getDatalabelPercentage, groupTailAsOther } from '../charts.utils';
+import {
+  getDatalabelPercentage,
+  getDimensionWithoutTruncation,
+  groupTailAsOther,
+} from '../charts.utils';
+import { getDimensionFieldName } from '../../../utils/data.utils';
 import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { Context } from 'chartjs-plugin-datalabels';
@@ -16,15 +27,13 @@ dayjs.extend(utc);
  * Constructs a TimeRange covering the full granularity bucket for a clicked time-axis bar.
  * e.g. granularity=month, value="2024-01-01" → { from: 2024-01-01T00:00:00Z, to: 2024-01-31T23:59:59Z }
  */
-export const buildTimeRangeFromAxisValue = (
-  value: string,
-  granularity?: string,
-): TimeRange => {
+export const buildTimeRangeFromAxisValue = (value: string, granularity?: string): TimeRange => {
   const unit = (granularity ?? 'day') as dayjs.ManipulateType;
   const d = dayjs.utc(value);
   return {
     from: d.startOf(unit).toDate(),
     to: d.endOf(unit).toDate(),
+    relativeTimeString: undefined,
   };
 };
 
@@ -45,7 +54,7 @@ export const getBarStackedChartProData = (
   uniqueAxis.sort();
 
   const axis = props.axisOrder ? props.axisOrder.filter((v) => uniqueAxis.includes(v)) : uniqueAxis;
-  const groupDimensionName = `${groupDimension.name}${groupDimension.nativeType === CUBE_DIMENSION_TYPE_TIME && groupDimension.inputs?.granularity ? `.${groupDimension.inputs.granularity}` : ''}`;
+  const groupDimensionName = getDimensionFieldName(groupDimension);
   const groupBy = [...new Set(data.map((d) => d[groupDimensionName]))].filter((d) => d != null);
 
   const chartColors = getChartColors();
@@ -200,21 +209,21 @@ export const getBarChartProOptions = (
         callbacks: {
           title: (context) => {
             const label = context[0]?.label;
-            return themeFormatter.data(dimension, label);
+            return themeFormatter.data(getDimensionWithoutTruncation(dimension), label);
           },
 
           label: (context) => {
             const measure = measures[context.datasetIndex % measures.length]!;
             const raw = context.raw as number;
 
-            const dimensionLabel = themeFormatter.data(dimension, context.dataset.label) || '';
             const measureValue = themeFormatter.data(measure, raw);
 
             let percentage = '';
             if (measure.inputs?.showValueAsPercentage) {
               percentage = `(${getDatalabelPercentage(raw, context.dataset.data)})`;
             }
-            return `${dimensionLabel}: ${measureValue} ${percentage}`;
+
+            return `${context.dataset.label}: ${measureValue} ${percentage}`;
           },
         },
       },
@@ -264,7 +273,10 @@ export const getBarChartProOptions = (
       const isTimeDimension = dimension.nativeType === CUBE_DIMENSION_TYPE_TIME;
       const axisDimensionTimeRange: TimeRange | null =
         isTimeDimension && axisDimensionValue
-          ? buildTimeRangeFromAxisValue(axisDimensionValue, dimension.inputs?.granularity as string | undefined)
+          ? buildTimeRangeFromAxisValue(
+              axisDimensionValue,
+              dimension.inputs?.granularity as string | undefined,
+            )
           : null;
 
       onBarClicked({
@@ -274,4 +286,47 @@ export const getBarChartProOptions = (
       });
     },
   };
+};
+
+export const getBarStackedChartProOptions = (
+  options: {
+    onBarClicked?: (args: {
+      axisDimensionValue: string | null;
+      groupingDimensionValue: string | null;
+    }) => void;
+    measures: Measure[];
+    dimension: Dimension;
+    groupDimension: Dimension;
+    horizontal: boolean;
+    data: ChartData<'bar'>;
+  },
+  theme: Theme,
+): Partial<ChartOptions<'bar'>> => {
+  const { measures, groupDimension } = options;
+  const themeFormatter = getThemeFormatter(theme);
+  const base = getBarChartProOptions(options, theme);
+
+  base.plugins!.tooltip = {
+    callbacks: {
+      ...base.plugins!.tooltip!.callbacks,
+      label: (context) => {
+        const measure = measures[context.datasetIndex % measures.length]!;
+        const raw = context.raw as number;
+        const measureValue = themeFormatter.data(measure, raw);
+
+        let percentage = '';
+        if (measure.inputs?.showValueAsPercentage) {
+          percentage = `(${getDatalabelPercentage(raw, context.dataset.data)})`;
+        }
+
+        const label = themeFormatter.data(
+          getDimensionWithoutTruncation(groupDimension),
+          (context.dataset as { rawLabel?: string }).rawLabel,
+        );
+        return `${label}: ${measureValue} ${percentage}`;
+      },
+    },
+  };
+
+  return base;
 };

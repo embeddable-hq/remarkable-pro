@@ -1,5 +1,17 @@
 # @embeddable/remarkable-ui
 
+## 0.2.6
+
+### Patch Changes
+
+- 2f4b329: Hide sort button on table charts. Default sort is now provided by specific input fields.
+
+## 0.2.5
+
+### Patch Changes
+
+- 03707bf: Add Scatter plot chart component
+
 ## 0.2.4
 
 ### Patch Changes
