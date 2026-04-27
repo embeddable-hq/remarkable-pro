@@ -107,6 +107,9 @@ export * from './components/charts/lines/LineChartComparisonDefaultPro/definitio
 export * as LineChartTabbedPro from './components/charts/lines/LineChartWithKpiTabsPro';
 export * from './components/charts/lines/LineChartWithKpiTabsPro';
 export * from './components/charts/lines/LineChartWithKpiTabsPro/definition';
+export * as ComparisonLineChartTabbedPro from './components/charts/lines/ComparisonLineChartWithKpiTabsPro';
+export * from './components/charts/lines/ComparisonLineChartWithKpiTabsPro';
+export * from './components/charts/lines/ComparisonLineChartWithKpiTabsPro/definition';
 
 // Charts - Scatter
 export * as ScatterChartPro from './components/charts/scatter/ScatterChartPro';

@@ -98,6 +98,7 @@ const results2Measures2Dimensions = mockDataResponse(
 
 const results1Measure = mockDataResponse([measureName], [[120]]);
 const results2Measures = mockDataResponse([measureName, measureVariantName], [[120, 100]]);
+const results2MeasuresVariant = mockDataResponse([measureName, measureVariantName], [[100, 85]]);
 const results1MeasureVariant = mockDataResponse([measureName], [[100]]);
 
 const dataset = {
@@ -115,6 +116,7 @@ export const previewData = {
   measureVariant,
   results1Measure,
   results2Measures,
+  results2MeasuresVariant,
   results1MeasureVariant,
   results1Measure1Dimension,
   results1Measure1DimensionVariant,
