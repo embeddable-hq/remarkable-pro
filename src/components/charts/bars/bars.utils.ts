@@ -3,7 +3,11 @@ import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
 import { ChartData, ChartOptions } from 'chart.js';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { getDatalabelPercentage, groupTailAsOther } from '../charts.utils';
+import {
+  getDatalabelPercentage,
+  getDimensionWithoutTruncation,
+  groupTailAsOther,
+} from '../charts.utils';
 import { getDimensionFieldName } from '../../../utils/data.utils';
 import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
@@ -180,21 +184,21 @@ export const getBarChartProOptions = (
         callbacks: {
           title: (context) => {
             const label = context[0]?.label;
-            return themeFormatter.data(dimension, label);
+            return themeFormatter.data(getDimensionWithoutTruncation(dimension), label);
           },
 
           label: (context) => {
             const measure = measures[context.datasetIndex % measures.length]!;
             const raw = context.raw as number;
 
-            const dimensionLabel = themeFormatter.data(dimension, context.dataset.label) || '';
             const measureValue = themeFormatter.data(measure, raw);
 
             let percentage = '';
             if (measure.inputs?.showValueAsPercentage) {
               percentage = `(${getDatalabelPercentage(raw, context.dataset.data)})`;
             }
-            return `${dimensionLabel}: ${measureValue} ${percentage}`;
+
+            return `${context.dataset.label}: ${measureValue} ${percentage}`;
           },
         },
       },
@@ -247,4 +251,47 @@ export const getBarChartProOptions = (
       });
     },
   };
+};
+
+export const getBarStackedChartProOptions = (
+  options: {
+    onBarClicked?: (args: {
+      axisDimensionValue: string | null;
+      groupingDimensionValue: string | null;
+    }) => void;
+    measures: Measure[];
+    dimension: Dimension;
+    groupDimension: Dimension;
+    horizontal: boolean;
+    data: ChartData<'bar'>;
+  },
+  theme: Theme,
+): Partial<ChartOptions<'bar'>> => {
+  const { measures, groupDimension } = options;
+  const themeFormatter = getThemeFormatter(theme);
+  const base = getBarChartProOptions(options, theme);
+
+  base.plugins!.tooltip = {
+    callbacks: {
+      ...base.plugins!.tooltip!.callbacks,
+      label: (context) => {
+        const measure = measures[context.datasetIndex % measures.length]!;
+        const raw = context.raw as number;
+        const measureValue = themeFormatter.data(measure, raw);
+
+        let percentage = '';
+        if (measure.inputs?.showValueAsPercentage) {
+          percentage = `(${getDatalabelPercentage(raw, context.dataset.data)})`;
+        }
+
+        const label = themeFormatter.data(
+          getDimensionWithoutTruncation(groupDimension),
+          (context.dataset as { rawLabel?: string }).rawLabel,
+        );
+        return `${label}: ${measureValue} ${percentage}`;
+      },
+    },
+  };
+
+  return base;
 };

@@ -7,6 +7,7 @@ import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils'
 import { mergician } from 'mergician';
 import { isColorValid, setColorAlpha } from '../../../../utils/color.utils';
 import { LineChartProOptionsClick } from '../lines.utils';
+import { getDimensionWithoutTruncation } from '../../charts.utils';
 
 export const getLineChartProData = (
   props: {
@@ -66,14 +67,14 @@ export const getLineChartProData = (
         data: values,
         backgroundColor: setColorAlpha(backgroundColor, 0.5),
         pointBackgroundColor: backgroundColor,
-        borderDash: measure.inputs?.['dashedLine']
+        borderDash: measure.inputs?.dashedLine
           ? [
               getStyleNumber('--em-linechart-line-dash', '0.25rem'),
               getStyleNumber('--em-linechart-line-gap', '0.25rem'),
             ]
           : undefined,
         borderColor,
-        fill: Boolean(measure.inputs?.['fillUnderLine']),
+        fill: Boolean(measure.inputs?.fillUnderLine),
       } as ChartData<'line'>['datasets'][number];
     }),
   };
@@ -107,12 +108,12 @@ export const getLineChartProOptions = (
         callbacks: {
           title: (context) => {
             const label = context[0]?.label;
-            return themeFormatter.data(dimension, label);
+            return themeFormatter.data(getDimensionWithoutTruncation(dimension), label);
           },
           label: (context) => {
             const measure = measures[context.datasetIndex]!;
             const raw = context.raw as number;
-            return `${themeFormatter.data(dimension, context.dataset.label) || ''}: ${themeFormatter.data(measure, raw)}`;
+            return `${context.dataset.label}: ${themeFormatter.data(measure, raw)}`;
           },
         },
       },

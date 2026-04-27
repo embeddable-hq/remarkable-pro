@@ -1,5 +1,9 @@
 import type { Dimension, Measure } from '@embeddable.com/core';
-import { getDatalabelPercentage, groupTailAsOther } from './charts.utils';
+import {
+  getDatalabelPercentage,
+  getDimensionWithoutTruncation,
+  groupTailAsOther,
+} from './charts.utils';
 import { i18n } from '../../theme/i18n/i18n';
 
 // -- mocks -------------------------------------------------------------------
@@ -45,6 +49,23 @@ describe('getDatalabelPercentage', () => {
   it('handles string numbers in the data array', () => {
     // data is unknown[], so strings are valid — parseFloat handles them
     expect(getDatalabelPercentage(50, ['50', '50'] as unknown[])).toBe('50%');
+  });
+});
+
+describe('getDimensionWithoutTruncation', () => {
+  it('returns a new dimension object with maxCharacters set to null', () => {
+    const dimensionWithMaxChars: Dimension = {
+      name: 'category',
+      __type__: 'dimension',
+      inputs: { maxCharacters: 10 },
+    } as unknown as Dimension;
+
+    const result = getDimensionWithoutTruncation(dimensionWithMaxChars);
+
+    expect(result).not.toBe(dimensionWithMaxChars); // should be a new object
+    expect(result.name).toBe(dimensionWithMaxChars.name); // name should be unchanged
+    expect(result.__type__).toBe(dimensionWithMaxChars.__type__); // type should be unchanged
+    expect(result.inputs?.maxCharacters).toBeNull(); // maxCharacters should be null
   });
 });
 

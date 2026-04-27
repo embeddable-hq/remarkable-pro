@@ -29,6 +29,7 @@ vi.mock('../../../theme/i18n/i18n', () => ({
 }));
 
 vi.mock('../charts.utils', () => ({
+  getDimensionWithoutTruncation: vi.fn((dimension: unknown) => dimension),
   groupTailAsOther: vi.fn((data: unknown[]) => data),
   getDatalabelPercentage: vi.fn((value: number, data: number[]) => {
     const total = data.reduce((sum, v) => sum + v, 0);
@@ -134,14 +135,18 @@ describe('getPieChartProData', () => {
 
 describe('getPieChartProOptions', () => {
   const measure = makeMeasure('revenue');
+  const dimension = makeDimension('total');
 
   it('uses legendPosition from theme', () => {
-    const options = getPieChartProOptions(measure, makeTheme({ legendPosition: 'right' }));
+    const options = getPieChartProOptions(
+      { measure, dimension },
+      makeTheme({ legendPosition: 'right' }),
+    );
     expect(options.plugins?.legend?.position).toBe('right');
   });
 
   it('defaults legendPosition to "bottom" when theme does not specify one', () => {
-    const options = getPieChartProOptions(measure, makeTheme({}));
+    const options = getPieChartProOptions({ measure, dimension }, makeTheme({}));
     expect(options.plugins?.legend?.position).toBe('bottom');
   });
 
@@ -149,7 +154,7 @@ describe('getPieChartProOptions', () => {
     const dataFn = vi.fn(() => '42');
     vi.mocked(getThemeFormatter).mockReturnValueOnce({ data: dataFn } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
-    const options = getPieChartProOptions(measure, makeTheme());
+    const options = getPieChartProOptions({ measure, dimension }, makeTheme());
     const formatter = options.plugins?.datalabels?.formatter as (v: unknown) => string;
     formatter(42);
 
@@ -161,7 +166,7 @@ describe('getPieChartProOptions', () => {
       data: vi.fn((_m: unknown, v: unknown) => `$${v}`),
     } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
-    const options = getPieChartProOptions(measure, makeTheme());
+    const options = getPieChartProOptions({ measure, dimension }, makeTheme());
     const labelFn = options.plugins?.tooltip?.callbacks?.label as (ctx: any) => string; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     // raw = 25, total = 100 → 25 %
@@ -175,12 +180,117 @@ describe('getPieChartProOptions', () => {
       data: vi.fn((_m: unknown, v: unknown) => String(v)),
     } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
 
-    const options = getPieChartProOptions(measure, makeTheme());
+    const options = getPieChartProOptions({ measure, dimension }, makeTheme());
     const labelFn = options.plugins?.tooltip?.callbacks?.label as (ctx: any) => string; // eslint-disable-line @typescript-eslint/no-explicit-any
 
     // 1 / 3 = 33.33… → rounds to 33 %
     const result = labelFn({ raw: 1, dataset: { data: [1, 1, 1] } });
 
     expect(result).toBe('1 (33%)');
+  });
+
+  // -- legend.labels.generateLabels -------------------------------------------
+
+  describe('legend.labels.generateLabels', () => {
+    const makeChart = (labels: string[], visibilities: boolean[] = []) => ({
+      data: { labels },
+      getDatasetMeta: vi.fn(() => ({
+        controller: {
+          getStyle: vi.fn((i: number) => ({
+            backgroundColor: `bg-${i}`,
+            borderColor: `border-${i}`,
+            borderWidth: i + 1,
+          })),
+        },
+      })),
+      getDataVisibility: vi.fn((i: number) => visibilities[i] ?? true),
+    });
+
+    it('generates one legend item per label', () => {
+      const options = getPieChartProOptions({ measure, dimension }, makeTheme());
+      const chart = makeChart(['Apple', 'Banana', 'Cherry']);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const items = options.plugins!.legend!.labels!.generateLabels!(chart as any);
+      expect(items).toHaveLength(3);
+    });
+
+    it('formats label text via themeFormatter.data(dimension, label)', () => {
+      const dataFn = vi.fn((_dim: unknown, v: unknown) => `fmt:${v}`);
+      vi.mocked(getThemeFormatter).mockReturnValueOnce({ data: dataFn } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+      const options = getPieChartProOptions({ measure, dimension }, makeTheme());
+      const chart = makeChart(['Apple']);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const items = options.plugins!.legend!.labels!.generateLabels!(chart as any);
+
+      expect(dataFn).toHaveBeenCalledWith(dimension, 'Apple');
+      expect(items[0]!.text).toBe('fmt:Apple');
+    });
+
+    it('maps fillStyle, strokeStyle, and lineWidth from chart style', () => {
+      const options = getPieChartProOptions({ measure, dimension }, makeTheme());
+      const chart = makeChart(['X', 'Y']);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const items = options.plugins!.legend!.labels!.generateLabels!(chart as any);
+
+      expect(items[0]!.fillStyle).toBe('bg-0');
+      expect(items[0]!.strokeStyle).toBe('border-0');
+      expect(items[0]!.lineWidth).toBe(1);
+      expect(items[1]!.fillStyle).toBe('bg-1');
+      expect(items[1]!.strokeStyle).toBe('border-1');
+      expect(items[1]!.lineWidth).toBe(2);
+    });
+
+    it('sets hidden to true when data visibility is false', () => {
+      const options = getPieChartProOptions({ measure, dimension }, makeTheme());
+      const chart = makeChart(['A', 'B'], [true, false]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const items = options.plugins!.legend!.labels!.generateLabels!(chart as any);
+
+      expect(items[0]!.hidden).toBe(false);
+      expect(items[1]!.hidden).toBe(true);
+    });
+
+    it('sets index to the position of each label', () => {
+      const options = getPieChartProOptions({ measure, dimension }, makeTheme());
+      const chart = makeChart(['A', 'B', 'C']);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const items = options.plugins!.legend!.labels!.generateLabels!(chart as any);
+
+      expect(items.map((item) => item.index)).toEqual([0, 1, 2]);
+    });
+
+    it('returns empty array when chart has no labels', () => {
+      const options = getPieChartProOptions({ measure, dimension }, makeTheme());
+      const chart = makeChart([]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const items = options.plugins!.legend!.labels!.generateLabels!(chart as any);
+
+      expect(items).toEqual([]);
+    });
+  });
+
+  // -- tooltip.callbacks.title ------------------------------------------------
+
+  describe('tooltip.callbacks.title', () => {
+    it('formats the first context label via getDimensionWithoutTruncation(dimension)', () => {
+      const dataFn = vi.fn((_dim: unknown, v: unknown) => `title:${v}`);
+      vi.mocked(getThemeFormatter).mockReturnValueOnce({ data: dataFn } as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+      const options = getPieChartProOptions({ measure, dimension }, makeTheme());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const titleFn = options.plugins!.tooltip!.callbacks!.title as (ctx: any) => string;
+      const result = titleFn([{ label: 'Segment A' }]);
+
+      expect(dataFn).toHaveBeenCalledWith(dimension, 'Segment A');
+      expect(result).toBe('title:Segment A');
+    });
+
+    it('handles an empty context array without throwing', () => {
+      const options = getPieChartProOptions({ measure, dimension }, makeTheme());
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const titleFn = options.plugins!.tooltip!.callbacks!.title as (ctx: any) => string;
+      expect(() => titleFn([])).not.toThrow();
+    });
   });
 });

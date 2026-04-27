@@ -7,6 +7,7 @@ import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils'
 import { setColorAlpha } from '../../../../utils/color.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { getLineChartProOptionsOnClick, LineChartProOptionsClick } from '../lines.utils';
+import { getDimensionWithoutTruncation } from '../../charts.utils';
 
 export const getLineChartGroupedProData = (
   props: {
@@ -72,13 +73,14 @@ export const getLineChartGroupedProData = (
 export const getLineChartGroupedProOptions = (
   options: {
     dimension: Dimension;
+    groupDimension: Dimension;
     measure: Measure;
     data: ChartData<'line'>;
     onLineClicked?: LineChartProOptionsClick;
   },
   theme: Theme,
 ): ChartOptions<'line'> => {
-  const { dimension, data, measure, onLineClicked } = options;
+  const { dimension, groupDimension, data, measure, onLineClicked } = options;
   const themeFormatter = getThemeFormatter(theme);
 
   const lineChartOptions: ChartOptions<'line'> = {
@@ -96,11 +98,16 @@ export const getLineChartGroupedProOptions = (
         callbacks: {
           title: (context) => {
             const label = context[0]?.label;
-            return themeFormatter.data(dimension, label);
+            return themeFormatter.data(getDimensionWithoutTruncation(dimension), label);
           },
           label: (context) => {
             const raw = context.raw as number;
-            return `${context.dataset.label}: ${themeFormatter.data(measure, raw)}`;
+
+            const label = themeFormatter.data(
+              getDimensionWithoutTruncation(groupDimension),
+              (context.dataset as { rawLabel?: string }).rawLabel,
+            );
+            return `${label}: ${themeFormatter.data(measure, raw)}`;
           },
         },
       },
