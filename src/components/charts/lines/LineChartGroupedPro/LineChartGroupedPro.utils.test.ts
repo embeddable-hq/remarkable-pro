@@ -3,17 +3,10 @@ import type { Dimension, Measure } from '@embeddable.com/core';
 import { getLineChartGroupedProOptions } from './LineChartGroupedPro.utils';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getDimensionWithoutTruncation } from '../../charts.utils';
-import { getLineChartProOptionsOnClick } from '../lines.utils';
-
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
 vi.mock('@embeddable.com/remarkable-ui', () => ({ getChartColors: vi.fn() }));
 vi.mock('../../charts.utils', () => ({
   getDimensionWithoutTruncation: vi.fn((d) => d),
-}));
-vi.mock('../lines.utils', () => ({
-  getLineChartProOptionsOnClick: vi.fn(({ onLineClicked }) =>
-    onLineClicked ? { onClick: vi.fn() } : {},
-  ),
 }));
 
 // -- helpers -----------------------------------------------------------------
@@ -251,55 +244,6 @@ describe('getLineChartGroupedProOptions', () => {
       options.scales!.y!.ticks!.callback!.call({} as never, 1000, 0, []);
 
       expect(mockFormatter.data).toHaveBeenCalledWith(measure, 1000);
-    });
-  });
-
-  // -- onClick delegation ------------------------------------------------------
-
-  describe('onClick delegation', () => {
-    it('passes onLineClicked to getLineChartProOptionsOnClick', () => {
-      const onLineClicked = vi.fn();
-      getLineChartGroupedProOptions(
-        {
-          dimension: makeDimension(),
-          groupDimension: makeDimension({ name: 'region' }),
-          measure: makeMeasure(),
-          data: makeChartData([]) as never,
-          onLineClicked,
-        },
-        makeTheme(),
-      );
-
-      expect(getLineChartProOptionsOnClick).toHaveBeenCalledWith({ onLineClicked });
-    });
-
-    it('includes an onClick handler in the merged options when onLineClicked is provided', () => {
-      const options = getLineChartGroupedProOptions(
-        {
-          dimension: makeDimension(),
-          groupDimension: makeDimension({ name: 'region' }),
-          measure: makeMeasure(),
-          data: makeChartData([]) as never,
-          onLineClicked: vi.fn(),
-        },
-        makeTheme(),
-      );
-
-      expect(options.onClick).toBeDefined();
-    });
-
-    it('does not include onClick when onLineClicked is omitted', () => {
-      const options = getLineChartGroupedProOptions(
-        {
-          dimension: makeDimension(),
-          groupDimension: makeDimension({ name: 'region' }),
-          measure: makeMeasure(),
-          data: makeChartData([]) as never,
-        },
-        makeTheme(),
-      );
-
-      expect(options.onClick).toBeUndefined();
     });
   });
 

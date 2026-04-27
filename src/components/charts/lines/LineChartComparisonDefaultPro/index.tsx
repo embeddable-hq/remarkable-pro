@@ -11,9 +11,11 @@ import {
   getLineChartComparisonProOptions,
 } from './LineChartComparisonDefaultPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { LineChartProOptionsClick } from '../lines.utils';
+import { LineChartProOptionsClick } from '../lines.types';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
+import { getElementAtEvent } from 'react-chartjs-2';
+import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 
 export type LineChartComparisonDefaultProProps = {
   xAxis: Dimension;
@@ -33,6 +35,7 @@ export type LineChartComparisonDefaultProProps = {
   comparisonDateRange: TimeRange;
   showComparisonAxis?: boolean;
   primaryDateRange: TimeRange;
+  granularity?: Granularity;
   setGranularity?: (granularity: Granularity) => void;
   setComparisonDateRange?: (dateRange: TimeRange) => void;
   onLineClicked?: LineChartProOptionsClick;
@@ -48,6 +51,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
     comparisonPeriod,
     measures,
     xAxis,
+    granularity,
     reverseXAxis,
     showLegend,
     showLogarithmicScale,
@@ -104,10 +108,39 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
       xAxisLabel,
       showComparisonAxis,
       showDataComparison,
-      onLineClicked,
     },
     theme,
   );
+
+  const handleClick = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+    chartRef?: React.RefObject<null>,
+  ) => {
+    if (!chartRef?.current) return;
+    const element = getElementAtEvent(chartRef.current, event)[0];
+    if (!element) return;
+
+    const isComparisonPeriod = element.datasetIndex >= measures.length;
+
+    let dimensionValue: string | undefined;
+    if (isComparisonPeriod && xAxis.nativeType === 'time') {
+      const dataset = data.datasets[element.datasetIndex] as { labels?: string[] };
+      dimensionValue = dataset.labels?.[element.index];
+    } else {
+      dimensionValue = data?.labels?.[element.index] as string | undefined;
+    }
+
+    const dimensionTimeRange = getTimeRangeFromDimensionValue({
+      value: dimensionValue,
+      stateGranularity: granularity,
+      dimension: xAxis,
+    });
+
+    onLineClicked?.({
+      dimensionValue,
+      dimensionTimeRange,
+    });
+  };
 
   const resultsCombined: DataResponse = {
     isLoading: Boolean(results.isLoading || resultsComparison?.isLoading),
@@ -147,6 +180,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
         yAxisRangeMax={yAxisRangeMax}
         yAxisRangeMin={yAxisRangeMin}
         options={options}
+        onClick={handleClick}
       />
     </ChartCard>
   );

@@ -10,7 +10,7 @@ import {
 } from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
-import { LineChartProOptionsClickArg } from '../lines.utils';
+import { LineChartProOptionsClickArg } from '../lines.types';
 import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
@@ -113,6 +113,11 @@ const meta = {
           label: 'Clicked axis dimension value',
           type: 'string',
         },
+        {
+          name: 'axisDimensionTimeRange',
+          label: 'Clicked axis dimension time range',
+          type: 'timeRange',
+        },
       ],
     },
   ],
@@ -210,9 +215,12 @@ const loadDataResultsComparison = (
 };
 
 const events = {
-  onLineClicked: (value: LineChartProOptionsClickArg) => ({
-    axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
-  }),
+  onLineClicked: (value: LineChartProOptionsClickArg) => {
+    return {
+      axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
+      axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
+    };
+  },
 };
 
 const props = (
@@ -228,6 +236,7 @@ const props = (
   return {
     ...inputs,
     xAxis: xAxisWithGranularity,
+    granularity: state?.granularity,
     setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
     comparisonDateRange: state?.comparisonDateRange,
     setComparisonDateRange: (comparisonDateRange: TimeRange) =>

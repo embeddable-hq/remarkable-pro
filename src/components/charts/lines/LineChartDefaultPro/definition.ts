@@ -8,7 +8,7 @@ import {
 } from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
-import { LineChartProOptionsClickArg } from '../lines.utils';
+import { LineChartProOptionsClickArg } from '../lines.types';
 import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';

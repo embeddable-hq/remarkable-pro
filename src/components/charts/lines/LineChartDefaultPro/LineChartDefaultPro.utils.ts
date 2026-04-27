@@ -6,7 +6,6 @@ import { getChartColors, getStyleNumber } from '@embeddable.com/remarkable-ui';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import { mergician } from 'mergician';
 import { isColorValid, setColorAlpha } from '../../../../utils/color.utils';
-import { LineChartProOptionsClick } from '../lines.utils';
 import { getDimensionWithoutTruncation } from '../../charts.utils';
 
 export const getLineChartProData = (

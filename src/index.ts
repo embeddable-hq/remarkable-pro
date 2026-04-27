@@ -90,17 +90,14 @@ export type {
   LineChartProPropsOnLineClicked,
 } from './components/charts/lines/LineChartDefaultPro';
 export * as LineChartGroupedPro from './components/charts/lines/LineChartGroupedPro';
-export type {
-  LineChartGroupedProProp,
-  LineChartGroupedProPropsOnLineClicked,
-} from './components/charts/lines/LineChartGroupedPro';
+export type { LineChartGroupedProProp } from './components/charts/lines/LineChartGroupedPro';
 export * as LineChartComparisonDefaultPro from './components/charts/lines/LineChartComparisonDefaultPro';
 export type { LineChartComparisonDefaultProProps } from './components/charts/lines/LineChartComparisonDefaultPro';
-export * from './components/charts/lines/lines.utils';
+export * from './components/charts/lines/lines.types';
 export type {
   LineChartProOptionsClickArg,
   LineChartProOptionsClick,
-} from './components/charts/lines/lines.utils';
+} from './components/charts/lines/lines.types';
 export * from './components/charts/lines/LineChartDefaultPro/LineChartDefaultPro.utils';
 export * from './components/charts/lines/LineChartGroupedPro/LineChartGroupedPro.utils';
 export * from './components/charts/lines/LineChartComparisonDefaultPro/LineChartComparisonDefaultPro.utils';

@@ -8,7 +8,7 @@ import {
 } from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
-import { LineChartProOptionsClickArg } from '../lines.utils';
+import { LineChartGroupedProOptionsClickArg } from '../lines.types';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
@@ -67,9 +67,19 @@ const meta = {
           type: 'string',
         },
         {
+          name: 'axisDimensionTimeRange',
+          label: 'Clicked axis dimension time range',
+          type: 'timeRange',
+        },
+        {
           name: 'groupingDimensionValue',
           label: 'Clicked grouping dimension value',
           type: 'string',
+        },
+        {
+          name: 'groupingDimensionTimeRange',
+          label: 'Clicked grouping dimension time range',
+          type: 'timeRange',
         },
       ],
     },
@@ -108,9 +118,11 @@ const loadDataResults = (
 ): DataResponse => loadData(loadDataResultsArgs(inputs, xAxis, clientContext));
 
 const events = {
-  onLineClicked: (value: LineChartProOptionsClickArg) => ({
+  onLineClicked: (value: LineChartGroupedProOptionsClickArg) => ({
     axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
+    axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
     groupingDimensionValue: value.groupingDimensionValue ?? Value.noFilter(),
+    groupingDimensionTimeRange: value.groupingDimensionTimeRange ?? Value.noFilter(),
   }),
 };
 
@@ -124,6 +136,7 @@ const props = (
   return {
     ...inputs,
     xAxis: xAxisWithGranularity,
+    granularity: state?.granularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
     results: loadDataResults(inputs, xAxisWithGranularity, clientContext),
   };

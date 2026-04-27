@@ -9,14 +9,11 @@ import {
   getLineChartGroupedProOptions,
 } from './LineChartGroupedPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { LineChartProOptionsClick } from '../lines.utils';
+import { LineChartGroupedProOptionsClickArg } from '../lines.types';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-
-export type LineChartGroupedProPropsOnLineClicked = {
-  axisDimensionValue: string | null;
-  groupingDimensionValue: string | null;
-};
+import { getElementAtEvent } from 'react-chartjs-2';
+import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 
 export type LineChartGroupedProProp = {
   xAxis: Dimension;
@@ -32,8 +29,9 @@ export type LineChartGroupedProProp = {
   yAxisLabel?: string;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
+  granularity?: Granularity;
   setGranularity?: (granularity: Granularity) => void;
-  onLineClicked?: LineChartProOptionsClick;
+  onLineClicked?: (arg: LineChartGroupedProOptionsClickArg) => void;
 } & ChartCardHeaderProps;
 
 const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
@@ -53,6 +51,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
     showValueLabels,
     yAxisRangeMax,
     yAxisRangeMin,
+    granularity,
     setGranularity,
     onLineClicked,
   } = props;
@@ -73,11 +72,42 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
     theme,
   );
   const options = getLineChartGroupedProOptions(
-    { data, dimension: xAxis, groupDimension: groupBy, measure, onLineClicked },
+    { data, dimension: xAxis, groupDimension: groupBy, measure },
     theme,
   );
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
+
+  const handleClick = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+    chartRef?: React.RefObject<null>,
+  ) => {
+    if (!chartRef?.current) return;
+    const element = getElementAtEvent(chartRef.current, event)[0]!;
+
+    const dimensionValue = data?.labels?.[element?.index] as string | undefined;
+    const groupingDimensionValue = (
+      data?.datasets?.[element?.datasetIndex] as { rawLabel?: string } | undefined
+    )?.rawLabel;
+
+    const dimensionTimeRange = getTimeRangeFromDimensionValue({
+      value: dimensionValue,
+      stateGranularity: granularity,
+      dimension: xAxis,
+    });
+
+    const groupingDimensionTimeRange = getTimeRangeFromDimensionValue({
+      value: groupingDimensionValue,
+      dimension: groupBy,
+    });
+
+    onLineClicked?.({
+      dimensionValue,
+      dimensionTimeRange,
+      groupingDimensionValue,
+      groupingDimensionTimeRange,
+    });
+  };
 
   return (
     <ChartCard
@@ -108,6 +138,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
         yAxisRangeMax={yAxisRangeMax}
         yAxisRangeMin={yAxisRangeMin}
         options={options}
+        onClick={handleClick}
       />
     </ChartCard>
   );

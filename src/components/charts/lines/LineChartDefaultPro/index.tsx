@@ -6,7 +6,7 @@ import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { getLineChartProData, getLineChartProOptions } from './LineChartDefaultPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { LineChartProOptionsClick } from '../lines.utils';
+import { LineChartProOptionsClick } from '../lines.types';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { getElementAtEvent } from 'react-chartjs-2';
@@ -91,7 +91,6 @@ const LineChartPro = (props: LineChartProProps) => {
     onLineClicked?.({
       dimensionValue,
       dimensionTimeRange,
-      groupingDimensionValue: undefined,
     });
   };
 

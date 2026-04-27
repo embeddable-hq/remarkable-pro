@@ -14,6 +14,8 @@ import {
 } from '../LineChartDefaultPro/LineChartDefaultPro.utils';
 import { LineChartProProps } from '../LineChartDefaultPro';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
+import { getElementAtEvent } from 'react-chartjs-2';
+import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 
 export type LineChartWithKpiTabsProProps = LineChartProProps & {
   resultsKpis: DataResponse;
@@ -35,6 +37,7 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
     showValueLabels,
     yAxisRangeMax,
     yAxisRangeMin,
+    granularity,
     setGranularity,
     onLineClicked,
     resultsKpis,
@@ -65,11 +68,32 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
   );
 
   const options = getLineChartProOptions(
-    { data, dimension: xAxis, measures: activeMeasure ? [activeMeasure] : [], onLineClicked },
+    { data, dimension: xAxis, measures: activeMeasure ? [activeMeasure] : [] },
     theme,
   );
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
+
+  const handleClick = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+    chartRef?: React.RefObject<null>,
+  ) => {
+    if (!chartRef?.current) return;
+    const element = getElementAtEvent(chartRef.current, event)[0]!;
+
+    const dimensionValue = data?.labels?.[element?.index] as string | undefined;
+
+    const dimensionTimeRange = getTimeRangeFromDimensionValue({
+      value: dimensionValue,
+      stateGranularity: granularity,
+      dimension: xAxis,
+    });
+
+    onLineClicked?.({
+      dimensionValue,
+      dimensionTimeRange,
+    });
+  };
 
   const themeFormatter = getThemeFormatter(theme);
 
@@ -112,6 +136,7 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
         yAxisRangeMax={yAxisRangeMax}
         yAxisRangeMin={yAxisRangeMin}
         options={options}
+        onClick={handleClick}
       />
     </ChartCard>
   );

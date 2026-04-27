@@ -6,7 +6,7 @@ import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 import { lineChartDefaultPro, LineChartDefaultProState } from '../LineChartDefaultPro/definition';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
-import { LineChartProOptionsClickArg } from '../lines.utils';
+import { LineChartProOptionsClickArg } from '../lines.types';
 
 const meta = {
   ...lineChartDefaultPro.meta,
@@ -45,6 +45,7 @@ const loadDataResultsKpis = (
 const events = {
   onLineClicked: (value: LineChartProOptionsClickArg) => ({
     axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
+    axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
   }),
 };
 
@@ -58,6 +59,7 @@ const props = (
   return {
     ...inputs,
     xAxis: xAxisWithGranularity,
+    granularity: state?.granularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
     results: loadDataResults(inputs, xAxisWithGranularity, clientContext),
     resultsKpis: loadDataResultsKpis(inputs, clientContext),

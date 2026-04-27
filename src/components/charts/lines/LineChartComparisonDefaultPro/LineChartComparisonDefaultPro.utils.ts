@@ -12,7 +12,6 @@ import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils'
 import { i18n } from '../../../../theme/i18n/i18n';
 import { mergician } from 'mergician';
 import { isColorValid, setColorAlpha } from '../../../../utils/color.utils';
-import { getLineChartProOptionsOnClick, LineChartProOptionsClick } from '../lines.utils';
 import { getDimensionWithoutTruncation } from '../../charts.utils';
 
 const AXIS_ID_MAIN = 'mainAxis';
@@ -161,7 +160,6 @@ type LineChartComparisonProOptionsProps = {
   xAxisLabel?: string;
   showComparisonAxis?: boolean;
   showDataComparison?: boolean;
-  onLineClicked?: LineChartProOptionsClick;
 };
 
 const getLineChartComparisonNonTimeOptions = (
@@ -375,7 +373,7 @@ export const getLineChartComparisonProOptions = (
   options: LineChartComparisonProOptionsProps,
   theme: Theme,
 ): ChartOptions<'line'> => {
-  const { onLineClicked, dimension } = options;
+  const { dimension } = options;
 
   const getOptions =
     dimension.nativeType === 'time'
@@ -383,7 +381,6 @@ export const getLineChartComparisonProOptions = (
       : getLineChartComparisonNonTimeOptions;
 
   return mergician(
-    getLineChartProOptionsOnClick({ onLineClicked }),
     getOptions(options, theme),
     theme.charts?.lineChartComparisonDefaultPro?.options || {},
   );
