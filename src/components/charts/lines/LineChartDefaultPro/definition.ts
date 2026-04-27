@@ -71,6 +71,11 @@ const meta = {
           label: 'Clicked axis dimension value',
           type: 'string',
         },
+        {
+          name: 'axisDimensionTimeRange',
+          label: 'Clicked axis dimension time range',
+          type: 'timeRange',
+        },
       ],
     },
   ],
@@ -107,9 +112,12 @@ const loadDataResults = (
 ): DataResponse => loadData(loadDataResultsArgs(inputs, xAxis, clientContext));
 
 const events = {
-  onLineClicked: (value: LineChartProOptionsClickArg) => ({
-    axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
-  }),
+  onLineClicked: (value: LineChartProOptionsClickArg) => {
+    return {
+      axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
+      axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
+    };
+  },
 };
 
 const props = (

@@ -1,10 +1,4 @@
-import {
-  CUBE_DIMENSION_TYPE_TIME,
-  DataResponse,
-  Dimension,
-  Measure,
-  TimeRange,
-} from '@embeddable.com/core';
+import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
 import { ChartData, ChartOptions } from 'chart.js';
@@ -18,24 +12,6 @@ import { getDimensionFieldName } from '../../../utils/data.utils';
 import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { Context } from 'chartjs-plugin-datalabels';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc.js';
-
-dayjs.extend(utc);
-
-/**
- * Constructs a TimeRange covering the full granularity bucket for a clicked time-axis bar.
- * e.g. granularity=month, value="2024-01-01" → { from: 2024-01-01T00:00:00Z, to: 2024-01-31T23:59:59Z }
- */
-export const buildTimeRangeFromAxisValue = (value: string, granularity?: string): TimeRange => {
-  const unit = (granularity ?? 'day') as dayjs.ManipulateType;
-  const d = dayjs.utc(value);
-  return {
-    from: d.startOf(unit).toDate(),
-    to: d.endOf(unit).toDate(),
-    relativeTimeString: undefined,
-  };
-};
 
 export const getBarStackedChartProData = (
   props: {
@@ -167,11 +143,6 @@ const getBarChartProDatalabelTotalFormatter = (
 
 export const getBarChartProOptions = (
   options: {
-    onBarClicked?: (args: {
-      axisDimensionValue: string | null;
-      axisDimensionTimeRange: TimeRange | null;
-      groupingDimensionValue: string | null;
-    }) => void;
     measures: Measure[];
     dimension: Dimension;
     horizontal: boolean;
@@ -179,7 +150,7 @@ export const getBarChartProOptions = (
   },
   theme: Theme,
 ): Partial<ChartOptions<'bar'>> => {
-  const { onBarClicked, measures, dimension, horizontal, data } = options;
+  const { measures, dimension, horizontal, data } = options;
 
   const themeFormatter = getThemeFormatter(theme);
   return {
@@ -257,43 +228,11 @@ export const getBarChartProOptions = (
         },
       },
     },
-    onClick: (_event, elements, chart) => {
-      if (!onBarClicked) return;
-
-      const element = elements[0];
-      const axisDimensionValue = (element ? chart.data.labels![element.index] : null) as
-        | string
-        | null;
-      const groupingDimensionValue = (
-        element
-          ? (chart.data.datasets[element.datasetIndex] as { rawLabel?: string | null })?.rawLabel
-          : null
-      ) as string | null;
-
-      const isTimeDimension = dimension.nativeType === CUBE_DIMENSION_TYPE_TIME;
-      const axisDimensionTimeRange: TimeRange | null =
-        isTimeDimension && axisDimensionValue
-          ? buildTimeRangeFromAxisValue(
-              axisDimensionValue,
-              dimension.inputs?.granularity as string | undefined,
-            )
-          : null;
-
-      onBarClicked({
-        axisDimensionValue,
-        axisDimensionTimeRange,
-        groupingDimensionValue,
-      });
-    },
   };
 };
 
 export const getBarStackedChartProOptions = (
   options: {
-    onBarClicked?: (args: {
-      axisDimensionValue: string | null;
-      groupingDimensionValue: string | null;
-    }) => void;
     measures: Measure[];
     dimension: Dimension;
     groupDimension: Dimension;

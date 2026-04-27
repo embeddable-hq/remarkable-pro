@@ -9,6 +9,8 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartProOptionsClick } from '../lines.utils';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
+import { getElementAtEvent } from 'react-chartjs-2';
+import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 
 export type LineChartProPropsOnLineClicked = { axisDimensionValue: string | null };
 
@@ -25,6 +27,7 @@ export type LineChartProProps = {
   yAxisLabel?: string;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
+  granularity?: Granularity;
   setGranularity?: (granularity: Granularity) => void;
   onLineClicked?: LineChartProOptionsClick;
 } & ChartCardHeaderProps;
@@ -37,6 +40,7 @@ const LineChartPro = (props: LineChartProProps) => {
   const {
     hideMenu,
     measures,
+    granularity,
     xAxis,
     reverseXAxis,
     showLegend,
@@ -63,12 +67,33 @@ const LineChartPro = (props: LineChartProProps) => {
     },
     theme,
   );
-  const options = getLineChartProOptions(
-    { data, dimension: xAxis, measures, onLineClicked },
-    theme,
-  );
+  const options = getLineChartProOptions({ data, dimension: xAxis, measures }, theme);
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
+
+  const handleClick = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+    chartRef?: React.RefObject<null>,
+  ) => {
+    if (!chartRef?.current) return;
+    const element = getElementAtEvent(chartRef.current, event)[0]!;
+
+    // NOTE: for the future events feature
+    // const measureValue = data?.datasets?.[element.datasetIndex]?.data?.[element.index];
+    const dimensionValue = data?.labels?.[element?.index] as string | undefined;
+
+    const dimensionTimeRange = getTimeRangeFromDimensionValue({
+      value: dimensionValue,
+      stateGranularity: granularity,
+      dimension: xAxis,
+    });
+
+    onLineClicked?.({
+      dimensionValue,
+      dimensionTimeRange,
+      groupingDimensionValue: undefined,
+    });
+  };
 
   return (
     <ChartCard
@@ -99,6 +124,7 @@ const LineChartPro = (props: LineChartProProps) => {
         yAxisRangeMax={yAxisRangeMax}
         yAxisRangeMin={yAxisRangeMin}
         options={options}
+        onClick={handleClick}
       />
     </ChartCard>
   );

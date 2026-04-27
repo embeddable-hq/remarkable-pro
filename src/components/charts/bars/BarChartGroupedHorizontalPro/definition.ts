@@ -1,4 +1,4 @@
-import { Granularity, OrderDirection, TimeRange, Value } from '@embeddable.com/core';
+import { Granularity, OrderDirection, Value } from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
@@ -12,6 +12,7 @@ import {
 } from '../bars.loadData.utils';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
+import { BarChartStackedProOptionsClickArg } from '../bars.types';
 
 const meta = {
   name: 'BarChartGroupedHorizontalPro',
@@ -58,6 +59,11 @@ const meta = {
           label: 'Clicked grouping dimension value',
           type: 'string',
         },
+        {
+          name: 'groupingDimensionTimeRange',
+          label: 'Clicked grouping dimension time range',
+          type: 'timeRange',
+        },
       ],
     },
   ],
@@ -80,14 +86,11 @@ const previewConfig = {
 const preview = definePreview(Component, previewConfig);
 
 const events = {
-  onBarClicked: (value: {
-    axisDimensionValue?: string;
-    axisDimensionTimeRange?: TimeRange;
-    groupingDimensionValue?: string;
-  }) => ({
-    axisDimensionValue: value.axisDimensionValue ?? Value.noFilter(),
-    axisDimensionTimeRange: value.axisDimensionTimeRange ?? Value.noFilter(),
+  onBarClicked: (value: BarChartStackedProOptionsClickArg) => ({
+    axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
+    axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
     groupingDimensionValue: value.groupingDimensionValue ?? Value.noFilter(),
+    groupingDimensionTimeRange: value.groupingDimensionTimeRange ?? Value.noFilter(),
   }),
 };
 
@@ -117,6 +120,7 @@ const props = (
   return {
     ...inputs,
     yAxis: yAxisWithGranularity,
+    granularity: state?.granularity,
     axisOrder: cachedAxisOrder,
     axisOrderCacheKey,
     setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),

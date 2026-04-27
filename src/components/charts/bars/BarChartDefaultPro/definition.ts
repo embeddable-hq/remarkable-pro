@@ -3,7 +3,6 @@ import {
   Dimension,
   Granularity,
   LoadDataRequest,
-  TimeRange,
   Value,
   loadData,
 } from '@embeddable.com/core';
@@ -15,6 +14,7 @@ import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 import { subInputs } from '../../../component.subinputs.constants';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
+import { BarChartProOptionsClickArg } from '../bars.types';
 
 const meta = {
   name: 'BarChartDefaultPro',
@@ -96,9 +96,9 @@ const loadDataResults = (
 ): DataResponse => loadData(loadDataResultsArgs(inputs, dimension, clientContext));
 
 const events = {
-  onBarClicked: (value: { axisDimensionValue?: string; axisDimensionTimeRange?: TimeRange }) => ({
-    axisDimensionValue: value.axisDimensionValue ?? Value.noFilter(),
-    axisDimensionTimeRange: value.axisDimensionTimeRange ?? Value.noFilter(),
+  onBarClicked: (value: BarChartProOptionsClickArg) => ({
+    axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
+    axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
   }),
 };
 
@@ -115,6 +115,7 @@ const props = (
   return {
     ...inputs,
     dimension: dimensionWithGranularity,
+    granularity: state?.granularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
     results: loadDataResults(inputs, dimensionWithGranularity, clientContext),
   };

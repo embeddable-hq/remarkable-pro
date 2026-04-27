@@ -85,11 +85,10 @@ export const getLineChartProOptions = (
     dimension: Dimension;
     measures: Measure[];
     data: ChartData<'line'>;
-    onLineClicked?: LineChartProOptionsClick;
   },
   theme: Theme,
 ): ChartOptions<'line'> => {
-  const { dimension, data, measures, onLineClicked } = options;
+  const { dimension, data, measures } = options;
   const themeFormatter = getThemeFormatter(theme);
 
   const lineChartOptions: ChartOptions<'line'> = {
@@ -136,16 +135,6 @@ export const getLineChartProOptions = (
           },
         },
       },
-    },
-    onClick: (_event, elements, chart) => {
-      if (!onLineClicked) return;
-
-      const element = elements[0];
-      const dimensionValue = (element ? chart.data.labels![element.index] : null) as string | null;
-
-      onLineClicked({
-        dimensionValue,
-      });
     },
   };
 
