@@ -563,7 +563,7 @@ describe('getBarChartProOptions', () => {
       const result = options.plugins!.tooltip!.callbacks!.label!.call({} as never, context);
 
       expect(getDatalabelPercentage).toHaveBeenCalledWith(50, [50]);
-      expect(result).toBe('fmt:Revenue: fmt:50 (50%)');
+      expect(result).toBe('Revenue: fmt:50 (50%)');
     });
   });
 

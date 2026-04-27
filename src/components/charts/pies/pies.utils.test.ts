@@ -29,6 +29,7 @@ vi.mock('../../../theme/i18n/i18n', () => ({
 }));
 
 vi.mock('../charts.utils', () => ({
+  getDimensionWithoutTruncation: vi.fn((dimension: unknown) => dimension),
   groupTailAsOther: vi.fn((data: unknown[]) => data),
   getDatalabelPercentage: vi.fn((value: number, data: number[]) => {
     const total = data.reduce((sum, v) => sum + v, 0);

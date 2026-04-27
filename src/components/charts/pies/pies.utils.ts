@@ -10,6 +10,7 @@ import { remarkableTheme } from '../../../theme/theme.constants';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
+import { i18n } from '../../../theme/i18n/i18n';
 
 export const getPieChartProData = (
   props: {
@@ -56,16 +57,21 @@ export const getPieChartProData = (
     }),
   );
 
+  const themeFormatter = getThemeFormatter(theme);
+
   return {
     labels: groupedData.map((item) => {
-      return item[props.dimension.name];
-      // const formattedValue = themeFormatter.data(props.dimension, value);
+      const value = item[props.dimension.name];
+      const formattedValue = themeFormatter.data(
+        getDimensionWithoutTruncation(props.dimension),
+        value,
+      );
 
-      // // If formatter did not work, try i18n translation
-      // if (value === formattedValue) {
-      //   return i18n.t(value);
-      // }
-      // return formattedValue;
+      // If formatter did not work, try i18n translation
+      if (value === formattedValue) {
+        return i18n.t(value);
+      }
+      return formattedValue;
     }),
     datasets: [
       {
