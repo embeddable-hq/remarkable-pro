@@ -1,4 +1,4 @@
-import { CUBE_DIMENSION_TYPE_TIME, DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
 import { ChartData, ChartOptions } from 'chart.js';
@@ -8,6 +8,7 @@ import {
   getDimensionWithoutTruncation,
   groupTailAsOther,
 } from '../charts.utils';
+import { getDimensionFieldName } from '../../../utils/data.utils';
 import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { Context } from 'chartjs-plugin-datalabels';
@@ -29,7 +30,7 @@ export const getBarStackedChartProData = (
   uniqueAxis.sort();
 
   const axis = props.axisOrder ? props.axisOrder.filter((v) => uniqueAxis.includes(v)) : uniqueAxis;
-  const groupDimensionName = `${groupDimension.name}${groupDimension.nativeType === CUBE_DIMENSION_TYPE_TIME && groupDimension.inputs?.granularity ? `.${groupDimension.inputs.granularity}` : ''}`;
+  const groupDimensionName = getDimensionFieldName(groupDimension);
   const groupBy = [...new Set(data.map((d) => d[groupDimensionName]))].filter((d) => d != null);
 
   const chartColors = getChartColors();

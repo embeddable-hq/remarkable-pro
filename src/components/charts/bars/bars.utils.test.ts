@@ -7,7 +7,11 @@ import { getChartColors } from '@embeddable.com/remarkable-ui';
 import type { Context } from 'chartjs-plugin-datalabels';
 
 vi.mock('../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
-vi.mock('../charts.utils', () => ({ groupTailAsOther: vi.fn(), getDatalabelPercentage: vi.fn() }));
+vi.mock('../charts.utils', () => ({
+  groupTailAsOther: vi.fn(),
+  getDatalabelPercentage: vi.fn(),
+  getDimensionWithoutTruncation: vi.fn((d) => d),
+}));
 vi.mock('../../../theme/styles/styles.utils', () => ({ getDimensionMeasureColor: vi.fn() }));
 vi.mock('@embeddable.com/remarkable-ui', () => ({ getChartColors: vi.fn() }));
 vi.mock('../../../theme/theme.constants', () => ({ remarkableTheme: { charts: {} } }));

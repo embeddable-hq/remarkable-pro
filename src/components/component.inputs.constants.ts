@@ -191,6 +191,17 @@ const dimensionOrMeasure = {
   inputs: dimensionMeasureSubInputs,
 } as const;
 
+const sortDimensionOrMeasure = {
+  name: 'sortDimensionOrMeasure',
+  type: 'dimensionOrMeasure',
+  label: 'Sort dimension or measure',
+  config: {
+    dataset: 'dataset',
+  },
+  category: 'Component Data',
+  inputs: undefined, // No need to show the sub-inputs in the UI for this input
+} as const;
+
 const dimensionsAndMeasures = {
   name: 'dimensionsAndMeasures',
   type: 'dimensionOrMeasure',
@@ -417,18 +428,23 @@ const yAxisMaxItems = {
   category: 'Axes Settings',
 } as const;
 
-const sortDirectionTopXAxis = {
-  name: 'sortDirectionTopXAxis',
+const sortDirection = {
+  name: 'sortDirection',
   type: SortDirectionType,
-  label: 'Sort by x-axis total',
+  label: 'Sort direction',
   category: 'Component Settings',
 } as const;
 
+const sortDirectionTopXAxis = {
+  ...sortDirection,
+  name: 'sortDirectionTopXAxis',
+  label: 'Sort by x-axis total',
+} as const;
+
 const sortDirectionTopYAxis = {
+  ...sortDirection,
   name: 'sortDirectionTopYAxis',
-  type: SortDirectionType,
   label: 'Sort by y-axis total',
-  category: 'Component Settings',
 } as const;
 
 const limitTopXAxis = {
@@ -464,6 +480,18 @@ const filters = {
   defaultValue: null,
 } as const;
 
+const xMeasure = {
+  ...measure,
+  name: 'xMeasure',
+  label: 'X-axis measure',
+} as const;
+
+const yMeasure = {
+  ...measure,
+  name: 'yMeasure',
+  label: 'Y-axis measure',
+} as const;
+
 export const inputs = {
   boolean,
   timeRange,
@@ -484,10 +512,13 @@ export const inputs = {
   dimensionOrMeasure,
   dimensionsAndMeasures,
   measure,
+  xMeasure,
+  yMeasure,
   measures,
   measureOptions,
   dimensionOptions,
   dimensionAndMeasureOptions,
+  sortDimensionOrMeasure,
   comparisonPeriod,
   maxResults,
   placeholder,
@@ -511,6 +542,7 @@ export const inputs = {
   xAxisRangeMax,
   xAxisMaxItems,
   yAxisMaxItems,
+  sortDirection,
   sortDirectionTopXAxis,
   sortDirectionTopYAxis,
   limitTopXAxis,

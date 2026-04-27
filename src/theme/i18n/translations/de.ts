@@ -41,6 +41,9 @@ export const de: ResourceLanguage = {
         noPreviousData: 'Keine vorherigen Daten',
         equalComparison: 'Keine Veränderung',
       },
+      scatterChart: {
+        noValue: 'Kein Wert',
+      },
     },
     editors: {
       errorTitle: 'Etwas ist schiefgelaufen.',
