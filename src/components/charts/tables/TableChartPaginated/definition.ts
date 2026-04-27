@@ -1,11 +1,18 @@
-import { DataResponse, LoadDataRequest, OrderBy, Value, loadData } from '@embeddable.com/core';
+import {
+  DataResponse,
+  LoadDataRequest,
+  OrderBy,
+  OrderDirection,
+  Value,
+  loadData,
+} from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import TablePaginatedChart, {
   TableChartPaginatedProOnRowClickArg,
   TableChartPaginatedProState,
 } from './index';
-import { mergician } from 'mergician';
 import { inputs } from '../../../component.inputs.constants';
+import { getSortDirectionValue } from '../../../types/SortDirection.type.emb';
 import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
 
@@ -14,7 +21,7 @@ const meta = {
   label: 'Table Chart - Paginated',
   category: 'Table Charts',
   inputs: [
-    inputs.dataset,
+    { ...inputs.dataset, config: { hideSort: true } },
     {
       ...inputs.dimensionsAndMeasures,
       label: 'Columns',
@@ -44,6 +51,13 @@ const meta = {
       category: 'Data Mapping for Interactions',
       required: false,
     },
+    {
+      ...inputs.sortDimensionOrMeasure,
+      name: 'sortColumn',
+      label: 'Default sort column',
+      category: 'Component Settings',
+    },
+    { ...inputs.sortDirection, label: 'Default sort direction', category: 'Component Settings' },
   ],
   events: [
     {
@@ -80,12 +94,19 @@ const previewConfig = {
 
 const preview = definePreview(TablePaginatedChart, previewConfig);
 
-export const defaultTableChartPaginatedState: TableChartPaginatedProState = {
+export const defaultTableChartPaginatedState = (
+  inputs?: Inputs<typeof meta>,
+): TableChartPaginatedProState => ({
   page: 0,
   pageSize: undefined,
-  sort: undefined,
+  sort: inputs?.sortColumn
+    ? {
+        id: inputs.sortColumn.name,
+        direction: getSortDirectionValue(inputs.sortDirection as OrderDirection) ?? 'asc',
+      }
+    : undefined,
   isLoadingDownloadData: false,
-};
+});
 
 const loadDataResultsArgs = (
   inputs: Inputs<typeof meta>,
@@ -141,7 +162,7 @@ const loadDataAllResults = (inputs: Inputs<typeof meta>, orderBy: OrderBy[]): Da
 
 const events = {
   onRowClicked: (rowDimensionValue: TableChartPaginatedProOnRowClickArg) => ({
-    rowDimensionValue: rowDimensionValue !== undefined ? rowDimensionValue : Value.noFilter(),
+    rowDimensionValue: rowDimensionValue === undefined ? Value.noFilter() : rowDimensionValue,
   }),
 };
 
@@ -149,33 +170,43 @@ const props = (
   inputs: Inputs<typeof meta>,
   [state, setState]: [TableChartPaginatedProState, (state: TableChartPaginatedProState) => void],
 ) => {
-  const orderDimensionAndMeasure = inputs.dimensionsAndMeasures.find(
-    (x) => x.name === state?.sort?.id,
-  );
+  const mergedState: TableChartPaginatedProState = {
+    ...defaultTableChartPaginatedState(inputs),
+    ...state,
+  };
 
+  const sortColumn =
+    inputs.dimensionsAndMeasures.find((x) => x.name === mergedState.sort?.id) ??
+    (inputs.sortColumn?.name === mergedState.sort?.id ? inputs.sortColumn : undefined);
   const orderBy: OrderBy[] =
-    orderDimensionAndMeasure && state?.sort
-      ? [{ property: orderDimensionAndMeasure, direction: state.sort.direction }]
+    sortColumn && mergedState.sort
+      ? [{ property: sortColumn, direction: mergedState.sort.direction }]
       : [];
 
-  const clickDimensionInDimensionsAndMeasures = inputs.dimensionsAndMeasures.some(
-    (dimOrMeas) => dimOrMeas.name === inputs.clickDimension?.name,
+  const hasClickDimension = inputs.dimensionsAndMeasures.some(
+    (col) => col.name === inputs.clickDimension?.name,
   );
 
   const dimensionsAndMeasuresToLoad = [
     ...inputs.dimensionsAndMeasures,
-    ...(clickDimensionInDimensionsAndMeasures ? [] : [inputs.clickDimension]),
+    ...(inputs.clickDimension && !hasClickDimension ? [inputs.clickDimension] : []),
   ];
 
   return {
     ...inputs,
-    state: mergician(defaultTableChartPaginatedState, state ?? {}),
+    state: mergedState,
     setState,
-    results: state?.pageSize
-      ? loadDataResults(inputs, state.page, state.pageSize, orderBy, dimensionsAndMeasuresToLoad)
+    results: mergedState.pageSize
+      ? loadDataResults(
+          inputs,
+          mergedState.page,
+          mergedState.pageSize,
+          orderBy,
+          dimensionsAndMeasuresToLoad,
+        )
       : undefined,
     totalResults: loadDataTotalResults(inputs, dimensionsAndMeasuresToLoad),
-    allResults: state?.isLoadingDownloadData ? loadDataAllResults(inputs, orderBy) : undefined,
+    allResults: mergedState.isLoadingDownloadData ? loadDataAllResults(inputs, orderBy) : undefined,
   };
 };
 
