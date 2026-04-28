@@ -1,7 +1,7 @@
 import { Granularity, TimeRange, Value, loadData } from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
-import { LineChartProOptionsClickArg } from '../lines.utils';
+import { LineChartProOptionsClickArg } from '../lines.types';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';

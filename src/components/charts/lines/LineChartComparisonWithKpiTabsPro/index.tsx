@@ -9,6 +9,7 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartTabs, ChartTabsProps, KpiTrend, LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import {
+  createComparisonClickHandler,
   getLineChartComparisonProData,
   getLineChartComparisonProOptions,
 } from '../LineChartComparisonDefaultPro/LineChartComparisonDefaultPro.utils';
@@ -105,10 +106,16 @@ const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabs
       xAxisLabel,
       showComparisonAxis,
       showDataComparison,
-      onLineClicked,
     },
     theme,
   );
+
+  const handleClick = createComparisonClickHandler({
+    data,
+    measures: activeMeasure ? [activeMeasure] : [],
+    dimension: xAxis,
+    onClicked: onLineClicked,
+  });
 
   const resultsCombined: DataResponse = {
     isLoading: Boolean(results.isLoading || resultsComparison?.isLoading),
@@ -178,6 +185,7 @@ const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabs
         yAxisRangeMax={yAxisRangeMax}
         yAxisRangeMin={yAxisRangeMin}
         options={options}
+        onClick={handleClick}
       />
     </ChartCard>
   );
