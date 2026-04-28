@@ -5,6 +5,7 @@ import {
   type Measure,
 } from '@embeddable.com/core';
 import {
+  getPointClickData,
   getScatterChartProData,
   getScatterChartProOptions,
   measureToNullableNumber,
@@ -403,6 +404,77 @@ describe('getScatterChartProData', () => {
         .mocked(getDimensionMeasureColor)
         .mock.calls.every((c) => c[0].dimensionOrMeasure === groupDim),
     ).toBe(true);
+  });
+});
+
+describe('getPointClickData', () => {
+  const xMeasure = makeMeasure('xVal');
+  const yMeasure = makeMeasure('yVal');
+  const makeDatasets = (rowIndex: number) => [{ data: [{ rowIndex }] }] as never;
+
+  it('returns null when dataset index is out of bounds', () => {
+    expect(
+      getPointClickData(
+        { datasetIndex: 1, index: 0 },
+        makeDatasets(0),
+        [{ point: 'P1', xVal: 10, yVal: 20 }],
+        xMeasure,
+        yMeasure,
+        makeDimension({ name: 'point' }),
+      ),
+    ).toBeNull();
+  });
+
+  it('returns null when row index exceeds data length', () => {
+    expect(
+      getPointClickData(
+        { datasetIndex: 0, index: 0 },
+        makeDatasets(5),
+        [{ point: 'P1', xVal: 10, yVal: 20 }],
+        xMeasure,
+        yMeasure,
+        makeDimension({ name: 'point' }),
+      ),
+    ).toBeNull();
+  });
+
+  it('returns click arg with null group values when no groupByDimension is passed', () => {
+    const result = getPointClickData(
+      { datasetIndex: 0, index: 0 },
+      makeDatasets(0),
+      [{ point: 'P1', xVal: 10, yVal: 20 }],
+      xMeasure,
+      yMeasure,
+      makeDimension({ name: 'point' }),
+    );
+    expect(result).toEqual({
+      xMeasureValue: '10',
+      yMeasureValue: '20',
+      pointDimensionValue: 'P1',
+      groupByDimensionValue: null,
+      pointDimensionTimeRange: undefined,
+      groupByDimensionTimeRange: undefined,
+    });
+  });
+
+  it('returns click arg with groupByDimensionValue when groupByDimension is provided', () => {
+    const result = getPointClickData(
+      { datasetIndex: 0, index: 0 },
+      makeDatasets(0),
+      [{ point: 'P1', xVal: 10, yVal: 20, g: 'GroupA' }],
+      xMeasure,
+      yMeasure,
+      makeDimension({ name: 'point' }),
+      makeDimension({ name: 'g' }),
+    );
+    expect(result).toEqual({
+      xMeasureValue: '10',
+      yMeasureValue: '20',
+      pointDimensionValue: 'P1',
+      groupByDimensionValue: 'GroupA',
+      pointDimensionTimeRange: undefined,
+      groupByDimensionTimeRange: undefined,
+    });
   });
 });
 

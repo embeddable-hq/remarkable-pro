@@ -7,14 +7,14 @@ import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCar
 import { useEffect } from 'react';
 import { getComparisonPeriodDateRange } from '../../../utils/timeRange.utils';
 import {
+  createComparisonClickHandler,
   getLineChartComparisonProData,
   getLineChartComparisonProOptions,
 } from './LineChartComparisonDefaultPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartProOptionsClick } from '../lines.types';
-import { LineChart, ChartClickArgs } from '@embeddable.com/remarkable-ui';
+import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 
 export type LineChartComparisonDefaultProProps = {
   xAxis: Dimension;
@@ -111,31 +111,13 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
     theme,
   );
 
-  const handleClick = ({ elementAtEvent }: ChartClickArgs) => {
-    const element = elementAtEvent[0];
-    if (!element) return;
-
-    const isComparisonPeriod = element.datasetIndex >= measures.length;
-
-    let dimensionValue: string | undefined;
-    if (isComparisonPeriod && xAxis.nativeType === 'time') {
-      const dataset = data.datasets[element.datasetIndex] as { labels?: string[] };
-      dimensionValue = dataset.labels?.[element.index];
-    } else {
-      dimensionValue = data?.labels?.[element.index] as string | undefined;
-    }
-
-    const dimensionTimeRange = getTimeRangeFromDimensionValue({
-      value: dimensionValue,
-      stateGranularity: granularity,
-      dimension: xAxis,
-    });
-
-    onLineClicked?.({
-      dimensionValue,
-      dimensionTimeRange,
-    });
-  };
+  const handleClick = createComparisonClickHandler({
+    data,
+    measures,
+    dimension: xAxis,
+    granularity,
+    onClicked: onLineClicked,
+  });
 
   const resultsCombined: DataResponse = {
     isLoading: Boolean(results.isLoading || resultsComparison?.isLoading),
