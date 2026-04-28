@@ -14,7 +14,7 @@ import {
 } from '../LineChartDefaultPro/LineChartDefaultPro.utils';
 import { LineChartProProps } from '../LineChartDefaultPro';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
-import { createSimpleClickHandler } from '../../charts.click.utils';
+import { createSimpleClickHandler } from '../../charts.utils';
 
 export type LineChartWithKpiTabsProProps = LineChartProProps & {
   resultsKpis: DataResponse;

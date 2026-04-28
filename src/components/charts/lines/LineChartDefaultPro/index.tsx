@@ -9,7 +9,7 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartProOptionsClick } from '../lines.types';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { createSimpleClickHandler } from '../../charts.click.utils';
+import { createSimpleClickHandler } from '../../charts.utils';
 
 export type LineChartProPropsOnLineClicked = { axisDimensionValue: string | null };
 

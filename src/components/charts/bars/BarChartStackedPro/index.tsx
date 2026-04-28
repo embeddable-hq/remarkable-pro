@@ -11,7 +11,7 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { useUpdateAxisOrderAndCacheKey } from '../bars.hooks';
 import { BarChartStackedBaseProps } from '../bars.types';
-import { createGroupedClickHandler } from '../../charts.click.utils';
+import { createGroupedClickHandler } from '../../charts.utils';
 
 export type BarChartStackedProProps = BarChartStackedBaseProps & {
   xAxis: Dimension;

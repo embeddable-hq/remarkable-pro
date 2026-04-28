@@ -9,7 +9,7 @@ import { mergician } from 'mergician';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { BarChartBaseProps } from '../bars.types';
-import { createSimpleClickHandler } from '../../charts.click.utils';
+import { createSimpleClickHandler } from '../../charts.utils';
 
 export type BarChartDefaultHorizontalProProps = BarChartBaseProps & {
   reverseYAxis?: boolean;

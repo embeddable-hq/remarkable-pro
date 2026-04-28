@@ -12,7 +12,7 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartGroupedProOptionsClickArg } from '../lines.types';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { createGroupedClickHandler } from '../../charts.click.utils';
+import { createGroupedClickHandler } from '../../charts.utils';
 
 export type LineChartGroupedProProp = {
   xAxis: Dimension;

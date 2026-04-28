@@ -14,7 +14,7 @@ import { PieChartClickArg } from './pies.types';
 import { getTimeRangeFromDimensionValue } from '../../utils/dimension.utils';
 import { i18n } from '../../../theme/i18n/i18n';
 
-export function createPieClickHandler({
+export const createPieClickHandler = ({
   results,
   dimension,
   onClicked,
@@ -22,7 +22,7 @@ export function createPieClickHandler({
   results: DataResponse;
   dimension: Dimension;
   onClicked?: (args: PieChartClickArg) => void;
-}): (args: ChartClickArgs) => void {
+}): ((args: ChartClickArgs) => void) => {
   return ({ elementAtEvent }) => {
     const element = elementAtEvent[0];
     if (!element) return;
@@ -30,7 +30,7 @@ export function createPieClickHandler({
     const dimensionTimeRange = getTimeRangeFromDimensionValue({ value: dimensionValue, dimension });
     onClicked?.({ dimensionValue, dimensionTimeRange });
   };
-}
+};
 
 export const getPieChartProData = (
   props: {
