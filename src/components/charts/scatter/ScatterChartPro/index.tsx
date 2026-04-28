@@ -1,5 +1,5 @@
 import { useTheme } from '@embeddable.com/react';
-import { ScatterChart, ChartClickArgs } from '@embeddable.com/remarkable-ui';
+import { ScatterChart } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
@@ -7,7 +7,7 @@ import { i18nSetup, i18n } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import {
-  getPointClickData,
+  createScatterClickHandler,
   getScatterChartProData,
   getScatterChartProOptions,
 } from './ScatterChartPro.utils';
@@ -78,20 +78,15 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
     theme,
   );
 
-  const handleClick = ({ elementAtEvent }: ChartClickArgs) => {
-    const element = elementAtEvent[0];
-    if (!element) return;
-    const clickData = getPointClickData(
-      element,
-      chartData.datasets,
-      results.data,
-      xMeasure,
-      yMeasure,
-      pointDimension,
-      groupByDimension,
-    );
-    if (clickData) onPointClick?.(clickData);
-  };
+  const handleClick = createScatterClickHandler({
+    datasets: chartData.datasets,
+    results,
+    xMeasure,
+    yMeasure,
+    pointDimension,
+    groupByDimension,
+    onPointClick,
+  });
 
   const chartOptions = mergician(
     getScatterChartProOptions({ xMeasure, yMeasure, noValueLabel }, theme),

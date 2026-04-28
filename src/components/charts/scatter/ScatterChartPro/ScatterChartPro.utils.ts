@@ -5,6 +5,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import type {
+  ChartClickArgs,
   ScatterChartInputPoint,
   ScatterDatasetWithOriginal,
 } from '@embeddable.com/remarkable-ui';
@@ -125,6 +126,39 @@ export const getPointClickData = (
       value: groupByDimensionValue ?? undefined,
       dimension: groupByDimension,
     }),
+  };
+};
+
+export const createScatterClickHandler = ({
+  datasets,
+  results,
+  xMeasure,
+  yMeasure,
+  pointDimension,
+  groupByDimension,
+  onPointClick,
+}: {
+  datasets: ChartData<'scatter', ScatterPoint[]>['datasets'];
+  results: DataResponse;
+  xMeasure: Measure;
+  yMeasure: Measure;
+  pointDimension: Dimension;
+  groupByDimension?: Dimension;
+  onPointClick?: (payload: ScatterChartProOptionsClickArg) => void;
+}): ((args: ChartClickArgs) => void) => {
+  return ({ elementAtEvent }) => {
+    const element = elementAtEvent[0];
+    if (!element) return;
+    const clickData = getPointClickData(
+      element,
+      datasets,
+      results.data,
+      xMeasure,
+      yMeasure,
+      pointDimension,
+      groupByDimension,
+    );
+    if (clickData) onPointClick?.(clickData);
   };
 };
 

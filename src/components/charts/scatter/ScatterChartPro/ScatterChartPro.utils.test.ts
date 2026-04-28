@@ -5,6 +5,7 @@ import {
   type Measure,
 } from '@embeddable.com/core';
 import {
+  createScatterClickHandler,
   getPointClickData,
   getScatterChartProData,
   getScatterChartProOptions,
@@ -475,6 +476,85 @@ describe('getPointClickData', () => {
       pointDimensionTimeRange: undefined,
       groupByDimensionTimeRange: undefined,
     });
+  });
+});
+
+describe('createScatterClickHandler', () => {
+  const xMeasure = makeMeasure('xVal');
+  const yMeasure = makeMeasure('yVal');
+  const pointDimension = makeDimension({ name: 'point' });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const makeDatasets = (rowIndex: number) => [{ data: [{ rowIndex }] }] as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const makeClickArgs = (elements: any[]) => ({ elementAtEvent: elements }) as any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const makeResults = (data: Record<string, unknown>[]) => ({ data }) as any as DataResponse;
+
+  it('does nothing when elementAtEvent is empty', () => {
+    const onPointClick = vi.fn();
+    const handler = createScatterClickHandler({
+      datasets: makeDatasets(0),
+      results: makeResults([{ point: 'P1', xVal: 1, yVal: 2 }]),
+      xMeasure,
+      yMeasure,
+      pointDimension,
+      onPointClick,
+    });
+
+    handler(makeClickArgs([]));
+
+    expect(onPointClick).not.toHaveBeenCalled();
+  });
+
+  it('calls onPointClick with click data when element is found', () => {
+    const onPointClick = vi.fn();
+    const handler = createScatterClickHandler({
+      datasets: makeDatasets(0),
+      results: makeResults([{ point: 'P1', xVal: 10, yVal: 20 }]),
+      xMeasure,
+      yMeasure,
+      pointDimension,
+      onPointClick,
+    });
+
+    handler(makeClickArgs([{ datasetIndex: 0, index: 0 }]));
+
+    expect(onPointClick).toHaveBeenCalledWith(
+      expect.objectContaining({
+        xMeasureValue: '10',
+        yMeasureValue: '20',
+        pointDimensionValue: 'P1',
+      }),
+    );
+  });
+
+  it('does not call onPointClick when getPointClickData returns null', () => {
+    const onPointClick = vi.fn();
+    const handler = createScatterClickHandler({
+      datasets: makeDatasets(99),
+      results: makeResults([{ point: 'P1', xVal: 1, yVal: 2 }]),
+      xMeasure,
+      yMeasure,
+      pointDimension,
+      onPointClick,
+    });
+
+    handler(makeClickArgs([{ datasetIndex: 0, index: 0 }]));
+
+    expect(onPointClick).not.toHaveBeenCalled();
+  });
+
+  it('does not throw when onPointClick is not provided', () => {
+    const handler = createScatterClickHandler({
+      datasets: makeDatasets(0),
+      results: makeResults([{ point: 'P1', xVal: 1, yVal: 2 }]),
+      xMeasure,
+      yMeasure,
+      pointDimension,
+    });
+
+    expect(() => handler(makeClickArgs([{ datasetIndex: 0, index: 0 }]))).not.toThrow();
   });
 });
 
