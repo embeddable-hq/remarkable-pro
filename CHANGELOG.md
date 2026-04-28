@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.2.8
+
+### Patch Changes
+
+- ab57224: Allow dimension changes of type timeRange
+
 ## 0.2.7
 
 ### Patch Changes
