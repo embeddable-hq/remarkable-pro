@@ -1,10 +1,10 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import type { DataResponse, Dimension, Measure, TimeRange } from '@embeddable.com/core';
-import ComparisonLineChartWithKpiTabsPro, { ComparisonLineChartWithKpiTabsProProps } from './index';
+import LineChartComparisonWithKpiTabsPro, { LineChartComparisonWithKpiTabsProProps } from './index';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { getLineChartProData } from '../LineChartDefaultPro/LineChartDefaultPro.utils';
+import { getLineChartComparisonProData } from '../LineChartComparisonDefaultPro/LineChartComparisonDefaultPro.utils';
 import { getComparisonPeriodDateRange } from '../../../utils/timeRange.utils';
 
 vi.mock('@embeddable.com/react', () => ({
@@ -62,9 +62,9 @@ vi.mock('../../shared/ChartGranularitySelectField/ChartGranularitySelectField', 
   ),
 }));
 
-vi.mock('../LineChartDefaultPro/LineChartDefaultPro.utils', () => ({
-  getLineChartProData: vi.fn(() => ({ datasets: [], labels: [] })),
-  getLineChartProOptions: vi.fn(() => ({})),
+vi.mock('../LineChartComparisonDefaultPro/LineChartComparisonDefaultPro.utils', () => ({
+  getLineChartComparisonProData: vi.fn(() => ({ datasets: [], labels: [] })),
+  getLineChartComparisonProOptions: vi.fn(() => ({})),
 }));
 
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({
@@ -90,17 +90,18 @@ const emptyKpis: DataResponse = { data: [] } as unknown as DataResponse;
 const primaryDateRange = makeDateRange('This week');
 const comparisonDateRange = makeDateRange('Previous period');
 
-const defaultProps: ComparisonLineChartWithKpiTabsProProps = {
+const defaultProps: LineChartComparisonWithKpiTabsProProps = {
   measures: [makeMeasure('revenue')],
   xAxis: makeXAxis(),
   results: emptyResults,
+  resultsComparison: emptyResults,
   resultsKpis: emptyKpis,
   resultsKpisComparison: undefined,
   comparisonDateRange,
   primaryDateRange,
 };
 
-describe('ComparisonLineChartWithKpiTabsPro', () => {
+describe('LineChartComparisonWithKpiTabsPro', () => {
   let mockFormatter: {
     dimensionOrMeasureTitle: ReturnType<typeof vi.fn>;
     data: ReturnType<typeof vi.fn>;
@@ -118,36 +119,36 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
 
   describe('chartTabsItems', () => {
     it('uses measure name as tab id', () => {
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} />);
       expect(screen.getByTestId('tab-revenue')).toBeInTheDocument();
     });
 
     it('uses dimensionOrMeasureTitle for tab label', () => {
       mockFormatter.dimensionOrMeasureTitle.mockReturnValue('Revenue Label');
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} />);
       expect(screen.getByTestId('tab-label-revenue')).toHaveTextContent('Revenue Label');
     });
 
     it('shows "-" when the KPI value is null', () => {
       const resultsKpis = { data: [{ revenue: null }] } as unknown as DataResponse;
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} resultsKpis={resultsKpis} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} resultsKpis={resultsKpis} />);
       expect(screen.getByTestId('tab-value-revenue')).toHaveTextContent('-');
     });
 
     it('shows "-" when the KPI value is undefined', () => {
       const resultsKpis = { data: [{}] } as unknown as DataResponse;
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} resultsKpis={resultsKpis} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} resultsKpis={resultsKpis} />);
       expect(screen.getByTestId('tab-value-revenue')).toHaveTextContent('-');
     });
 
     it('shows "-" when resultsKpis has no data rows', () => {
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} resultsKpis={emptyKpis} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} resultsKpis={emptyKpis} />);
       expect(screen.getByTestId('tab-value-revenue')).toHaveTextContent('-');
     });
 
     it('shows "-" when resultsKpis is undefined', () => {
       render(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           resultsKpis={undefined as unknown as DataResponse}
         />,
@@ -158,14 +159,14 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
     it('formats KPI value using themeFormatter.data when present', () => {
       const resultsKpis = { data: [{ revenue: 42000 }] } as unknown as DataResponse;
       mockFormatter.data.mockReturnValue('$42,000');
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} resultsKpis={resultsKpis} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} resultsKpis={resultsKpis} />);
       expect(screen.getByTestId('tab-value-revenue')).toHaveTextContent('$42,000');
       expect(mockFormatter.data).toHaveBeenCalledWith(defaultProps.measures[0], 42000);
     });
 
     it('builds one tab per measure', () => {
       const measures = [makeMeasure('revenue'), makeMeasure('orders'), makeMeasure('sessions')];
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} measures={measures} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} measures={measures} />);
       expect(screen.getByTestId('tab-revenue')).toBeInTheDocument();
       expect(screen.getByTestId('tab-orders')).toBeInTheDocument();
       expect(screen.getByTestId('tab-sessions')).toBeInTheDocument();
@@ -175,22 +176,22 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
   describe('active measure state', () => {
     it('defaults to the first measure', () => {
       const measures = [makeMeasure('revenue'), makeMeasure('orders')];
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} measures={measures} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} measures={measures} />);
       expect(screen.getByTestId('chart-tabs')).toHaveAttribute('data-value', 'revenue');
     });
 
     it('updates activeMeasureName when a tab is clicked', () => {
       const measures = [makeMeasure('revenue'), makeMeasure('orders')];
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} measures={measures} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} measures={measures} />);
       fireEvent.click(screen.getByTestId('tab-orders'));
       expect(screen.getByTestId('chart-tabs')).toHaveAttribute('data-value', 'orders');
     });
 
-    it('passes only the active measure to getLineChartProData after switching tabs', () => {
+    it('passes only the active measure to getLineChartComparisonProData after switching tabs', () => {
       const measures = [makeMeasure('revenue'), makeMeasure('orders')];
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} measures={measures} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} measures={measures} />);
       fireEvent.click(screen.getByTestId('tab-orders'));
-      expect(vi.mocked(getLineChartProData)).toHaveBeenLastCalledWith(
+      expect(vi.mocked(getLineChartComparisonProData)).toHaveBeenLastCalledWith(
         expect.objectContaining({ measures: [expect.objectContaining({ name: 'orders' })] }),
         expect.anything(),
       );
@@ -198,7 +199,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
 
     it('resets to the first measure when the active one is removed', async () => {
       const { rerender } = render(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           measures={[makeMeasure('revenue'), makeMeasure('orders')]}
         />,
@@ -208,7 +209,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
       expect(screen.getByTestId('chart-tabs')).toHaveAttribute('data-value', 'orders');
 
       rerender(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           measures={[makeMeasure('revenue'), makeMeasure('sales')]}
         />,
@@ -221,7 +222,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
 
     it('keeps the active measure when it still exists after a measures update', () => {
       const { rerender } = render(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           measures={[makeMeasure('revenue'), makeMeasure('orders')]}
         />,
@@ -230,7 +231,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
       fireEvent.click(screen.getByTestId('tab-orders'));
 
       rerender(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           measures={[makeMeasure('revenue'), makeMeasure('orders'), makeMeasure('sales')]}
         />,
@@ -242,11 +243,20 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
 
   describe('useFillGaps', () => {
     it('is called with results, xAxis, and primaryDateRange as externalDateBounds', () => {
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} />);
       expect(useFillGaps).toHaveBeenCalledWith({
         results: defaultProps.results,
         dimension: defaultProps.xAxis,
         externalDateBounds: primaryDateRange,
+      });
+    });
+
+    it('is called with resultsComparison and comparisonDateRange as externalDateBounds', () => {
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} />);
+      expect(useFillGaps).toHaveBeenCalledWith({
+        results: defaultProps.resultsComparison,
+        dimension: defaultProps.xAxis,
+        externalDateBounds: comparisonDateRange,
       });
     });
   });
@@ -257,7 +267,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
 
     it('renders KpiTrend when primaryDateRange, comparisonPeriod, and both KPI values are present', () => {
       render(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           resultsKpis={resultsKpis}
           resultsKpisComparison={resultsKpisComparison}
@@ -269,7 +279,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
 
     it('does not render KpiTrend when comparisonPeriod is absent', () => {
       render(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           resultsKpis={resultsKpis}
           resultsKpisComparison={resultsKpisComparison}
@@ -281,7 +291,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
 
     it('does not render KpiTrend when primaryDateRange is absent', () => {
       render(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           resultsKpis={resultsKpis}
           resultsKpisComparison={resultsKpisComparison}
@@ -295,7 +305,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
     it('does not render KpiTrend when kpiValue is null', () => {
       const kpisNull = { data: [{ revenue: null }] } as unknown as DataResponse;
       render(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           resultsKpis={kpisNull}
           resultsKpisComparison={resultsKpisComparison}
@@ -308,7 +318,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
     it('does not render KpiTrend when kpiComparisonValue is null', () => {
       const kpisCompNull = { data: [{ revenue: null }] } as unknown as DataResponse;
       render(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           resultsKpis={resultsKpis}
           resultsKpisComparison={kpisCompNull}
@@ -321,7 +331,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
     describe('trend text', () => {
       it('shows absolute positive diff with "+" prefix', () => {
         render(
-          <ComparisonLineChartWithKpiTabsPro
+          <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
             resultsKpis={resultsKpis}
             resultsKpisComparison={resultsKpisComparison}
@@ -335,7 +345,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
         const kpisLower = { data: [{ revenue: 80 }] } as unknown as DataResponse;
         const kpisHigher = { data: [{ revenue: 100 }] } as unknown as DataResponse;
         render(
-          <ComparisonLineChartWithKpiTabsPro
+          <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
             resultsKpis={kpisLower}
             resultsKpisComparison={kpisHigher}
@@ -347,7 +357,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
 
       it('shows percentage with "+" prefix when displayChangeAsPercentage=true and positive', () => {
         render(
-          <ComparisonLineChartWithKpiTabsPro
+          <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
             resultsKpis={resultsKpis}
             resultsKpisComparison={resultsKpisComparison}
@@ -362,7 +372,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
         const kpisLower = { data: [{ revenue: 80 }] } as unknown as DataResponse;
         const kpisHigher = { data: [{ revenue: 100 }] } as unknown as DataResponse;
         render(
-          <ComparisonLineChartWithKpiTabsPro
+          <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
             resultsKpis={kpisLower}
             resultsKpisComparison={kpisHigher}
@@ -375,7 +385,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
 
       it('respects percentageDecimalPlaces when showing percentage', () => {
         render(
-          <ComparisonLineChartWithKpiTabsPro
+          <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
             resultsKpis={resultsKpis}
             resultsKpisComparison={resultsKpisComparison}
@@ -390,7 +400,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
       it('falls back to absolute diff when kpiComparisonValue is 0 and displayChangeAsPercentage=true', () => {
         const kpisZeroComparison = { data: [{ revenue: 0 }] } as unknown as DataResponse;
         render(
-          <ComparisonLineChartWithKpiTabsPro
+          <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
             resultsKpis={resultsKpis}
             resultsKpisComparison={kpisZeroComparison}
@@ -405,7 +415,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
     describe('invertChangeColors', () => {
       it('sets reverseTrend=false for a positive diff when invertChangeColors is false', () => {
         render(
-          <ComparisonLineChartWithKpiTabsPro
+          <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
             resultsKpis={resultsKpis}
             resultsKpisComparison={resultsKpisComparison}
@@ -418,7 +428,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
 
       it('sets reverseTrend=true for a positive diff when invertChangeColors is true', () => {
         render(
-          <ComparisonLineChartWithKpiTabsPro
+          <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
             resultsKpis={resultsKpis}
             resultsKpisComparison={resultsKpisComparison}
@@ -433,7 +443,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
         const kpisLower = { data: [{ revenue: 80 }] } as unknown as DataResponse;
         const kpisHigher = { data: [{ revenue: 100 }] } as unknown as DataResponse;
         render(
-          <ComparisonLineChartWithKpiTabsPro
+          <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
             resultsKpis={kpisLower}
             resultsKpisComparison={kpisHigher}
@@ -448,7 +458,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
         const kpisLower = { data: [{ revenue: 80 }] } as unknown as DataResponse;
         const kpisHigher = { data: [{ revenue: 100 }] } as unknown as DataResponse;
         render(
-          <ComparisonLineChartWithKpiTabsPro
+          <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
             resultsKpis={kpisLower}
             resultsKpisComparison={kpisHigher}
@@ -468,7 +478,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
       vi.mocked(getComparisonPeriodDateRange).mockReturnValue(fakeRange);
 
       render(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           comparisonPeriod="Previous period"
           setComparisonDateRange={setComparisonDateRange}
@@ -481,7 +491,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
     it('calls setComparisonDateRange again when comparisonPeriod changes', async () => {
       const setComparisonDateRange = vi.fn();
       const { rerender } = render(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           comparisonPeriod="Previous period"
           setComparisonDateRange={setComparisonDateRange}
@@ -491,7 +501,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
       const callsBefore = setComparisonDateRange.mock.calls.length;
 
       rerender(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           comparisonPeriod="Previous year"
           setComparisonDateRange={setComparisonDateRange}
@@ -506,17 +516,17 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
 
   describe('granularity selector', () => {
     it('renders ChartGranularitySelectField when setGranularity is provided', () => {
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} setGranularity={vi.fn()} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} setGranularity={vi.fn()} />);
       expect(screen.getByTestId('granularity-select-field')).toBeInTheDocument();
     });
 
     it('does not render ChartGranularitySelectField when setGranularity is not provided', () => {
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} />);
       expect(screen.queryByTestId('granularity-select-field')).not.toBeInTheDocument();
     });
 
     it('passes hasMarginTop=true when title, description and tooltip are all absent', () => {
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} setGranularity={vi.fn()} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} setGranularity={vi.fn()} />);
       expect(screen.getByTestId('granularity-select-field')).toHaveAttribute(
         'data-has-margin-top',
         'true',
@@ -525,7 +535,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
 
     it('passes hasMarginTop=false when title is present', () => {
       render(
-        <ComparisonLineChartWithKpiTabsPro
+        <LineChartComparisonWithKpiTabsPro
           {...defaultProps}
           title="My Chart"
           setGranularity={vi.fn()}
@@ -540,7 +550,7 @@ describe('ComparisonLineChartWithKpiTabsPro', () => {
 
   describe('LineChart', () => {
     it('renders the line chart', () => {
-      render(<ComparisonLineChartWithKpiTabsPro {...defaultProps} />);
+      render(<LineChartComparisonWithKpiTabsPro {...defaultProps} />);
       expect(screen.getByTestId('line-chart')).toBeInTheDocument();
     });
   });

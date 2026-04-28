@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
-import { DataResponse, TimeRange } from '@embeddable.com/core';
+import { DataResponse } from '@embeddable.com/core';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
@@ -9,25 +9,22 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartTabs, ChartTabsProps, KpiTrend, LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import {
-  getLineChartProData,
-  getLineChartProOptions,
-} from '../LineChartDefaultPro/LineChartDefaultPro.utils';
-import { LineChartWithKpiTabsProProps } from '../LineChartWithKpiTabsPro';
+  getLineChartComparisonProData,
+  getLineChartComparisonProOptions,
+} from '../LineChartComparisonDefaultPro/LineChartComparisonDefaultPro.utils';
+import { LineChartComparisonDefaultProProps } from '../LineChartComparisonDefaultPro';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getComparisonPeriodDateRange } from '../../../utils/timeRange.utils';
 
-export type ComparisonLineChartWithKpiTabsProProps = LineChartWithKpiTabsProProps & {
-  comparisonPeriod?: string;
-  comparisonDateRange: TimeRange;
-  primaryDateRange: TimeRange;
-  resultsKpisComparison: DataResponse | undefined;
+export type LineChartComparisonWithKpiTabsProProps = LineChartComparisonDefaultProProps & {
+  resultsKpis: DataResponse;
+  resultsKpisComparison?: DataResponse;
   displayChangeAsPercentage?: boolean;
   percentageDecimalPlaces?: number;
   invertChangeColors?: boolean;
-  setComparisonDateRange?: (dateRange: TimeRange) => void;
 };
 
-const ComparisonLineChartWithKpiTabsPro = (props: ComparisonLineChartWithKpiTabsProProps) => {
+const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabsProProps) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
@@ -43,16 +40,18 @@ const ComparisonLineChartWithKpiTabsPro = (props: ComparisonLineChartWithKpiTabs
     showValueLabels,
     yAxisRangeMax,
     yAxisRangeMin,
+    comparisonPeriod,
+    comparisonDateRange,
+    showComparisonAxis,
+    primaryDateRange,
     setGranularity,
+    setComparisonDateRange,
     onLineClicked,
     resultsKpis,
     resultsKpisComparison,
-    comparisonPeriod,
-    primaryDateRange,
     displayChangeAsPercentage,
     percentageDecimalPlaces,
     invertChangeColors,
-    setComparisonDateRange,
   } = props;
 
   const [activeMeasureName, setActiveMeasureName] = useState(measures[0]?.name ?? '');
@@ -79,9 +78,18 @@ const ComparisonLineChartWithKpiTabsPro = (props: ComparisonLineChartWithKpiTabs
     externalDateBounds: primaryDateRange,
   });
 
-  const data = getLineChartProData(
+  const resultsComparison = useFillGaps({
+    results: props.resultsComparison,
+    dimension: xAxis,
+    externalDateBounds: comparisonDateRange,
+  });
+
+  const showDataComparison = Boolean(primaryDateRange && comparisonPeriod);
+
+  const data = getLineChartComparisonProData(
     {
       data: results.data,
+      dataComparison: showDataComparison ? (resultsComparison?.data ?? []) : undefined,
       dimension: xAxis,
       measures: activeMeasure ? [activeMeasure] : [],
       hasMinMaxYAxisRange: Boolean(yAxisRangeMin != null || yAxisRangeMax != null),
@@ -89,14 +97,29 @@ const ComparisonLineChartWithKpiTabsPro = (props: ComparisonLineChartWithKpiTabs
     theme,
   );
 
-  const options = getLineChartProOptions(
-    { data, dimension: xAxis, measures: activeMeasure ? [activeMeasure] : [], onLineClicked },
+  const options = getLineChartComparisonProOptions(
+    {
+      data,
+      dimension: xAxis,
+      measures: activeMeasure ? [activeMeasure] : [],
+      xAxisLabel,
+      showComparisonAxis,
+      showDataComparison,
+      onLineClicked,
+    },
     theme,
   );
 
+  const resultsCombined: DataResponse = {
+    isLoading: Boolean(results.isLoading || resultsComparison?.isLoading),
+    data:
+      !results?.data && !resultsComparison?.data
+        ? undefined
+        : [...(results.data ?? []), ...(resultsComparison?.data ?? [])],
+  };
+
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
   const themeFormatter = getThemeFormatter(theme);
-  const showDataComparison = Boolean(primaryDateRange && comparisonPeriod);
 
   const chartTabsItems: ChartTabsProps['items'] = measures.map((measure) => {
     const kpiValue = resultsKpis?.data?.[0]?.[measure.name];
@@ -127,9 +150,9 @@ const ComparisonLineChartWithKpiTabsPro = (props: ComparisonLineChartWithKpiTabs
 
   return (
     <ChartCard
-      data={results}
+      data={resultsCombined}
       dimensionsAndMeasures={[...measures, xAxis]}
-      errorMessage={results.error}
+      errorMessage={results.error || resultsComparison?.error}
       description={description}
       title={title}
       tooltip={tooltip}
@@ -160,5 +183,5 @@ const ComparisonLineChartWithKpiTabsPro = (props: ComparisonLineChartWithKpiTabs
   );
 };
 
-export { ComparisonLineChartWithKpiTabsPro };
-export default ComparisonLineChartWithKpiTabsPro;
+export { LineChartComparisonWithKpiTabsPro };
+export default LineChartComparisonWithKpiTabsPro;
