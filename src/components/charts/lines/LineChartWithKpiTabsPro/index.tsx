@@ -6,7 +6,12 @@ import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { ChartTabs, ChartTabsProps, LineChart } from '@embeddable.com/remarkable-ui';
+import {
+  ChartTabs,
+  ChartTabsProps,
+  ChartClickArgs,
+  LineChart,
+} from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import {
   getLineChartProData,
@@ -14,7 +19,6 @@ import {
 } from '../LineChartDefaultPro/LineChartDefaultPro.utils';
 import { LineChartProProps } from '../LineChartDefaultPro';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
-import { getElementAtEvent } from 'react-chartjs-2';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 
 export type LineChartWithKpiTabsProProps = LineChartProProps & {
@@ -74,12 +78,8 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
 
-  const handleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-    chartRef?: React.RefObject<null>,
-  ) => {
-    if (!chartRef?.current) return;
-    const element = getElementAtEvent(chartRef.current, event)[0]!;
+  const handleClick = ({ elementAtEvent }: ChartClickArgs) => {
+    const element = elementAtEvent[0]!;
 
     const dimensionValue = data?.labels?.[element?.index] as string | undefined;
 

@@ -10,9 +10,8 @@ import {
 } from './LineChartGroupedPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartGroupedProOptionsClickArg } from '../lines.types';
-import { LineChart } from '@embeddable.com/remarkable-ui';
+import { LineChart, ChartClickArgs } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { getElementAtEvent } from 'react-chartjs-2';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 
 export type LineChartGroupedProProp = {
@@ -78,12 +77,8 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
 
-  const handleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-    chartRef?: React.RefObject<null>,
-  ) => {
-    if (!chartRef?.current) return;
-    const element = getElementAtEvent(chartRef.current, event)[0]!;
+  const handleClick = ({ elementAtEvent }: ChartClickArgs) => {
+    const element = elementAtEvent[0]!;
 
     const dimensionValue = data?.labels?.[element?.index] as string | undefined;
     const groupingDimensionValue = (

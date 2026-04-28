@@ -3,14 +3,13 @@ import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
-import { BarChart } from '@embeddable.com/remarkable-ui';
+import { BarChart, ChartClickArgs } from '@embeddable.com/remarkable-ui';
 import { getBarStackedChartProData, getBarStackedChartProOptions } from '../bars.utils';
 import { mergician } from 'mergician';
 import { Dimension } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { useUpdateAxisOrderAndCacheKey } from '../bars.hooks';
-import { getElementAtEvent } from 'react-chartjs-2';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { BarChartStackedBaseProps } from '../bars.types';
 
@@ -88,12 +87,8 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
 
-  const handleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-    chartRef?: React.RefObject<null>,
-  ) => {
-    if (!chartRef?.current) return;
-    const element = getElementAtEvent(chartRef.current, event)[0]!;
+  const handleClick = ({ elementAtEvent }: ChartClickArgs) => {
+    const element = elementAtEvent[0]!;
 
     const dimensionValue = data?.labels?.[element?.index] as string | undefined;
     const groupingDimensionValue = (

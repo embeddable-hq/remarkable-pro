@@ -1,7 +1,6 @@
 import { useTheme } from '@embeddable.com/react';
-import { ScatterChart } from '@embeddable.com/remarkable-ui';
+import { ScatterChart, ChartClickArgs } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
-import { getElementAtEvent } from 'react-chartjs-2';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup, i18n } from '../../../../theme/i18n/i18n';
@@ -79,12 +78,8 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
     theme,
   );
 
-  const handleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-    chartRef?: React.RefObject<null>,
-  ) => {
-    if (!chartRef?.current) return;
-    const element = getElementAtEvent(chartRef.current, event)[0];
+  const handleClick = ({ elementAtEvent }: ChartClickArgs) => {
+    const element = elementAtEvent[0];
     if (!element) return;
     const clickData = getPointClickData(
       element,

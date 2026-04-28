@@ -12,9 +12,8 @@ import {
 } from './LineChartComparisonDefaultPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartProOptionsClick } from '../lines.types';
-import { LineChart } from '@embeddable.com/remarkable-ui';
+import { LineChart, ChartClickArgs } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { getElementAtEvent } from 'react-chartjs-2';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 
 export type LineChartComparisonDefaultProProps = {
@@ -112,12 +111,8 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
     theme,
   );
 
-  const handleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-    chartRef?: React.RefObject<null>,
-  ) => {
-    if (!chartRef?.current) return;
-    const element = getElementAtEvent(chartRef.current, event)[0];
+  const handleClick = ({ elementAtEvent }: ChartClickArgs) => {
+    const element = elementAtEvent[0];
     if (!element) return;
 
     const isComparisonPeriod = element.datasetIndex >= measures.length;

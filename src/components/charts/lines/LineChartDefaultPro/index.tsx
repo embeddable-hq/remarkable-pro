@@ -7,9 +7,8 @@ import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCar
 import { getLineChartProData, getLineChartProOptions } from './LineChartDefaultPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartProOptionsClick } from '../lines.types';
-import { LineChart } from '@embeddable.com/remarkable-ui';
+import { LineChart, ChartClickArgs } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { getElementAtEvent } from 'react-chartjs-2';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 
 export type LineChartProPropsOnLineClicked = { axisDimensionValue: string | null };
@@ -71,12 +70,8 @@ const LineChartPro = (props: LineChartProProps) => {
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
 
-  const handleClick = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-    chartRef?: React.RefObject<null>,
-  ) => {
-    if (!chartRef?.current) return;
-    const element = getElementAtEvent(chartRef.current, event)[0]!;
+  const handleClick = ({ elementAtEvent }: ChartClickArgs) => {
+    const element = elementAtEvent[0]!;
 
     // NOTE: for the future events feature
     // const measureValue = data?.datasets?.[element.datasetIndex]?.data?.[element.index];
