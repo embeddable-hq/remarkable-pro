@@ -3,15 +3,15 @@ import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
-import { BarChart, ChartClickArgs } from '@embeddable.com/remarkable-ui';
+import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarStackedChartProData, getBarStackedChartProOptions } from '../bars.utils';
 import { mergician } from 'mergician';
 import { Dimension } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { useUpdateAxisOrderAndCacheKey } from '../bars.hooks';
-import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { BarChartStackedBaseProps } from '../bars.types';
+import { createGroupedClickHandler } from '../../charts.click.utils';
 
 export type BarChartStackedHorizontalProProps = BarChartStackedBaseProps & {
   yAxis: Dimension;
@@ -87,32 +87,13 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
 
-  const handleClick = ({ elementAtEvent }: ChartClickArgs) => {
-    const element = elementAtEvent[0]!;
-
-    const dimensionValue = data?.labels?.[element?.index] as string | undefined;
-    const groupingDimensionValue = (
-      data?.datasets?.[element?.datasetIndex] as { rawLabel?: string } | undefined
-    )?.rawLabel;
-
-    const dimensionTimeRange = getTimeRangeFromDimensionValue({
-      value: dimensionValue,
-      stateGranularity: granularity,
-      dimension: yAxis,
-    });
-
-    const groupingDimensionTimeRange = getTimeRangeFromDimensionValue({
-      value: groupingDimensionValue,
-      dimension: groupBy,
-    });
-
-    onBarClicked?.({
-      dimensionValue,
-      dimensionTimeRange,
-      groupingDimensionValue,
-      groupingDimensionTimeRange,
-    });
-  };
+  const handleClick = createGroupedClickHandler({
+    data,
+    dimension: yAxis,
+    groupBy,
+    granularity,
+    onClicked: onBarClicked,
+  });
 
   return (
     <ChartCard

@@ -10,9 +10,9 @@ import {
 } from './LineChartGroupedPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartGroupedProOptionsClickArg } from '../lines.types';
-import { LineChart, ChartClickArgs } from '@embeddable.com/remarkable-ui';
+import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import { createGroupedClickHandler } from '../../charts.click.utils';
 
 export type LineChartGroupedProProp = {
   xAxis: Dimension;
@@ -77,32 +77,13 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
 
-  const handleClick = ({ elementAtEvent }: ChartClickArgs) => {
-    const element = elementAtEvent[0]!;
-
-    const dimensionValue = data?.labels?.[element?.index] as string | undefined;
-    const groupingDimensionValue = (
-      data?.datasets?.[element?.datasetIndex] as { rawLabel?: string } | undefined
-    )?.rawLabel;
-
-    const dimensionTimeRange = getTimeRangeFromDimensionValue({
-      value: dimensionValue,
-      stateGranularity: granularity,
-      dimension: xAxis,
-    });
-
-    const groupingDimensionTimeRange = getTimeRangeFromDimensionValue({
-      value: groupingDimensionValue,
-      dimension: groupBy,
-    });
-
-    onLineClicked?.({
-      dimensionValue,
-      dimensionTimeRange,
-      groupingDimensionValue,
-      groupingDimensionTimeRange,
-    });
-  };
+  const handleClick = createGroupedClickHandler({
+    data,
+    dimension: xAxis,
+    groupBy,
+    granularity,
+    onClicked: onLineClicked,
+  });
 
   return (
     <ChartCard

@@ -3,13 +3,13 @@ import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
-import { BarChart, ChartClickArgs } from '@embeddable.com/remarkable-ui';
+import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarChartProData, getBarChartProOptions } from '../bars.utils';
 import { mergician } from 'mergician';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { BarChartBaseProps } from '../bars.types';
+import { createSimpleClickHandler } from '../../charts.click.utils';
 
 export type BarChartDefaultHorizontalProProps = BarChartBaseProps & {
   reverseYAxis?: boolean;
@@ -58,24 +58,12 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
 
-  const handleClick = ({ elementAtEvent }: ChartClickArgs) => {
-    const element = elementAtEvent[0]!;
-
-    // NOTE: for the future events feature
-    // const measureValue = data?.datasets?.[element.datasetIndex]?.data?.[element.index];
-    const dimensionValue = data?.labels?.[element?.index] as string | undefined;
-
-    const dimensionTimeRange = getTimeRangeFromDimensionValue({
-      value: dimensionValue,
-      stateGranularity: granularity,
-      dimension,
-    });
-
-    onBarClicked?.({
-      dimensionValue,
-      dimensionTimeRange,
-    });
-  };
+  const handleClick = createSimpleClickHandler({
+    data,
+    dimension,
+    granularity,
+    onClicked: onBarClicked,
+  });
 
   return (
     <ChartCard

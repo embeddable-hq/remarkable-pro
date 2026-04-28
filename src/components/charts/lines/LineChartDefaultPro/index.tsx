@@ -7,9 +7,9 @@ import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCar
 import { getLineChartProData, getLineChartProOptions } from './LineChartDefaultPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartProOptionsClick } from '../lines.types';
-import { LineChart, ChartClickArgs } from '@embeddable.com/remarkable-ui';
+import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import { createSimpleClickHandler } from '../../charts.click.utils';
 
 export type LineChartProPropsOnLineClicked = { axisDimensionValue: string | null };
 
@@ -70,24 +70,12 @@ const LineChartPro = (props: LineChartProProps) => {
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
 
-  const handleClick = ({ elementAtEvent }: ChartClickArgs) => {
-    const element = elementAtEvent[0]!;
-
-    // NOTE: for the future events feature
-    // const measureValue = data?.datasets?.[element.datasetIndex]?.data?.[element.index];
-    const dimensionValue = data?.labels?.[element?.index] as string | undefined;
-
-    const dimensionTimeRange = getTimeRangeFromDimensionValue({
-      value: dimensionValue,
-      stateGranularity: granularity,
-      dimension: xAxis,
-    });
-
-    onLineClicked?.({
-      dimensionValue,
-      dimensionTimeRange,
-    });
-  };
+  const handleClick = createSimpleClickHandler({
+    data,
+    dimension: xAxis,
+    granularity,
+    onClicked: onLineClicked,
+  });
 
   return (
     <ChartCard
