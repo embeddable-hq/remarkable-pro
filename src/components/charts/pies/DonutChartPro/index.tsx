@@ -1,11 +1,10 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
-import { getPieChartProOptions, getPieChartProData } from '../pies.utils';
+import { getPieChartProOptions, getPieChartProData, createPieClickHandler } from '../pies.utils';
 import { DefaultPieChartProps } from '../pies.types';
-import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
-import { DonutChart, ChartClickArgs } from '@embeddable.com/remarkable-ui';
+import { DonutChart } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
 import { resolveI18nProps } from '../../../component.utils';
 
@@ -44,20 +43,7 @@ const DonutChartPro = (props: DonutChartProProps) => {
     theme.charts.donutChartPro?.options ?? {},
   );
 
-  const handleClick = ({ elementAtEvent }: ChartClickArgs) => {
-    if (!onSegmentClick) return;
-
-    const element = elementAtEvent[0];
-    const dimensionValue =
-      element === undefined
-        ? undefined
-        : (results.data?.[element.index]?.[dimension.name] as string | undefined);
-
-    onSegmentClick({
-      dimensionValue,
-      dimensionTimeRange: getTimeRangeFromDimensionValue({ value: dimensionValue, dimension }),
-    });
-  };
+  const handleClick = createPieClickHandler({ results, dimension, onClicked: onSegmentClick });
 
   return (
     <ChartCard

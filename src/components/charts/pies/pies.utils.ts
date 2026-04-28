@@ -9,8 +9,28 @@ import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
-import { getChartColors } from '@embeddable.com/remarkable-ui';
+import { getChartColors, ChartClickArgs } from '@embeddable.com/remarkable-ui';
+import { PieChartClickArg } from './pies.types';
+import { getTimeRangeFromDimensionValue } from '../../utils/dimension.utils';
 import { i18n } from '../../../theme/i18n/i18n';
+
+export function createPieClickHandler({
+  results,
+  dimension,
+  onClicked,
+}: {
+  results: DataResponse;
+  dimension: Dimension;
+  onClicked?: (args: PieChartClickArg) => void;
+}): (args: ChartClickArgs) => void {
+  return ({ elementAtEvent }) => {
+    const element = elementAtEvent[0];
+    if (!element) return;
+    const dimensionValue = results.data?.[element.index]?.[dimension.name] as string | undefined;
+    const dimensionTimeRange = getTimeRangeFromDimensionValue({ value: dimensionValue, dimension });
+    onClicked?.({ dimensionValue, dimensionTimeRange });
+  };
+}
 
 export const getPieChartProData = (
   props: {
