@@ -65,7 +65,7 @@ export const createSimpleClickHandler = ({
   };
 };
 
-export function createGroupedClickHandler({
+export const createGroupedClickHandler = ({
   data,
   dimension,
   groupBy,
@@ -77,7 +77,7 @@ export function createGroupedClickHandler({
   groupBy: Dimension;
   granularity?: Granularity;
   onClicked?: (args: GroupedClickArg) => void;
-}): (args: ChartClickArgs) => void {
+}): ((args: ChartClickArgs) => void) => {
   return ({ elementAtEvent }) => {
     const element = elementAtEvent[0]!;
     const dimensionValue = data?.labels?.[element?.index] as string | undefined;
@@ -100,4 +100,4 @@ export function createGroupedClickHandler({
       groupingDimensionTimeRange,
     });
   };
-}
+};

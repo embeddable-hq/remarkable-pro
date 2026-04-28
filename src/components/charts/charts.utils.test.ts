@@ -1,15 +1,24 @@
+import type { ChartClickArgs } from '@embeddable.com/remarkable-ui';
+import type { ChartData } from 'chart.js';
 import type { Dimension, Measure } from '@embeddable.com/core';
 import {
+  createGroupedClickHandler,
+  createSimpleClickHandler,
   getDatalabelPercentage,
   getDimensionWithoutTruncation,
   groupTailAsOther,
 } from './charts.utils';
 import { i18n } from '../../theme/i18n/i18n';
+import { getTimeRangeFromDimensionValue } from '../utils/dimension.utils';
 
 // -- mocks -------------------------------------------------------------------
 
 vi.mock('../../theme/i18n/i18n', () => ({
   i18n: { t: vi.fn((key: string) => `t(${key})`) },
+}));
+
+vi.mock('../utils/dimension.utils', () => ({
+  getTimeRangeFromDimensionValue: vi.fn(),
 }));
 
 // -- helpers -----------------------------------------------------------------
@@ -159,5 +168,234 @@ describe('groupTailAsOther', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = groupTailAsOther(undefined as any, dimension, [measure], 3);
     expect(result).toEqual([]);
+  });
+});
+
+// -- createSimpleClickHandler / createGroupedClickHandler --------------------
+
+const makeTimeDimension = (name = 'date'): Dimension =>
+  ({ name, __type__: 'dimension', nativeType: 'time', inputs: {} }) as unknown as Dimension;
+
+const makeClick = (index: number, datasetIndex = 0): ChartClickArgs =>
+  ({ elementAtEvent: [{ index, datasetIndex }] }) as unknown as ChartClickArgs;
+
+const makeChartData = (labels: string[], datasets: { rawLabel?: string }[] = []): ChartData =>
+  ({ labels, datasets }) as unknown as ChartData;
+
+describe('createSimpleClickHandler', () => {
+  const mockGetTimeRange = vi.mocked(getTimeRangeFromDimensionValue);
+
+  beforeEach(() => {
+    mockGetTimeRange.mockReset();
+  });
+
+  it('calls onClicked with the dimensionValue from labels at the clicked index', () => {
+    const onClicked = vi.fn();
+    const dimension = makeDimension('category');
+    mockGetTimeRange.mockReturnValue(undefined);
+
+    const handler = createSimpleClickHandler({
+      data: makeChartData(['Apple', 'Banana', 'Cherry']),
+      dimension,
+      onClicked,
+    });
+
+    handler(makeClick(1));
+
+    expect(onClicked).toHaveBeenCalledWith(expect.objectContaining({ dimensionValue: 'Banana' }));
+  });
+
+  it('calls onClicked with the dimensionTimeRange returned by getTimeRangeFromDimensionValue', () => {
+    const onClicked = vi.fn();
+    const dimension = makeTimeDimension();
+    const fakeRange = {
+      from: new Date('2024-01-01'),
+      to: new Date('2024-01-31'),
+      relativeTimeString: undefined,
+    };
+    mockGetTimeRange.mockReturnValue(fakeRange);
+
+    const handler = createSimpleClickHandler({
+      data: makeChartData(['2024-01-01']),
+      dimension,
+      onClicked,
+    });
+
+    handler(makeClick(0));
+
+    expect(onClicked).toHaveBeenCalledWith(
+      expect.objectContaining({ dimensionTimeRange: fakeRange }),
+    );
+  });
+
+  it('passes dimension and granularity to getTimeRangeFromDimensionValue', () => {
+    const dimension = makeDimension('category');
+    mockGetTimeRange.mockReturnValue(undefined);
+
+    const handler = createSimpleClickHandler({
+      data: makeChartData(['A']),
+      dimension,
+      granularity: 'month',
+      onClicked: vi.fn(),
+    });
+
+    handler(makeClick(0));
+
+    expect(mockGetTimeRange).toHaveBeenCalledWith({
+      value: 'A',
+      stateGranularity: 'month',
+      dimension,
+    });
+  });
+
+  it('does not throw when onClicked is undefined', () => {
+    mockGetTimeRange.mockReturnValue(undefined);
+
+    const handler = createSimpleClickHandler({
+      data: makeChartData(['A']),
+      dimension: makeDimension(),
+    });
+
+    expect(() => handler(makeClick(0))).not.toThrow();
+  });
+
+  it('passes undefined dimensionValue when elementAtEvent is empty', () => {
+    const onClicked = vi.fn();
+    mockGetTimeRange.mockReturnValue(undefined);
+
+    const handler = createSimpleClickHandler({
+      data: makeChartData(['A']),
+      dimension: makeDimension(),
+      onClicked,
+    });
+
+    handler({ elementAtEvent: [] } as unknown as ChartClickArgs);
+
+    expect(onClicked).toHaveBeenCalledWith(expect.objectContaining({ dimensionValue: undefined }));
+  });
+});
+
+describe('createGroupedClickHandler', () => {
+  const mockGetTimeRange = vi.mocked(getTimeRangeFromDimensionValue);
+
+  beforeEach(() => {
+    mockGetTimeRange.mockReset();
+  });
+
+  it('calls onClicked with dimensionValue from labels and groupingDimensionValue from dataset rawLabel', () => {
+    const onClicked = vi.fn();
+    mockGetTimeRange.mockReturnValue(undefined);
+
+    const handler = createGroupedClickHandler({
+      data: makeChartData(
+        ['North', 'South'],
+        [{ rawLabel: 'Electronics' }, { rawLabel: 'Clothing' }],
+      ),
+      dimension: makeDimension('region'),
+      groupBy: makeDimension('category'),
+      onClicked,
+    });
+
+    handler(makeClick(1, 0));
+
+    expect(onClicked).toHaveBeenCalledWith(
+      expect.objectContaining({
+        dimensionValue: 'South',
+        groupingDimensionValue: 'Electronics',
+      }),
+    );
+  });
+
+  it('calls getTimeRangeFromDimensionValue separately for dimension and groupBy', () => {
+    const dimension = makeTimeDimension('date');
+    const groupBy = makeTimeDimension('category');
+    const dimRange = {
+      from: new Date('2024-01-01'),
+      to: new Date('2024-01-31'),
+      relativeTimeString: undefined,
+    };
+    const groupRange = {
+      from: new Date('2024-02-01'),
+      to: new Date('2024-02-29'),
+      relativeTimeString: undefined,
+    };
+
+    mockGetTimeRange.mockReturnValueOnce(dimRange).mockReturnValueOnce(groupRange);
+
+    const onClicked = vi.fn();
+    const handler = createGroupedClickHandler({
+      data: makeChartData(['2024-01-01'], [{ rawLabel: '2024-02-01' }]),
+      dimension,
+      groupBy,
+      onClicked,
+    });
+
+    handler(makeClick(0, 0));
+
+    expect(mockGetTimeRange).toHaveBeenCalledWith({
+      value: '2024-01-01',
+      stateGranularity: undefined,
+      dimension,
+    });
+    expect(mockGetTimeRange).toHaveBeenCalledWith({
+      value: '2024-02-01',
+      dimension: groupBy,
+    });
+    expect(onClicked).toHaveBeenCalledWith({
+      dimensionValue: '2024-01-01',
+      dimensionTimeRange: dimRange,
+      groupingDimensionValue: '2024-02-01',
+      groupingDimensionTimeRange: groupRange,
+    });
+  });
+
+  it('passes granularity to getTimeRangeFromDimensionValue for the primary dimension', () => {
+    const dimension = makeDimension('date');
+    const groupBy = makeDimension('category');
+    mockGetTimeRange.mockReturnValue(undefined);
+
+    const handler = createGroupedClickHandler({
+      data: makeChartData(['A'], [{ rawLabel: 'G' }]),
+      dimension,
+      groupBy,
+      granularity: 'week',
+      onClicked: vi.fn(),
+    });
+
+    handler(makeClick(0, 0));
+
+    expect(mockGetTimeRange).toHaveBeenCalledWith(
+      expect.objectContaining({ stateGranularity: 'week', dimension }),
+    );
+  });
+
+  it('passes undefined groupingDimensionValue when dataset has no rawLabel', () => {
+    const onClicked = vi.fn();
+    mockGetTimeRange.mockReturnValue(undefined);
+
+    const handler = createGroupedClickHandler({
+      data: makeChartData(['A'], [{}]),
+      dimension: makeDimension(),
+      groupBy: makeDimension('g'),
+      onClicked,
+    });
+
+    handler(makeClick(0, 0));
+
+    expect(onClicked).toHaveBeenCalledWith(
+      expect.objectContaining({ groupingDimensionValue: undefined }),
+    );
+  });
+
+  it('does not throw when onClicked is undefined', () => {
+    mockGetTimeRange.mockReturnValue(undefined);
+
+    const handler = createGroupedClickHandler({
+      data: makeChartData(['A'], [{ rawLabel: 'G' }]),
+      dimension: makeDimension(),
+      groupBy: makeDimension('g'),
+    });
+
+    expect(() => handler(makeClick(0, 0))).not.toThrow();
   });
 });
