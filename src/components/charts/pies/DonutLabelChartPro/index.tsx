@@ -1,6 +1,6 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
-import { getPieChartProOptions, getPieChartProData } from '../pies.utils';
+import { getPieChartProOptions, getPieChartProData, createPieClickHandler } from '../pies.utils';
 import { DefaultPieChartProps } from '../pies.types';
 import { DataResponse, Measure } from '@embeddable.com/core';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
@@ -42,13 +42,7 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
     theme,
   );
 
-  const handleSegmentClick = (index: number | undefined) => {
-    if (!onSegmentClick) return;
-
-    onSegmentClick({
-      dimensionValue: index === undefined ? undefined : results.data?.[index]?.[dimension.name],
-    });
-  };
+  const handleClick = createPieClickHandler({ results, dimension, onClicked: onSegmentClick });
 
   const label = themeFormatter.data(
     innerLabelMeasure,
@@ -78,7 +72,7 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
         showLegend={showLegend}
         showTooltips={showTooltips}
         showValueLabels={showValueLabels}
-        onSegmentClick={handleSegmentClick}
+        onClick={handleClick}
       />
     </ChartCard>
   );

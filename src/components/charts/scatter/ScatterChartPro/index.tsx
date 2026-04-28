@@ -1,6 +1,5 @@
 import { useTheme } from '@embeddable.com/react';
 import { ScatterChart } from '@embeddable.com/remarkable-ui';
-import type { ChartPointClicked } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
@@ -8,13 +7,12 @@ import { i18nSetup, i18n } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import {
-  getPointClickData,
+  createScatterClickHandler,
   getScatterChartProData,
   getScatterChartProOptions,
 } from './ScatterChartPro.utils';
 
-import type { PointClickArgs } from '../../charts.types';
-export type ScatterChartPointClickArgs = PointClickArgs;
+import type { ScatterChartProOptionsClickArg } from '../scatter.types';
 
 export type ScatterChartProProps = {
   xMeasure: Measure;
@@ -35,7 +33,7 @@ export type ScatterChartProProps = {
   yAxisRangeMin?: number;
   yAxisRangeMax?: number;
   reverseXAxis?: boolean;
-  onPointClick?: (payload: ScatterChartPointClickArgs) => void;
+  onPointClick?: (payload: ScatterChartProOptionsClickArg) => void;
 } & ChartCardHeaderProps;
 
 const ScatterChartPro = (props: ScatterChartProProps) => {
@@ -80,19 +78,15 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
     theme,
   );
 
-  const handlePointClick = (point: ChartPointClicked | undefined) => {
-    if (!onPointClick || !point) return;
-    const clickData = getPointClickData(
-      point,
-      chartData.datasets,
-      results.data,
-      xMeasure,
-      yMeasure,
-      pointDimension,
-      groupByDimension,
-    );
-    if (clickData) onPointClick(clickData);
-  };
+  const handleClick = createScatterClickHandler({
+    datasets: chartData.datasets,
+    results,
+    xMeasure,
+    yMeasure,
+    pointDimension,
+    groupByDimension,
+    onPointClick,
+  });
 
   const chartOptions = mergician(
     getScatterChartProOptions({ xMeasure, yMeasure, noValueLabel }, theme),
@@ -130,7 +124,7 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
         yAxisRangeMin={yAxisRangeMin}
         yAxisRangeMax={yAxisRangeMax}
         reverseXAxis={reverseXAxis}
-        onPointClick={handlePointClick}
+        onClick={handleClick}
       />
     </ChartCard>
   );

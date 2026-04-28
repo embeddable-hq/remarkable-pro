@@ -143,10 +143,6 @@ const getBarChartProDatalabelTotalFormatter = (
 
 export const getBarChartProOptions = (
   options: {
-    onBarClicked?: (args: {
-      axisDimensionValue: string | null;
-      groupingDimensionValue: string | null;
-    }) => void;
     measures: Measure[];
     dimension: Dimension;
     horizontal: boolean;
@@ -154,7 +150,7 @@ export const getBarChartProOptions = (
   },
   theme: Theme,
 ): Partial<ChartOptions<'bar'>> => {
-  const { onBarClicked, measures, dimension, horizontal, data } = options;
+  const { measures, dimension, horizontal, data } = options;
 
   const themeFormatter = getThemeFormatter(theme);
   return {
@@ -232,33 +228,11 @@ export const getBarChartProOptions = (
         },
       },
     },
-    onClick: (_event, elements, chart) => {
-      if (!onBarClicked) return;
-
-      const element = elements[0];
-      const axisDimensionValue = (element ? chart.data.labels![element.index] : null) as
-        | string
-        | null;
-      const groupingDimensionValue = (
-        element
-          ? (chart.data.datasets[element.datasetIndex] as { rawLabel?: string | null })?.rawLabel
-          : null
-      ) as string | null;
-
-      onBarClicked({
-        axisDimensionValue,
-        groupingDimensionValue,
-      });
-    },
   };
 };
 
 export const getBarStackedChartProOptions = (
   options: {
-    onBarClicked?: (args: {
-      axisDimensionValue: string | null;
-      groupingDimensionValue: string | null;
-    }) => void;
     measures: Measure[];
     dimension: Dimension;
     groupDimension: Dimension;

@@ -6,7 +6,6 @@ import { mergician } from 'mergician';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import { setColorAlpha } from '../../../../utils/color.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
-import { getLineChartProOptionsOnClick, LineChartProOptionsClick } from '../lines.utils';
 import { getDimensionWithoutTruncation } from '../../charts.utils';
 
 export const getLineChartGroupedProData = (
@@ -76,11 +75,10 @@ export const getLineChartGroupedProOptions = (
     groupDimension: Dimension;
     measure: Measure;
     data: ChartData<'line'>;
-    onLineClicked?: LineChartProOptionsClick;
   },
   theme: Theme,
 ): ChartOptions<'line'> => {
-  const { dimension, groupDimension, data, measure, onLineClicked } = options;
+  const { dimension, groupDimension, data, measure } = options;
   const themeFormatter = getThemeFormatter(theme);
 
   const lineChartOptions: ChartOptions<'line'> = {
@@ -133,9 +131,5 @@ export const getLineChartGroupedProOptions = (
     },
   };
 
-  return mergician(
-    getLineChartProOptionsOnClick({ onLineClicked }),
-    lineChartOptions,
-    theme.charts?.lineChartGroupedPro?.options || {},
-  );
+  return mergician(lineChartOptions, theme.charts?.lineChartGroupedPro?.options || {});
 };

@@ -1,5 +1,10 @@
-import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { DataResponse, Dimension, Measure, TimeRange } from '@embeddable.com/core';
 import { ChartCardHeaderProps } from '../shared/ChartCard/ChartCard';
+
+export type PieChartClickArg = {
+  dimensionValue: string | undefined;
+  dimensionTimeRange: TimeRange | undefined;
+};
 
 export type DefaultPieChartProps = {
   dimension: Dimension;
@@ -11,5 +16,5 @@ export type DefaultPieChartProps = {
   showValueLabels?: boolean;
   showValueLabelsAsPercentage?: boolean;
 
-  onSegmentClick?: (args: { dimensionValue: string | null }) => void;
+  onSegmentClick?: (args: PieChartClickArg) => void;
 } & ChartCardHeaderProps;

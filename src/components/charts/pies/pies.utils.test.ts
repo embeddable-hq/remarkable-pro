@@ -1,5 +1,5 @@
-import type { Dimension, Measure } from '@embeddable.com/core';
-import { getPieChartProData, getPieChartProOptions } from './pies.utils';
+import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { createPieClickHandler, getPieChartProData, getPieChartProOptions } from './pies.utils';
 import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { groupTailAsOther } from '../charts.utils';
@@ -42,10 +42,100 @@ vi.mock('../charts.utils', () => ({
 const makeDimension = (name = 'category'): Dimension =>
   ({ name, __type__: 'dimension', inputs: {} }) as unknown as Dimension;
 
+const makeTimeDimension = (name = 'date', granularity = 'month'): Dimension =>
+  ({
+    name,
+    nativeType: 'time',
+    __type__: 'dimension',
+    inputs: { granularity },
+  }) as unknown as Dimension;
+
 const makeMeasure = (name = 'value'): Measure =>
   ({ name, __type__: 'measure', inputs: {} }) as unknown as Measure;
 
 const makeTheme = (charts: Record<string, unknown> = {}) => ({ charts }) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+
+// ----------------------------------------------------------------------------
+
+describe('createPieClickHandler', () => {
+  const dimension = makeDimension('category');
+
+  const makeResults = (data: Record<string, unknown>[] | undefined) =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ({ data }) as any as DataResponse;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const makeElement = (index: number) => ({ index }) as any;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const makeClickArgs = (elements: any[]) => ({ elementAtEvent: elements }) as any;
+
+  it('does nothing when elementAtEvent is empty', () => {
+    const onClicked = vi.fn();
+    const handler = createPieClickHandler({ results: makeResults([]), dimension, onClicked });
+
+    handler(makeClickArgs([]));
+
+    expect(onClicked).not.toHaveBeenCalled();
+  });
+
+  it('calls onClicked with the dimensionValue from results.data at element.index', () => {
+    const onClicked = vi.fn();
+    const results = makeResults([{ category: 'Apple' }, { category: 'Banana' }]);
+    const handler = createPieClickHandler({ results, dimension, onClicked });
+
+    handler(makeClickArgs([makeElement(1)]));
+
+    expect(onClicked).toHaveBeenCalledWith(expect.objectContaining({ dimensionValue: 'Banana' }));
+  });
+
+  it('passes dimensionTimeRange as undefined for a non-time dimension', () => {
+    const onClicked = vi.fn();
+    const results = makeResults([{ category: 'Apple' }]);
+    const handler = createPieClickHandler({ results, dimension, onClicked });
+
+    handler(makeClickArgs([makeElement(0)]));
+
+    expect(onClicked).toHaveBeenCalledWith(
+      expect.objectContaining({ dimensionTimeRange: undefined }),
+    );
+  });
+
+  it('passes a real TimeRange for a time dimension', () => {
+    const timeDimension = makeTimeDimension('date', 'month');
+    const onClicked = vi.fn();
+    const results = makeResults([{ date: '2024-01-15' }]);
+    const handler = createPieClickHandler({ results, dimension: timeDimension, onClicked });
+
+    handler(makeClickArgs([makeElement(0)]));
+
+    expect(onClicked).toHaveBeenCalledWith({
+      dimensionValue: '2024-01-15',
+      dimensionTimeRange: {
+        from: new Date('2024-01-01T00:00:00.000Z'),
+        to: new Date('2024-01-31T23:59:59.999Z'),
+        relativeTimeString: undefined,
+      },
+    });
+  });
+
+  it('does not throw when onClicked is not provided', () => {
+    const results = makeResults([{ category: 'Apple' }]);
+    const handler = createPieClickHandler({ results, dimension });
+
+    expect(() => handler(makeClickArgs([makeElement(0)]))).not.toThrow();
+  });
+
+  it('sets dimensionValue to undefined when results.data is undefined', () => {
+    const onClicked = vi.fn();
+    const results = makeResults(undefined);
+    const handler = createPieClickHandler({ results, dimension, onClicked });
+
+    handler(makeClickArgs([makeElement(0)]));
+
+    expect(onClicked).toHaveBeenCalledWith(expect.objectContaining({ dimensionValue: undefined }));
+  });
+});
 
 // ----------------------------------------------------------------------------
 

@@ -12,6 +12,7 @@ import {
 } from '../bars.loadData.utils';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
+import { BarChartStackedProOptionsClickArg } from '../bars.types';
 
 const meta = {
   name: 'BarChartGroupedPro',
@@ -49,9 +50,19 @@ const meta = {
           type: 'string',
         },
         {
+          name: 'axisDimensionTimeRange',
+          label: 'Clicked axis dimension time range',
+          type: 'timeRange',
+        },
+        {
           name: 'groupingDimensionValue',
           label: 'Clicked grouping dimension value',
           type: 'string',
+        },
+        {
+          name: 'groupingDimensionTimeRange',
+          label: 'Clicked grouping dimension time range',
+          type: 'timeRange',
         },
       ],
     },
@@ -75,9 +86,11 @@ const previewConfig = {
 const preview = definePreview(Component, previewConfig);
 
 const events = {
-  onBarClicked: (value: { axisDimensionValue?: string; groupingDimensionValue?: string }) => ({
-    axisDimensionValue: value.axisDimensionValue ?? Value.noFilter(),
+  onBarClicked: (value: BarChartStackedProOptionsClickArg) => ({
+    axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
+    axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
     groupingDimensionValue: value.groupingDimensionValue ?? Value.noFilter(),
+    groupingDimensionTimeRange: value.groupingDimensionTimeRange ?? Value.noFilter(),
   }),
 };
 
@@ -104,6 +117,7 @@ const props = (
   return {
     ...inputs,
     xAxis: xAxisWithGranularity,
+    granularity: state?.granularity,
     axisOrder: cachedAxisOrder,
     axisOrderCacheKey,
     setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),

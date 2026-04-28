@@ -1,41 +1,24 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
+import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarStackedChartProData, getBarStackedChartProOptions } from '../bars.utils';
 import { mergician } from 'mergician';
-import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
+import { Dimension } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { useUpdateAxisOrderAndCacheKey } from '../bars.hooks';
+import { BarChartStackedBaseProps } from '../bars.types';
+import { createGroupedClickHandler } from '../../charts.utils';
 
-export type BarChartStackedHorizontalProProps = {
-  groupBy: Dimension;
-  measure: Measure;
-  results?: DataResponse;
-  resultsAxisOrder?: DataResponse;
-  axisOrder?: string[];
-  axisOrderCacheKey?: string;
-  setAxisOrderAndCacheKey?: (values: string[], cacheKey: string) => void;
-  reverseYAxis?: boolean;
-  showLegend?: boolean;
-  showLogarithmicScale?: boolean;
-  showTooltips?: boolean;
-  showTotalLabels?: boolean;
-  showValueLabels?: boolean;
+export type BarChartStackedHorizontalProProps = BarChartStackedBaseProps & {
   yAxis: Dimension;
-  xAxisLabel?: string;
-  yAxisLabel?: string;
+  reverseYAxis?: boolean;
   xAxisRangeMax?: number;
   xAxisRangeMin?: number;
-  setGranularity?: (granularity: Granularity) => void;
-  onBarClicked?: (args: {
-    axisDimensionValue: string | null;
-    groupingDimensionValue: string | null;
-  }) => void;
-} & ChartCardHeaderProps;
+};
 
 const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) => {
   const theme = useTheme() as Theme;
@@ -56,6 +39,7 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
     yAxis,
     xAxisRangeMax,
     xAxisRangeMin,
+    granularity,
     setGranularity,
     onBarClicked,
     axisOrder,
@@ -93,7 +77,6 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
         measures: [measure],
         groupDimension: groupBy,
         horizontal: true,
-        onBarClicked,
         data,
         dimension: yAxis,
       },
@@ -103,6 +86,14 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
   );
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
+
+  const handleClick = createGroupedClickHandler({
+    data,
+    dimension: yAxis,
+    groupBy,
+    granularity,
+    onClicked: onBarClicked,
+  });
 
   return (
     <ChartCard
@@ -134,6 +125,7 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
         xAxisRangeMax={xAxisRangeMax}
         showTotalLabels={showTotalLabels}
         options={options}
+        onClick={handleClick}
         stacked
         horizontal
       />

@@ -1,12 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Dimension, Measure } from '@embeddable.com/core';
-import { getLineChartGroupedProOptions } from './LineChartGroupedPro.utils';
+import { getLineChartProData, getLineChartProOptions } from './LineChartDefaultPro.utils';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getDimensionWithoutTruncation } from '../../charts.utils';
+
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
-vi.mock('@embeddable.com/remarkable-ui', () => ({ getChartColors: vi.fn() }));
-vi.mock('../../charts.utils', () => ({
-  getDimensionWithoutTruncation: vi.fn((d) => d),
+vi.mock('@embeddable.com/remarkable-ui', () => ({
+  getChartColors: vi.fn(() => []),
+  getStyleNumber: vi.fn(() => 5),
+}));
+vi.mock('../../charts.utils', () => ({ getDimensionWithoutTruncation: vi.fn((d) => d) }));
+vi.mock('../../../../theme/styles/styles.utils', () => ({
+  getDimensionMeasureColor: vi.fn(() => '#000'),
+}));
+vi.mock('../../../../utils/color.utils', () => ({
+  isColorValid: vi.fn(() => false),
+  setColorAlpha: vi.fn((c: string) => c),
+}));
+vi.mock('mergician', () => ({
+  mergician: vi.fn((...args: object[]) => Object.assign({}, ...args)),
 }));
 
 // -- helpers -----------------------------------------------------------------
@@ -35,16 +47,85 @@ const makeTheme = (overrides = {}) => ({ charts: {}, ...overrides }) as never;
 
 const makeMockFormatter = () => ({
   data: vi.fn((_: unknown, value: unknown) => `fmt:${value}`),
+  dimensionOrMeasureTitle: vi.fn((m: { title: string }) => m.title),
 });
 
-const makeChartData = (
-  labels: string[],
-  datasets: { rawLabel?: string; data: number[] }[] = [],
-) => ({ labels, datasets });
+const makeChartData = (labels: string[], datasets: { data: number[] }[] = []) => ({
+  labels,
+  datasets,
+});
 
 // ----------------------------------------------------------------------------
 
-describe('getLineChartGroupedProOptions', () => {
+describe('getLineChartProData', () => {
+  let mockFormatter: ReturnType<typeof makeMockFormatter>;
+
+  beforeEach(() => {
+    mockFormatter = makeMockFormatter();
+    vi.mocked(getThemeFormatter).mockReturnValue(mockFormatter as never);
+  });
+
+  it('returns empty labels and datasets when data is undefined', () => {
+    const result = getLineChartProData(
+      {
+        data: undefined as never,
+        dimension: makeDimension(),
+        measures: [makeMeasure()],
+        hasMinMaxYAxisRange: false,
+      },
+      makeTheme(),
+    );
+
+    expect(result.labels).toEqual([]);
+    expect(result.datasets).toEqual([{ data: [] }]);
+  });
+
+  it('maps labels from dimension name', () => {
+    const result = getLineChartProData(
+      {
+        data: [{ date: 'Jan' }, { date: 'Feb' }],
+        dimension: makeDimension({ name: 'date' }),
+        measures: [makeMeasure()],
+        hasMinMaxYAxisRange: false,
+      },
+      makeTheme(),
+    );
+
+    expect(result.labels).toEqual(['Jan', 'Feb']);
+  });
+
+  it('fills null for missing measure values when connectGaps is false', () => {
+    const result = getLineChartProData(
+      {
+        data: [{ date: 'Jan', revenue: 100 }, { date: 'Feb' }],
+        dimension: makeDimension({ name: 'date' }),
+        measures: [makeMeasure({ name: 'revenue', inputs: { connectGaps: false } })],
+        hasMinMaxYAxisRange: false,
+      },
+      makeTheme(),
+    );
+
+    expect(result?.datasets?.[0]?.data).toEqual([100, null]);
+  });
+
+  it('fills zero for missing measure values when connectGaps is true', () => {
+    const result = getLineChartProData(
+      {
+        data: [{ date: 'Jan', revenue: 100 }, { date: 'Feb' }],
+        dimension: makeDimension({ name: 'date' }),
+        measures: [makeMeasure({ name: 'revenue', inputs: { connectGaps: true } })],
+        hasMinMaxYAxisRange: false,
+      },
+      makeTheme(),
+    );
+
+    expect(result?.datasets?.[0]?.data).toEqual([100, 0]);
+  });
+});
+
+// ----------------------------------------------------------------------------
+
+describe('getLineChartProOptions', () => {
   let mockFormatter: ReturnType<typeof makeMockFormatter>;
 
   beforeEach(() => {
@@ -56,37 +137,37 @@ describe('getLineChartGroupedProOptions', () => {
   // -- datalabels.labels.value.formatter ---------------------------------------
 
   describe('plugins.datalabels.labels.value.formatter', () => {
-    it('formats the value using the measure', () => {
+    it('formats the value using the correct measure by datasetIndex', () => {
       const measure = makeMeasure({ name: 'revenue' });
-      const options = getLineChartGroupedProOptions(
+      const options = getLineChartProOptions(
         {
           dimension: makeDimension(),
-          groupDimension: makeDimension({ name: 'region' }),
-          measure,
+          measures: [measure],
           data: makeChartData([]) as never,
         },
         makeTheme(),
       );
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (options.plugins!.datalabels!.labels as any)!.value!.formatter!(42, {});
+      (options.plugins!.datalabels!.labels as any)!.value!.formatter!(42, { datasetIndex: 0 });
 
       expect(mockFormatter.data).toHaveBeenCalledWith(measure, 42);
     });
 
     it('returns the formatted value', () => {
-      const options = getLineChartGroupedProOptions(
+      const options = getLineChartProOptions(
         {
           dimension: makeDimension(),
-          groupDimension: makeDimension({ name: 'region' }),
-          measure: makeMeasure(),
+          measures: [makeMeasure()],
           data: makeChartData([]) as never,
         },
         makeTheme(),
       );
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const result = (options.plugins!.datalabels!.labels as any)!.value!.formatter!(99, {});
+      const result = (options.plugins!.datalabels!.labels as any)!.value!.formatter!(99, {
+        datasetIndex: 0,
+      });
 
       expect(result).toBe('fmt:99');
     });
@@ -95,13 +176,12 @@ describe('getLineChartGroupedProOptions', () => {
   // -- tooltip.callbacks.title -------------------------------------------------
 
   describe('plugins.tooltip.callbacks.title', () => {
-    it('passes the label through getDimensionWithoutTruncation(dimension)', () => {
+    it('passes label through getDimensionWithoutTruncation(dimension)', () => {
       const dimension = makeDimension({ name: 'date' });
-      const options = getLineChartGroupedProOptions(
+      const options = getLineChartProOptions(
         {
           dimension,
-          groupDimension: makeDimension({ name: 'region' }),
-          measure: makeMeasure(),
+          measures: [makeMeasure()],
           data: makeChartData([]) as never,
         },
         makeTheme(),
@@ -117,11 +197,10 @@ describe('getLineChartGroupedProOptions', () => {
     });
 
     it('returns the formatted title', () => {
-      const options = getLineChartGroupedProOptions(
+      const options = getLineChartProOptions(
         {
           dimension: makeDimension(),
-          groupDimension: makeDimension({ name: 'region' }),
-          measure: makeMeasure(),
+          measures: [makeMeasure()],
           data: makeChartData([]) as never,
         },
         makeTheme(),
@@ -139,14 +218,12 @@ describe('getLineChartGroupedProOptions', () => {
   // -- tooltip.callbacks.label -------------------------------------------------
 
   describe('plugins.tooltip.callbacks.label', () => {
-    it('formats the rawLabel using groupDimension and the raw value using the measure', () => {
-      const groupDimension = makeDimension({ name: 'region' });
+    it('formats raw value using the correct measure by datasetIndex', () => {
       const measure = makeMeasure({ name: 'revenue' });
-      const options = getLineChartGroupedProOptions(
+      const options = getLineChartProOptions(
         {
           dimension: makeDimension(),
-          groupDimension,
-          measure,
+          measures: [measure],
           data: makeChartData([]) as never,
         },
         makeTheme(),
@@ -154,23 +231,17 @@ describe('getLineChartGroupedProOptions', () => {
 
       options.plugins!.tooltip!.callbacks!.label!.call(
         {} as never,
-        {
-          raw: 200,
-          dataset: { rawLabel: 'North' },
-        } as never,
+        { datasetIndex: 0, raw: 500, dataset: { label: 'Revenue' } } as never,
       );
 
-      expect(getDimensionWithoutTruncation).toHaveBeenCalledWith(groupDimension);
-      expect(mockFormatter.data).toHaveBeenCalledWith(groupDimension, 'North');
-      expect(mockFormatter.data).toHaveBeenCalledWith(measure, 200);
+      expect(mockFormatter.data).toHaveBeenCalledWith(measure, 500);
     });
 
-    it('returns "groupLabel: measureValue" format', () => {
-      const options = getLineChartGroupedProOptions(
+    it('returns "datasetLabel: formattedValue" format', () => {
+      const options = getLineChartProOptions(
         {
           dimension: makeDimension(),
-          groupDimension: makeDimension({ name: 'region' }),
-          measure: makeMeasure(),
+          measures: [makeMeasure({ title: 'Revenue' })],
           data: makeChartData([]) as never,
         },
         makeTheme(),
@@ -178,13 +249,10 @@ describe('getLineChartGroupedProOptions', () => {
 
       const result = options.plugins!.tooltip!.callbacks!.label!.call(
         {} as never,
-        {
-          raw: 500,
-          dataset: { rawLabel: 'East' },
-        } as never,
+        { datasetIndex: 0, raw: 200, dataset: { label: 'Revenue' } } as never,
       );
 
-      expect(result).toBe('fmt:East: fmt:500');
+      expect(result).toBe('Revenue: fmt:200');
     });
   });
 
@@ -194,11 +262,10 @@ describe('getLineChartGroupedProOptions', () => {
     it('formats the label from data.labels at the given numeric index using dimension', () => {
       const dimension = makeDimension({ name: 'date' });
       const data = makeChartData(['Jan', 'Feb', 'Mar']);
-      const options = getLineChartGroupedProOptions(
+      const options = getLineChartProOptions(
         {
           dimension,
-          groupDimension: makeDimension({ name: 'region' }),
-          measure: makeMeasure(),
+          measures: [makeMeasure()],
           data: data as never,
         },
         makeTheme(),
@@ -210,11 +277,10 @@ describe('getLineChartGroupedProOptions', () => {
     });
 
     it('returns undefined when data.labels is absent', () => {
-      const options = getLineChartGroupedProOptions(
+      const options = getLineChartProOptions(
         {
           dimension: makeDimension(),
-          groupDimension: makeDimension({ name: 'region' }),
-          measure: makeMeasure(),
+          measures: [makeMeasure()],
           data: {} as never,
         },
         makeTheme(),
@@ -229,13 +295,12 @@ describe('getLineChartGroupedProOptions', () => {
   // -- scales.y.ticks.callback -------------------------------------------------
 
   describe('scales.y.ticks.callback', () => {
-    it('formats the value using the measure', () => {
+    it('formats the value using measures[0]', () => {
       const measure = makeMeasure({ name: 'revenue' });
-      const options = getLineChartGroupedProOptions(
+      const options = getLineChartProOptions(
         {
           dimension: makeDimension(),
-          groupDimension: makeDimension({ name: 'region' }),
-          measure,
+          measures: [measure],
           data: makeChartData([]) as never,
         },
         makeTheme(),
@@ -249,27 +314,39 @@ describe('getLineChartGroupedProOptions', () => {
 
   // -- theme merge -------------------------------------------------------------
 
-  describe('theme.charts.lineChartGroupedPro.options merge', () => {
+  describe('theme.charts.lineChartDefaultPro.options merge', () => {
     it('merges theme-level chart options into the result', () => {
       const theme = {
         charts: {
-          lineChartGroupedPro: {
+          lineChartDefaultPro: {
             options: { animation: false },
           },
         },
       } as never;
 
-      const options = getLineChartGroupedProOptions(
+      const options = getLineChartProOptions(
         {
           dimension: makeDimension(),
-          groupDimension: makeDimension({ name: 'region' }),
-          measure: makeMeasure(),
+          measures: [makeMeasure()],
           data: makeChartData([]) as never,
         },
         theme,
       );
 
       expect((options as { animation?: unknown }).animation).toBe(false);
+    });
+
+    it('works without theme chart options defined', () => {
+      const options = getLineChartProOptions(
+        {
+          dimension: makeDimension(),
+          measures: [makeMeasure()],
+          data: makeChartData([]) as never,
+        },
+        makeTheme(),
+      );
+
+      expect(options.scales).toBeDefined();
     });
   });
 });

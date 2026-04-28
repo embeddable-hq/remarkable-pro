@@ -14,6 +14,7 @@ import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 import { subInputs } from '../../../component.subinputs.constants';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
+import { BarChartProOptionsClickArg } from '../bars.types';
 
 const meta = {
   name: 'BarChartDefaultHorizontalPro',
@@ -51,6 +52,11 @@ const meta = {
           label: 'Clicked axis dimension value',
           type: 'string',
         },
+        {
+          name: 'axisDimensionTimeRange',
+          label: 'Clicked axis dimension time range',
+          type: 'timeRange',
+        },
       ],
     },
   ],
@@ -87,8 +93,9 @@ const loadDataResults = (
 ): DataResponse => loadData(loadDataResultsArgs(inputs, dimension, clientContext));
 
 const events = {
-  onBarClicked: (value: { axisDimensionValue?: string }) => ({
-    axisDimensionValue: value.axisDimensionValue ?? Value.noFilter(),
+  onBarClicked: (value: BarChartProOptionsClickArg) => ({
+    axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
+    axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
   }),
 };
 

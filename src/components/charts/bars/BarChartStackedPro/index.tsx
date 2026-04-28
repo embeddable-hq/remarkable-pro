@@ -1,42 +1,25 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
+import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarStackedChartProData, getBarStackedChartProOptions } from '../bars.utils';
 import { mergician } from 'mergician';
-import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
+import { Dimension } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { useUpdateAxisOrderAndCacheKey } from '../bars.hooks';
+import { BarChartStackedBaseProps } from '../bars.types';
+import { createGroupedClickHandler } from '../../charts.utils';
 
-export type BarChartStackedProProps = {
-  groupBy: Dimension;
-  maxLegendItems?: number;
-  measure: Measure;
-  results?: DataResponse;
-  resultsAxisOrder?: DataResponse;
-  axisOrder?: string[];
-  axisOrderCacheKey?: string;
-  setAxisOrderAndCacheKey?: (values: string[], cacheKey: string) => void;
-  reverseXAxis?: boolean;
-  showLegend?: boolean;
-  showLogarithmicScale?: boolean;
-  showTotalLabels?: boolean;
-  showTooltips?: boolean;
-  showValueLabels?: boolean;
+export type BarChartStackedProProps = BarChartStackedBaseProps & {
   xAxis: Dimension;
-  xAxisLabel?: string;
-  yAxisLabel?: string;
+  maxLegendItems?: number;
+  reverseXAxis?: boolean;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
-  setGranularity?: (granularity: Granularity) => void;
-  onBarClicked?: (args: {
-    axisDimensionValue: string | null;
-    groupingDimensionValue: string | null;
-  }) => void;
-} & ChartCardHeaderProps;
+};
 
 const BarChartStackedPro = (props: BarChartStackedProProps) => {
   const theme = useTheme() as Theme;
@@ -56,6 +39,7 @@ const BarChartStackedPro = (props: BarChartStackedProProps) => {
     xAxis,
     yAxisRangeMax,
     yAxisRangeMin,
+    granularity,
     setGranularity,
     onBarClicked,
     axisOrder,
@@ -93,7 +77,6 @@ const BarChartStackedPro = (props: BarChartStackedProProps) => {
         measures: [measure],
         groupDimension: groupBy,
         horizontal: false,
-        onBarClicked,
         data,
         dimension: xAxis,
       },
@@ -103,6 +86,14 @@ const BarChartStackedPro = (props: BarChartStackedProProps) => {
   );
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
+
+  const handleClick = createGroupedClickHandler({
+    data,
+    dimension: xAxis,
+    groupBy,
+    granularity,
+    onClicked: onBarClicked,
+  });
 
   return (
     <ChartCard
@@ -134,6 +125,7 @@ const BarChartStackedPro = (props: BarChartStackedProProps) => {
         yAxisRangeMax={yAxisRangeMax}
         showTotalLabels={showTotalLabels}
         options={options}
+        onClick={handleClick}
         stacked
       />
     </ChartCard>

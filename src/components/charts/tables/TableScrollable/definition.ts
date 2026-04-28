@@ -71,6 +71,11 @@ const meta = {
           label: 'Clicked row dimension value',
           type: 'string',
         },
+        {
+          name: 'rowDimensionTimeRange',
+          label: 'Clicked row dimension time range',
+          type: 'timeRange',
+        },
       ],
     },
   ],
@@ -141,8 +146,9 @@ const loadDataAllResults = (
 };
 
 const events = {
-  onRowClicked: (rowDimensionValue: TableScrollableProOnRowClickArg) => ({
-    rowDimensionValue: rowDimensionValue === undefined ? Value.noFilter() : rowDimensionValue,
+  onRowClicked: (value: TableScrollableProOnRowClickArg) => ({
+    rowDimensionValue: value.dimensionValue ?? Value.noFilter(),
+    rowDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
   }),
 };
 

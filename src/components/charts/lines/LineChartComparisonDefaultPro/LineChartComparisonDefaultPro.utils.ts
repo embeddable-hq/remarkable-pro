@@ -1,7 +1,8 @@
-import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { ChartData, ChartOptions } from 'chart.js';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import {
+  ChartClickArgs,
   getChartColors,
   getChartjsAxisOptionsScalesTicksDefault,
   getChartjsAxisOptionsScalesTitle,
@@ -12,8 +13,9 @@ import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils'
 import { i18n } from '../../../../theme/i18n/i18n';
 import { mergician } from 'mergician';
 import { isColorValid, setColorAlpha } from '../../../../utils/color.utils';
-import { getLineChartProOptionsOnClick, LineChartProOptionsClick } from '../lines.utils';
 import { getDimensionWithoutTruncation } from '../../charts.utils';
+import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import { LineChartProOptionsClick } from '../lines.types';
 
 const AXIS_ID_MAIN = 'mainAxis';
 const AXIS_ID_COMPARISON = 'comparisonAxis';
@@ -161,7 +163,6 @@ type LineChartComparisonProOptionsProps = {
   xAxisLabel?: string;
   showComparisonAxis?: boolean;
   showDataComparison?: boolean;
-  onLineClicked?: LineChartProOptionsClick;
 };
 
 const getLineChartComparisonNonTimeOptions = (
@@ -371,11 +372,48 @@ const getLineChartComparisonTimeOptions = (
   return lineChartOptions;
 };
 
+export const createComparisonClickHandler = ({
+  data,
+  measures,
+  dimension,
+  granularity,
+  onClicked,
+}: {
+  data: ChartData<'line'>;
+  measures: Measure[];
+  dimension: Dimension;
+  granularity?: Granularity;
+  onClicked?: LineChartProOptionsClick;
+}): ((args: ChartClickArgs) => void) => {
+  return ({ elementAtEvent }) => {
+    const element = elementAtEvent[0];
+    if (!element) return;
+
+    const isComparisonPeriod = element.datasetIndex >= measures.length;
+
+    let dimensionValue: string | undefined;
+    if (isComparisonPeriod && dimension.nativeType === 'time') {
+      const dataset = data.datasets[element.datasetIndex] as { labels?: string[] };
+      dimensionValue = dataset.labels?.[element.index];
+    } else {
+      dimensionValue = data?.labels?.[element.index] as string | undefined;
+    }
+
+    const dimensionTimeRange = getTimeRangeFromDimensionValue({
+      value: dimensionValue,
+      stateGranularity: granularity,
+      dimension,
+    });
+
+    onClicked?.({ dimensionValue, dimensionTimeRange });
+  };
+};
+
 export const getLineChartComparisonProOptions = (
   options: LineChartComparisonProOptionsProps,
   theme: Theme,
 ): ChartOptions<'line'> => {
-  const { onLineClicked, dimension } = options;
+  const { dimension } = options;
 
   const getOptions =
     dimension.nativeType === 'time'
@@ -383,7 +421,6 @@ export const getLineChartComparisonProOptions = (
       : getLineChartComparisonNonTimeOptions;
 
   return mergician(
-    getLineChartProOptionsOnClick({ onLineClicked }),
     getOptions(options, theme),
     theme.charts?.lineChartComparisonDefaultPro?.options || {},
   );

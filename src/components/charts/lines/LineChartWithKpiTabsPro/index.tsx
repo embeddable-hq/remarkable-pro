@@ -14,6 +14,7 @@ import {
 } from '../LineChartDefaultPro/LineChartDefaultPro.utils';
 import { LineChartProProps } from '../LineChartDefaultPro';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
+import { createSimpleClickHandler } from '../../charts.utils';
 
 export type LineChartWithKpiTabsProProps = LineChartProProps & {
   resultsKpis: DataResponse;
@@ -35,6 +36,7 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
     showValueLabels,
     yAxisRangeMax,
     yAxisRangeMin,
+    granularity,
     setGranularity,
     onLineClicked,
     resultsKpis,
@@ -65,11 +67,18 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
   );
 
   const options = getLineChartProOptions(
-    { data, dimension: xAxis, measures: activeMeasure ? [activeMeasure] : [], onLineClicked },
+    { data, dimension: xAxis, measures: activeMeasure ? [activeMeasure] : [] },
     theme,
   );
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
+
+  const handleClick = createSimpleClickHandler({
+    data,
+    dimension: xAxis,
+    granularity,
+    onClicked: onLineClicked,
+  });
 
   const themeFormatter = getThemeFormatter(theme);
 
@@ -112,6 +121,7 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
         yAxisRangeMax={yAxisRangeMax}
         yAxisRangeMin={yAxisRangeMin}
         options={options}
+        onClick={handleClick}
       />
     </ChartCard>
   );

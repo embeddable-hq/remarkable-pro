@@ -7,11 +7,12 @@ import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCar
 import { useEffect } from 'react';
 import { getComparisonPeriodDateRange } from '../../../utils/timeRange.utils';
 import {
+  createComparisonClickHandler,
   getLineChartComparisonProData,
   getLineChartComparisonProOptions,
 } from './LineChartComparisonDefaultPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { LineChartProOptionsClick } from '../lines.utils';
+import { LineChartProOptionsClick } from '../lines.types';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 
@@ -33,6 +34,7 @@ export type LineChartComparisonDefaultProProps = {
   comparisonDateRange: TimeRange;
   showComparisonAxis?: boolean;
   primaryDateRange: TimeRange;
+  granularity?: Granularity;
   setGranularity?: (granularity: Granularity) => void;
   setComparisonDateRange?: (dateRange: TimeRange) => void;
   onLineClicked?: LineChartProOptionsClick;
@@ -48,6 +50,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
     comparisonPeriod,
     measures,
     xAxis,
+    granularity,
     reverseXAxis,
     showLegend,
     showLogarithmicScale,
@@ -104,10 +107,17 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
       xAxisLabel,
       showComparisonAxis,
       showDataComparison,
-      onLineClicked,
     },
     theme,
   );
+
+  const handleClick = createComparisonClickHandler({
+    data,
+    measures,
+    dimension: xAxis,
+    granularity,
+    onClicked: onLineClicked,
+  });
 
   const resultsCombined: DataResponse = {
     isLoading: Boolean(results.isLoading || resultsComparison?.isLoading),
@@ -147,6 +157,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
         yAxisRangeMax={yAxisRangeMax}
         yAxisRangeMin={yAxisRangeMin}
         options={options}
+        onClick={handleClick}
       />
     </ChartCard>
   );

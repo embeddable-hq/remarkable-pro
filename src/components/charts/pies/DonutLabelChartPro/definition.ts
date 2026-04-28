@@ -1,4 +1,5 @@
 import { DataResponse, LoadDataRequest, Measure, Value, loadData } from '@embeddable.com/core';
+import { PieChartClickArg } from '../pies.types';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
@@ -38,6 +39,11 @@ const meta = {
           name: 'dimensionValue',
           label: 'Clicked dimension',
           type: 'string',
+        },
+        {
+          name: 'dimensionTimeRange',
+          label: 'Clicked dimension time range',
+          type: 'timeRange',
         },
       ],
     },
@@ -83,8 +89,9 @@ const loadDataResultsInnerLabel = (inputs: Inputs<typeof meta>): DataResponse =>
   loadData(loadDataResultsInnerLabelArgs(inputs));
 
 const events = {
-  onSegmentClick: (value: { dimensionValue?: string }) => ({
+  onSegmentClick: (value: PieChartClickArg) => ({
     dimensionValue: value.dimensionValue ?? Value.noFilter(),
+    dimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
   }),
 };
 

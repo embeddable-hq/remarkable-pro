@@ -9,14 +9,10 @@ import {
   getLineChartGroupedProOptions,
 } from './LineChartGroupedPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { LineChartProOptionsClick } from '../lines.utils';
+import { LineChartGroupedProOptionsClickArg } from '../lines.types';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-
-export type LineChartGroupedProPropsOnLineClicked = {
-  axisDimensionValue: string | null;
-  groupingDimensionValue: string | null;
-};
+import { createGroupedClickHandler } from '../../charts.utils';
 
 export type LineChartGroupedProProp = {
   xAxis: Dimension;
@@ -32,8 +28,9 @@ export type LineChartGroupedProProp = {
   yAxisLabel?: string;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
+  granularity?: Granularity;
   setGranularity?: (granularity: Granularity) => void;
-  onLineClicked?: LineChartProOptionsClick;
+  onLineClicked?: (arg: LineChartGroupedProOptionsClickArg) => void;
 } & ChartCardHeaderProps;
 
 const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
@@ -53,6 +50,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
     showValueLabels,
     yAxisRangeMax,
     yAxisRangeMin,
+    granularity,
     setGranularity,
     onLineClicked,
   } = props;
@@ -73,11 +71,19 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
     theme,
   );
   const options = getLineChartGroupedProOptions(
-    { data, dimension: xAxis, groupDimension: groupBy, measure, onLineClicked },
+    { data, dimension: xAxis, groupDimension: groupBy, measure },
     theme,
   );
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
+
+  const handleClick = createGroupedClickHandler({
+    data,
+    dimension: xAxis,
+    groupBy,
+    granularity,
+    onClicked: onLineClicked,
+  });
 
   return (
     <ChartCard
@@ -108,6 +114,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
         yAxisRangeMax={yAxisRangeMax}
         yAxisRangeMin={yAxisRangeMin}
         options={options}
+        onClick={handleClick}
       />
     </ChartCard>
   );

@@ -6,9 +6,10 @@ import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { getLineChartProData, getLineChartProOptions } from './LineChartDefaultPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { LineChartProOptionsClick } from '../lines.utils';
+import { LineChartProOptionsClick } from '../lines.types';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
+import { createSimpleClickHandler } from '../../charts.utils';
 
 export type LineChartProPropsOnLineClicked = { axisDimensionValue: string | null };
 
@@ -25,6 +26,7 @@ export type LineChartProProps = {
   yAxisLabel?: string;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
+  granularity?: Granularity;
   setGranularity?: (granularity: Granularity) => void;
   onLineClicked?: LineChartProOptionsClick;
 } & ChartCardHeaderProps;
@@ -37,6 +39,7 @@ const LineChartPro = (props: LineChartProProps) => {
   const {
     hideMenu,
     measures,
+    granularity,
     xAxis,
     reverseXAxis,
     showLegend,
@@ -63,12 +66,16 @@ const LineChartPro = (props: LineChartProProps) => {
     },
     theme,
   );
-  const options = getLineChartProOptions(
-    { data, dimension: xAxis, measures, onLineClicked },
-    theme,
-  );
+  const options = getLineChartProOptions({ data, dimension: xAxis, measures }, theme);
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
+
+  const handleClick = createSimpleClickHandler({
+    data,
+    dimension: xAxis,
+    granularity,
+    onClicked: onLineClicked,
+  });
 
   return (
     <ChartCard
@@ -99,6 +106,7 @@ const LineChartPro = (props: LineChartProProps) => {
         yAxisRangeMax={yAxisRangeMax}
         yAxisRangeMin={yAxisRangeMin}
         options={options}
+        onClick={handleClick}
       />
     </ChartCard>
   );

@@ -1,7 +1,7 @@
 import { useTheme } from '@embeddable.com/react';
 import { PieChart } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../../theme/theme.types';
-import { getPieChartProOptions, getPieChartProData } from '../pies.utils';
+import { getPieChartProOptions, getPieChartProData, createPieClickHandler } from '../pies.utils';
 import { DefaultPieChartProps } from '../pies.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
@@ -39,13 +39,7 @@ const PieChartPro = (props: PieChartProProps) => {
     theme.charts.pieChartPro?.options ?? {},
   );
 
-  const handleSegmentClick = (index: number | undefined) => {
-    if (!onSegmentClick) return;
-
-    onSegmentClick({
-      dimensionValue: index === undefined ? undefined : results.data?.[index]?.[dimension.name],
-    });
-  };
+  const handleClick = createPieClickHandler({ results, dimension, onClicked: onSegmentClick });
 
   return (
     <ChartCard
@@ -63,7 +57,7 @@ const PieChartPro = (props: PieChartProProps) => {
         showLegend={showLegend}
         showTooltips={showTooltips}
         showValueLabels={showValueLabels}
-        onSegmentClick={handleSegmentClick}
+        onClick={handleClick}
       />
     </ChartCard>
   );
