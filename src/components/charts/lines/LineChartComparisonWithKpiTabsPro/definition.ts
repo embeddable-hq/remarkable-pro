@@ -18,7 +18,7 @@ const meta = {
   name: 'LineChartComparisonWithKpiTabsPro',
   label: 'Line Chart Comparison - With KPI Tabs',
   inputs: [
-    ...lineChartComparisonDefaultPro.meta.inputs.slice(0, 1),
+    inputs.dataset,
     {
       ...inputs.measures,
       inputs: [

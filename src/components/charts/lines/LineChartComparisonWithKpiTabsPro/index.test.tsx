@@ -65,6 +65,7 @@ vi.mock('../../shared/ChartGranularitySelectField/ChartGranularitySelectField', 
 vi.mock('../LineChartComparisonDefaultPro/LineChartComparisonDefaultPro.utils', () => ({
   getLineChartComparisonProData: vi.fn(() => ({ datasets: [], labels: [] })),
   getLineChartComparisonProOptions: vi.fn(() => ({})),
+  createComparisonClickHandler: vi.fn(() => vi.fn()),
 }));
 
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({
