@@ -123,6 +123,11 @@ const meta = {
   ],
 } as const satisfies EmbeddedComponentMeta;
 
+export type LineChartComparisonDefaultProMeasuresInput = Extract<
+  (typeof meta.inputs)[number],
+  { name: 'measures' }
+>;
+
 export type LineChartComparisonDefaultProState = {
   comparisonDateRange: TimeRange;
   granularity?: Granularity;

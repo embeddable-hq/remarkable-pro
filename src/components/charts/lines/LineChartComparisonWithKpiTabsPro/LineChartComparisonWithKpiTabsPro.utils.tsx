@@ -8,8 +8,6 @@ type ComparisonKpiTabsParams = {
   resultsKpis: DataResponse | undefined;
   resultsKpisComparison: DataResponse | undefined;
   showDataComparison: boolean;
-  displayChangeAsPercentage?: boolean;
-  percentageDecimalPlaces?: number;
   themeFormatter: GetThemeFormatter;
 };
 
@@ -18,13 +16,17 @@ export const getComparisonKpiTabsItems = ({
   resultsKpis,
   resultsKpisComparison,
   showDataComparison,
-  displayChangeAsPercentage,
-  percentageDecimalPlaces,
   themeFormatter,
 }: ComparisonKpiTabsParams): ChartTabsProps['items'] =>
   measures.map((measure) => {
     const kpiValue = resultsKpis?.data?.[0]?.[measure.name];
     const kpiComparisonValue = resultsKpisComparison?.data?.[0]?.[measure.name];
+    const displayChangeAsPercentage = measure.inputs?.['displayChangeAsPercentage'] as
+      | boolean
+      | undefined;
+    const percentageDecimalPlaces = measure.inputs?.['percentageDecimalPlaces'] as
+      | number
+      | undefined;
     return {
       id: measure.name,
       label: themeFormatter.dimensionOrMeasureTitle(measure),

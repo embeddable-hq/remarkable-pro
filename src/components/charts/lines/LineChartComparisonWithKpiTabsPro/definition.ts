@@ -2,7 +2,6 @@ import { Granularity, TimeRange, Value, loadData } from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { LineChartProOptionsClickArg } from '../lines.types';
-import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
@@ -10,6 +9,7 @@ import { getClientContextTimezone } from '../../../../theme/utils/clientContext.
 import { ThemeClientContext } from '../../../../theme/theme.types';
 import {
   lineChartComparisonDefaultPro,
+  LineChartComparisonDefaultProMeasuresInput,
   LineChartComparisonDefaultProState,
 } from '../LineChartComparisonDefaultPro/definition';
 
@@ -18,34 +18,38 @@ const meta = {
   name: 'LineChartComparisonWithKpiTabsPro',
   label: 'Line Chart Comparison - With KPI Tabs',
   inputs: [
-    inputs.dataset,
-    {
-      ...inputs.measures,
-      inputs: [
-        ...lineChartComparisonDefaultPro.meta.inputs[1].inputs,
-        {
-          ...subInputs.boolean,
-          name: 'invertChangeColors',
-          label: 'Reverse positive/negative colors',
-          defaultValue: false,
-        },
-      ],
-    },
-    ...lineChartComparisonDefaultPro.meta.inputs.slice(2),
-    {
-      ...inputs.boolean,
-      name: 'displayChangeAsPercentage',
-      label: 'Display change as %',
-      defaultValue: false,
-      category: 'Component Settings',
-    },
-    {
-      ...inputs.number,
-      name: 'percentageDecimalPlaces',
-      label: 'Percentage decimal places',
-      defaultValue: 1,
-      category: 'Component Settings',
-    },
+    ...lineChartComparisonDefaultPro.meta.inputs.map((input) => {
+      if (input.name === 'measures') {
+        const measuresInput = input as LineChartComparisonDefaultProMeasuresInput;
+        return {
+          ...measuresInput,
+          inputs: [
+            ...measuresInput.inputs,
+            ...[
+              {
+                ...subInputs.boolean,
+                name: 'invertChangeColors',
+                label: 'Reverse positive/negative colors',
+                defaultValue: false,
+              },
+              {
+                ...subInputs.boolean,
+                name: 'displayChangeAsPercentage',
+                label: 'Display change as %',
+                defaultValue: false,
+              },
+              {
+                ...subInputs.number,
+                name: 'percentageDecimalPlaces',
+                label: 'Percentage decimal places',
+                defaultValue: 1,
+              },
+            ],
+          ],
+        };
+      }
+      return input;
+    }),
   ],
 } as const satisfies EmbeddedComponentMeta;
 

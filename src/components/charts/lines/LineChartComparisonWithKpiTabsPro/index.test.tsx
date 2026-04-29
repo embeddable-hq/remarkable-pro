@@ -357,13 +357,19 @@ describe('LineChartComparisonWithKpiTabsPro', () => {
       });
 
       it('shows percentage with "+" prefix when displayChangeAsPercentage=true and positive', () => {
+        const measures = [
+          {
+            ...makeMeasure('revenue'),
+            inputs: { displayChangeAsPercentage: true },
+          } as unknown as Measure,
+        ];
         render(
           <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
+            measures={measures}
             resultsKpis={resultsKpis}
             resultsKpisComparison={resultsKpisComparison}
             comparisonPeriod="Previous period"
-            displayChangeAsPercentage={true}
           />,
         );
         expect(screen.getByTestId('kpi-trend')).toHaveAttribute('data-value', '+25.0%');
@@ -372,27 +378,38 @@ describe('LineChartComparisonWithKpiTabsPro', () => {
       it('shows percentage without "+" prefix when negative', () => {
         const kpisLower = { data: [{ revenue: 80 }] } as unknown as DataResponse;
         const kpisHigher = { data: [{ revenue: 100 }] } as unknown as DataResponse;
+        const measures = [
+          {
+            ...makeMeasure('revenue'),
+            inputs: { displayChangeAsPercentage: true },
+          } as unknown as Measure,
+        ];
         render(
           <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
+            measures={measures}
             resultsKpis={kpisLower}
             resultsKpisComparison={kpisHigher}
             comparisonPeriod="Previous period"
-            displayChangeAsPercentage={true}
           />,
         );
         expect(screen.getByTestId('kpi-trend')).toHaveAttribute('data-value', '-20.0%');
       });
 
       it('respects percentageDecimalPlaces when showing percentage', () => {
+        const measures = [
+          {
+            ...makeMeasure('revenue'),
+            inputs: { displayChangeAsPercentage: true, percentageDecimalPlaces: 2 },
+          } as unknown as Measure,
+        ];
         render(
           <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
+            measures={measures}
             resultsKpis={resultsKpis}
             resultsKpisComparison={resultsKpisComparison}
             comparisonPeriod="Previous period"
-            displayChangeAsPercentage={true}
-            percentageDecimalPlaces={2}
           />,
         );
         expect(screen.getByTestId('kpi-trend')).toHaveAttribute('data-value', '+25.00%');
@@ -400,13 +417,19 @@ describe('LineChartComparisonWithKpiTabsPro', () => {
 
       it('falls back to absolute diff when kpiComparisonValue is 0 and displayChangeAsPercentage=true', () => {
         const kpisZeroComparison = { data: [{ revenue: 0 }] } as unknown as DataResponse;
+        const measures = [
+          {
+            ...makeMeasure('revenue'),
+            inputs: { displayChangeAsPercentage: true },
+          } as unknown as Measure,
+        ];
         render(
           <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
+            measures={measures}
             resultsKpis={resultsKpis}
             resultsKpisComparison={kpisZeroComparison}
             comparisonPeriod="Previous period"
-            displayChangeAsPercentage={true}
           />,
         );
         expect(screen.getByTestId('kpi-trend')).toHaveAttribute('data-value', '+100');

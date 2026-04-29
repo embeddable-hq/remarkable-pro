@@ -21,8 +21,6 @@ import { getComparisonPeriodDateRange } from '../../../utils/timeRange.utils';
 export type LineChartComparisonWithKpiTabsProProps = LineChartComparisonDefaultProProps & {
   resultsKpis: DataResponse;
   resultsKpisComparison?: DataResponse;
-  displayChangeAsPercentage?: boolean;
-  percentageDecimalPlaces?: number;
 };
 
 const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabsProProps) => {
@@ -50,8 +48,6 @@ const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabs
     onLineClicked,
     resultsKpis,
     resultsKpisComparison,
-    displayChangeAsPercentage,
-    percentageDecimalPlaces,
   } = props;
 
   const [activeMeasureName, setActiveMeasureName] = useState(measures[0]?.name ?? '');
@@ -132,8 +128,6 @@ const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabs
     resultsKpis,
     resultsKpisComparison,
     showDataComparison,
-    displayChangeAsPercentage,
-    percentageDecimalPlaces,
     themeFormatter,
   });
 
