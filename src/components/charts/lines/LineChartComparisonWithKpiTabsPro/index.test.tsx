@@ -413,14 +413,18 @@ describe('LineChartComparisonWithKpiTabsPro', () => {
     });
 
     describe('invertChangeColors', () => {
+      const withInvert = (invert: boolean) => [
+        { ...makeMeasure('revenue'), inputs: { invertChangeColors: invert } } as unknown as Measure,
+      ];
+
       it('sets reverseTrend=false for a positive diff when invertChangeColors is false', () => {
         render(
           <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
+            measures={withInvert(false)}
             resultsKpis={resultsKpis}
             resultsKpisComparison={resultsKpisComparison}
             comparisonPeriod="Previous period"
-            invertChangeColors={false}
           />,
         );
         expect(screen.getByTestId('kpi-trend')).toHaveAttribute('data-reverse-trend', 'false');
@@ -430,10 +434,10 @@ describe('LineChartComparisonWithKpiTabsPro', () => {
         render(
           <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
+            measures={withInvert(true)}
             resultsKpis={resultsKpis}
             resultsKpisComparison={resultsKpisComparison}
             comparisonPeriod="Previous period"
-            invertChangeColors={true}
           />,
         );
         expect(screen.getByTestId('kpi-trend')).toHaveAttribute('data-reverse-trend', 'true');
@@ -445,10 +449,10 @@ describe('LineChartComparisonWithKpiTabsPro', () => {
         render(
           <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
+            measures={withInvert(false)}
             resultsKpis={kpisLower}
             resultsKpisComparison={kpisHigher}
             comparisonPeriod="Previous period"
-            invertChangeColors={false}
           />,
         );
         expect(screen.getByTestId('kpi-trend')).toHaveAttribute('data-reverse-trend', 'true');
@@ -460,10 +464,10 @@ describe('LineChartComparisonWithKpiTabsPro', () => {
         render(
           <LineChartComparisonWithKpiTabsPro
             {...defaultProps}
+            measures={withInvert(true)}
             resultsKpis={kpisLower}
             resultsKpisComparison={kpisHigher}
             comparisonPeriod="Previous period"
-            invertChangeColors={true}
           />,
         );
         expect(screen.getByTestId('kpi-trend')).toHaveAttribute('data-reverse-trend', 'false');

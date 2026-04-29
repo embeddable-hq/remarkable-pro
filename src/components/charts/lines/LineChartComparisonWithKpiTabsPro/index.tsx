@@ -22,7 +22,6 @@ export type LineChartComparisonWithKpiTabsProProps = LineChartComparisonDefaultP
   resultsKpisComparison?: DataResponse;
   displayChangeAsPercentage?: boolean;
   percentageDecimalPlaces?: number;
-  invertChangeColors?: boolean;
 };
 
 const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabsProProps) => {
@@ -52,7 +51,6 @@ const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabs
     resultsKpisComparison,
     displayChangeAsPercentage,
     percentageDecimalPlaces,
-    invertChangeColors,
   } = props;
 
   const [activeMeasureName, setActiveMeasureName] = useState(measures[0]?.name ?? '');
@@ -143,6 +141,7 @@ const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabs
       } else {
         trendText = `${isPositive ? '+' : ''}${themeFormatter.data(measure, diff)}`;
       }
+      const invertChangeColors = Boolean(measure.inputs?.['invertChangeColors']);
       const isBadTrend = invertChangeColors ? isPositive : !isPositive;
       slot = <KpiTrend value={trendText} reverseTrend={isBadTrend} />;
     }

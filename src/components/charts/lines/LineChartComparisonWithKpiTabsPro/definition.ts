@@ -3,6 +3,7 @@ import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/re
 import Component from './index';
 import { LineChartProOptionsClickArg } from '../lines.types';
 import { inputs } from '../../../component.inputs.constants';
+import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
@@ -17,7 +18,20 @@ const meta = {
   name: 'LineChartComparisonWithKpiTabsPro',
   label: 'Line Chart Comparison - With KPI Tabs',
   inputs: [
-    ...lineChartComparisonDefaultPro.meta.inputs,
+    ...lineChartComparisonDefaultPro.meta.inputs.slice(0, 1),
+    {
+      ...inputs.measures,
+      inputs: [
+        ...lineChartComparisonDefaultPro.meta.inputs[1].inputs,
+        {
+          ...subInputs.boolean,
+          name: 'invertChangeColors',
+          label: 'Reverse positive/negative colors',
+          defaultValue: false,
+        },
+      ],
+    },
+    ...lineChartComparisonDefaultPro.meta.inputs.slice(2),
     {
       ...inputs.boolean,
       name: 'displayChangeAsPercentage',
@@ -30,13 +44,6 @@ const meta = {
       name: 'percentageDecimalPlaces',
       label: 'Percentage decimal places',
       defaultValue: 1,
-      category: 'Component Settings',
-    },
-    {
-      ...inputs.boolean,
-      name: 'invertChangeColors',
-      label: 'Reverse positive/negative colors',
-      defaultValue: false,
       category: 'Component Settings',
     },
   ],
