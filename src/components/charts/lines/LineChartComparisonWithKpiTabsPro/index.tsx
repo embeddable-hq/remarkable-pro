@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { DataResponse } from '@embeddable.com/core';
@@ -6,8 +6,9 @@ import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { ChartTabs, ChartTabsProps, KpiTrend, LineChart } from '@embeddable.com/remarkable-ui';
+import { ChartTabs, LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
+import { getComparisonKpiTabsItems } from './LineChartComparisonWithKpiTabsPro.utils';
 import {
   createComparisonClickHandler,
   getLineChartComparisonProData,
@@ -126,32 +127,14 @@ const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabs
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
   const themeFormatter = getThemeFormatter(theme);
 
-  const chartTabsItems: ChartTabsProps['items'] = measures.map((measure) => {
-    const kpiValue = resultsKpis?.data?.[0]?.[measure.name];
-    const kpiComparisonValue = resultsKpisComparison?.data?.[0]?.[measure.name];
-
-    let slot: ReactNode = undefined;
-    if (showDataComparison && kpiValue != null && kpiComparisonValue != null) {
-      const diff = (kpiValue as number) - (kpiComparisonValue as number);
-      const isPositive = diff > 0;
-      let trendText: string;
-      if (displayChangeAsPercentage && (kpiComparisonValue as number) !== 0) {
-        const pct = (diff / (kpiComparisonValue as number)) * 100;
-        trendText = `${isPositive ? '+' : ''}${pct.toFixed(percentageDecimalPlaces ?? 1)}%`;
-      } else {
-        trendText = `${isPositive ? '+' : ''}${themeFormatter.data(measure, diff)}`;
-      }
-      const invertChangeColors = Boolean(measure.inputs?.['invertChangeColors']);
-      const isBadTrend = invertChangeColors ? isPositive : !isPositive;
-      slot = <KpiTrend value={trendText} reverseTrend={isBadTrend} />;
-    }
-
-    return {
-      id: measure.name,
-      label: themeFormatter.dimensionOrMeasureTitle(measure),
-      value: kpiValue == null ? '-' : themeFormatter.data(measure, kpiValue),
-      slot,
-    };
+  const chartTabsItems = getComparisonKpiTabsItems({
+    measures,
+    resultsKpis,
+    resultsKpisComparison,
+    showDataComparison,
+    displayChangeAsPercentage,
+    percentageDecimalPlaces,
+    themeFormatter,
   });
 
   return (
