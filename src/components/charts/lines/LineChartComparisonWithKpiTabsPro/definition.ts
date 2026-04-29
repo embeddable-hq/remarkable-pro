@@ -66,7 +66,6 @@ const previewConfig = {
 
 const preview = definePreview(Component, previewConfig);
 
-// Reuse loadData helpers from LineChartComparisonDefaultPro
 const loadDataResults = lineChartComparisonDefaultPro.results.loadData;
 const loadDataResultsComparison = lineChartComparisonDefaultPro.resultsComparison.loadData;
 
