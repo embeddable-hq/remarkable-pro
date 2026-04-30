@@ -68,6 +68,8 @@ const previewConfig = {
   sizeMeasure: previewData.measure,
   pointDimension: previewData.dimension,
   results: previewData.results2Measures1Dimension,
+  bubbleRadiusMin: 3,
+  bubbleRadiusMax: 10,
   showLegend: true,
   hideMenu: true,
 };
