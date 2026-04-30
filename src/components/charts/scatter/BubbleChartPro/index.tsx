@@ -1,5 +1,5 @@
 import { useTheme } from '@embeddable.com/react';
-import { ScatterChart } from '@embeddable.com/remarkable-ui';
+import { BubbleChart } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
@@ -7,16 +7,17 @@ import { i18nSetup, i18n } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import {
-  createScatterClickHandler,
-  getScatterChartProData,
-  getScatterChartProOptions,
-} from './ScatterChartPro.utils';
+  createBubbleClickHandler,
+  getBubbleChartProData,
+  getBubbleChartProOptions,
+} from './BubbleChartPro.utils';
 
-import type { ScatterChartProOptionsClickArg } from '../scatter.types';
+import type { BubbleChartProOptionsClickArg } from '../scatter.types';
 
-export type ScatterChartProProps = {
+export type BubbleChartProProps = {
   xMeasure: Measure;
   yMeasure: Measure;
+  sizeMeasure: Measure;
   pointDimension: Dimension;
   groupByDimension?: Dimension;
   results: DataResponse;
@@ -33,16 +34,19 @@ export type ScatterChartProProps = {
   yAxisRangeMin?: number;
   yAxisRangeMax?: number;
   reverseXAxis?: boolean;
-  onPointClick?: (payload: ScatterChartProOptionsClickArg) => void;
+  bubbleRadiusMin?: number;
+  bubbleRadiusMax?: number;
+  onPointClick?: (payload: BubbleChartProOptionsClickArg) => void;
 } & ChartCardHeaderProps;
 
-const ScatterChartPro = (props: ScatterChartProProps) => {
+const BubbleChartPro = (props: BubbleChartProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
   const {
     xMeasure,
     yMeasure,
+    sizeMeasure,
     pointDimension,
     groupByDimension,
     results,
@@ -57,6 +61,8 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
     yAxisRangeMin,
     yAxisRangeMax,
     reverseXAxis,
+    bubbleRadiusMin,
+    bubbleRadiusMax,
     onPointClick,
     hideMenu,
   } = props;
@@ -65,11 +71,12 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
 
   const noValueLabel = i18n.t('charts.scatterChart.noValue');
 
-  const chartData = getScatterChartProData(
+  const chartData = getBubbleChartProData(
     {
       data: results.data,
       xMeasure,
       yMeasure,
+      sizeMeasure,
       pointDimension,
       groupByDimension,
       noValueLabel,
@@ -78,19 +85,31 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
     theme,
   );
 
-  const handleClick = createScatterClickHandler({
+  const handleClick = createBubbleClickHandler({
     datasets: chartData.datasets,
     results,
     xMeasure,
     yMeasure,
+    sizeMeasure,
     pointDimension,
     groupByDimension,
     onPointClick,
   });
 
   const chartOptions = mergician(
-    getScatterChartProOptions({ xMeasure, yMeasure, noValueLabel, showPointLabels }, theme),
-    theme.charts.scatterChartPro?.options ?? {},
+    getBubbleChartProOptions(
+      {
+        xMeasure,
+        yMeasure,
+        sizeMeasure,
+        noValueLabel,
+        bubbleRadiusMax,
+        showValueLabels,
+        showPointLabels,
+      },
+      theme,
+    ),
+    theme.charts.bubbleChartPro?.options ?? {},
   );
 
   return (
@@ -100,6 +119,7 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
         pointDimension,
         xMeasure,
         yMeasure,
+        sizeMeasure,
         ...(groupByDimension ? [groupByDimension] : []),
       ]}
       errorMessage={results.error}
@@ -108,7 +128,7 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
       tooltip={tooltip}
       hideMenu={hideMenu}
     >
-      <ScatterChart
+      <BubbleChart
         data={chartData}
         options={chartOptions}
         nullBandLabel={noValueLabel}
@@ -124,10 +144,12 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
         yAxisRangeMin={yAxisRangeMin}
         yAxisRangeMax={yAxisRangeMax}
         reverseXAxis={reverseXAxis}
+        bubbleRadiusMin={bubbleRadiusMin}
+        bubbleRadiusMax={bubbleRadiusMax}
         onClick={handleClick}
       />
     </ChartCard>
   );
 };
 
-export default ScatterChartPro;
+export default BubbleChartPro;
