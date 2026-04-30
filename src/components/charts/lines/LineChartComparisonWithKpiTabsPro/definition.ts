@@ -1,4 +1,11 @@
-import { Granularity, TimeRange, Value, loadData } from '@embeddable.com/core';
+import {
+  Dimension,
+  Granularity,
+  LoadDataRequest,
+  TimeRange,
+  Value,
+  loadData,
+} from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { LineChartProOptionsClickArg } from '../lines.types';
@@ -73,6 +80,62 @@ const preview = definePreview(Component, previewConfig);
 const loadDataResults = lineChartComparisonDefaultPro.results.loadData;
 const loadDataResultsComparison = lineChartComparisonDefaultPro.resultsComparison.loadData;
 
+const loadDataResultsKpisArgs = (
+  inputs: Inputs<typeof meta>,
+  xAxis: Dimension,
+  clientContext?: ThemeClientContext,
+): LoadDataRequest => {
+  const timeProperty =
+    xAxis.nativeType === 'time' ? xAxis : inputs.timePropertyForNonTimeDimensions;
+  return {
+    from: inputs.dataset,
+    select: [...inputs.measures],
+    filters:
+      inputs.primaryDateRange && timeProperty
+        ? [{ property: timeProperty, operator: 'inDateRange', value: inputs.primaryDateRange }]
+        : undefined,
+    timezone: getClientContextTimezone(clientContext?.timezone),
+  };
+};
+
+const loadDataResultsKpis = (
+  inputs: Inputs<typeof meta>,
+  xAxis: Dimension,
+  clientContext: ThemeClientContext,
+) => loadData(loadDataResultsKpisArgs(inputs, xAxis, clientContext));
+
+const loadDataResultsKpisComparisonArgs = (
+  inputs: Inputs<typeof meta>,
+  xAxis: Dimension,
+  comparisonDateRange: TimeRange,
+  clientContext: ThemeClientContext,
+): LoadDataRequest => {
+  const timeProperty =
+    xAxis.nativeType === 'time' ? xAxis : inputs.timePropertyForNonTimeDimensions;
+  return {
+    from: inputs.dataset,
+    select: [...inputs.measures],
+    filters: [{ property: timeProperty, operator: 'inDateRange', value: comparisonDateRange }],
+    timezone: getClientContextTimezone(clientContext?.timezone),
+  };
+};
+
+const loadDataResultsKpisComparison = (
+  inputs: Inputs<typeof meta>,
+  xAxis: Dimension,
+  state: LineChartComparisonWithKpiTabsProState,
+  clientContext: ThemeClientContext,
+) => {
+  const timeProperty =
+    xAxis.nativeType === 'time' ? xAxis : inputs.timePropertyForNonTimeDimensions;
+  if (inputs.primaryDateRange && timeProperty && state?.comparisonDateRange) {
+    return loadData(
+      loadDataResultsKpisComparisonArgs(inputs, xAxis, state.comparisonDateRange, clientContext),
+    );
+  }
+  return undefined;
+};
+
 const events = {
   onLineClicked: (value: LineChartProOptionsClickArg) => ({
     axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
@@ -88,21 +151,6 @@ const props = (
   clientContext: ThemeClientContext,
 ) => {
   const xAxisWithGranularity = getDimensionWithGranularity(inputs.xAxis, state?.granularity);
-  const timeProperty =
-    xAxisWithGranularity.nativeType === 'time'
-      ? xAxisWithGranularity
-      : inputs.timePropertyForNonTimeDimensions;
-  const timezone = getClientContextTimezone(clientContext?.timezone);
-  const primaryFilter =
-    inputs.primaryDateRange && timeProperty
-      ? [
-          {
-            property: timeProperty,
-            operator: 'inDateRange' as const,
-            value: inputs.primaryDateRange,
-          },
-        ]
-      : undefined;
 
   return {
     ...inputs,
@@ -118,27 +166,13 @@ const props = (
       state,
       clientContext,
     ),
-    resultsKpis: loadData({
-      from: inputs.dataset,
-      select: [...inputs.measures],
-      filters: primaryFilter,
-      timezone,
-    }),
-    resultsKpisComparison:
-      inputs.primaryDateRange && timeProperty && state?.comparisonDateRange
-        ? loadData({
-            from: inputs.dataset,
-            select: [...inputs.measures],
-            filters: [
-              {
-                property: timeProperty,
-                operator: 'inDateRange' as const,
-                value: state.comparisonDateRange,
-              },
-            ],
-            timezone,
-          })
-        : undefined,
+    resultsKpis: loadDataResultsKpis(inputs, xAxisWithGranularity, clientContext),
+    resultsKpisComparison: loadDataResultsKpisComparison(
+      inputs,
+      xAxisWithGranularity,
+      state,
+      clientContext,
+    ),
   };
 };
 
@@ -148,4 +182,14 @@ export const lineChartComparisonWithKpiTabsPro = {
   preview,
   previewConfig,
   config: { props, events },
+  results: lineChartComparisonDefaultPro.results,
+  resultsComparison: lineChartComparisonDefaultPro.resultsComparison,
+  resultsKpis: {
+    loadDataArgs: loadDataResultsKpisArgs,
+    loadData: loadDataResultsKpis,
+  },
+  resultsKpisComparison: {
+    loadDataArgs: loadDataResultsKpisComparisonArgs,
+    loadData: loadDataResultsKpisComparison,
+  },
 } as const;
