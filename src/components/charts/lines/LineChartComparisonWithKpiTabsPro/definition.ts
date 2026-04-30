@@ -25,7 +25,6 @@ const meta = {
           ...measuresInput,
           inputs: [
             ...measuresInput.inputs,
-            ...[
               {
                 ...subInputs.boolean,
                 name: 'invertChangeColors',
@@ -45,6 +44,7 @@ const meta = {
                 defaultValue: 1,
               },
             ],
+         ]
           ],
         };
       }
