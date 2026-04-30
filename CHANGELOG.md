@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.2.9
+
+### Patch Changes
+
+- 0ffa82f: Add ComparisonLineChartWithKpiTabs
+
 ## 0.2.8
 
 ### Patch Changes
