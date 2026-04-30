@@ -67,7 +67,6 @@ const getKpiTrendSlot = ({
   const reverseTrend = measure.inputs?.['invertChangeColors'] ? isPositive : !isPositive;
   const trendText = getTrendText({
     diff,
-    isPositive,
     kpiComparisonValue: kpiComparisonValue as number,
     displayChangeAsPercentage,
     percentageDecimalPlaces,
@@ -80,7 +79,6 @@ const getKpiTrendSlot = ({
 
 const getTrendText = ({
   diff,
-  isPositive,
   kpiComparisonValue,
   displayChangeAsPercentage,
   percentageDecimalPlaces,
@@ -88,13 +86,13 @@ const getTrendText = ({
   themeFormatter,
 }: {
   diff: number;
-  isPositive: boolean;
   kpiComparisonValue: number;
   displayChangeAsPercentage?: boolean;
   percentageDecimalPlaces?: number;
   measure: Measure;
   themeFormatter: GetThemeFormatter;
 }): string => {
+  const isPositive = diff > 0;
   const sign = isPositive ? '+' : '';
   if (displayChangeAsPercentage && kpiComparisonValue !== 0) {
     const pct = (diff / kpiComparisonValue) * 100;
