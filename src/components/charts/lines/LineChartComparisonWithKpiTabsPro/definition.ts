@@ -32,26 +32,24 @@ const meta = {
           ...measuresInput,
           inputs: [
             ...measuresInput.inputs,
-              {
-                ...subInputs.boolean,
-                name: 'invertChangeColors',
-                label: 'Reverse positive/negative colors',
-                defaultValue: false,
-              },
-              {
-                ...subInputs.boolean,
-                name: 'displayChangeAsPercentage',
-                label: 'Display change as %',
-                defaultValue: false,
-              },
-              {
-                ...subInputs.number,
-                name: 'percentageDecimalPlaces',
-                label: 'Percentage decimal places',
-                defaultValue: 1,
-              },
-            ],
-         ]
+            {
+              ...subInputs.boolean,
+              name: 'invertChangeColors',
+              label: 'Reverse positive/negative colors',
+              defaultValue: false,
+            },
+            {
+              ...subInputs.boolean,
+              name: 'displayChangeAsPercentage',
+              label: 'Display change as %',
+              defaultValue: false,
+            },
+            {
+              ...subInputs.number,
+              name: 'percentageDecimalPlaces',
+              label: 'Percentage decimal places',
+              defaultValue: 1,
+            },
           ],
         };
       }
