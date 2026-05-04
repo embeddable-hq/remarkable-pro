@@ -18,7 +18,6 @@ import {
   getCellValue,
   NULL_GROUP_KEY,
   buildScatterProScales,
-  buildScatterProDatalabelsValue,
 } from '../scatter.pro.utils';
 
 export { measureToNullableNumber };
@@ -60,7 +59,7 @@ export const getBubbleChartProOptions = (
 
   const getBubbleRadius = (context: Context): number => {
     const ds = context.dataset as BubbleDatasetWithOriginal;
-    return ds.computedRadii?.[context.dataIndex] ?? radiusMax;
+    return ds.bubbleSizes?.[context.dataIndex] ?? radiusMax;
   };
 
   const captionOffset = (context: Context): number => getBubbleRadius(context) + labelGap;
@@ -85,16 +84,24 @@ export const getBubbleChartProOptions = (
           label: (ctx) => {
             const ds = ctx.dataset as BubbleDatasetWithOriginal;
             const orig = ds.originalData?.[ctx.dataIndex];
-            const prefix = ds.label ? `${ds.label}: ` : '';
-            if (!orig) return prefix;
-            return `${prefix}(${formatValue(xMeasure, orig.x)}, ${formatValue(yMeasure, orig.y)}, ${formatValue(sizeMeasure, orig.size)})`;
+            if (!orig) return '';
+            return [
+              `${themeFormatter.dimensionOrMeasureTitle(xMeasure)}: ${formatValue(xMeasure, orig.x)}`,
+              `${themeFormatter.dimensionOrMeasureTitle(yMeasure)}: ${formatValue(yMeasure, orig.y)}`,
+              `${themeFormatter.dimensionOrMeasureTitle(sizeMeasure)}: ${formatValue(sizeMeasure, orig.size)}`,
+            ];
           },
         },
       },
       datalabels: {
         labels: {
           value: {
-            ...buildScatterProDatalabelsValue(xMeasure, yMeasure, formatValue),
+            formatter: (_value: unknown, context: { dataset: unknown; dataIndex: number }) => {
+              const ds = context.dataset as BubbleDatasetWithOriginal;
+              const orig = ds.originalData?.[context.dataIndex];
+              if (!orig) return '';
+              return formatValue(sizeMeasure, orig.size);
+            },
             anchor: 'center',
             align: 'bottom',
             offset: valueOffset,

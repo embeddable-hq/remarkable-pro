@@ -132,7 +132,7 @@ const BubbleChartPro = (props: BubbleChartProProps) => {
         data={chartData}
         options={chartOptions}
         nullBandLabel={noValueLabel}
-        showLegend={showLegend}
+        showLegend={showLegend && !!groupByDimension}
         showTooltips={showTooltips}
         showPointLabels={showPointLabels}
         showValueLabels={showValueLabels}
