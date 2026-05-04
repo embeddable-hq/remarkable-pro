@@ -220,6 +220,26 @@ describe('getBubbleChartProData', () => {
     expect(getDimensionMeasureColor).not.toHaveBeenCalled();
   });
 
+  it('ignores pointColor override when groupByDimension is set', () => {
+    vi.mocked(getDimensionMeasureColor).mockClear();
+    const groupDim = makeDimension({ name: 'g', title: 'G' });
+    const result = getBubbleChartProData(
+      {
+        data: [{ point: 'a', x: 1, y: 2, s: 5, g: 'A' }],
+        xMeasure: x,
+        yMeasure: y,
+        sizeMeasure: s,
+        pointDimension: pointDim(),
+        groupByDimension: groupDim,
+        noValueLabel: 'NV',
+        pointColor: '#abc',
+      },
+      makeTheme(),
+    );
+    expect(result.datasets[0]!.backgroundColor).not.toBe('#abc');
+    expect(getDimensionMeasureColor).toHaveBeenCalled();
+  });
+
   it('uses getDimensionMeasureColor when pointColor is absent', () => {
     vi.mocked(getDimensionMeasureColor).mockClear();
     getBubbleChartProData(

@@ -208,7 +208,7 @@ export const getBubbleChartProData = (
   const chartColors = getChartColors();
   const data = (props.data ?? []) as Record<string, unknown>[];
   const pointField = getDimensionFieldName(props.pointDimension);
-  const overrideColor = props.pointColor?.trim() || undefined;
+  const overrideColor = props.groupByDimension ? undefined : props.pointColor?.trim() || undefined;
 
   if (!data.length) {
     return { datasets: [{ label: '', data: [] }] };
