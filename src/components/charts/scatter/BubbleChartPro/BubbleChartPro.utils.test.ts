@@ -436,14 +436,14 @@ describe('getBubbleChartProOptions', () => {
     expect(yCb(2)).toBe('data:y:2');
   });
 
-  it('tooltip label includes x, y, and size formatted values', () => {
+  it('tooltip label includes x, y, and size formatted values as separate lines', () => {
     const opts = getBubbleChartProOptions(
       { xMeasure, yMeasure, sizeMeasure, noValueLabel: NO_VALUE },
       {} as Theme,
     );
     const labelFn = opts.plugins?.tooltip?.callbacks?.label as (
       ctx: TooltipItem<'bubble'>,
-    ) => string;
+    ) => string[];
 
     const ctx = {
       dataset: {
@@ -454,7 +454,7 @@ describe('getBubbleChartProOptions', () => {
       dataIndex: 0,
     } as unknown as TooltipItem<'bubble'>;
 
-    expect(labelFn(ctx)).toBe('Series A: (data:x:10, data:y:20, data:sz:50)');
+    expect(labelFn(ctx)).toEqual(['X: data:x:10', 'Y: data:y:20', 'Size: data:sz:50']);
   });
 
   it('tooltip returns noValueLabel for null size', () => {
@@ -464,7 +464,7 @@ describe('getBubbleChartProOptions', () => {
     );
     const labelFn = opts.plugins?.tooltip?.callbacks?.label as (
       ctx: TooltipItem<'bubble'>,
-    ) => string;
+    ) => string[];
 
     const ctx = {
       dataset: {
@@ -475,6 +475,6 @@ describe('getBubbleChartProOptions', () => {
       dataIndex: 0,
     } as unknown as TooltipItem<'bubble'>;
 
-    expect(labelFn(ctx)).toBe(`(data:x:1, data:y:2, ${NO_VALUE})`);
+    expect(labelFn(ctx)).toEqual(['X: data:x:1', 'Y: data:y:2', `Size: ${NO_VALUE}`]);
   });
 });
