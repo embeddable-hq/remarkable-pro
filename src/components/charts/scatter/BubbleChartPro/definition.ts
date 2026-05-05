@@ -13,38 +13,28 @@ import {
   scatterBaseEventProperties,
 } from '../scatter.definition.shared';
 
-const sizeMeasureInput = {
-  ...inputs.measure,
-  name: 'sizeMeasure',
-  label: 'Bubble size measure',
-} as const;
-
-const bubbleRadiusMinInput = {
-  ...inputs.number,
-  name: 'bubbleRadiusMin',
-  label: 'Bubble min radius (px)',
-  defaultValue: 3,
-  category: 'Component Settings',
-} as const;
-
-const bubbleRadiusMaxInput = {
-  ...inputs.number,
-  name: 'bubbleRadiusMax',
-  label: 'Bubble max radius (px)',
-  defaultValue: 20,
-  category: 'Component Settings',
-} as const;
-
 const meta = {
   name: 'BubbleChartPro',
   label: 'Bubble Chart',
   category: 'Scatter Charts',
   inputs: [
     ...scatterBaseInputs,
-    sizeMeasureInput,
+    { ...inputs.measure, name: 'bubbleSizeMeasure', label: 'Bubble size measure' } as const,
     ...scatterPointAndGroupInputs,
-    bubbleRadiusMinInput,
-    bubbleRadiusMaxInput,
+    {
+      ...inputs.number,
+      name: 'bubbleRadiusMin',
+      label: 'Bubble min radius (px)',
+      defaultValue: 3,
+      category: 'Component Settings',
+    } as const,
+    {
+      ...inputs.number,
+      name: 'bubbleRadiusMax',
+      label: 'Bubble max radius (px)',
+      defaultValue: 20,
+      category: 'Component Settings',
+    } as const,
     ...scatterDisplayInputs,
   ],
   events: [
@@ -65,7 +55,7 @@ const previewConfig = {
   dataset: previewData.dataset,
   xMeasure: previewData.measure,
   yMeasure: previewData.measureVariant,
-  sizeMeasure: previewData.measure,
+  bubbleSizeMeasure: previewData.measure,
   pointDimension: previewData.dimension,
   results: previewData.results2Measures1Dimension,
   bubbleRadiusMin: 3,
@@ -85,7 +75,7 @@ const loadDataResultsArgs = (
   select: [
     inputs.xMeasure,
     inputs.yMeasure,
-    inputs.sizeMeasure,
+    inputs.bubbleSizeMeasure,
     inputs.pointDimension,
     ...(inputs.groupByDimension ? [inputs.groupByDimension] : []),
   ],

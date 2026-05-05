@@ -17,7 +17,7 @@ import type { BubbleChartProOptionsClickArg } from '../scatter.types';
 export type BubbleChartProProps = {
   xMeasure: Measure;
   yMeasure: Measure;
-  sizeMeasure: Measure;
+  bubbleSizeMeasure: Measure;
   pointDimension: Dimension;
   groupByDimension?: Dimension;
   results: DataResponse;
@@ -46,7 +46,7 @@ const BubbleChartPro = (props: BubbleChartProProps) => {
   const {
     xMeasure,
     yMeasure,
-    sizeMeasure,
+    bubbleSizeMeasure: sizeMeasure,
     pointDimension,
     groupByDimension,
     results,
