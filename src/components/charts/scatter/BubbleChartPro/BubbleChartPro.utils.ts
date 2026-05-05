@@ -70,13 +70,7 @@ export const getBubbleChartProOptions = (
     return r + labelGap;
   };
 
-  const labelLineCount = (showValueLabels ? 1 : 0) + (showPointLabels ? 1 : 0);
-  const bottomPadding = radiusMax + labelGap + labelLineCount * (labelLineHeight + labelGap);
-
   return {
-    layout: {
-      padding: { top: radiusMax, right: radiusMax, left: radiusMax, bottom: bottomPadding },
-    },
     scales: buildScatterProScales(xMeasure, yMeasure, (m, v) => themeFormatter.data(m, v)),
     plugins: {
       tooltip: {
@@ -96,6 +90,7 @@ export const getBubbleChartProOptions = (
       datalabels: {
         labels: {
           value: {
+            display: showValueLabels ? 'auto' : false,
             formatter: (_value: unknown, context: { dataset: unknown; dataIndex: number }) => {
               const ds = context.dataset as BubbleDatasetWithOriginal;
               const orig = ds.originalData?.[context.dataIndex];
@@ -107,6 +102,7 @@ export const getBubbleChartProOptions = (
             offset: valueOffset,
           },
           caption: {
+            display: showPointLabels ? 'auto' : false,
             anchor: 'center',
             align: 'bottom',
             offset: captionOffset,
