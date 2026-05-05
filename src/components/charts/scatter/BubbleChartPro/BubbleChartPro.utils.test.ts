@@ -9,8 +9,8 @@ import {
   getBubblePointClickData,
   getBubbleChartProData,
   getBubbleChartProOptions,
-  measureToNullableNumber,
 } from './BubbleChartPro.utils';
+import { measureToNullableNumber } from '../scatter.pro.utils';
 import {
   getThemeFormatter,
   type GetThemeFormatter,

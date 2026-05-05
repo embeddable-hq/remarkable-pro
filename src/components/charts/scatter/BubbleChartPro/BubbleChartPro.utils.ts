@@ -21,8 +21,6 @@ import {
   type RawValue,
 } from '../scatter.pro.utils';
 
-export { measureToNullableNumber };
-
 export type BubblePoint = BubbleChartInputPoint & { rowIndex: number };
 
 export const getBubbleChartProOptions = (

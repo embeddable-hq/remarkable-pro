@@ -9,8 +9,8 @@ import {
   getPointClickData,
   getScatterChartProData,
   getScatterChartProOptions,
-  measureToNullableNumber,
 } from './ScatterChartPro.utils';
+import { measureToNullableNumber } from '../scatter.pro.utils';
 import {
   getThemeFormatter,
   type GetThemeFormatter,
