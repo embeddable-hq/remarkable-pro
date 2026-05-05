@@ -12,7 +12,7 @@ import {
   getScatterChartProOptions,
 } from './ScatterChartPro.utils';
 
-import type { ScatterChartProOptionsClickArg } from '../scatter.types';
+import type { ScatterChartProOptionsClickArg } from './ScatterChartPro.types';
 
 export type ScatterChartProProps = {
   xMeasure: Measure;

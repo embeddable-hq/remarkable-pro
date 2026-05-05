@@ -1,5 +1,5 @@
 import { DataResponse, LoadDataRequest, Value, loadData } from '@embeddable.com/core';
-import type { ScatterChartProOptionsClickArg } from '../scatter.types';
+import type { ScatterChartProOptionsClickArg } from './ScatterChartPro.types';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { previewData } from '../../../preview.data.constants';

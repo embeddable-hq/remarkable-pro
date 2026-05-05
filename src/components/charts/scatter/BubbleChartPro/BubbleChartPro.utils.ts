@@ -11,7 +11,7 @@ import type {
   BubbleDatasetExtended,
 } from '@embeddable.com/remarkable-ui';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
-import type { BubbleChartProOptionsClickArg } from '../scatter.types';
+import type { BubbleChartProOptionsClickArg } from './BubbleChartPro.types';
 import { getDimensionFieldName } from '../../../../utils/data.utils';
 import {
   measureToNullableNumber,

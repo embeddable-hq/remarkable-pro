@@ -8,7 +8,3 @@ export type ScatterChartProOptionsClickArg = {
   pointDimensionTimeRange: TimeRange;
   groupByDimensionTimeRange: TimeRange;
 };
-
-export type BubbleChartProOptionsClickArg = ScatterChartProOptionsClickArg & {
-  sizeMeasureValue: string;
-};

@@ -1,5 +1,5 @@
 import { DataResponse, LoadDataRequest, Value, loadData } from '@embeddable.com/core';
-import type { BubbleChartProOptionsClickArg } from '../scatter.types';
+import type { BubbleChartProOptionsClickArg } from './BubbleChartPro.types';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';

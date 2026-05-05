@@ -10,7 +10,7 @@ import type {
   ScatterDatasetExtended,
 } from '@embeddable.com/remarkable-ui';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
-import type { ScatterChartProOptionsClickArg } from '../scatter.types';
+import type { ScatterChartProOptionsClickArg } from './ScatterChartPro.types';
 import { getDimensionFieldName } from '../../../../utils/data.utils';
 import {
   measureToNullableNumber,

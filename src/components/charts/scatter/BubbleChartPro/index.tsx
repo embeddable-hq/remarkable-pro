@@ -12,7 +12,7 @@ import {
   getBubbleChartProOptions,
 } from './BubbleChartPro.utils';
 
-import type { BubbleChartProOptionsClickArg } from '../scatter.types';
+import type { BubbleChartProOptionsClickArg } from './BubbleChartPro.types';
 
 export type BubbleChartProProps = {
   xMeasure: Measure;
