@@ -14,10 +14,11 @@ import type { ScatterChartProOptionsClickArg } from '../scatter.types';
 import { getDimensionFieldName } from '../../../../utils/data.utils';
 import {
   measureToNullableNumber,
-  getCellValue,
+  rawValueToString,
   NULL_GROUP_KEY,
   buildScatterProScales,
   buildScatterProDatalabelsValue,
+  type RawValue,
 } from '../scatter.pro.utils';
 
 export { measureToNullableNumber };
@@ -91,8 +92,6 @@ export const getScatterChartProOptions = (
   };
 };
 
-type CellValue = string | number | boolean | null | undefined;
-
 export type ScatterPoint = ScatterChartInputPoint & { rowIndex: number };
 
 export const getPointClickData = (
@@ -106,18 +105,18 @@ export const getPointClickData = (
 ): ScatterChartProOptionsClickArg | null => {
   const rowIdx = datasets[point.datasetIndex]?.data[point.index]?.rowIndex;
   if (rowIdx === undefined) return null;
-  const row = data?.[rowIdx] as Record<string, CellValue> | undefined;
+  const row = data?.[rowIdx] as Record<string, RawValue> | undefined;
   if (!row) return null;
 
   const pointField = getDimensionFieldName(pointDimension);
   const groupField = groupByDimension ? getDimensionFieldName(groupByDimension) : undefined;
 
-  const pointDimensionValue = getCellValue(row[pointField]);
-  const groupByDimensionValue = groupField ? getCellValue(row[groupField]) : null;
+  const pointDimensionValue = rawValueToString(row[pointField]);
+  const groupByDimensionValue = groupField ? rawValueToString(row[groupField]) : null;
 
   return {
-    xMeasureValue: getCellValue(row[xMeasure.name]),
-    yMeasureValue: getCellValue(row[yMeasure.name]),
+    xMeasureValue: rawValueToString(row[xMeasure.name]),
+    yMeasureValue: rawValueToString(row[yMeasure.name]),
     pointDimensionValue,
     groupByDimensionValue,
     pointDimensionTimeRange: getTimeRangeFromDimensionValue({

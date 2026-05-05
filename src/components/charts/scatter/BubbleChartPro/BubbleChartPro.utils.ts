@@ -15,14 +15,13 @@ import type { BubbleChartProOptionsClickArg } from '../scatter.types';
 import { getDimensionFieldName } from '../../../../utils/data.utils';
 import {
   measureToNullableNumber,
-  getCellValue,
+  rawValueToString,
   NULL_GROUP_KEY,
   buildScatterProScales,
+  type RawValue,
 } from '../scatter.pro.utils';
 
 export { measureToNullableNumber };
-
-type CellValue = string | number | boolean | null | undefined;
 
 export type BubblePoint = BubbleChartInputPoint & { rowIndex: number };
 
@@ -125,19 +124,19 @@ export const getBubblePointClickData = (
 ): BubbleChartProOptionsClickArg | null => {
   const rowIdx = datasets[point.datasetIndex]?.data[point.index]?.rowIndex;
   if (rowIdx === undefined) return null;
-  const row = data?.[rowIdx] as Record<string, CellValue> | undefined;
+  const row = data?.[rowIdx] as Record<string, RawValue> | undefined;
   if (!row) return null;
 
   const pointField = getDimensionFieldName(pointDimension);
   const groupField = groupByDimension ? getDimensionFieldName(groupByDimension) : undefined;
 
-  const pointDimensionValue = getCellValue(row[pointField]);
-  const groupByDimensionValue = groupField ? getCellValue(row[groupField]) : null;
+  const pointDimensionValue = rawValueToString(row[pointField]);
+  const groupByDimensionValue = groupField ? rawValueToString(row[groupField]) : null;
 
   return {
-    xMeasureValue: getCellValue(row[xMeasure.name]),
-    yMeasureValue: getCellValue(row[yMeasure.name]),
-    sizeMeasureValue: getCellValue(row[sizeMeasure.name]),
+    xMeasureValue: rawValueToString(row[xMeasure.name]),
+    yMeasureValue: rawValueToString(row[yMeasure.name]),
+    sizeMeasureValue: rawValueToString(row[sizeMeasure.name]),
     pointDimensionValue,
     groupByDimensionValue,
     pointDimensionTimeRange: getTimeRangeFromDimensionValue({

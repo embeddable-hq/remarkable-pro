@@ -7,7 +7,9 @@ export const measureToNullableNumber = (value: unknown): number | null => {
   return Number.isFinite(n) ? n : null;
 };
 
-export const getCellValue = (value: string | number | boolean | null | undefined): string => {
+export type RawValue = string | number | boolean | null | undefined;
+
+export const rawValueToString = (value: string | number | boolean | null | undefined): string => {
   if (value === null || value === undefined) return '';
   if (typeof value === 'object') return JSON.stringify(value);
   return String(value);
