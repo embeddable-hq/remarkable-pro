@@ -10,7 +10,6 @@ import {
   scatterBaseInputs,
   scatterPointAndGroupInputs,
   scatterDisplayInputs,
-  scatterBaseEventProperties,
 } from '../scatter.definition.shared';
 
 const meta = {
@@ -42,8 +41,21 @@ const meta = {
       name: 'onPointClick',
       label: 'A point is clicked',
       properties: [
-        ...scatterBaseEventProperties,
-        { name: 'sizeMeasureValue', label: 'Clicked bubble size value', type: 'string' as const },
+        { name: 'xMeasureValue', label: 'Clicked X measure value', type: 'string' },
+        { name: 'yMeasureValue', label: 'Clicked Y measure value', type: 'string' },
+        { name: 'pointDimensionValue', label: 'Clicked point dimension value', type: 'string' },
+        { name: 'groupByDimensionValue', label: 'Clicked group by value', type: 'string' },
+        {
+          name: 'pointDimensionTimeRange',
+          label: 'Clicked point dimension time range',
+          type: 'timeRange',
+        },
+        {
+          name: 'groupByDimensionTimeRange',
+          label: 'Clicked group by time range',
+          type: 'timeRange',
+        },
+        { name: 'sizeMeasureValue', label: 'Clicked bubble size value', type: 'string' },
       ],
     },
   ],

@@ -35,20 +35,3 @@ export const scatterDisplayInputs = [
   inputs.yAxisRangeMax,
   inputs.maxResults,
 ] as const;
-
-export const scatterBaseEventProperties = [
-  { name: 'xMeasureValue', label: 'Clicked X measure value', type: 'string' as const },
-  { name: 'yMeasureValue', label: 'Clicked Y measure value', type: 'string' as const },
-  { name: 'pointDimensionValue', label: 'Clicked point dimension value', type: 'string' as const },
-  { name: 'groupByDimensionValue', label: 'Clicked group by value', type: 'string' as const },
-  {
-    name: 'pointDimensionTimeRange',
-    label: 'Clicked point dimension time range',
-    type: 'timeRange' as const,
-  },
-  {
-    name: 'groupByDimensionTimeRange',
-    label: 'Clicked group by time range',
-    type: 'timeRange' as const,
-  },
-];
