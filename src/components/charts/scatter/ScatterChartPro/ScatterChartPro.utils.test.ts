@@ -19,7 +19,7 @@ import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils'
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import type { Theme } from '../../../../theme/theme.types';
 import type { TooltipItem } from 'chart.js';
-import type { ScatterDatasetWithOriginal } from '@embeddable.com/remarkable-ui';
+import type { ScatterDatasetExtended } from '@embeddable.com/remarkable-ui';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
 import { getDimensionFieldName } from '../../../../utils/data.utils';
 
@@ -646,7 +646,7 @@ describe('getScatterChartProOptions', () => {
           label: 'Series A',
           originalData: [{ x: 10, y: 20 }],
           data: [],
-        } as unknown as ScatterDatasetWithOriginal,
+        } as unknown as ScatterDatasetExtended,
         dataIndex: 0,
         parsed: { x: 10, y: 20 },
       } as unknown as TooltipItem<'scatter'>;
@@ -668,7 +668,7 @@ describe('getScatterChartProOptions', () => {
           label: '',
           originalData: [{ x: null, y: null }],
           data: [],
-        } as unknown as ScatterDatasetWithOriginal,
+        } as unknown as ScatterDatasetExtended,
         dataIndex: 0,
         parsed: { x: 0, y: 0 },
       } as unknown as TooltipItem<'scatter'>;

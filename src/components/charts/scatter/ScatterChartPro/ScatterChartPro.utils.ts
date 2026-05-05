@@ -7,7 +7,7 @@ import { getChartColors } from '@embeddable.com/remarkable-ui';
 import type {
   ChartClickArgs,
   ScatterChartInputPoint,
-  ScatterDatasetWithOriginal,
+  ScatterDatasetExtended,
 } from '@embeddable.com/remarkable-ui';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import type { ScatterChartProOptionsClickArg } from '../scatter.types';
@@ -58,7 +58,7 @@ export const getScatterChartProOptions = (
       tooltip: {
         callbacks: {
           label: (ctx) => {
-            const ds = ctx.dataset as ScatterDatasetWithOriginal;
+            const ds = ctx.dataset as ScatterDatasetExtended;
             const orig =
               ds.originalData?.[ctx.dataIndex] ??
               (ctx.dataset.data[ctx.dataIndex] as

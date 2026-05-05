@@ -8,7 +8,7 @@ import { getChartColors } from '@embeddable.com/remarkable-ui';
 import type {
   ChartClickArgs,
   BubbleChartInputPoint,
-  BubbleDatasetWithOriginal,
+  BubbleDatasetExtended,
 } from '@embeddable.com/remarkable-ui';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import type { BubbleChartProOptionsClickArg } from '../scatter.types';
@@ -58,8 +58,8 @@ export const getBubbleChartProOptions = (
   const labelLineHeight = 20;
 
   const getBubbleRadius = (context: Context): number => {
-    const ds = context.dataset as BubbleDatasetWithOriginal;
-    return ds.bubbleSizes?.[context.dataIndex] ?? radiusMax;
+    const ds = context.dataset as BubbleDatasetExtended;
+    return ds.bubbleSizes[context.dataIndex] ?? radiusMax;
   };
 
   const captionOffset = (context: Context): number => getBubbleRadius(context) + labelGap;
@@ -76,7 +76,7 @@ export const getBubbleChartProOptions = (
       tooltip: {
         callbacks: {
           label: (ctx) => {
-            const ds = ctx.dataset as BubbleDatasetWithOriginal;
+            const ds = ctx.dataset as BubbleDatasetExtended;
             const orig = ds.originalData?.[ctx.dataIndex];
             if (!orig) return '';
             return [
@@ -92,7 +92,7 @@ export const getBubbleChartProOptions = (
           value: {
             display: showValueLabels ? 'auto' : false,
             formatter: (_value: unknown, context: { dataset: unknown; dataIndex: number }) => {
-              const ds = context.dataset as BubbleDatasetWithOriginal;
+              const ds = context.dataset as BubbleDatasetExtended;
               const orig = ds.originalData?.[context.dataIndex];
               if (!orig) return '';
               return formatValue(sizeMeasure, orig.size);

@@ -19,7 +19,7 @@ import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils'
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import type { Theme } from '../../../../theme/theme.types';
 import type { TooltipItem } from 'chart.js';
-import type { BubbleDatasetWithOriginal } from '@embeddable.com/remarkable-ui';
+import type { BubbleDatasetExtended } from '@embeddable.com/remarkable-ui';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
 import { getDimensionFieldName } from '../../../../utils/data.utils';
 
@@ -470,7 +470,7 @@ describe('getBubbleChartProOptions', () => {
         label: 'Series A',
         originalData: [{ x: 10, y: 20, size: 50 }],
         data: [],
-      } as unknown as BubbleDatasetWithOriginal,
+      } as unknown as BubbleDatasetExtended,
       dataIndex: 0,
     } as unknown as TooltipItem<'bubble'>;
 
@@ -491,7 +491,7 @@ describe('getBubbleChartProOptions', () => {
         label: '',
         originalData: [{ x: 1, y: 2, size: null }],
         data: [],
-      } as unknown as BubbleDatasetWithOriginal,
+      } as unknown as BubbleDatasetExtended,
       dataIndex: 0,
     } as unknown as TooltipItem<'bubble'>;
 
