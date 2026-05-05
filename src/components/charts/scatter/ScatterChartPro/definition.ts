@@ -2,20 +2,56 @@ import { DataResponse, LoadDataRequest, Value, loadData } from '@embeddable.com/
 import type { ScatterChartProOptionsClickArg } from './ScatterChartPro.types';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
+import { inputs } from '../../../component.inputs.constants';
+import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
-import {
-  scatterBaseInputs,
-  scatterPointAndGroupInputs,
-  scatterDisplayInputs,
-} from '../scatter.definition.shared';
 
 const meta = {
   name: 'ScatterChartPro',
   label: 'Scatter Chart',
   category: 'Scatter Charts',
-  inputs: [...scatterBaseInputs, ...scatterPointAndGroupInputs, ...scatterDisplayInputs],
+  inputs: [
+    inputs.dataset,
+    inputs.xMeasure,
+    inputs.yMeasure,
+    { ...inputs.dimension, name: 'pointDimension', label: 'Point dimension' },
+    {
+      ...inputs.dimension,
+      name: 'groupByDimension',
+      label: 'Group by (optional)',
+      required: false,
+    },
+    {
+      ...subInputs.color,
+      name: 'pointColor',
+      label: 'Point color',
+      category: 'Component Settings',
+    },
+    inputs.title,
+    inputs.description,
+    inputs.tooltip,
+    inputs.showLegend,
+    inputs.showTooltips,
+    {
+      ...inputs.boolean,
+      name: 'showPointLabels',
+      label: 'Show point labels',
+      defaultValue: false,
+      category: 'Component Settings',
+    } as const,
+    inputs.showValueLabels,
+    inputs.showLogarithmicScale,
+    inputs.xAxisLabel,
+    inputs.yAxisLabel,
+    inputs.reverseXAxis,
+    inputs.xAxisRangeMin,
+    inputs.xAxisRangeMax,
+    inputs.yAxisRangeMin,
+    inputs.yAxisRangeMax,
+    inputs.maxResults,
+  ],
   events: [
     {
       name: 'onPointClick',

@@ -3,23 +3,33 @@ import type { BubbleChartProOptionsClickArg } from './BubbleChartPro.types';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
+import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
-import {
-  scatterBaseInputs,
-  scatterPointAndGroupInputs,
-  scatterDisplayInputs,
-} from '../scatter.definition.shared';
 
 const meta = {
   name: 'BubbleChartPro',
   label: 'Bubble Chart',
   category: 'Scatter Charts',
   inputs: [
-    ...scatterBaseInputs,
+    inputs.dataset,
+    inputs.xMeasure,
+    inputs.yMeasure,
     { ...inputs.measure, name: 'bubbleSizeMeasure', label: 'Bubble size measure' } as const,
-    ...scatterPointAndGroupInputs,
+    { ...inputs.dimension, name: 'pointDimension', label: 'Point dimension' },
+    {
+      ...inputs.dimension,
+      name: 'groupByDimension',
+      label: 'Group by (optional)',
+      required: false,
+    },
+    {
+      ...subInputs.color,
+      name: 'pointColor',
+      label: 'Point color',
+      category: 'Component Settings',
+    },
     {
       ...inputs.number,
       name: 'bubbleRadiusMin',
@@ -34,7 +44,28 @@ const meta = {
       defaultValue: 20,
       category: 'Component Settings',
     } as const,
-    ...scatterDisplayInputs,
+    inputs.title,
+    inputs.description,
+    inputs.tooltip,
+    inputs.showLegend,
+    inputs.showTooltips,
+    {
+      ...inputs.boolean,
+      name: 'showPointLabels',
+      label: 'Show point labels',
+      defaultValue: false,
+      category: 'Component Settings',
+    } as const,
+    inputs.showValueLabels,
+    inputs.showLogarithmicScale,
+    inputs.xAxisLabel,
+    inputs.yAxisLabel,
+    inputs.reverseXAxis,
+    inputs.xAxisRangeMin,
+    inputs.xAxisRangeMax,
+    inputs.yAxisRangeMin,
+    inputs.yAxisRangeMax,
+    inputs.maxResults,
   ],
   events: [
     {
