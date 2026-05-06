@@ -17,7 +17,7 @@ export const rawValueToString = (value: string | number | boolean | null | undef
 
 export const NULL_GROUP_KEY = '__scatter_null_group__';
 
-export const buildScatterProScales = (
+export const buildScatterScales = (
   xMeasure: Measure,
   yMeasure: Measure,
   formatTick: (measure: Measure, value: number) => string,
@@ -37,23 +37,5 @@ export const buildScatterProScales = (
         return formatTick(yMeasure, v);
       },
     },
-  },
-});
-
-type SharedDatasetOriginal = {
-  label?: string;
-  originalData?: { x: number | null; y: number | null }[];
-};
-
-export const buildScatterProDatalabelsValue = (
-  xMeasure: Measure,
-  yMeasure: Measure,
-  formatValue: (measure: Measure, value: number | null | undefined) => string,
-) => ({
-  formatter: (_value: unknown, context: { dataset: unknown; dataIndex: number }) => {
-    const ds = context.dataset as SharedDatasetOriginal;
-    const raw = ds.originalData?.[context.dataIndex];
-    if (!raw) return '';
-    return `${formatValue(xMeasure, raw.x)}, ${formatValue(yMeasure, raw.y)}`;
   },
 });

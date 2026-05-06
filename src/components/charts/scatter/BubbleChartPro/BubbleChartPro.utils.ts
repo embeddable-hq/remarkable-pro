@@ -17,9 +17,9 @@ import {
   measureToNullableNumber,
   rawValueToString,
   NULL_GROUP_KEY,
-  buildScatterProScales,
+  buildScatterScales,
   type RawValue,
-} from '../scatter.pro.utils';
+} from '../scatter.utils';
 
 export type BubblePoint = BubbleChartInputPoint & { rowIndex: number };
 
@@ -68,7 +68,9 @@ export const getBubbleChartProOptions = (
   };
 
   return {
-    scales: buildScatterProScales(xMeasure, yMeasure, (m, v) => themeFormatter.data(m, v)),
+    scales: buildScatterScales(xMeasure, yMeasure, (m: Measure, v: number) =>
+      themeFormatter.data(m, v),
+    ),
     plugins: {
       tooltip: {
         callbacks: {

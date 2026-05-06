@@ -16,10 +16,27 @@ import {
   measureToNullableNumber,
   rawValueToString,
   NULL_GROUP_KEY,
-  buildScatterProScales,
-  buildScatterProDatalabelsValue,
+  buildScatterScales,
   type RawValue,
-} from '../scatter.pro.utils';
+} from '../scatter.utils';
+
+type SharedDatasetOriginal = {
+  label?: string;
+  originalData?: { x: number | null; y: number | null }[];
+};
+
+const buildDatalabelsValue = (
+  xMeasure: Measure,
+  yMeasure: Measure,
+  formatValue: (measure: Measure, value: number | null | undefined) => string,
+) => ({
+  formatter: (_value: unknown, context: { dataset: unknown; dataIndex: number }) => {
+    const ds = context.dataset as SharedDatasetOriginal;
+    const raw = ds.originalData?.[context.dataIndex];
+    if (!raw) return '';
+    return `${formatValue(xMeasure, raw.x)}, ${formatValue(yMeasure, raw.y)}`;
+  },
+});
 
 export const getScatterChartProOptions = (
   {
@@ -52,7 +69,9 @@ export const getScatterChartProOptions = (
     : pointRadius + labelGap;
 
   return {
-    scales: buildScatterProScales(xMeasure, yMeasure, (m, v) => themeFormatter.data(m, v)),
+    scales: buildScatterScales(xMeasure, yMeasure, (m: Measure, v: number) =>
+      themeFormatter.data(m, v),
+    ),
     plugins: {
       tooltip: {
         callbacks: {
@@ -73,7 +92,7 @@ export const getScatterChartProOptions = (
         labels: {
           value: {
             display: 'auto',
-            ...buildScatterProDatalabelsValue(xMeasure, yMeasure, formatValue),
+            ...buildDatalabelsValue(xMeasure, yMeasure, formatValue),
             anchor: 'center',
             align: 'bottom',
             offset: valueOffset,

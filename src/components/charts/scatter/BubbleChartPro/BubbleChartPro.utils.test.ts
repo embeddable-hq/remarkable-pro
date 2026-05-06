@@ -10,7 +10,7 @@ import {
   getBubbleChartProData,
   getBubbleChartProOptions,
 } from './BubbleChartPro.utils';
-import { measureToNullableNumber } from '../scatter.pro.utils';
+import { measureToNullableNumber } from '../scatter.utils';
 import {
   getThemeFormatter,
   type GetThemeFormatter,
