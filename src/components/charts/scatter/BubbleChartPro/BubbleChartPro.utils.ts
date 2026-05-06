@@ -1,27 +1,21 @@
-import { ChartData, type ChartOptions } from 'chart.js';
+import { BubbleDataPoint, ChartData, type ChartOptions } from 'chart.js';
 import { Context } from 'chartjs-plugin-datalabels';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { Theme } from '../../../../theme/theme.types';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
-import { getChartColors } from '@embeddable.com/remarkable-ui';
-import type {
-  ChartClickArgs,
-  BubbleChartInputPoint,
-  BubbleDatasetExtended,
-} from '@embeddable.com/remarkable-ui';
+import { getChartColors, getStyleNumber } from '@embeddable.com/remarkable-ui';
+import type { ChartClickArgs, BubbleDatasetExtended } from '@embeddable.com/remarkable-ui';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
-import type { BubbleChartProOptionsClickArg } from './BubbleChartPro.types';
+import type { BubbleChartProOptionsClickArg, BubblePoint } from './BubbleChartPro.types';
 import { getDimensionFieldName } from '../../../../utils/data.utils';
 import {
   measureToNullableNumber,
   rawValueToString,
   NULL_GROUP_KEY,
-  buildScatterScales,
+  getScatterScales,
   type RawValue,
 } from '../scatter.utils';
-
-export type BubblePoint = BubbleChartInputPoint & { rowIndex: number };
 
 export const getBubbleChartProOptions = (
   {
@@ -30,7 +24,6 @@ export const getBubbleChartProOptions = (
     sizeMeasure,
     noValueLabel,
     bubbleRadiusMax,
-    showValueLabels,
     showPointLabels,
   }: {
     xMeasure: Measure;
@@ -38,7 +31,6 @@ export const getBubbleChartProOptions = (
     sizeMeasure: Measure;
     noValueLabel: string;
     bubbleRadiusMax?: number;
-    showValueLabels?: boolean;
     showPointLabels?: boolean;
   },
   theme: Theme,
@@ -51,8 +43,8 @@ export const getBubbleChartProOptions = (
   };
 
   const radiusMax = bubbleRadiusMax ?? 20;
-  const labelGap = 4;
-  const labelLineHeight = 20;
+  const labelGap = getStyleNumber('--em-scatterchart-label-stack-gap', '0.25rem');
+  const labelLineHeight = getStyleNumber('--em-scatterchart-label-stack-height', '1.25rem');
 
   const getBubbleRadius = (context: Context): number => {
     const ds = context.dataset as BubbleDatasetExtended;
@@ -68,8 +60,8 @@ export const getBubbleChartProOptions = (
   };
 
   return {
-    scales: buildScatterScales(xMeasure, yMeasure, (m: Measure, v: number) =>
-      themeFormatter.data(m, v),
+    scales: getScatterScales(xMeasure, yMeasure, (measure: Measure, value: number) =>
+      themeFormatter.data(measure, value),
     ),
     plugins: {
       tooltip: {
@@ -89,8 +81,7 @@ export const getBubbleChartProOptions = (
       datalabels: {
         labels: {
           value: {
-            display: showValueLabels ? 'auto' : false,
-            formatter: (_value: unknown, context: { dataset: unknown; dataIndex: number }) => {
+            formatter: (_value: BubbleDataPoint, context: Context) => {
               const ds = context.dataset as BubbleDatasetExtended;
               const orig = ds.originalData?.[context.dataIndex];
               if (!orig) return '';
@@ -101,7 +92,6 @@ export const getBubbleChartProOptions = (
             offset: valueOffset,
           },
           caption: {
-            display: showPointLabels ? 'auto' : false,
             anchor: 'center',
             align: 'bottom',
             offset: captionOffset,

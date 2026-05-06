@@ -1,9 +1,10 @@
-import { ChartData, type ChartOptions } from 'chart.js';
+import { ChartData, type ChartOptions, ScatterDataPoint } from 'chart.js';
+import { Context } from 'chartjs-plugin-datalabels';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { Theme } from '../../../../theme/theme.types';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
-import { getChartColors } from '@embeddable.com/remarkable-ui';
+import { getChartColors, getStyleNumber } from '@embeddable.com/remarkable-ui';
 import type {
   ChartClickArgs,
   ScatterChartInputPoint,
@@ -16,22 +17,17 @@ import {
   measureToNullableNumber,
   rawValueToString,
   NULL_GROUP_KEY,
-  buildScatterScales,
+  getScatterScales,
   type RawValue,
 } from '../scatter.utils';
-
-type SharedDatasetOriginal = {
-  label?: string;
-  originalData?: { x: number | null; y: number | null }[];
-};
 
 const buildDatalabelsValue = (
   xMeasure: Measure,
   yMeasure: Measure,
   formatValue: (measure: Measure, value: number | null | undefined) => string,
 ) => ({
-  formatter: (_value: unknown, context: { dataset: unknown; dataIndex: number }) => {
-    const ds = context.dataset as SharedDatasetOriginal;
+  formatter: (_value: ScatterDataPoint | number | null, context: Context) => {
+    const ds = context.dataset as ScatterDatasetExtended;
     const raw = ds.originalData?.[context.dataIndex];
     if (!raw) return '';
     return `${formatValue(xMeasure, raw.x)}, ${formatValue(yMeasure, raw.y)}`;
@@ -59,9 +55,9 @@ export const getScatterChartProOptions = (
     return themeFormatter.data(measure, value);
   };
 
-  const pointRadius = 6;
-  const labelGap = 4;
-  const labelLineHeight = 20;
+  const pointRadius = getStyleNumber('--em-scatterchart-point-radius', '0.375rem');
+  const labelGap = getStyleNumber('--em-scatterchart-label-stack-gap', '0.25rem');
+  const labelLineHeight = getStyleNumber('--em-scatterchart-label-stack-height', '1.25rem');
 
   const captionOffset = pointRadius + labelGap;
   const valueOffset = showPointLabels
@@ -69,8 +65,8 @@ export const getScatterChartProOptions = (
     : pointRadius + labelGap;
 
   return {
-    scales: buildScatterScales(xMeasure, yMeasure, (m: Measure, v: number) =>
-      themeFormatter.data(m, v),
+    scales: getScatterScales(xMeasure, yMeasure, (measure: Measure, value: number) =>
+      themeFormatter.data(measure, value),
     ),
     plugins: {
       tooltip: {

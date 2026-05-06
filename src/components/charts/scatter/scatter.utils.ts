@@ -17,25 +17,22 @@ export const rawValueToString = (value: string | number | boolean | null | undef
 
 export const NULL_GROUP_KEY = '__scatter_null_group__';
 
-export const buildScatterScales = (
+const getTickValue = (tickValue: string | number): number =>
+  typeof tickValue === 'number' ? tickValue : Number(tickValue);
+
+export const getScatterScales = (
   xMeasure: Measure,
   yMeasure: Measure,
   formatTick: (measure: Measure, value: number) => string,
 ) => ({
   x: {
     ticks: {
-      callback: (tickValue: string | number) => {
-        const v = typeof tickValue === 'number' ? tickValue : Number(tickValue);
-        return formatTick(xMeasure, v);
-      },
+      callback: (tickValue: string | number) => formatTick(xMeasure, getTickValue(tickValue)),
     },
   },
   y: {
     ticks: {
-      callback: (tickValue: string | number) => {
-        const v = typeof tickValue === 'number' ? tickValue : Number(tickValue);
-        return formatTick(yMeasure, v);
-      },
+      callback: (tickValue: string | number) => formatTick(yMeasure, getTickValue(tickValue)),
     },
   },
 });

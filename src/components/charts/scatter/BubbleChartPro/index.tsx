@@ -104,7 +104,6 @@ const BubbleChartPro = (props: BubbleChartProProps) => {
         sizeMeasure,
         noValueLabel,
         bubbleRadiusMax,
-        showValueLabels,
         showPointLabels,
       },
       theme,

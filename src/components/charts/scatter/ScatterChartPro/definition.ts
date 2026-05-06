@@ -40,7 +40,7 @@ const meta = {
       label: 'Show point labels',
       defaultValue: false,
       category: 'Component Settings',
-    } as const,
+    },
     inputs.showValueLabels,
     inputs.showLogarithmicScale,
     inputs.xAxisLabel,
