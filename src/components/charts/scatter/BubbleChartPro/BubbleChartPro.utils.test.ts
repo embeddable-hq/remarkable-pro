@@ -25,7 +25,10 @@ import { getDimensionFieldName } from '../../../../utils/data.utils';
 
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
 vi.mock('../../../../theme/styles/styles.utils', () => ({ getDimensionMeasureColor: vi.fn() }));
-vi.mock('@embeddable.com/remarkable-ui', () => ({ getChartColors: vi.fn() }));
+vi.mock('@embeddable.com/remarkable-ui', () => ({
+  getChartColors: vi.fn(),
+  getStyleNumber: vi.fn(),
+}));
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const makeDimension = (overrides: Record<string, any> = {}): Dimension =>
