@@ -10,6 +10,8 @@ import { ThemeClientContext } from '../../../../theme/theme.types';
 const meta = {
   name: 'PivotTablePro',
   label: 'Pivot Table',
+  description:
+    'Cross-tabulated table — row and column dimensions intersected by one or more measures.',
   category: 'Table Charts',
   inputs: [
     inputs.dataset,

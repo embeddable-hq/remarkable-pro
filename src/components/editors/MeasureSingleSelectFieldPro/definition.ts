@@ -7,6 +7,8 @@ import { previewData } from '../../preview.data.constants';
 const meta = {
   name: 'MeasureSingleSelectFieldPro',
   label: 'Measure Single Select Field',
+  description:
+    'Dropdown for selecting a single measure from a list. Pairs with a measure variable; emits onChange.',
   category: 'Dropdowns - dimensions and measures',
   defaultWidth: 300,
   defaultHeight: 120,

@@ -9,6 +9,8 @@ import { ThemeClientContext } from '../../../../theme/theme.types';
 const meta = {
   name: 'HeatMapPro',
   label: 'Heat Map',
+  description:
+    'Heat map of one measure over two dimensions (rows × columns). Use to spot density or correlation patterns.',
   category: 'Table Charts',
   inputs: [
     inputs.dataset,

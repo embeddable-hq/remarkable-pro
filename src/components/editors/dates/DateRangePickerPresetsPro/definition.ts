@@ -6,6 +6,8 @@ import { inputs } from '../../../component.inputs.constants';
 const meta = {
   name: 'DateRangeSelectFieldPro',
   label: 'Date-Range Picker - Presets',
+  description:
+    'Date-range picker with preset ranges only (Last 7 days, Last 30 days, …). Pairs with a timeRange variable; emits onChange.',
   category: 'Dropdowns - dates',
   defaultWidth: 300,
   defaultHeight: 120,

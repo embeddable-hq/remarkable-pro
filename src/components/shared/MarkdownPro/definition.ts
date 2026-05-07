@@ -5,6 +5,8 @@ import { inputs } from '../../component.inputs.constants';
 const meta = {
   name: 'MarkdownPro',
   label: 'Markdown',
+  description:
+    'Renders a markdown block. Use for headings, instructions, or static explanations between widgets.',
   category: 'Content',
   defaultWidth: 600,
   defaultHeight: 300,

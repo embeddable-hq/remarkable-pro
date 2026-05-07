@@ -21,6 +21,8 @@ import { ThemeClientContext } from '../../../../theme/theme.types';
 const meta = {
   name: 'LineChartComparisonDefaultPro',
   label: 'Line Chart Comparison - Default',
+  description:
+    'Line chart overlaying the current period and a comparison period. Pairs with a comparisonPeriod variable and a timeRange variable.',
   category: 'Line Charts',
   inputs: [
     inputs.dataset,

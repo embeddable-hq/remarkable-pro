@@ -19,6 +19,8 @@ import { ThemeClientContext } from '../../../../theme/theme.types';
 const meta = {
   name: 'LineChartDefaultPro',
   label: 'Line Chart - Default',
+  description:
+    'Line chart with one time dimension on the x-axis and one or more measures. Use for time-series trends.',
   category: 'Line Charts',
   inputs: [
     inputs.dataset,

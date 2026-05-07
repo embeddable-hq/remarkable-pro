@@ -7,6 +7,8 @@ import { previewData } from '../../preview.data.constants';
 const meta = {
   name: 'SingleSelectFieldPro',
   label: 'Single Select Field',
+  description:
+    'Single-select dropdown of dimension values from a dataset. Pairs with a string variable; emits onChange.',
   category: 'Dropdowns - values',
   defaultWidth: 300,
   defaultHeight: 120,

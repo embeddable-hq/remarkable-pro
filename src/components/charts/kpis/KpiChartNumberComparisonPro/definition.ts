@@ -9,6 +9,8 @@ import { ThemeClientContext } from '../../../../theme/theme.types';
 const meta = {
   name: 'KpiChartNumberComparisonPro',
   label: 'Kpi Chart - Number Comparison',
+  description:
+    'KPI with a delta versus a comparison period. Takes one measure and pairs with a comparison-period variable.',
   category: 'Kpi Charts',
   inputs: [
     inputs.dataset,

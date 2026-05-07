@@ -6,6 +6,7 @@ import { getStyle } from '@embeddable.com/remarkable-ui';
 const meta = {
   name: 'HorizontalDividerPro',
   label: 'Horizontal Divider',
+  description: 'Visual divider for separating sections of the dashboard.',
   category: 'Layout',
   defaultWidth: 450,
   defaultHeight: 120,

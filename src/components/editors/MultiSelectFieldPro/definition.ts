@@ -7,6 +7,8 @@ import { previewData } from '../../preview.data.constants';
 const meta = {
   name: 'MultiSelectFieldPro',
   label: 'Multi Select Field',
+  description:
+    'Multi-select dropdown of dimension values from a dataset. Pairs with a string-array variable used in dataset filters; emits onChange.',
   category: 'Dropdowns - values',
   defaultWidth: 300,
   defaultHeight: 120,

@@ -7,6 +7,8 @@ import Component from './index';
 const meta = {
   name: 'DimensionMeasureMultiSelectFieldPro',
   label: 'Dimension and Measure Multi Select Field',
+  description:
+    'Multi-select dropdown for dimensions and measures combined. Pairs with a dimensionOrMeasure-array variable; emits onChange.',
   category: 'Dropdowns - dimensions and measures',
   defaultWidth: 300,
   defaultHeight: 120,

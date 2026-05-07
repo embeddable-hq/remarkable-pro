@@ -7,6 +7,8 @@ import { previewData } from '../../../preview.data.constants';
 const meta = {
   name: 'KpiChartNumberPro',
   label: 'Kpi Chart - Number',
+  description:
+    'Single big-number KPI showing one measure. Use for headline metrics without comparison.',
   category: 'Kpi Charts',
   inputs: [
     inputs.dataset,

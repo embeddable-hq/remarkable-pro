@@ -17,6 +17,8 @@ import { BarChartStackedProOptionsClickArg } from '../bars.types';
 const meta = {
   name: 'BarChartGroupedHorizontalPro',
   label: 'Bar Chart - Grouped Horizontal',
+  description:
+    'Same as BarChartGroupedPro but with horizontal bars. Pick when category labels are long or numerous.',
   category: 'Bar Charts',
   inputs: [
     inputs.dataset,

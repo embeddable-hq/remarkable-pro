@@ -20,6 +20,7 @@ import { previewData } from '../../../preview.data.constants';
 const meta = {
   name: 'TableScrollable',
   label: 'Table Chart - Scrollable',
+  description: 'Scrollable table that loads all rows at once. Pick for small or medium datasets.',
   category: 'Table Charts',
   inputs: [
     { ...inputs.dataset, config: { hideSort: true } },

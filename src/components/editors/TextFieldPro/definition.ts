@@ -6,6 +6,7 @@ import { inputs } from '../../component.inputs.constants';
 const meta = {
   name: 'TextFieldPro',
   label: 'Text Field',
+  description: 'Free-text input field. Pairs with a string variable; emits onChange.',
   category: 'Inputs',
   defaultWidth: 300,
   defaultHeight: 120,

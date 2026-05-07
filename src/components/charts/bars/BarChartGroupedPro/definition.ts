@@ -17,6 +17,8 @@ import { BarChartStackedProOptionsClickArg } from '../bars.types';
 const meta = {
   name: 'BarChartGroupedPro',
   label: 'Bar Chart - Grouped',
+  description:
+    'Vertical bar chart with side-by-side bars — one x-axis dimension, one grouping dimension, one measure. Use to compare sub-categories at each x value.',
   category: 'Bar Charts',
   inputs: [
     inputs.dataset,

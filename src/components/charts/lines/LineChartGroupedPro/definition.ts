@@ -18,6 +18,8 @@ import { ThemeClientContext } from '../../../../theme/theme.types';
 const meta = {
   name: 'LineChartGroupedPro',
   label: 'Line Chart - Grouped',
+  description:
+    'Line chart split into multiple lines by a grouping dimension — one time dim + one grouping dim + one measure.',
   category: 'Line Charts',
   inputs: [
     inputs.dataset,
