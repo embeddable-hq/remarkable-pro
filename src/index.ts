@@ -111,6 +111,12 @@ export * as LineChartComparisonWithKpiTabsPro from './components/charts/lines/Li
 export * from './components/charts/lines/LineChartComparisonWithKpiTabsPro';
 export * from './components/charts/lines/LineChartComparisonWithKpiTabsPro/definition';
 
+// Charts - Combo
+export * as BarLineChartPro from './components/charts/combo/BarLineChartPro';
+export * from './components/charts/combo/combo.types';
+export * from './components/charts/combo/BarLineChartPro/BarLineChartPro.utils';
+export * from './components/charts/combo/BarLineChartPro/definition';
+
 // Charts - Scatter
 export * as ScatterChartPro from './components/charts/scatter/ScatterChartPro';
 export type { ScatterChartProProps } from './components/charts/scatter/ScatterChartPro';
