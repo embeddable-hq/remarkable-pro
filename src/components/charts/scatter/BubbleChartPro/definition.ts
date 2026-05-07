@@ -1,5 +1,5 @@
 import { DataResponse, LoadDataRequest, Value, loadData } from '@embeddable.com/core';
-import type { ScatterChartProOptionsClickArg } from './ScatterChartPro.types';
+import type { BubbleChartProOptionsClickArg } from './BubbleChartPro.types';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
@@ -9,13 +9,14 @@ import { getClientContextTimezone } from '../../../../theme/utils/clientContext.
 import { ThemeClientContext } from '../../../../theme/theme.types';
 
 const meta = {
-  name: 'ScatterChartPro',
-  label: 'Scatter Chart',
+  name: 'BubbleChartPro',
+  label: 'Bubble Chart',
   category: 'Scatter Charts',
   inputs: [
     inputs.dataset,
     inputs.xMeasure,
     inputs.yMeasure,
+    { ...inputs.measure, name: 'bubbleSizeMeasure', label: 'Bubble size measure' },
     { ...inputs.dimension, name: 'pointDimension', label: 'Point dimension' },
     {
       ...inputs.dimension,
@@ -27,6 +28,20 @@ const meta = {
       ...subInputs.color,
       name: 'pointColor',
       label: 'Point color',
+      category: 'Component Settings',
+    },
+    {
+      ...inputs.number,
+      name: 'bubbleRadiusMin',
+      label: 'Bubble min radius (px)',
+      defaultValue: 3,
+      category: 'Component Settings',
+    },
+    {
+      ...inputs.number,
+      name: 'bubbleRadiusMax',
+      label: 'Bubble max radius (px)',
+      defaultValue: 20,
       category: 'Component Settings',
     },
     inputs.title,
@@ -71,19 +86,23 @@ const meta = {
           label: 'Clicked group by time range',
           type: 'timeRange',
         },
+        { name: 'sizeMeasureValue', label: 'Clicked bubble size value', type: 'string' },
       ],
     },
   ],
 } as const satisfies EmbeddedComponentMeta;
 
-export type ScatterChartProState = Record<string, never>;
+export type BubbleChartProState = Record<string, never>;
 
 const previewConfig = {
   dataset: previewData.dataset,
   xMeasure: previewData.measure,
   yMeasure: previewData.measureVariant,
+  bubbleSizeMeasure: previewData.measure,
   pointDimension: previewData.dimension,
   results: previewData.results2Measures1Dimension,
+  bubbleRadiusMin: 3,
+  bubbleRadiusMax: 10,
   showLegend: true,
   hideMenu: true,
 };
@@ -99,6 +118,7 @@ const loadDataResultsArgs = (
   select: [
     inputs.xMeasure,
     inputs.yMeasure,
+    inputs.bubbleSizeMeasure,
     inputs.pointDimension,
     ...(inputs.groupByDimension ? [inputs.groupByDimension] : []),
   ],
@@ -111,9 +131,10 @@ const loadDataResults = (
 ): DataResponse => loadData(loadDataResultsArgs(inputs, clientContext));
 
 const events = {
-  onPointClick: (value: ScatterChartProOptionsClickArg) => ({
+  onPointClick: (value: BubbleChartProOptionsClickArg) => ({
     xMeasureValue: value.xMeasureValue ?? Value.noFilter(),
     yMeasureValue: value.yMeasureValue ?? Value.noFilter(),
+    sizeMeasureValue: value.sizeMeasureValue ?? Value.noFilter(),
     pointDimensionValue: value.pointDimensionValue ?? Value.noFilter(),
     groupByDimensionValue: value.groupByDimensionValue ?? Value.noFilter(),
   }),
@@ -121,7 +142,7 @@ const events = {
 
 const props = (
   inputs: Inputs<typeof meta>,
-  [_state, _setState]: [ScatterChartProState, (state: ScatterChartProState) => void],
+  [_state, _setState]: [BubbleChartProState, (state: BubbleChartProState) => void],
   clientContext: ThemeClientContext,
 ) => ({
   ...inputs,
@@ -129,7 +150,7 @@ const props = (
   results: loadDataResults(inputs, clientContext),
 });
 
-export const scatterChartPro = {
+export const bubbleChartPro = {
   Component,
   meta,
   preview,

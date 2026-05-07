@@ -115,6 +115,9 @@ export * from './components/charts/lines/LineChartComparisonWithKpiTabsPro/defin
 export * as ScatterChartPro from './components/charts/scatter/ScatterChartPro';
 export type { ScatterChartProProps } from './components/charts/scatter/ScatterChartPro';
 export * from './components/charts/scatter/ScatterChartPro/definition';
+export * as BubbleChartPro from './components/charts/scatter/BubbleChartPro';
+export type { BubbleChartProProps } from './components/charts/scatter/BubbleChartPro';
+export * from './components/charts/scatter/BubbleChartPro/definition';
 
 // Charts - Pies
 export * as DonutChartPro from './components/charts/pies/DonutChartPro';

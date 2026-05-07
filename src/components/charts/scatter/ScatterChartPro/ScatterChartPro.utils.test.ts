@@ -9,8 +9,8 @@ import {
   getPointClickData,
   getScatterChartProData,
   getScatterChartProOptions,
-  measureToNullableNumber,
 } from './ScatterChartPro.utils';
+import { measureToNullableNumber } from '../scatter.utils';
 import {
   getThemeFormatter,
   type GetThemeFormatter,
@@ -19,13 +19,16 @@ import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils'
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import type { Theme } from '../../../../theme/theme.types';
 import type { TooltipItem } from 'chart.js';
-import type { ScatterDatasetWithOriginal } from '@embeddable.com/remarkable-ui';
+import type { ScatterDatasetExtended } from '@embeddable.com/remarkable-ui';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
 import { getDimensionFieldName } from '../../../../utils/data.utils';
 
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
 vi.mock('../../../../theme/styles/styles.utils', () => ({ getDimensionMeasureColor: vi.fn() }));
-vi.mock('@embeddable.com/remarkable-ui', () => ({ getChartColors: vi.fn() }));
+vi.mock('@embeddable.com/remarkable-ui', () => ({
+  getChartColors: vi.fn(),
+  getStyleNumber: vi.fn(),
+}));
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const makeDimension = (overrides: Record<string, any> = {}): Dimension =>
@@ -646,7 +649,7 @@ describe('getScatterChartProOptions', () => {
           label: 'Series A',
           originalData: [{ x: 10, y: 20 }],
           data: [],
-        } as unknown as ScatterDatasetWithOriginal,
+        } as unknown as ScatterDatasetExtended,
         dataIndex: 0,
         parsed: { x: 10, y: 20 },
       } as unknown as TooltipItem<'scatter'>;
@@ -668,7 +671,7 @@ describe('getScatterChartProOptions', () => {
           label: '',
           originalData: [{ x: null, y: null }],
           data: [],
-        } as unknown as ScatterDatasetWithOriginal,
+        } as unknown as ScatterDatasetExtended,
         dataIndex: 0,
         parsed: { x: 0, y: 0 },
       } as unknown as TooltipItem<'scatter'>;
