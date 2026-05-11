@@ -28,7 +28,28 @@ vi.mock('../../../../utils/color.utils', () => ({
 vi.mock('../../bars/bars.utils', () => ({ getBarChartProOptions: vi.fn(() => ({})) }));
 vi.mock('../../../utils/dimension.utils', () => ({ getTimeRangeFromDimensionValue: vi.fn() }));
 vi.mock('mergician', () => ({
-  mergician: vi.fn((...args: object[]) => Object.assign({}, ...args)),
+  mergician: vi.fn((...args: object[]) => {
+    const deepMerge = (
+      target: Record<string, unknown>,
+      ...sources: Record<string, unknown>[]
+    ): Record<string, unknown> => {
+      for (const source of sources) {
+        for (const key of Object.keys(source)) {
+          const val = source[key];
+          if (val && typeof val === 'object' && !Array.isArray(val)) {
+            target[key] = deepMerge(
+              (target[key] as Record<string, unknown>) ?? {},
+              val as Record<string, unknown>,
+            );
+          } else {
+            target[key] = val;
+          }
+        }
+      }
+      return target;
+    };
+    return deepMerge({}, ...(args as Record<string, unknown>[]));
+  }),
 }));
 
 // -- helpers -----------------------------------------------------------------
