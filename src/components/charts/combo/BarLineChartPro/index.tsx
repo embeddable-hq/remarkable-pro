@@ -1,7 +1,6 @@
 import { Chart as ChartJS, LineController, LineElement, PointElement } from 'chart.js';
 import { useTheme } from '@embeddable.com/react';
 import { BarChart } from '@embeddable.com/remarkable-ui';
-import { mergician } from 'mergician';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
@@ -61,22 +60,20 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
     theme,
   );
 
-  const options = mergician(
-    getBarLineChartProOptions(
-      {
-        measures,
-        lineMeasures,
-        dimension,
-        data,
-        showSecondaryAxis,
-        showValueLabels,
-        showValueLabelsLine,
-        yAxisSecondaryLabel,
-        yAxisSecondaryMin,
-        yAxisSecondaryMax,
-      },
-      theme,
-    ),
+  const options = getBarLineChartProOptions(
+    {
+      measures,
+      lineMeasures,
+      dimension,
+      data,
+      showSecondaryAxis,
+      showValueLabels,
+      showValueLabelsLine,
+      yAxisSecondaryLabel,
+      yAxisSecondaryMin,
+      yAxisSecondaryMax,
+    },
+    theme,
   );
 
   const handleClick = createBarLineClickHandler({
