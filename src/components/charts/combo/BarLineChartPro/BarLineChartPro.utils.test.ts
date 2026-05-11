@@ -100,7 +100,7 @@ describe('getBarLineChartProData', () => {
       {
         data: undefined as never,
         dimension: makeDimension(),
-        measures: [makeMeasure()],
+        barMeasures: [makeMeasure()],
         lineMeasures: [],
         showSecondaryAxis: false,
       },
@@ -117,7 +117,7 @@ describe('getBarLineChartProData', () => {
     vi.mocked(groupTailAsOther).mockReturnValue(data);
 
     const result = getBarLineChartProData(
-      { data, dimension, measures: [makeMeasure()], lineMeasures: [], showSecondaryAxis: false },
+      { data, dimension, barMeasures: [makeMeasure()], lineMeasures: [], showSecondaryAxis: false },
       makeTheme(),
     );
 
@@ -132,7 +132,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension: makeDimension(),
-        measures: [makeMeasure({ name: 'revenue' }), makeMeasure({ name: 'cost' })],
+        barMeasures: [makeMeasure({ name: 'revenue' }), makeMeasure({ name: 'cost' })],
         lineMeasures: [],
         showSecondaryAxis: false,
       },
@@ -151,7 +151,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension: makeDimension(),
-        measures: [makeMeasure({ name: 'revenue' })],
+        barMeasures: [makeMeasure({ name: 'revenue' })],
         lineMeasures: [makeMeasure({ name: 'avg' })],
         showSecondaryAxis: false,
       },
@@ -170,7 +170,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension: makeDimension(),
-        measures: [makeMeasure({ name: 'revenue' })],
+        barMeasures: [makeMeasure({ name: 'revenue' })],
         lineMeasures: [makeMeasure({ name: 'avg' })],
         showSecondaryAxis: false,
       },
@@ -189,7 +189,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension: makeDimension(),
-        measures: [makeMeasure({ name: 'revenue' })],
+        barMeasures: [makeMeasure({ name: 'revenue' })],
         lineMeasures: [],
         showSecondaryAxis: false,
       },
@@ -207,7 +207,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension: makeDimension(),
-        measures: [],
+        barMeasures: [],
         lineMeasures: [makeMeasure({ name: 'avg', inputs: { connectGaps: false } })],
         showSecondaryAxis: false,
       },
@@ -225,7 +225,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension: makeDimension(),
-        measures: [],
+        barMeasures: [],
         lineMeasures: [makeMeasure({ name: 'avg', inputs: { connectGaps: true } })],
         showSecondaryAxis: false,
       },
@@ -243,7 +243,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension: makeDimension(),
-        measures: [],
+        barMeasures: [],
         lineMeasures: [makeMeasure({ name: 'avg', inputs: { dashedLine: true } })],
         showSecondaryAxis: false,
       },
@@ -261,7 +261,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension: makeDimension(),
-        measures: [],
+        barMeasures: [],
         lineMeasures: [makeMeasure({ name: 'avg', inputs: { dashedLine: false } })],
         showSecondaryAxis: false,
       },
@@ -279,7 +279,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension: makeDimension(),
-        measures: [],
+        barMeasures: [],
         lineMeasures: [makeMeasure({ name: 'avg', inputs: { fillUnderLine: true } })],
         showSecondaryAxis: false,
       },
@@ -297,7 +297,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension: makeDimension(),
-        measures: [],
+        barMeasures: [],
         lineMeasures: [makeMeasure({ name: 'avg', inputs: { useSecondaryAxis: true } })],
         showSecondaryAxis: true,
       },
@@ -315,7 +315,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension: makeDimension(),
-        measures: [],
+        barMeasures: [],
         lineMeasures: [makeMeasure({ name: 'avg', inputs: { useSecondaryAxis: true } })],
         showSecondaryAxis: false,
       },
@@ -333,7 +333,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension: makeDimension(),
-        measures: [],
+        barMeasures: [],
         lineMeasures: [makeMeasure({ name: 'avg', inputs: { useSecondaryAxis: false } })],
         showSecondaryAxis: true,
       },
@@ -351,7 +351,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension: makeDimension(),
-        measures: [makeMeasure({ name: 'revenue' })],
+        barMeasures: [makeMeasure({ name: 'revenue' })],
         lineMeasures: [makeMeasure({ name: 'avg' })],
         showSecondaryAxis: false,
       },
@@ -373,7 +373,7 @@ describe('getBarLineChartProData', () => {
       {
         data,
         dimension,
-        measures: [barMeasure],
+        barMeasures: [barMeasure],
         lineMeasures: [lineMeasure],
         showSecondaryAxis: false,
       },
@@ -412,7 +412,7 @@ describe('getBarLineChartProOptions', () => {
     it('sets interaction mode to "index"', () => {
       const options = getBarLineChartProOptions(
         {
-          measures: [makeMeasure()],
+          barMeasures: [makeMeasure()],
           lineMeasures: [],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -427,7 +427,7 @@ describe('getBarLineChartProOptions', () => {
     it('sets intersect to false', () => {
       const options = getBarLineChartProOptions(
         {
-          measures: [makeMeasure()],
+          barMeasures: [makeMeasure()],
           lineMeasures: [],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -446,7 +446,7 @@ describe('getBarLineChartProOptions', () => {
     it('returns false for bar series when showValueLabels is false', () => {
       const options = getBarLineChartProOptions(
         {
-          measures: [makeMeasure()],
+          barMeasures: [makeMeasure()],
           lineMeasures: [],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -468,7 +468,7 @@ describe('getBarLineChartProOptions', () => {
     it('returns "auto" for bar series when showValueLabels is true and value is non-zero', () => {
       const options = getBarLineChartProOptions(
         {
-          measures: [makeMeasure()],
+          barMeasures: [makeMeasure()],
           lineMeasures: [],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -490,7 +490,7 @@ describe('getBarLineChartProOptions', () => {
     it('returns false for line series when showValueLabelsLine is false', () => {
       const options = getBarLineChartProOptions(
         {
-          measures: [makeMeasure({ name: 'revenue' })],
+          barMeasures: [makeMeasure({ name: 'revenue' })],
           lineMeasures: [makeMeasure({ name: 'avg' })],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -513,7 +513,7 @@ describe('getBarLineChartProOptions', () => {
     it('returns "auto" for line series when showValueLabelsLine is true and value is non-zero', () => {
       const options = getBarLineChartProOptions(
         {
-          measures: [makeMeasure({ name: 'revenue' })],
+          barMeasures: [makeMeasure({ name: 'revenue' })],
           lineMeasures: [makeMeasure({ name: 'avg' })],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -535,7 +535,7 @@ describe('getBarLineChartProOptions', () => {
     it('returns false for zero values regardless of showValueLabels', () => {
       const options = getBarLineChartProOptions(
         {
-          measures: [makeMeasure()],
+          barMeasures: [makeMeasure()],
           lineMeasures: [],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -562,7 +562,7 @@ describe('getBarLineChartProOptions', () => {
       const dimension = makeDimension({ name: 'date' });
       const options = getBarLineChartProOptions(
         {
-          measures: [makeMeasure()],
+          barMeasures: [makeMeasure()],
           lineMeasures: [],
           dimension,
           data: makeChartData() as never,
@@ -581,7 +581,7 @@ describe('getBarLineChartProOptions', () => {
       const barMeasure = makeMeasure({ name: 'revenue' });
       const options = getBarLineChartProOptions(
         {
-          measures: [barMeasure],
+          barMeasures: [barMeasure],
           lineMeasures: [makeMeasure({ name: 'avg' })],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -603,7 +603,7 @@ describe('getBarLineChartProOptions', () => {
       const lineMeasure = makeMeasure({ name: 'avg' });
       const options = getBarLineChartProOptions(
         {
-          measures: [barMeasure],
+          barMeasures: [barMeasure],
           lineMeasures: [lineMeasure],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -625,7 +625,7 @@ describe('getBarLineChartProOptions', () => {
 
       const options = getBarLineChartProOptions(
         {
-          measures: [makeMeasure()],
+          barMeasures: [makeMeasure()],
           lineMeasures: [],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -649,7 +649,7 @@ describe('getBarLineChartProOptions', () => {
     it('does not add y1 scale when showSecondaryAxis is false', () => {
       const options = getBarLineChartProOptions(
         {
-          measures: [makeMeasure()],
+          barMeasures: [makeMeasure()],
           lineMeasures: [],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -664,7 +664,7 @@ describe('getBarLineChartProOptions', () => {
     it('adds y1 scale when showSecondaryAxis is true', () => {
       const options = getBarLineChartProOptions(
         {
-          measures: [makeMeasure()],
+          barMeasures: [makeMeasure()],
           lineMeasures: [makeMeasure({ name: 'avg' })],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -679,7 +679,7 @@ describe('getBarLineChartProOptions', () => {
     it('y1 is positioned on the right', () => {
       const options = getBarLineChartProOptions(
         {
-          measures: [],
+          barMeasures: [],
           lineMeasures: [makeMeasure({ name: 'avg' })],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -694,7 +694,7 @@ describe('getBarLineChartProOptions', () => {
     it('y1 respects yAxisSecondaryMin and yAxisSecondaryMax', () => {
       const options = getBarLineChartProOptions(
         {
-          measures: [],
+          barMeasures: [],
           lineMeasures: [makeMeasure({ name: 'avg' })],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -713,7 +713,7 @@ describe('getBarLineChartProOptions', () => {
       const lineMeasure = makeMeasure({ name: 'avg' });
       const options = getBarLineChartProOptions(
         {
-          measures: [],
+          barMeasures: [],
           lineMeasures: [lineMeasure],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -731,7 +731,7 @@ describe('getBarLineChartProOptions', () => {
     it('y1 title is displayed when yAxisSecondaryLabel is provided', () => {
       const options = getBarLineChartProOptions(
         {
-          measures: [],
+          barMeasures: [],
           lineMeasures: [makeMeasure()],
           dimension: makeDimension(),
           data: makeChartData() as never,
@@ -757,7 +757,7 @@ describe('getBarLineChartProOptions', () => {
 
     const options = getBarLineChartProOptions(
       {
-        measures: [makeMeasure()],
+        barMeasures: [makeMeasure()],
         lineMeasures: [],
         dimension: makeDimension(),
         data: makeChartData() as never,
@@ -780,13 +780,13 @@ describe('createBarLineClickHandler', () => {
   it('calls onBarClicked when datasetIndex is within bar measures range', () => {
     const onBarClicked = vi.fn();
     const dimension = makeDimension();
-    const measures = [makeMeasure({ name: 'revenue' })];
+    const barMeasures = [makeMeasure({ name: 'revenue' })];
     const data = { labels: ['Jan', 'Feb'], datasets: [] };
 
     const handler = createBarLineClickHandler({
       data: data as never,
       dimension,
-      measures,
+      barMeasures,
       onBarClicked,
     });
 
@@ -801,13 +801,13 @@ describe('createBarLineClickHandler', () => {
   it('calls onLineClicked when datasetIndex is >= measures.length', () => {
     const onLineClicked = vi.fn();
     const dimension = makeDimension();
-    const measures = [makeMeasure({ name: 'revenue' })];
+    const barMeasures = [makeMeasure({ name: 'revenue' })];
     const data = { labels: ['Jan', 'Feb'], datasets: [] };
 
     const handler = createBarLineClickHandler({
       data: data as never,
       dimension,
-      measures,
+      barMeasures,
       onLineClicked,
     });
 
@@ -826,7 +826,7 @@ describe('createBarLineClickHandler', () => {
     const handler = createBarLineClickHandler({
       data: { labels: ['Jan'], datasets: [] } as never,
       dimension: makeDimension(),
-      measures: [makeMeasure()],
+      barMeasures: [makeMeasure()],
       onBarClicked,
       onLineClicked,
     });
@@ -839,12 +839,12 @@ describe('createBarLineClickHandler', () => {
 
   it('does not call onLineClicked when a bar is clicked', () => {
     const onLineClicked = vi.fn();
-    const measures = [makeMeasure()];
+    const barMeasures = [makeMeasure()];
 
     const handler = createBarLineClickHandler({
       data: { labels: ['Jan'], datasets: [] } as never,
       dimension: makeDimension(),
-      measures,
+      barMeasures,
       onLineClicked,
     });
 
@@ -855,12 +855,12 @@ describe('createBarLineClickHandler', () => {
 
   it('does not call onBarClicked when a line is clicked', () => {
     const onBarClicked = vi.fn();
-    const measures = [makeMeasure()];
+    const barMeasures = [makeMeasure()];
 
     const handler = createBarLineClickHandler({
       data: { labels: ['Jan'], datasets: [] } as never,
       dimension: makeDimension(),
-      measures,
+      barMeasures,
       onBarClicked,
     });
 
@@ -880,7 +880,7 @@ describe('createBarLineClickHandler', () => {
       data: { labels: ['Jan'], datasets: [] } as never,
       dimension,
       granularity: 'month' as never,
-      measures: [makeMeasure()],
+      barMeasures: [makeMeasure()],
       onBarClicked,
     });
 

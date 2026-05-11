@@ -52,7 +52,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
     {
       data: results.data,
       dimension,
-      measures,
+      barMeasures: measures,
       lineMeasures,
       maxItems: xAxisMaxItems,
       showSecondaryAxis,
@@ -62,7 +62,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
 
   const options = getBarLineChartProOptions(
     {
-      measures,
+      barMeasures: measures,
       lineMeasures,
       dimension,
       data,
@@ -80,7 +80,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
     data,
     dimension,
     granularity,
-    measures,
+    barMeasures: measures,
     onBarClicked,
     onLineClicked,
   });

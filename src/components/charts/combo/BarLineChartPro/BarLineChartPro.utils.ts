@@ -16,7 +16,7 @@ export const getBarLineChartProData = (
   props: {
     data: DataResponse['data'];
     dimension: Dimension;
-    measures: Measure[];
+    barMeasures: Measure[];
     lineMeasures: Measure[];
     maxItems?: number;
     showSecondaryAxis: boolean;
@@ -27,15 +27,15 @@ export const getBarLineChartProData = (
     return { labels: [], datasets: [{ data: [] }] };
   }
 
-  const { data, dimension, measures, lineMeasures, maxItems, showSecondaryAxis } = props;
-  const allMeasures = [...measures, ...lineMeasures];
-  const groupedData = groupTailAsOther(data, dimension, allMeasures, maxItems);
+  const { data, dimension, barMeasures, lineMeasures, maxItems, showSecondaryAxis } = props;
+  const measures = [...barMeasures, ...lineMeasures];
+  const groupedData = groupTailAsOther(data, dimension, measures, maxItems);
   const themeFormatter = getThemeFormatter(theme);
   const chartColors = getChartColors();
 
   const labels = groupedData.map((item) => item[dimension.name]);
 
-  const barDatasets = measures.map((measure, index) => ({
+  const barDatasets = barMeasures.map((measure, index) => ({
     order: 1,
     label: themeFormatter.dimensionOrMeasureTitle(measure),
     data: groupedData.map((item) => item[measure.name] ?? 0),
@@ -58,7 +58,7 @@ export const getBarLineChartProData = (
   }));
 
   const lineDatasets = lineMeasures.map((measure, index) => {
-    const colorIndex = measures.length + index;
+    const colorIndex = barMeasures.length + index;
     const lineColor = measure.inputs?.['lineColor'];
     const zeroFill = Boolean(measure.inputs?.['connectGaps']);
 
@@ -111,7 +111,7 @@ export const getBarLineChartProData = (
 
 export const getBarLineChartProOptions = (
   options: {
-    measures: Measure[];
+    barMeasures: Measure[];
     lineMeasures: Measure[];
     dimension: Dimension;
     data: ChartData<'bar'>;
@@ -125,7 +125,7 @@ export const getBarLineChartProOptions = (
   theme: Theme,
 ): Partial<ChartOptions<'bar'>> => {
   const {
-    measures,
+    barMeasures,
     lineMeasures,
     dimension,
     data,
@@ -137,11 +137,11 @@ export const getBarLineChartProOptions = (
     yAxisSecondaryMax,
   } = options;
 
-  const allMeasures = [...measures, ...lineMeasures];
+  const measures = [...barMeasures, ...lineMeasures];
   const themeFormatter = getThemeFormatter(theme);
 
   const baseOptions = getBarChartProOptions(
-    { measures, horizontal: false, data, dimension },
+    { measures: barMeasures, horizontal: false, data, dimension },
     theme,
   );
 
@@ -149,14 +149,14 @@ export const getBarLineChartProOptions = (
     plugins: {
       datalabels: {
         display: (context) => {
-          const isLineSeries = context.datasetIndex >= measures.length;
+          const isLineSeries = context.datasetIndex >= barMeasures.length;
           const show = isLineSeries ? showValueLabelsLine : showValueLabels;
           return show && context.dataset.data[context.dataIndex] !== 0 ? 'auto' : false;
         },
         labels: {
           value: {
             formatter: (value, context) => {
-              const measure = allMeasures[context.datasetIndex];
+              const measure = measures[context.datasetIndex];
               if (!measure) return value;
               return themeFormatter.data(measure, value);
             },
@@ -175,7 +175,7 @@ export const getBarLineChartProOptions = (
             return themeFormatter.data(getDimensionWithoutTruncation(dimension), label);
           },
           label: (context) => {
-            const measure = allMeasures[context.datasetIndex];
+            const measure = measures[context.datasetIndex];
             if (!measure) return '';
             const raw = context.raw as number;
             return `${context.dataset.label}: ${themeFormatter.data(measure, raw)}`;
@@ -231,14 +231,14 @@ export const createBarLineClickHandler = ({
   data,
   dimension,
   granularity,
-  measures,
+  barMeasures,
   onBarClicked,
   onLineClicked,
 }: {
   data: ChartData;
   dimension: Dimension;
   granularity?: Granularity;
-  measures: Measure[];
+  barMeasures: Measure[];
   onBarClicked?: (args: BarLineChartProClickArg) => void;
   onLineClicked?: (args: BarLineChartProClickArg) => void;
 }): ((args: ChartClickArgs) => void) => {
@@ -254,7 +254,7 @@ export const createBarLineClickHandler = ({
     });
     const clickArg: BarLineChartProClickArg = { dimensionValue, dimensionTimeRange };
 
-    if (element.datasetIndex < measures.length) {
+    if (element.datasetIndex < barMeasures.length) {
       onBarClicked?.(clickArg);
     } else {
       onLineClicked?.(clickArg);
