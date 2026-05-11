@@ -109,7 +109,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
       <KpiChart
         displayNullAs={displayNullAs}
         value={value}
-        comparisonValue={resultsCombined.isLoading ? undefined : comparisonValue}
+        comparisonValue={resultsCombined.isLoading || value == null ? undefined : comparisonValue}
         valueFormatter={valueFormatter}
         valueFontSize={fontSize}
         trendFontSize={changeFontSize}
