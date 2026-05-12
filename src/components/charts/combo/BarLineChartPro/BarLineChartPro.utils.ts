@@ -7,7 +7,11 @@ import { Theme } from '../../../../theme/theme.types';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import { isColorValid, setColorAlpha } from '../../../../utils/color.utils';
-import { getDimensionWithoutTruncation, groupTailAsOther } from '../../charts.utils';
+import {
+  getDatalabelPercentage,
+  getDimensionWithoutTruncation,
+  groupTailAsOther,
+} from '../../charts.utils';
 import { getBarChartProOptions } from '../../bars/bars.utils';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { BarLineChartProClickArg } from '../combo.types';
@@ -158,6 +162,9 @@ export const getBarLineChartProOptions = (
             formatter: (value, context) => {
               const measure = measures[context.datasetIndex];
               if (!measure) return value;
+              if (measure.inputs?.showValueAsPercentage) {
+                return getDatalabelPercentage(Number(value), context.dataset.data);
+              }
               return themeFormatter.data(measure, value);
             },
           },
@@ -178,7 +185,11 @@ export const getBarLineChartProOptions = (
             const measure = measures[context.datasetIndex];
             if (!measure) return '';
             const raw = context.raw as number;
-            return `${context.dataset.label}: ${themeFormatter.data(measure, raw)}`;
+            const formatted = themeFormatter.data(measure, raw);
+            const percentage = measure.inputs?.showValueAsPercentage
+              ? ` (${getDatalabelPercentage(raw, context.dataset.data)})`
+              : '';
+            return `${context.dataset.label}: ${formatted}${percentage}`;
           },
         },
       },

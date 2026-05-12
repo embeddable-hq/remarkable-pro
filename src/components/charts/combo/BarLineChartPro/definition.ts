@@ -60,12 +60,29 @@ const meta = {
       ...inputs.boolean,
       name: 'showSecondaryAxis',
       label: 'Show secondary axis',
+      description:
+        'Adds a right-hand Y-axis for line series. Use "Use secondary axis" on each line measure to assign it.',
       defaultValue: false,
       category: 'Axes Settings',
     },
-    { ...inputs.yAxisLabel, name: 'yAxisSecondaryLabel', label: 'Secondary Y-axis label' },
-    { ...inputs.yAxisRangeMin, name: 'yAxisSecondaryMin', label: 'Secondary Y-axis min' },
-    { ...inputs.yAxisRangeMax, name: 'yAxisSecondaryMax', label: 'Secondary Y-axis max' },
+    {
+      ...inputs.yAxisLabel,
+      name: 'yAxisSecondaryLabel',
+      label: 'Secondary Y-axis label',
+      description: 'Label for the right-hand Y-axis used by line series.',
+    },
+    {
+      ...inputs.yAxisRangeMin,
+      name: 'yAxisSecondaryMin',
+      label: 'Secondary Y-axis min',
+      description: 'Minimum value for the right-hand Y-axis used by line series.',
+    },
+    {
+      ...inputs.yAxisRangeMax,
+      name: 'yAxisSecondaryMax',
+      label: 'Secondary Y-axis max',
+      description: 'Maximum value for the right-hand Y-axis used by line series.',
+    },
     inputs.maxResults,
   ],
   events: [
