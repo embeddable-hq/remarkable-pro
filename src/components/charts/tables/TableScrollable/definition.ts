@@ -180,7 +180,7 @@ const props = (
     state: mergedState,
     setState,
     results: loadDataResults(inputs, mergedState.page, orderBy, dimensionsAndMeasuresToLoad),
-    // allResults: loadDataAllResults(inputs, orderBy, mergedState),
+    allResults: loadDataAllResults(inputs, orderBy, mergedState),
   };
 };
 
