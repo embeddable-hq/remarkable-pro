@@ -31,7 +31,6 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
     showLogarithmicScale,
     showValueLabels,
     showValueLabelsLine,
-    showSecondaryAxis = false,
     yAxisSecondaryLabel,
     yAxisSecondaryMin,
     yAxisSecondaryMax,
@@ -45,6 +44,8 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
   } = props;
 
   const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+
+  const showSecondaryAxis = lineMeasures.some((m) => Boolean(m.inputs?.['useSecondaryAxis']));
 
   const results = useFillGaps({ results: props.results, dimension });
 

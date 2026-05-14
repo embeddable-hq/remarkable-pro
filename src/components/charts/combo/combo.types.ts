@@ -22,7 +22,6 @@ export type BarLineChartProProps = {
   yAxisRangeMax?: number;
   reverseXAxis?: boolean;
   xAxisMaxItems?: number;
-  showSecondaryAxis?: boolean;
   yAxisSecondaryLabel?: string;
   yAxisSecondaryMin?: number;
   yAxisSecondaryMax?: number;

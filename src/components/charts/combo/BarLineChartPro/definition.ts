@@ -38,7 +38,7 @@ const meta = {
         { ...subInputs.boolean, name: 'dashedLine', label: 'Dashed line', defaultValue: false },
         { ...subInputs.boolean, name: 'connectGaps', label: 'Connect gaps', defaultValue: true },
         { ...subInputs.boolean, name: 'fillUnderLine', label: 'Fill under line' },
-        { ...subInputs.boolean, name: 'useSecondaryAxis', label: 'Use secondary axis' },
+        { ...subInputs.boolean, name: 'useSecondaryAxis', label: 'Assign to secondary axis' },
       ],
     },
     { ...inputs.dimensionWithGranularitySelectField, label: 'X-axis' },
@@ -56,15 +56,6 @@ const meta = {
     inputs.yAxisRangeMax,
     inputs.reverseXAxis,
     inputs.xAxisMaxItems,
-    {
-      ...inputs.boolean,
-      name: 'showSecondaryAxis',
-      label: 'Show secondary axis',
-      description:
-        'Adds a right-hand Y-axis for line series. Use "Use secondary axis" on each line measure to assign it.',
-      defaultValue: false,
-      category: 'Axes Settings',
-    },
     {
       ...inputs.yAxisLabel,
       name: 'yAxisSecondaryLabel',

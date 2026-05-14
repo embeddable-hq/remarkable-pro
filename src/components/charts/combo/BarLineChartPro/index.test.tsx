@@ -56,7 +56,8 @@ vi.mock('./BarLineChartPro.utils', () => ({
   createBarLineClickHandler: vi.fn(() => vi.fn()),
 }));
 
-const makeMeasure = (name: string): Measure => ({ name }) as unknown as Measure;
+const makeMeasure = (name: string, inputs: Record<string, unknown> = {}): Measure =>
+  ({ name, inputs }) as unknown as Measure;
 const makeDimension = (): Dimension => ({ name: 'date', inputs: {} }) as unknown as Dimension;
 
 const emptyResults: DataResponse = { data: [], isLoading: false } as unknown as DataResponse;
@@ -92,9 +93,9 @@ describe('BarLineChartPro', () => {
   });
 
   describe('getBarLineChartProData', () => {
-    it('is called with barMeasures, lineMeasures, dimension, and showSecondaryAxis', () => {
-      const lineMeasures = [makeMeasure('orders')];
-      render(<BarLineChartPro {...defaultProps} lineMeasures={lineMeasures} showSecondaryAxis />);
+    it('is called with barMeasures, lineMeasures, dimension, and showSecondaryAxis derived from measure inputs', () => {
+      const lineMeasures = [makeMeasure('orders', { useSecondaryAxis: true })];
+      render(<BarLineChartPro {...defaultProps} lineMeasures={lineMeasures} />);
       expect(vi.mocked(getBarLineChartProData)).toHaveBeenCalledWith(
         expect.objectContaining({
           barMeasures: defaultProps.measures,
@@ -133,10 +134,11 @@ describe('BarLineChartPro', () => {
 
   describe('getBarLineChartProOptions', () => {
     it('is called with secondary axis props', () => {
+      const lineMeasures = [makeMeasure('orders', { useSecondaryAxis: true })];
       render(
         <BarLineChartPro
           {...defaultProps}
-          showSecondaryAxis
+          lineMeasures={lineMeasures}
           yAxisSecondaryLabel="Units"
           yAxisSecondaryMin={0}
           yAxisSecondaryMax={100}
