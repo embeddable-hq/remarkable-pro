@@ -84,6 +84,10 @@ export * from './components/charts/kpis/KpiChartNumberPro/definition';
 export * from './components/charts/kpis/KpiChartNumberComparisonPro/definition';
 
 // Charts - Lines
+export * as AreaChartPro from './components/charts/lines/AreaChartPro';
+export type { AreaChartProProps } from './components/charts/lines/AreaChartPro';
+export * from './components/charts/lines/AreaChartPro/AreaChartPro.utils';
+export * from './components/charts/lines/AreaChartPro/definition';
 export * as LineChartDefaultPro from './components/charts/lines/LineChartDefaultPro';
 export type {
   LineChartProProps,
