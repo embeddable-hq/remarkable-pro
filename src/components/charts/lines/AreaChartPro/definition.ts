@@ -11,7 +11,6 @@ const meta = {
   ...lineChartDefaultPro.meta,
   name: 'AreaChartPro',
   label: 'Area Chart',
-  category: 'Line Charts',
 } as const satisfies EmbeddedComponentMeta;
 
 export type AreaChartProState = LineChartDefaultProState;
