@@ -54,8 +54,9 @@ export const createSimpleClickHandler = ({
   onClicked?: (args: SimpleClickArg) => void;
 }): ((args: ChartClickArgs) => void) => {
   return ({ elementAtEvent }) => {
-    const element = elementAtEvent[0]!;
-    const dimensionValue = data?.labels?.[element?.index] as string | undefined;
+    const element = elementAtEvent[0];
+    if (!element) return;
+    const dimensionValue = data?.labels?.[element.index] as string | undefined;
     const dimensionTimeRange = getTimeRangeFromDimensionValue({
       value: dimensionValue,
       stateGranularity: granularity,
@@ -79,10 +80,11 @@ export const createGroupedClickHandler = ({
   onClicked?: (args: GroupedClickArg) => void;
 }): ((args: ChartClickArgs) => void) => {
   return ({ elementAtEvent }) => {
-    const element = elementAtEvent[0]!;
-    const dimensionValue = data?.labels?.[element?.index] as string | undefined;
+    const element = elementAtEvent[0];
+    if (!element) return;
+    const dimensionValue = data?.labels?.[element.index] as string | undefined;
     const groupingDimensionValue = (
-      data?.datasets?.[element?.datasetIndex] as { rawLabel?: string } | undefined
+      data?.datasets?.[element.datasetIndex] as { rawLabel?: string } | undefined
     )?.rawLabel;
     const dimensionTimeRange = getTimeRangeFromDimensionValue({
       value: dimensionValue,
