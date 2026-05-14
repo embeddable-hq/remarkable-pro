@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.2.11
+
+### Patch Changes
+
+- d6d7475: Avoid empty event interactions
+
 ## 0.2.10
 
 ### Patch Changes
