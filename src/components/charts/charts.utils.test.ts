@@ -259,7 +259,7 @@ describe('createSimpleClickHandler', () => {
     expect(() => handler(makeClick(0))).not.toThrow();
   });
 
-  it('passes undefined dimensionValue when elementAtEvent is empty', () => {
+  it('does not call onClicked when elementAtEvent is empty', () => {
     const onClicked = vi.fn();
     mockGetTimeRange.mockReturnValue(undefined);
 
@@ -271,7 +271,7 @@ describe('createSimpleClickHandler', () => {
 
     handler({ elementAtEvent: [] } as unknown as ChartClickArgs);
 
-    expect(onClicked).toHaveBeenCalledWith(expect.objectContaining({ dimensionValue: undefined }));
+    expect(onClicked).not.toHaveBeenCalled();
   });
 });
 
@@ -397,5 +397,21 @@ describe('createGroupedClickHandler', () => {
     });
 
     expect(() => handler(makeClick(0, 0))).not.toThrow();
+  });
+
+  it('does not call onClicked when elementAtEvent is empty', () => {
+    const onClicked = vi.fn();
+    mockGetTimeRange.mockReturnValue(undefined);
+
+    const handler = createGroupedClickHandler({
+      data: makeChartData(['A'], [{ rawLabel: 'G' }]),
+      dimension: makeDimension(),
+      groupBy: makeDimension('g'),
+      onClicked,
+    });
+
+    handler({ elementAtEvent: [] } as unknown as ChartClickArgs);
+
+    expect(onClicked).not.toHaveBeenCalled();
   });
 });
