@@ -1,9 +1,9 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
-import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
-import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
+import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { LineChartGroupedProProp } from '../LineChartGroupedPro';
 import { getAreaChartProData, getAreaChartProOptions } from './AreaChartPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartGroupedProOptionsClickArg } from '../lines.types';
@@ -12,24 +12,9 @@ import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelect
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { ActiveElement, ChartEvent } from 'chart.js';
 
-export type AreaChartProProps = {
-  xAxis: Dimension;
-  groupBy: Dimension;
-  measure: Measure;
-  results: DataResponse;
-  reverseXAxis?: boolean;
-  showLegend?: boolean;
-  showLogarithmicScale?: boolean;
-  showTooltips?: boolean;
-  showValueLabels?: boolean;
-  xAxisLabel?: string;
-  yAxisLabel?: string;
-  yAxisRangeMax?: number;
-  yAxisRangeMin?: number;
-  granularity?: Granularity;
-  setGranularity?: (granularity: Granularity) => void;
+export type AreaChartProProps = Omit<LineChartGroupedProProp, 'onLineClicked'> & {
   onAreaClicked?: (arg: LineChartGroupedProOptionsClickArg) => void;
-} & ChartCardHeaderProps;
+};
 
 const AreaChartPro = (props: AreaChartProProps) => {
   const theme: Theme = useTheme() as Theme;
