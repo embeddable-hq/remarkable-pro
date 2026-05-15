@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.2.12
+
+### Patch Changes
+
+- 8ded9e0: Add BarLineChartPro component
+
 ## 0.2.11
 
 ### Patch Changes
