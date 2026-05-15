@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.2.13
+
+### Patch Changes
+
+- 3323405: Allow timeRange click event on kpi tabs chart
+
 ## 0.2.12
 
 ### Patch Changes
