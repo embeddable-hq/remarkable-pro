@@ -1,28 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Dimension, Measure } from '@embeddable.com/core';
 import { getAreaChartProData, getAreaChartProOptions } from './AreaChartPro.utils';
-import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
-import { getDimensionWithoutTruncation } from '../../charts.utils';
 
 vi.mock('../LineChartGroupedPro/LineChartGroupedPro.utils', () => ({
   getLineChartGroupedProData: vi.fn(),
   getLineChartGroupedProOptions: vi.fn(),
-}));
-vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
-vi.mock('@embeddable.com/remarkable-ui', () => ({
-  getChartColors: vi.fn(() => []),
-  getStyleNumber: vi.fn(() => 5),
-}));
-vi.mock('../../charts.utils', () => ({ getDimensionWithoutTruncation: vi.fn((d) => d) }));
-vi.mock('../../../../theme/styles/styles.utils', () => ({
-  getDimensionMeasureColor: vi.fn(() => '#000'),
-}));
-vi.mock('../../../../utils/color.utils', () => ({
-  isColorValid: vi.fn(() => false),
-  setColorAlpha: vi.fn((c: string) => c),
-}));
-vi.mock('mergician', () => ({
-  mergician: vi.fn((...args: object[]) => Object.assign({}, ...args)),
 }));
 
 import {
@@ -54,11 +36,6 @@ const makeMeasure = (overrides: Record<string, any> = {}): Measure =>
 
 const makeTheme = (overrides = {}) => ({ charts: {}, ...overrides }) as never;
 
-const makeMockFormatter = () => ({
-  data: vi.fn((_: unknown, value: unknown) => `fmt:${value}`),
-  dimensionOrMeasureTitle: vi.fn((m: { title: string }) => m.title),
-});
-
 const makeChartData = (labels: string[], datasets: { data: number[] }[] = []) => ({
   labels,
   datasets,
@@ -67,11 +44,6 @@ const makeChartData = (labels: string[], datasets: { data: number[] }[] = []) =>
 // ----------------------------------------------------------------------------
 
 describe('getAreaChartProData', () => {
-  beforeEach(() => {
-    const mockFormatter = makeMockFormatter();
-    vi.mocked(getThemeFormatter).mockReturnValue(mockFormatter as never);
-  });
-
   it('sets fill: true on every dataset', () => {
     vi.mocked(getLineChartGroupedProData).mockReturnValue({
       labels: ['Jan', 'Feb'],
@@ -165,9 +137,6 @@ describe('getAreaChartProData', () => {
 
 describe('getAreaChartProOptions', () => {
   beforeEach(() => {
-    const mockFormatter = makeMockFormatter();
-    vi.mocked(getThemeFormatter).mockReturnValue(mockFormatter as never);
-    vi.mocked(getDimensionWithoutTruncation).mockImplementation((d) => d);
     vi.mocked(getLineChartGroupedProOptions).mockReturnValue({ scales: { x: {}, y: {} } } as never);
   });
 
