@@ -1,4 +1,11 @@
-import { Granularity, Value } from '@embeddable.com/core';
+import {
+  DataResponse,
+  Dimension,
+  Granularity,
+  LoadDataRequest,
+  Value,
+  loadData,
+} from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { LineChartGroupedProOptionsClickArg } from '../lines.types';
@@ -6,11 +13,40 @@ import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
 import { lineChartGroupedPro, LineChartGroupedProState } from '../LineChartGroupedPro/definition';
+import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 
 const meta = {
   ...lineChartGroupedPro.meta,
   name: 'AreaChartPro',
   label: 'Area Chart',
+  events: [
+    {
+      name: 'onAreaClicked',
+      label: 'An area is clicked',
+      properties: [
+        {
+          name: 'axisDimensionValue',
+          label: 'Clicked axis dimension value',
+          type: 'string',
+        },
+        {
+          name: 'axisDimensionTimeRange',
+          label: 'Clicked axis dimension time range',
+          type: 'timeRange',
+        },
+        {
+          name: 'segmentDimensionValue',
+          label: 'Clicked segment dimension value',
+          type: 'string',
+        },
+        {
+          name: 'segmentDimensionTimeRange',
+          label: 'Clicked segment dimension time range',
+          type: 'timeRange',
+        },
+      ],
+    },
+  ],
 } as const satisfies EmbeddedComponentMeta;
 
 export type AreaChartProState = LineChartGroupedProState;
@@ -25,15 +61,29 @@ const previewConfig = {
 
 const preview = definePreview(Component, previewConfig);
 
-const loadDataResultsArgs = lineChartGroupedPro.results.loadDataArgs;
-const loadDataResults = lineChartGroupedPro.results.loadData;
+const loadDataResultsArgs = (
+  inputs: Inputs<typeof meta>,
+  xAxis?: Dimension,
+  clientContext?: ThemeClientContext,
+): LoadDataRequest => ({
+  limit: inputs.maxResults,
+  from: inputs.dataset,
+  select: [xAxis ?? inputs.xAxis, inputs.groupBy, inputs.measure],
+  timezone: getClientContextTimezone(clientContext?.timezone),
+});
+
+const loadDataResults = (
+  inputs: Inputs<typeof meta>,
+  xAxis: Dimension,
+  clientContext: ThemeClientContext,
+): DataResponse => loadData(loadDataResultsArgs(inputs, xAxis, clientContext));
 
 const events = {
-  onLineClicked: (value: LineChartGroupedProOptionsClickArg) => ({
+  onAreaClicked: (value: LineChartGroupedProOptionsClickArg) => ({
     axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
     axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
-    groupingDimensionValue: value.groupingDimensionValue ?? Value.noFilter(),
-    groupingDimensionTimeRange: value.groupingDimensionTimeRange ?? Value.noFilter(),
+    segmentDimensionValue: value.groupingDimensionValue ?? Value.noFilter(),
+    segmentDimensionTimeRange: value.groupingDimensionTimeRange ?? Value.noFilter(),
   }),
 };
 
