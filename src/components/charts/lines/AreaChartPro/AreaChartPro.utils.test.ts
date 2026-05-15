@@ -1,0 +1,204 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Dimension, Measure } from '@embeddable.com/core';
+import { getAreaChartProData, getAreaChartProOptions } from './AreaChartPro.utils';
+
+vi.mock('../LineChartGroupedPro/LineChartGroupedPro.utils', () => ({
+  getLineChartGroupedProData: vi.fn(),
+  getLineChartGroupedProOptions: vi.fn(),
+}));
+
+import {
+  getLineChartGroupedProData,
+  getLineChartGroupedProOptions,
+} from '../LineChartGroupedPro/LineChartGroupedPro.utils';
+
+// -- helpers -----------------------------------------------------------------
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const makeDimension = (overrides: Record<string, any> = {}): Dimension =>
+  ({
+    name: 'date',
+    title: 'Date',
+    nativeType: 'string',
+    inputs: {},
+    ...overrides,
+  }) as unknown as Dimension;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const makeMeasure = (overrides: Record<string, any> = {}): Measure =>
+  ({
+    name: 'revenue',
+    title: 'Revenue',
+    nativeType: 'number',
+    inputs: {},
+    ...overrides,
+  }) as unknown as Measure;
+
+const makeTheme = (overrides = {}) => ({ charts: {}, ...overrides }) as never;
+
+const makeChartData = (labels: string[], datasets: { data: number[] }[] = []) => ({
+  labels,
+  datasets,
+});
+
+// ----------------------------------------------------------------------------
+
+describe('getAreaChartProData', () => {
+  it('sets fill: true on every dataset', () => {
+    vi.mocked(getLineChartGroupedProData).mockReturnValue({
+      labels: ['Jan', 'Feb'],
+      datasets: [
+        { data: [100, 200], label: 'Group A', fill: false },
+        { data: [50, 75], label: 'Group B', fill: false },
+      ],
+    } as never);
+
+    const result = getAreaChartProData(
+      {
+        data: [
+          { date: 'Jan', revenue: 100 },
+          { date: 'Feb', revenue: 200 },
+        ],
+        dimension: makeDimension(),
+        groupDimension: makeDimension({ name: 'category' }),
+        measure: makeMeasure(),
+        hasMinMaxYAxisRange: false,
+      },
+      makeTheme(),
+    );
+
+    expect(result.datasets.every((ds) => ds.fill === true)).toBe(true);
+  });
+
+  it('preserves all other dataset properties when setting fill', () => {
+    vi.mocked(getLineChartGroupedProData).mockReturnValue({
+      labels: ['Jan'],
+      datasets: [{ data: [100], label: 'Group A', borderColor: '#ff0000' }],
+    } as never);
+
+    const result = getAreaChartProData(
+      {
+        data: [{ date: 'Jan', revenue: 100 }],
+        dimension: makeDimension(),
+        groupDimension: makeDimension({ name: 'category' }),
+        measure: makeMeasure(),
+        hasMinMaxYAxisRange: false,
+      },
+      makeTheme(),
+    );
+
+    expect(result.datasets[0]).toMatchObject({
+      data: [100],
+      label: 'Group A',
+      borderColor: '#ff0000',
+      fill: true,
+    });
+  });
+
+  it('preserves labels from the underlying grouped line chart data', () => {
+    vi.mocked(getLineChartGroupedProData).mockReturnValue({
+      labels: ['Jan', 'Feb', 'Mar'],
+      datasets: [{ data: [1, 2, 3] }],
+    } as never);
+
+    const result = getAreaChartProData(
+      {
+        data: [],
+        dimension: makeDimension(),
+        groupDimension: makeDimension({ name: 'category' }),
+        measure: makeMeasure(),
+        hasMinMaxYAxisRange: false,
+      },
+      makeTheme(),
+    );
+
+    expect(result.labels).toEqual(['Jan', 'Feb', 'Mar']);
+  });
+
+  it('delegates to getLineChartGroupedProData with the same props and theme', () => {
+    vi.mocked(getLineChartGroupedProData).mockReturnValue({ labels: [], datasets: [] } as never);
+
+    const props = {
+      data: [{ date: 'Jan', revenue: 42 }],
+      dimension: makeDimension(),
+      groupDimension: makeDimension({ name: 'category' }),
+      measure: makeMeasure(),
+      hasMinMaxYAxisRange: true,
+    };
+    const theme = makeTheme();
+
+    getAreaChartProData(props, theme);
+
+    expect(getLineChartGroupedProData).toHaveBeenCalledWith(props, theme);
+  });
+});
+
+// ----------------------------------------------------------------------------
+
+describe('getAreaChartProOptions', () => {
+  beforeEach(() => {
+    vi.mocked(getLineChartGroupedProOptions).mockReturnValue({ scales: { x: {}, y: {} } } as never);
+  });
+
+  it('sets scales.y.stacked to true', () => {
+    const result = getAreaChartProOptions(
+      {
+        dimension: makeDimension(),
+        groupDimension: makeDimension({ name: 'category' }),
+        measure: makeMeasure(),
+        data: makeChartData([]) as never,
+      },
+      makeTheme(),
+    );
+
+    expect(result.scales?.y?.stacked).toBe(true);
+  });
+
+  it('delegates to getLineChartGroupedProOptions with the same options and theme', () => {
+    const options = {
+      dimension: makeDimension(),
+      groupDimension: makeDimension({ name: 'category' }),
+      measure: makeMeasure(),
+      data: makeChartData([]) as never,
+    };
+    const theme = makeTheme();
+
+    getAreaChartProOptions(options, theme);
+
+    expect(getLineChartGroupedProOptions).toHaveBeenCalledWith(options, theme);
+  });
+
+  it('merges areaChartPro theme options when provided', () => {
+    const theme = {
+      charts: {
+        areaChartPro: { options: { animation: false } },
+      },
+    } as never;
+
+    const result = getAreaChartProOptions(
+      {
+        dimension: makeDimension(),
+        groupDimension: makeDimension({ name: 'category' }),
+        measure: makeMeasure(),
+        data: makeChartData([]) as never,
+      },
+      theme,
+    );
+
+    expect((result as { animation?: unknown }).animation).toBe(false);
+  });
+
+  it('works without areaChartPro theme options defined', () => {
+    const result = getAreaChartProOptions(
+      {
+        dimension: makeDimension(),
+        groupDimension: makeDimension({ name: 'category' }),
+        measure: makeMeasure(),
+        data: makeChartData([]) as never,
+      },
+      makeTheme(),
+    );
+
+    expect(result.scales).toBeDefined();
+  });
+});
