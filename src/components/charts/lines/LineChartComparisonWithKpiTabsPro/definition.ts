@@ -137,6 +137,7 @@ const loadDataResultsKpisComparison = (
 const events = {
   onLineClicked: (value: LineChartProOptionsClickArg) => ({
     axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
+    axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
   }),
 };
 
