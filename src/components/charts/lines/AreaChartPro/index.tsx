@@ -6,14 +6,15 @@ import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { getAreaChartProData, getAreaChartProOptions } from './AreaChartPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { LineChartProOptionsClick } from '../lines.types';
+import { LineChartGroupedProOptionsClickArg } from '../lines.types';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { createSimpleClickHandler } from '../../charts.utils';
+import { createGroupedClickHandler } from '../../charts.utils';
 
 export type AreaChartProProps = {
   xAxis: Dimension;
-  measures: Measure[];
+  groupBy: Dimension;
+  measure: Measure;
   results: DataResponse;
   reverseXAxis?: boolean;
   showLegend?: boolean;
@@ -26,7 +27,7 @@ export type AreaChartProProps = {
   yAxisRangeMin?: number;
   granularity?: Granularity;
   setGranularity?: (granularity: Granularity) => void;
-  onLineClicked?: LineChartProOptionsClick;
+  onLineClicked?: (arg: LineChartGroupedProOptionsClickArg) => void;
 } & ChartCardHeaderProps;
 
 const AreaChartPro = (props: AreaChartProProps) => {
@@ -36,9 +37,9 @@ const AreaChartPro = (props: AreaChartProProps) => {
   const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
   const {
     hideMenu,
-    measures,
-    granularity,
+    measure,
     xAxis,
+    groupBy,
     reverseXAxis,
     showLegend,
     showLogarithmicScale,
@@ -46,6 +47,7 @@ const AreaChartPro = (props: AreaChartProProps) => {
     showValueLabels,
     yAxisRangeMax,
     yAxisRangeMin,
+    granularity,
     setGranularity,
     onLineClicked,
   } = props;
@@ -59,18 +61,23 @@ const AreaChartPro = (props: AreaChartProProps) => {
     {
       data: results.data,
       dimension: xAxis,
-      measures,
+      groupDimension: groupBy,
+      measure,
       hasMinMaxYAxisRange: Boolean(yAxisRangeMin != null || yAxisRangeMax != null),
     },
     theme,
   );
-  const options = getAreaChartProOptions({ data, dimension: xAxis, measures }, theme);
+  const options = getAreaChartProOptions(
+    { data, dimension: xAxis, groupDimension: groupBy, measure },
+    theme,
+  );
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
 
-  const handleClick = createSimpleClickHandler({
+  const handleClick = createGroupedClickHandler({
     data,
     dimension: xAxis,
+    groupBy,
     granularity,
     onClicked: onLineClicked,
   });
@@ -78,7 +85,7 @@ const AreaChartPro = (props: AreaChartProProps) => {
   return (
     <ChartCard
       data={results}
-      dimensionsAndMeasures={[...measures, xAxis]}
+      dimensionsAndMeasures={[measure, xAxis, groupBy]}
       errorMessage={results.error}
       description={description}
       title={title}

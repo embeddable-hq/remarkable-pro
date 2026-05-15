@@ -1,36 +1,39 @@
 import { Granularity, Value } from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
-import { LineChartProOptionsClickArg } from '../lines.types';
+import { LineChartGroupedProOptionsClickArg } from '../lines.types';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
-import { lineChartDefaultPro, LineChartDefaultProState } from '../LineChartDefaultPro/definition';
+import { lineChartGroupedPro, LineChartGroupedProState } from '../LineChartGroupedPro/definition';
 
 const meta = {
-  ...lineChartDefaultPro.meta,
+  ...lineChartGroupedPro.meta,
   name: 'AreaChartPro',
   label: 'Area Chart',
 } as const satisfies EmbeddedComponentMeta;
 
-export type AreaChartProState = LineChartDefaultProState;
+export type AreaChartProState = LineChartGroupedProState;
 
 const previewConfig = {
   xAxis: previewData.dimension,
-  measures: [previewData.measure],
-  results: previewData.results1Measure1Dimension,
+  groupBy: previewData.dimensionGroup,
+  measure: previewData.measure,
+  results: previewData.results1Measure2Dimensions,
   hideMenu: true,
 };
 
 const preview = definePreview(Component, previewConfig);
 
-const loadDataResultsArgs = lineChartDefaultPro.results.loadDataArgs;
-const loadDataResults = lineChartDefaultPro.results.loadData;
+const loadDataResultsArgs = lineChartGroupedPro.results.loadDataArgs;
+const loadDataResults = lineChartGroupedPro.results.loadData;
 
 const events = {
-  onLineClicked: (value: LineChartProOptionsClickArg) => ({
+  onLineClicked: (value: LineChartGroupedProOptionsClickArg) => ({
     axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
     axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
+    groupingDimensionValue: value.groupingDimensionValue ?? Value.noFilter(),
+    groupingDimensionTimeRange: value.groupingDimensionTimeRange ?? Value.noFilter(),
   }),
 };
 
@@ -44,6 +47,7 @@ const props = (
   return {
     ...inputs,
     xAxis: xAxisWithGranularity,
+    granularity: state?.granularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
     results: loadDataResults(inputs, xAxisWithGranularity, clientContext),
   };
