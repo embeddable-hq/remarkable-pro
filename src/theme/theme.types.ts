@@ -44,6 +44,7 @@ export type ThemeCharts = {
   lineChartDefaultPro?: { options: Partial<ChartOptions<'line'>> };
   lineChartGroupedPro?: { options: Partial<ChartOptions<'line'>> };
   lineChartComparisonDefaultPro?: { options: Partial<ChartOptions<'line'>> };
+  barLineChartPro?: { options: Partial<ChartOptions<'bar'>> };
   scatterChartPro?: { options: Partial<ChartOptions<'scatter'>> };
   bubbleChartPro?: { options: Partial<ChartOptions<'bubble'>> };
 };
