@@ -79,10 +79,7 @@ const AreaChartPro = (props: AreaChartProProps) => {
     dimension: xAxis,
     groupBy,
     granularity,
-    onClicked: (value) => {
-      console.log('[AreaChartPro] onAreaClicked', value);
-      onAreaClicked?.(value);
-    },
+    onClicked: onAreaClicked,
   });
 
   const handleClick: typeof groupedClickHandler = (args) =>
