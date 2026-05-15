@@ -27,7 +27,7 @@ export type AreaChartProProps = {
   yAxisRangeMin?: number;
   granularity?: Granularity;
   setGranularity?: (granularity: Granularity) => void;
-  onLineClicked?: (arg: LineChartGroupedProOptionsClickArg) => void;
+  onAreaClicked?: (arg: LineChartGroupedProOptionsClickArg) => void;
 } & ChartCardHeaderProps;
 
 const AreaChartPro = (props: AreaChartProProps) => {
@@ -49,7 +49,7 @@ const AreaChartPro = (props: AreaChartProProps) => {
     yAxisRangeMin,
     granularity,
     setGranularity,
-    onLineClicked,
+    onAreaClicked,
   } = props;
 
   const results = useFillGaps({
@@ -74,13 +74,22 @@ const AreaChartPro = (props: AreaChartProProps) => {
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
 
-  const handleClick = createGroupedClickHandler({
+  const groupedClickHandler = createGroupedClickHandler({
     data,
     dimension: xAxis,
     groupBy,
     granularity,
-    onClicked: onLineClicked,
+    onClicked: (value) => {
+      console.log('[AreaChartPro] onAreaClicked', value);
+      onAreaClicked?.(value);
+    },
   });
+
+  const handleClick: typeof groupedClickHandler = (args) =>
+    groupedClickHandler({
+      ...args,
+      elementAtEvent: args.elementAtEvent.length ? args.elementAtEvent : args.elementsAtEvent,
+    });
 
   return (
     <ChartCard
