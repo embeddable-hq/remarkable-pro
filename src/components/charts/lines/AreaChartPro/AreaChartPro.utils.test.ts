@@ -4,9 +4,9 @@ import { getAreaChartProData, getAreaChartProOptions } from './AreaChartPro.util
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getDimensionWithoutTruncation } from '../../charts.utils';
 
-vi.mock('../LineChartDefaultPro/LineChartDefaultPro.utils', () => ({
-  getLineChartProData: vi.fn(),
-  getLineChartProOptions: vi.fn(),
+vi.mock('../LineChartGroupedPro/LineChartGroupedPro.utils', () => ({
+  getLineChartGroupedProData: vi.fn(),
+  getLineChartGroupedProOptions: vi.fn(),
 }));
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
 vi.mock('@embeddable.com/remarkable-ui', () => ({
@@ -26,9 +26,9 @@ vi.mock('mergician', () => ({
 }));
 
 import {
-  getLineChartProData,
-  getLineChartProOptions,
-} from '../LineChartDefaultPro/LineChartDefaultPro.utils';
+  getLineChartGroupedProData,
+  getLineChartGroupedProOptions,
+} from '../LineChartGroupedPro/LineChartGroupedPro.utils';
 
 // -- helpers -----------------------------------------------------------------
 
@@ -73,11 +73,11 @@ describe('getAreaChartProData', () => {
   });
 
   it('sets fill: true on every dataset', () => {
-    vi.mocked(getLineChartProData).mockReturnValue({
+    vi.mocked(getLineChartGroupedProData).mockReturnValue({
       labels: ['Jan', 'Feb'],
       datasets: [
-        { data: [100, 200], label: 'Revenue', fill: false },
-        { data: [50, 75], label: 'Costs', fill: false },
+        { data: [100, 200], label: 'Group A', fill: false },
+        { data: [50, 75], label: 'Group B', fill: false },
       ],
     } as never);
 
@@ -88,7 +88,8 @@ describe('getAreaChartProData', () => {
           { date: 'Feb', revenue: 200 },
         ],
         dimension: makeDimension(),
-        measures: [makeMeasure()],
+        groupDimension: makeDimension({ name: 'category' }),
+        measure: makeMeasure(),
         hasMinMaxYAxisRange: false,
       },
       makeTheme(),
@@ -98,16 +99,17 @@ describe('getAreaChartProData', () => {
   });
 
   it('preserves all other dataset properties when setting fill', () => {
-    vi.mocked(getLineChartProData).mockReturnValue({
+    vi.mocked(getLineChartGroupedProData).mockReturnValue({
       labels: ['Jan'],
-      datasets: [{ data: [100], label: 'Revenue', borderColor: '#ff0000' }],
+      datasets: [{ data: [100], label: 'Group A', borderColor: '#ff0000' }],
     } as never);
 
     const result = getAreaChartProData(
       {
         data: [{ date: 'Jan', revenue: 100 }],
         dimension: makeDimension(),
-        measures: [makeMeasure()],
+        groupDimension: makeDimension({ name: 'category' }),
+        measure: makeMeasure(),
         hasMinMaxYAxisRange: false,
       },
       makeTheme(),
@@ -115,14 +117,14 @@ describe('getAreaChartProData', () => {
 
     expect(result.datasets[0]).toMatchObject({
       data: [100],
-      label: 'Revenue',
+      label: 'Group A',
       borderColor: '#ff0000',
       fill: true,
     });
   });
 
-  it('preserves labels from the underlying line chart data', () => {
-    vi.mocked(getLineChartProData).mockReturnValue({
+  it('preserves labels from the underlying grouped line chart data', () => {
+    vi.mocked(getLineChartGroupedProData).mockReturnValue({
       labels: ['Jan', 'Feb', 'Mar'],
       datasets: [{ data: [1, 2, 3] }],
     } as never);
@@ -131,7 +133,8 @@ describe('getAreaChartProData', () => {
       {
         data: [],
         dimension: makeDimension(),
-        measures: [makeMeasure()],
+        groupDimension: makeDimension({ name: 'category' }),
+        measure: makeMeasure(),
         hasMinMaxYAxisRange: false,
       },
       makeTheme(),
@@ -140,20 +143,21 @@ describe('getAreaChartProData', () => {
     expect(result.labels).toEqual(['Jan', 'Feb', 'Mar']);
   });
 
-  it('delegates to getLineChartProData with the same props and theme', () => {
-    vi.mocked(getLineChartProData).mockReturnValue({ labels: [], datasets: [] } as never);
+  it('delegates to getLineChartGroupedProData with the same props and theme', () => {
+    vi.mocked(getLineChartGroupedProData).mockReturnValue({ labels: [], datasets: [] } as never);
 
     const props = {
       data: [{ date: 'Jan', revenue: 42 }],
       dimension: makeDimension(),
-      measures: [makeMeasure()],
+      groupDimension: makeDimension({ name: 'category' }),
+      measure: makeMeasure(),
       hasMinMaxYAxisRange: true,
     };
     const theme = makeTheme();
 
     getAreaChartProData(props, theme);
 
-    expect(getLineChartProData).toHaveBeenCalledWith(props, theme);
+    expect(getLineChartGroupedProData).toHaveBeenCalledWith(props, theme);
   });
 });
 
@@ -164,14 +168,15 @@ describe('getAreaChartProOptions', () => {
     const mockFormatter = makeMockFormatter();
     vi.mocked(getThemeFormatter).mockReturnValue(mockFormatter as never);
     vi.mocked(getDimensionWithoutTruncation).mockImplementation((d) => d);
-    vi.mocked(getLineChartProOptions).mockReturnValue({ scales: { x: {}, y: {} } } as never);
+    vi.mocked(getLineChartGroupedProOptions).mockReturnValue({ scales: { x: {}, y: {} } } as never);
   });
 
   it('sets scales.y.stacked to true', () => {
     const result = getAreaChartProOptions(
       {
         dimension: makeDimension(),
-        measures: [makeMeasure()],
+        groupDimension: makeDimension({ name: 'category' }),
+        measure: makeMeasure(),
         data: makeChartData([]) as never,
       },
       makeTheme(),
@@ -180,30 +185,32 @@ describe('getAreaChartProOptions', () => {
     expect(result.scales?.y?.stacked).toBe(true);
   });
 
-  it('delegates to getLineChartProOptions with the same options and theme', () => {
+  it('delegates to getLineChartGroupedProOptions with the same options and theme', () => {
     const options = {
       dimension: makeDimension(),
-      measures: [makeMeasure()],
+      groupDimension: makeDimension({ name: 'category' }),
+      measure: makeMeasure(),
       data: makeChartData([]) as never,
     };
     const theme = makeTheme();
 
     getAreaChartProOptions(options, theme);
 
-    expect(getLineChartProOptions).toHaveBeenCalledWith(options, theme);
+    expect(getLineChartGroupedProOptions).toHaveBeenCalledWith(options, theme);
   });
 
-  it('merges areaChartDefaultPro theme options when provided', () => {
+  it('merges areaChartPro theme options when provided', () => {
     const theme = {
       charts: {
-        areaChartDefaultPro: { options: { animation: false } },
+        areaChartPro: { options: { animation: false } },
       },
     } as never;
 
     const result = getAreaChartProOptions(
       {
         dimension: makeDimension(),
-        measures: [makeMeasure()],
+        groupDimension: makeDimension({ name: 'category' }),
+        measure: makeMeasure(),
         data: makeChartData([]) as never,
       },
       theme,
@@ -212,11 +219,12 @@ describe('getAreaChartProOptions', () => {
     expect((result as { animation?: unknown }).animation).toBe(false);
   });
 
-  it('works without areaChartDefaultPro theme options defined', () => {
+  it('works without areaChartPro theme options defined', () => {
     const result = getAreaChartProOptions(
       {
         dimension: makeDimension(),
-        measures: [makeMeasure()],
+        groupDimension: makeDimension({ name: 'category' }),
+        measure: makeMeasure(),
         data: makeChartData([]) as never,
       },
       makeTheme(),
