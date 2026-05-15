@@ -3,20 +3,21 @@ import { Theme } from '../../../../theme/theme.types';
 import { ChartData, ChartOptions } from 'chart.js';
 import { mergician } from 'mergician';
 import {
-  getLineChartProData,
-  getLineChartProOptions,
-} from '../LineChartDefaultPro/LineChartDefaultPro.utils';
+  getLineChartGroupedProData,
+  getLineChartGroupedProOptions,
+} from '../LineChartGroupedPro/LineChartGroupedPro.utils';
 
 export const getAreaChartProData = (
   props: {
     data: DataResponse['data'];
     dimension: Dimension;
-    measures: Measure[];
+    groupDimension: Dimension;
+    measure: Measure;
     hasMinMaxYAxisRange: boolean;
   },
   theme: Theme,
 ): ChartData<'line'> => {
-  const data = getLineChartProData(props, theme);
+  const data = getLineChartGroupedProData(props, theme);
 
   return {
     ...data,
@@ -27,15 +28,16 @@ export const getAreaChartProData = (
 export const getAreaChartProOptions = (
   options: {
     dimension: Dimension;
-    measures: Measure[];
+    groupDimension: Dimension;
+    measure: Measure;
     data: ChartData<'line'>;
   },
   theme: Theme,
 ): ChartOptions<'line'> => {
-  const lineOptions = getLineChartProOptions(options, theme);
+  const lineOptions = getLineChartGroupedProOptions(options, theme);
 
   return mergician(lineOptions, {
     scales: { y: { stacked: true } },
-    ...(theme.charts?.areaChartDefaultPro?.options || {}),
+    ...(theme.charts?.areaChartPro?.options || {}),
   });
 };
