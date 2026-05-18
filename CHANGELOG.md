@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.0
+
+### Minor Changes
+
+- a789d87: Add description to component meta
+
 ## 0.2.13
 
 ### Patch Changes
