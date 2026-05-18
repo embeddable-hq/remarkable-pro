@@ -2,167 +2,300 @@
 
 This project follows a modular, scalable architecture that separates reusable components, theming, internationalization, and internal scripts. The structure prioritizes **maintainability**, **extensibility**, and **clean integration**.
 
-Currently the remarkable-ui and remarkable-ui-embeddable belong to the same repo. In the future, remarkable-ui will be extracted into its own library.
-
-# Remarkable UI Structure
-
-```
-src
-├── charts                            > chart components
-│   ├── PieChart                      > folder with the name of the component
-│   │   ├── PieChart.ts               > react component
-│   │   ├── PieChart.styles.ts        > styles of the component
-│   │   ├── PieChart.utils.ts         > utils of the component
-│   │   ├── PieChart.types.ts         > types of the component
-│   │   ├── PieChart.tests.ts         > tests of the component
-│   │   └── PieChart.stories.ts       > storybook of the component
-│   ├── BarChart
-│   │   └── ...                       > same as above (PieChart)
-│   ├── ...
-│   └── shared                     > shared components inside the charts
-├── controls                      > control components
-├── shared                        > shared components used between charts and controls. also used to build own components
-├── styles                        > styles of the repo
-│   ├── styles.constants.ts       > object with css variable to be injected
-│   └── styles.utils.ts           > injecting css variables from TS
-└── index.ts                      > exported types, constants, functions and components
-```
-
-# Remarkable UI Overview
-
-This will be our component library, later to export as a individual npm package.
-
-## Components
-
-Components are separated into 3 sections:
-
-1. `charts`: Reusable chart components
-2. `controls`: Reusable control components
-3. `shared`: Shared components used by charts and controls. Additionally includes components used to create other components.
-
-## Styles
-
-Styles include all the styling used by the components above and offers functionality to access those values via TS.
-
-## Testing & Storybook
-
-Every component should have:
-
-- A `.test.ts` file for unit tests
-- A `.story.ts` file to showcase and visually test the component in Storybook
-
-## Adding a new component
-
-1. Create a folder in `charts`, `controls`, or `shared`
-2. Add:
-   - `Component.ts`
-   - `Component.test.ts`
-   - `Component.story.ts`
-   - (Optional) `Component.types.ts`, `Component.styles.ts`, etc.
-3. Update `index.ts` of the root folder
-
-## Best Practices
-
-- Use strong typing with TypeScript across all files
-- Centralize exports through each folder’s `index.ts`
-- Maintain consistent folder and file naming
-
-# Remarkable UI Embeddable Structure
+# Project Structure
 
 ```
 src
 ├── components
+│   ├── component.inputs.constants.ts         > shared input definitions composed in each definition.ts
+│   ├── component.subinputs.constants.ts      > shared sub-input definitions
+│   ├── preview.data.constants.ts             > static preview data used in the editor canvas
 │   ├── charts                                > chart components
-│   │   ├── pies                              > component group name (only applies if component has multiple variants)
-│   │   │   ├── PieChart                      > name of the component
-│   │   │   │   ├── index.ts                  > react component
-│   │   │   │   └── PieChart.emb.ts           > component configuration (inputs and initiation)
-│   │   │   ├── DonutChart
-│   │   │   │   ├── index.ts
-│   │   │   │   └── DonutChart.emb.ts
-│   │   │   └── DonutLabelChart
-│   │   │       ├── index.ts
-│   │   │       └── DonutLabelChart.emb.ts
+│   │   ├── charts.utils.ts                   > shared utils across all chart groups
+│   │   ├── pies                              > component group (only when multiple variants exist)
+│   │   │   ├── pies.utils.ts                 > shared utils for the group
+│   │   │   ├── pies.types.ts                 > shared types for the group (if needed)
+│   │   │   ├── PieChartPro                   > component name
+│   │   │   │   ├── index.tsx                 > react component
+│   │   │   │   ├── definition.ts             > component logic (meta, props, events, data, preview)
+│   │   │   │   └── PieChartPro.emb.ts        > SDK integration wrapper
+│   │   │   └── DonutChartPro
+│   │   │       └── ...                       > same as above
 │   │   ├── bars
 │   │   │   └── ...
-│   │   └── shared                            > components reused inside the charts
-│   │       └── ChartCard.ts                  > react component
-│   │           ├── ChartCard.story.ts        > storybook of the component > check need
-│   │           ├── ChartCard.test.ts.        > tests of the component
-│   │           ├── ChartCard.types.ts        > types of the component (only if more than one, including the DatePickerProps)
-│   │           ├── ChartCard.utils.ts        > utils of the component
-│   │           └── ChartCard.styles.ts       > styles of the component
-│   └── controls                              > control components
-│       ├──  DatePicker                       > name of the component
-│       │   ├── DatePicker.story.ts
-│       │   ├── DatePicker.test.ts.
-│       │   ├── DatePicker.types.ts
-│       │   ├── DatePicker.utils.ts
-│       │   └── DatePicker.styles.ts
-│       ├── ...
-│       └── shared                            > components reused inside the control
+│   │   └── shared                            > components reused across chart groups
+│   │       └── ChartCard
+│   │           ├── ChartCard.tsx
+│   │           ├── ChartCard.test.tsx
+│   │           └── ChartCard.module.css
+│   ├── editors                               > editor / control components
+│   │   ├── dates                             > date picker variants (grouped)
+│   │   │   ├── dates.utils.ts
+│   │   │   └── DateRangePickerPresetsPro
+│   │   │       └── ...
+│   │   ├── SingleSelectFieldPro
+│   │   │   └── ...
+│   │   └── shared                            > components reused across editors
+│   │       └── EditorCard
+│   │           └── ...
+│   ├── shared                                > components shared across charts and editors
+│   │   └── EmptyContainerPro
+│   │       └── ...
+│   ├── types                                 > embeddable type definitions
+│   │   └── DisplayFormat.type.emb.ts
+│   └── utils                                 > shared component-level utilities
+│       └── timeRange.utils.ts
+├── editors                                   > standalone editor components
+│   └── ColorEditor
+│       ├── index.tsx
+│       ├── ColorEditor.emb.ts
+│       └── Color.type.emb.ts
 ├── theme                                     > theme functionality
-│   ├── formatter                             > formatter of the theme
-│   │   ├── formatter.constants.ts            > formatter default values
+│   ├── theme.constants.ts                    > theme default values
+│   ├── theme.types.ts
+│   ├── defaults                              > predefined default configurations
+│   │   └── defaults.GranularityOptions.constants.ts
+│   ├── formatter                             > controls how data is displayed to end users
+│   │   ├── formatter.constants.ts
 │   │   ├── formatter.types.ts
 │   │   └── formatter.utils.ts
-│   ├── i18n                                  > i18n
-│   │   ├── translations                      > files supported
-│   │   │   ├── en.ts
-│   │   │   ├── de.ts
-│   │   │   └── ...
-│   │   └── i18n.ts                           > setup the i18n (singleton)
-│   ├── styles                                > styles of the theme
-│   │   ├── styles.constants.ts               > style default values
+│   ├── i18n                                  > internationalization
+│   │   ├── i18n.ts                           > i18n setup (singleton)
+│   │   └── translations
+│   │       ├── en.ts
+│   │       └── de.ts
+│   ├── styles
+│   │   ├── styles.constants.ts
 │   │   ├── styles.types.ts
 │   │   └── styles.utils.ts
-│   ├── utils                                 > theme utils
-│   │   ├── export.utils.ts
-│   │   └── ...
-│   ├── theme.constants.ts                    > theme default values
-│   └── theme.types.ts
-├── assets
-│   ├── icons
-│   ├── fonts
+│   └── utils
+│       └── export.utils.ts
+├── utils                                     > global utility functions
+│   ├── array.utils.ts
+│   ├── color.utils.ts
 │   └── ...
-├── types                                     > overall types
-├── embeddable.theme.ts                       > default theme using `/theme` properties
-├── embeddable.config.ts                      > main embeddable config
-├── lifecycle.config.ts                       > hook for applying theme updates to the DOM and others
-├── tsconfig.json
-├── eslintrc.js
-├── prettier.config.js
-├── package.json
-├── ARCHITECTURE.md
-└── README.md
+├── types                                     > global TypeScript type declarations
+│   └── ...
+└── assets
+    └── icons
+
+embeddable.theme.ts                           > default theme using `/theme` properties
+embeddable.lifecycle.ts                       > hook for applying theme updates to the DOM and others
 ```
 
-Each component may include:
+**Embeddable components** (charts, editors) always include:
 
-- `.ts`: Main component file
-- `.story.ts`: Storybook file
-- `.test.ts`: Unit tests
+- `index.tsx`: Main React component file
+- `definition.ts`: Component logic (meta, props, events, data loading, preview)
+- `ComponentName.emb.ts`: SDK integration wrapper
+
+**Shared components** only include what they need — typically `ComponentName.tsx` and optionally a test and CSS module.
+
+All components may also include:
+
+- `.test.tsx`: Unit tests
 - `.types.ts`: Local types (if needed)
 - `.utils.ts`: Local utilities (if needed)
-- `.styles.ts`: Component-specific styling
+- `.utils.test.ts`: Unit tests for utilities (if needed)
+- `.hooks.ts`: React hooks (if needed)
+- `.module.css`: Component-specific styles (CSS Modules)
 
 ---
 
----
-
-# Remarkable UI Embeddable Overview
-
-## Components
+# Components
 
 Contains **pre-configured charts and controls**, ready to use out of the box. These are **not intended for direct import** when building custom UI.
 
 - `charts`: Pre-built chart components (e.g., `PieChart`)
-- `controls`: Pre-built control components (e.g., `DatePicker`)
+- `editors`: Pre-built editor/control components (e.g., `DateRangePicker`)
 
 Each includes:
 
-- `.emb.ts`: Configuration file (inputs + `defineComponent`)
-- `index.ts`: Default export for the React component
+- `definition.ts`: The source of truth — all component logic (meta, props, events, data loading, preview)
+- `.emb.ts`: Thin integration wrapper — re-exports `meta` and `preview`, default-exports `defineComponent`
+- `index.tsx`: Default export for the React component
+
+---
+
+## The `definition.ts` / `.emb.ts` Pattern
+
+Each embeddable component is split across two files: `definition.ts` and `ComponentName.emb.ts`. This separation keeps all logic testable and reusable while keeping the SDK integration point minimal.
+
+### `definition.ts` — The source of truth
+
+This file owns everything the component needs to function. It exports a single named `const` object (camelCase version of the component name) that groups all parts together.
+
+**Structure:**
+
+```ts
+import { DataResponse, LoadDataRequest, Value, loadData } from '@embeddable.com/core';
+import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
+import Component from './index';
+import { inputs } from '../../../component.inputs.constants';
+import { previewData } from '../../../preview.data.constants';
+
+// 1. Meta — component identity, inputs, events, variables
+const meta = {
+  name: 'PieChartPro',
+  label: 'Pie Chart',
+  category: 'Pie Charts',
+  inputs: [
+    inputs.dataset,
+    inputs.measure,
+    // ...
+  ],
+  events: [
+    {
+      name: 'onSegmentClick',
+      label: 'A segment is clicked',
+      properties: [{ name: 'dimensionValue', label: 'Clicked dimension', type: 'string' }],
+    },
+  ],
+} as const satisfies EmbeddedComponentMeta;
+
+// 2. Preview config — static data used in the Embeddable editor canvas
+const previewConfig = {
+  dimension: previewData.dimension,
+  measure: previewData.measure,
+  results: previewData.results1Measure1Dimension,
+  hideMenu: true,
+};
+
+const preview = definePreview(Component, previewConfig);
+
+// 3. Data loading — pure functions that describe what data to fetch
+const loadDataResultsArgs = (inputs: Inputs<typeof meta>): LoadDataRequest => ({
+  from: inputs.dataset,
+  select: [inputs.measure, inputs.dimension],
+});
+
+const loadDataResults = (inputs: Inputs<typeof meta>): DataResponse =>
+  loadData(loadDataResultsArgs(inputs));
+
+// 4. Events — map raw UI values to Embeddable event payloads
+const events = {
+  onSegmentClick: (value: { dimensionValue?: string }) => ({
+    dimensionValue: value.dimensionValue ?? Value.noFilter(),
+  }),
+};
+
+// 5. Props — maps inputs (+ optional state) to what the React component receives
+const props = (inputs: Inputs<typeof meta>) => ({
+  ...inputs,
+  results: loadDataResults(inputs),
+});
+
+// 6. Named export — everything grouped under one object
+export const pieChartPro = {
+  Component,
+  meta,
+  preview,
+  previewConfig,
+  config: { props, events },
+  results: {
+    loadDataArgs: loadDataResultsArgs,
+    loadData: loadDataResults,
+  },
+} as const;
+```
+
+**Key rules:**
+
+- `meta` must use `as const satisfies EmbeddedComponentMeta` for full type inference downstream
+- `inputs` are composed from shared constants in `component.inputs.constants.ts`; spread and override properties as needed (`{ ...inputs.fontSize, name: 'changeFontSize', label: 'Trend font-size' }`)
+- `loadDataResultsArgs` and `loadDataResults` are always separate functions — `loadDataResultsArgs` is a pure function for testing and reuse; `loadDataResults` calls `loadData` with those args
+- `props` receives `inputs` and optionally `[state, setState]` as a tuple when the component needs local state
+- The exported object uses `as const` so all keys are read-only and types are fully inferred
+
+### State
+
+When a component needs local state (e.g. granularity selection, pagination, search), export a type for it from `definition.ts`:
+
+```ts
+export type BarChartDefaultProState = {
+  granularity?: Granularity;
+};
+```
+
+Then `props` receives the state tuple:
+
+```ts
+const props = (
+  inputs: Inputs<typeof meta>,
+  [state, setState]: [BarChartDefaultProState, (state: BarChartDefaultProState) => void],
+) => {
+  // use state, call setState to update
+  return { ...inputs, setGranularity: (g: Granularity) => setState({ granularity: g }) };
+};
+```
+
+### Multiple data queries
+
+Components that fire more than one `loadData` call (e.g. comparison KPIs, paginated tables) add additional `results*` keys to the exported object, each with their own `loadDataArgs` and `loadData` pair:
+
+```ts
+export const kpiChartNumberComparisonPro = {
+  Component,
+  meta,
+  preview,
+  previewConfig,
+  config: { props },
+  results: {
+    loadDataArgs: loadDataResultsArgs,
+    loadData: loadDataResults,
+  },
+  resultsComparison: {
+    loadDataArgs: loadDataResultsComparisonArgs,
+    loadData: loadDataResultsComparison,
+  },
+} as const;
+```
+
+### `ComponentName.emb.ts` — The integration wrapper
+
+This file is intentionally minimal. Its only job is to wire the `definition.ts` exports into the Embeddable SDK:
+
+```ts
+import { defineComponent } from '@embeddable.com/react';
+import { pieChartPro } from './definition';
+
+export const preview = pieChartPro.preview;
+
+export const meta = pieChartPro.meta;
+
+export default defineComponent(pieChartPro.Component, meta, pieChartPro.config);
+```
+
+It always has this exact shape: three statements, nothing more.
+
+### Why this split?
+
+| Concern                                      | Where it lives                    |
+| -------------------------------------------- | --------------------------------- |
+| What the component is (name, inputs, events) | `definition.ts` → `meta`          |
+| How it fetches data                          | `definition.ts` → `results.*`     |
+| How it maps data to props                    | `definition.ts` → `config.props`  |
+| How it handles events                        | `definition.ts` → `config.events` |
+| What it looks like in the editor canvas      | `definition.ts` → `preview`       |
+| Embeddable SDK registration                  | `*.emb.ts`                        |
+| React rendering                              | `index.tsx`                       |
+
+Keeping all logic in `definition.ts` means it can be imported by tests, by other components that share a definition, or by utilities — without pulling in the Embeddable SDK.
+
+### Shared input constants
+
+Inputs are defined once in `component.inputs.constants.ts` and composed in each `definition.ts`. Use spread to override individual properties:
+
+```ts
+// Use as-is
+inputs.title
+
+// Override a single property
+{ ...inputs.fontSize, name: 'changeFontSize', label: 'Trend font-size' }
+
+// Override and add properties
+{ ...inputs.measures, inputs: [...inputs.measures.inputs, inputs.color] }
+```
 
 ---
 
@@ -183,15 +316,17 @@ Contains shared **global types** for the project.
 
 ## Extending the Library
 
-### Adding a new embeddable component
+### Adding a new component
 
-1. Create a folder in `charts` or `controls`
+1. Create a folder in `charts` or `editors`
 2. Add:
-   - A `*.emb.ts` config file
-   - An `index.ts` with the default export
+   - `definition.ts` — all component logic (see pattern above)
+   - `ComponentName.emb.ts` — the three-line SDK wrapper
+   - `index.tsx` with the React component as the default export
 
 ## Best Practices
 
 - Use strong typing with TypeScript across all files
 - Maintain consistent folder and file naming
 - Keep the `embeddable` components isolated and non-exported
+- All component logic belongs in `definition.ts`; `*.emb.ts` must stay minimal
