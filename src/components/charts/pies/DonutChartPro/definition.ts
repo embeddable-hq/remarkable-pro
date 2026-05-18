@@ -9,6 +9,8 @@ import { subInputs } from '../../../component.subinputs.constants';
 const meta = {
   name: 'DonutChartPro',
   label: 'Donut Chart',
+  description:
+    'Donut chart for parts-of-whole over one dimension with one measure. Pick over PieChartPro when you want a center hole for a label or KPI.',
   category: 'Pie Charts',
   inputs: [
     inputs.dataset,

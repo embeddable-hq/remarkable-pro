@@ -9,6 +9,8 @@ import { subInputs } from '../../../component.subinputs.constants';
 const meta = {
   name: 'DonutLabelChartPro',
   label: 'Donut Label Chart',
+  description:
+    'Same as DonutChartPro with a customizable center text label. Use when the center space can provide a useful summary (e.g. total, label).',
   category: 'Pie Charts',
   inputs: [
     inputs.dataset,

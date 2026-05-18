@@ -7,6 +7,8 @@ import { inputs } from '../../component.inputs.constants';
 const meta = {
   name: 'ComparisonPeriodSelectFieldPro',
   label: 'Comparison Period Select Field',
+  description:
+    'Dropdown for picking a comparison period (Previous period, Previous year). Pairs with a comparisonPeriod variable; emits onChange.',
   category: 'Dropdowns - dates',
   defaultWidth: 300,
   defaultHeight: 120,

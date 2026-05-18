@@ -11,6 +11,8 @@ import { ThemeClientContext } from '../../../../theme/theme.types';
 const meta = {
   name: 'ScatterChartPro',
   label: 'Scatter Chart',
+  description:
+    'Scatter plot showing the relationship between two measures across a grouping dimension. Use to spot correlations.',
   category: 'Scatter Charts',
   inputs: [
     inputs.dataset,

@@ -17,6 +17,8 @@ import { BarChartStackedProOptionsClickArg } from '../bars.types';
 const meta = {
   name: 'BarChartStackedPro',
   label: 'Bar Chart - Stacked',
+  description:
+    'Vertical bar chart with stacked segments — two dimensions (x-axis + stack) and one measure. Use for parts-of-whole across categories.',
   category: 'Bar Charts',
   inputs: [
     inputs.dataset,

@@ -7,6 +7,8 @@ import Component from './index';
 const meta = {
   name: 'GranularitySelectFieldPro',
   label: 'Granularity Select Field',
+  description:
+    'Dropdown for picking time granularity (day, week, month, …). Pairs with a granularity variable used as a sub-input on a time dimension.',
   category: 'Dropdowns - dates',
   defaultWidth: 300,
   defaultHeight: 120,

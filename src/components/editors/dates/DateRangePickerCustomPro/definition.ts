@@ -6,6 +6,8 @@ import { inputs } from '../../../component.inputs.constants';
 const meta = {
   name: 'DateRangePickerCustomPro',
   label: 'Date-Range Picker - Custom',
+  description:
+    'Date-range picker with a custom-range input. Pairs with a timeRange variable; emits onChange. Pick over DateRangePickerPresetsPro for arbitrary ranges.',
   category: 'Dropdowns - dates',
   defaultWidth: 300,
   defaultHeight: 120,

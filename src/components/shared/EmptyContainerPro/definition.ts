@@ -4,6 +4,7 @@ import Component from './index';
 const meta = {
   name: 'EmptyBlockPro',
   label: 'Empty Block',
+  description: 'Empty placeholder block. Use to add whitespace or reserve layout space.',
   category: 'Layout',
   defaultWidth: 450,
   defaultHeight: 120,

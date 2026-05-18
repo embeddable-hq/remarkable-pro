@@ -7,6 +7,8 @@ import { FilterBuilderClause } from './FilterBuilderPro.utils';
 const meta = {
   name: 'FilterBuilderPro',
   label: 'Filter Builder',
+  description:
+    'Free-form filter builder that lets end users compose member/operator/value clauses. Use to expose ad-hoc filtering on a dataset.',
   category: 'Filters',
   defaultWidth: 600,
   defaultHeight: 120,

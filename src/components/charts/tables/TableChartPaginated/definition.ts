@@ -19,6 +19,7 @@ import { previewData } from '../../../preview.data.constants';
 const meta = {
   name: 'TableChartPaginated',
   label: 'Table Chart - Paginated',
+  description: 'Server-side paginated table. Pick over TableScrollable for large datasets.',
   category: 'Table Charts',
   inputs: [
     { ...inputs.dataset, config: { hideSort: true } },

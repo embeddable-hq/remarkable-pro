@@ -19,6 +19,8 @@ import { BarChartProOptionsClickArg } from '../bars.types';
 const meta = {
   name: 'BarChartDefaultHorizontalPro',
   label: 'Bar Chart - Default Horizontal',
+  description:
+    'Same as BarChartDefaultPro but with horizontal bars. Pick when category labels are long or numerous.',
   category: 'Bar Charts',
   inputs: [
     inputs.dataset,

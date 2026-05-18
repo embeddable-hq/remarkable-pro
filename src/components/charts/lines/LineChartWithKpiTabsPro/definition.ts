@@ -12,6 +12,8 @@ const meta = {
   ...lineChartDefaultPro.meta,
   name: 'LineChartWithKpiTabsPro',
   label: 'Line Chart - With Kpi Tabs',
+  description:
+    'Line chart with clickable KPI tabs above — each measure gets a tab showing its total. One time dimension and one or more measures.',
 } as const satisfies EmbeddedComponentMeta;
 
 const previewConfig = {
