@@ -12,6 +12,8 @@ const meta = {
   description:
     'Same as DonutChartPro with a customizable center text label. Use when the center space can provide a useful summary (e.g. total, label).',
   category: 'Pie Charts',
+  defaultHeight: 442,
+  defaultWidth: 630,
   inputs: [
     inputs.dataset,
     { ...inputs.measure, inputs: [...inputs.measure.inputs, subInputs.showValueAsPercentage] },
