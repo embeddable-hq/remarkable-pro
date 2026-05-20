@@ -26,6 +26,8 @@ const meta = {
   label: 'Line Chart Comparison - With KPI Tabs',
   description:
     'Line chart with comparison overlay and KPI tabs. Takes one or more measures, a time dimension, a timeRange variable, and a comparison period.',
+  defaultHeight: 526,
+  defaultWidth: 1280,
   inputs: [
     ...lineChartComparisonDefaultPro.meta.inputs.map((input) => {
       if (input.name === 'measures') {

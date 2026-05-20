@@ -12,6 +12,8 @@ const meta = {
   description:
     'KPI with a delta versus a comparison period. Takes one measure and pairs with a comparison-period variable.',
   category: 'Kpi Charts',
+  defaultHeight: 442,
+  defaultWidth: 630,
   inputs: [
     inputs.dataset,
     inputs.measure,
@@ -20,7 +22,8 @@ const meta = {
       ...inputs.timeRange,
       name: 'primaryDateRange',
       label: 'Primary date-range',
-      description: 'You can also connect this to a date range selector using its variable',
+      description:
+        'The comparison period is derived internally using this date range — do not also apply a date filter on the underlying dataset',
       category: 'Component Data',
     },
     {

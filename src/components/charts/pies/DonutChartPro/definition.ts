@@ -12,6 +12,8 @@ const meta = {
   description:
     'Donut chart for parts-of-whole over one dimension with one measure. Pick over PieChartPro when you want a center hole for a label or KPI.',
   category: 'Pie Charts',
+  defaultHeight: 442,
+  defaultWidth: 630,
   inputs: [
     inputs.dataset,
     { ...inputs.measure, inputs: [...inputs.measure.inputs, subInputs.showValueAsPercentage] },

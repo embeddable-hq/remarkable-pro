@@ -10,6 +10,8 @@ const meta = {
   description:
     'Single big-number KPI showing one measure. Use for headline metrics without comparison.',
   category: 'Kpi Charts',
+  defaultHeight: 442,
+  defaultWidth: 630,
   inputs: [
     inputs.dataset,
     inputs.measure,

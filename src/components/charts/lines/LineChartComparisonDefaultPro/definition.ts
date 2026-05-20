@@ -68,7 +68,8 @@ const meta = {
       ...inputs.timeRange,
       name: 'primaryDateRange',
       label: 'Primary date-range',
-      description: 'You can also connect this to a date range selector using its variable',
+      description:
+        'The comparison period is derived internally using this date range — do not also apply a date filter on the underlying dataset',
       category: 'Component Data',
     },
     {
