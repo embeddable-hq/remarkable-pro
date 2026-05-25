@@ -4,8 +4,11 @@ import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import AreaChartPro from './index';
 import type { AreaChartProProps } from './index';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { getAreaChartProData, getAreaChartProOptions } from './AreaChartPro.utils';
-import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import {
+  createAreaClickHandler,
+  getAreaChartProData,
+  getAreaChartProOptions,
+} from './AreaChartPro.utils';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
@@ -29,12 +32,8 @@ vi.mock('../../charts.fillGaps.hooks', () => ({
   useFillGaps: vi.fn(),
 }));
 
-let capturedLineChartProps: Record<string, unknown> = {};
 vi.mock('@embeddable.com/remarkable-ui', () => ({
-  LineChart: (props: Record<string, unknown>) => {
-    capturedLineChartProps = props;
-    return <div data-testid="line-chart" />;
-  },
+  LineChart: () => <div data-testid="line-chart" />,
 }));
 
 vi.mock('../../shared/ChartGranularitySelectField/ChartGranularitySelectField', () => ({
@@ -46,10 +45,7 @@ vi.mock('../../shared/ChartGranularitySelectField/ChartGranularitySelectField', 
 vi.mock('./AreaChartPro.utils', () => ({
   getAreaChartProData: vi.fn(() => ({ datasets: [], labels: [] })),
   getAreaChartProOptions: vi.fn(() => ({})),
-}));
-
-vi.mock('../../../utils/dimension.utils', () => ({
-  getTimeRangeFromDimensionValue: vi.fn(() => undefined),
+  createAreaClickHandler: vi.fn(() => vi.fn()),
 }));
 
 const makeMeasure = (name = 'revenue'): Measure => ({ name, inputs: {} }) as unknown as Measure;
@@ -64,26 +60,13 @@ const defaultProps: AreaChartProProps = {
   results: emptyResults,
 };
 
-const makeElement = (index: number, datasetIndex: number, y: number) => ({
-  index,
-  datasetIndex,
-  element: { y },
-});
-
-const makeEvent = (offsetY: number | null) => ({
-  native: offsetY != null ? { offsetY } : null,
-});
-
-const getOnClick = () =>
-  (capturedLineChartProps.options as { onClick: (...args: unknown[]) => void }).onClick;
-
 describe('AreaChartPro', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    capturedLineChartProps = {};
     vi.mocked(useFillGaps).mockReturnValue(emptyResults);
     vi.mocked(getAreaChartProData).mockReturnValue({ datasets: [], labels: [] } as never);
     vi.mocked(getAreaChartProOptions).mockReturnValue({} as never);
+    vi.mocked(createAreaClickHandler).mockReturnValue(vi.fn());
   });
 
   describe('rendering', () => {
@@ -162,6 +145,30 @@ describe('AreaChartPro', () => {
     });
   });
 
+  describe('createAreaClickHandler', () => {
+    it('is called with dimension, groupBy, granularity, onPointClicked, and onAreaClicked', () => {
+      const onPointClicked = vi.fn();
+      const onAreaClicked = vi.fn();
+      render(
+        <AreaChartPro
+          {...defaultProps}
+          granularity="month"
+          onPointClicked={onPointClicked}
+          onAreaClicked={onAreaClicked}
+        />,
+      );
+      expect(vi.mocked(createAreaClickHandler)).toHaveBeenCalledWith(
+        expect.objectContaining({
+          dimension: defaultProps.xAxis,
+          groupBy: defaultProps.groupBy,
+          granularity: 'month',
+          onPointClicked,
+          onAreaClicked,
+        }),
+      );
+    });
+  });
+
   describe('granularity selector', () => {
     it('renders ChartGranularitySelectField when setGranularity is provided', () => {
       render(<AreaChartPro {...defaultProps} setGranularity={vi.fn()} />);
@@ -203,84 +210,6 @@ describe('AreaChartPro', () => {
         'data-has-margin-top',
         'false',
       );
-    });
-  });
-
-  describe('handleAreaClick', () => {
-    const chartData = {
-      labels: ['Jan', 'Feb', 'Mar'],
-      datasets: [
-        { rawLabel: 'Group A', data: [100, 200, 300] },
-        { rawLabel: 'Group B', data: [50, 75, 90] },
-      ],
-    };
-
-    beforeEach(() => {
-      vi.mocked(getAreaChartProData).mockReturnValue(chartData as never);
-    });
-
-    it('does not call onAreaClicked when elements is empty', () => {
-      const onAreaClicked = vi.fn();
-      render(<AreaChartPro {...defaultProps} onAreaClicked={onAreaClicked} />);
-      getOnClick()(makeEvent(100), []);
-      expect(onAreaClicked).not.toHaveBeenCalled();
-    });
-
-    it('does not call onAreaClicked when it is not provided', () => {
-      render(<AreaChartPro {...defaultProps} />);
-      expect(() => getOnClick()(makeEvent(100), [makeElement(0, 0, 50)])).not.toThrow();
-    });
-
-    it('selects the element with the highest y at or below clickY', () => {
-      const onAreaClicked = vi.fn();
-      render(<AreaChartPro {...defaultProps} onAreaClicked={onAreaClicked} />);
-      getOnClick()(makeEvent(70), [makeElement(0, 0, 30), makeElement(0, 1, 60)]);
-      expect(onAreaClicked).toHaveBeenCalledWith(
-        expect.objectContaining({ groupingDimensionValue: 'Group B' }),
-      );
-    });
-
-    it('falls back to elements[0] when no element is at or below clickY', () => {
-      const onAreaClicked = vi.fn();
-      render(<AreaChartPro {...defaultProps} onAreaClicked={onAreaClicked} />);
-      getOnClick()(makeEvent(10), [makeElement(1, 0, 50), makeElement(1, 1, 70)]);
-      expect(onAreaClicked).toHaveBeenCalledWith(
-        expect.objectContaining({ groupingDimensionValue: 'Group A' }),
-      );
-    });
-
-    it('uses all elements when clickY is null', () => {
-      const onAreaClicked = vi.fn();
-      render(<AreaChartPro {...defaultProps} onAreaClicked={onAreaClicked} />);
-      getOnClick()({ native: null }, [makeElement(0, 0, 30), makeElement(0, 1, 80)]);
-      expect(onAreaClicked).toHaveBeenCalledWith(
-        expect.objectContaining({ groupingDimensionValue: 'Group B' }),
-      );
-    });
-
-    it('passes dimensionValue from labels at element.index', () => {
-      const onAreaClicked = vi.fn();
-      render(<AreaChartPro {...defaultProps} onAreaClicked={onAreaClicked} />);
-      getOnClick()(makeEvent(100), [makeElement(1, 0, 50)]);
-      expect(onAreaClicked).toHaveBeenCalledWith(
-        expect.objectContaining({ dimensionValue: 'Feb' }),
-      );
-    });
-
-    it('passes groupingDimensionValue from dataset.rawLabel at element.datasetIndex', () => {
-      const onAreaClicked = vi.fn();
-      render(<AreaChartPro {...defaultProps} onAreaClicked={onAreaClicked} />);
-      getOnClick()(makeEvent(100), [makeElement(0, 1, 50)]);
-      expect(onAreaClicked).toHaveBeenCalledWith(
-        expect.objectContaining({ groupingDimensionValue: 'Group B' }),
-      );
-    });
-
-    it('calls getTimeRangeFromDimensionValue for both dimension and grouping dimension', () => {
-      const onAreaClicked = vi.fn();
-      render(<AreaChartPro {...defaultProps} onAreaClicked={onAreaClicked} />);
-      getOnClick()(makeEvent(100), [makeElement(0, 0, 50)]);
-      expect(getTimeRangeFromDimensionValue).toHaveBeenCalledTimes(2);
     });
   });
 });

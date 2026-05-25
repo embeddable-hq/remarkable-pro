@@ -4,16 +4,19 @@ import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import { ChartCard } from '../../shared/ChartCard/ChartCard';
 import { LineChartGroupedProProp } from '../LineChartGroupedPro';
-import { getAreaChartProData, getAreaChartProOptions } from './AreaChartPro.utils';
+import {
+  createAreaClickHandler,
+  getAreaChartProData,
+  getAreaChartProOptions,
+} from './AreaChartPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { LineChartGroupedProOptionsClickArg } from '../lines.types';
+import { AreaChartProAreaClickArg, AreaChartProPointClickArg } from '../lines.types';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
-import { ActiveElement, ChartEvent } from 'chart.js';
 
 export type AreaChartProProps = Omit<LineChartGroupedProProp, 'onLineClicked'> & {
-  onAreaClicked?: (arg: LineChartGroupedProOptionsClickArg) => void;
+  onPointClicked?: (arg: AreaChartProPointClickArg) => void;
+  onAreaClicked?: (arg: AreaChartProAreaClickArg) => void;
 };
 
 const AreaChartPro = (props: AreaChartProProps) => {
@@ -35,6 +38,7 @@ const AreaChartPro = (props: AreaChartProProps) => {
     yAxisRangeMin,
     granularity,
     setGranularity,
+    onPointClicked,
     onAreaClicked,
   } = props;
 
@@ -54,42 +58,17 @@ const AreaChartPro = (props: AreaChartProProps) => {
     theme,
   );
 
-  const handleAreaClick = (event: ChartEvent, elements: ActiveElement[]) => {
-    if (!elements.length || !onAreaClicked) return;
-    const clickY = (event.native as MouseEvent | null)?.offsetY;
-
-    const qualifying = clickY != null ? elements.filter((el) => el.element.y <= clickY) : elements;
-    const element =
-      qualifying.reduce<ActiveElement | undefined>(
-        (max, el) => (!max || el.element.y > max.element.y ? el : max),
-        undefined,
-      ) ?? elements[0]!;
-
-    const dimensionValue = data?.labels?.[element.index] as string | undefined;
-    const groupingDimensionValue = (
-      data?.datasets?.[element.datasetIndex] as { rawLabel?: string } | undefined
-    )?.rawLabel;
-
-    const clickArg: LineChartGroupedProOptionsClickArg = {
-      dimensionValue,
-      dimensionTimeRange: getTimeRangeFromDimensionValue({
-        value: dimensionValue,
-        stateGranularity: granularity,
-        dimension: xAxis,
-      }),
-      groupingDimensionValue,
-      groupingDimensionTimeRange: getTimeRangeFromDimensionValue({
-        value: groupingDimensionValue,
-        dimension: groupBy,
-      }),
-    };
-    onAreaClicked(clickArg);
-  };
-
   const options = {
     ...getAreaChartProOptions({ data, dimension: xAxis, groupDimension: groupBy, measure }, theme),
     interaction: { mode: 'index' as const, intersect: false },
-    onClick: handleAreaClick,
+    onClick: createAreaClickHandler({
+      data,
+      dimension: xAxis,
+      groupBy,
+      granularity,
+      onPointClicked,
+      onAreaClicked,
+    }),
   };
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;

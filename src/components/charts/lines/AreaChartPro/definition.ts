@@ -8,7 +8,7 @@ import {
 } from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
-import { LineChartGroupedProOptionsClickArg } from '../lines.types';
+import { AreaChartProAreaClickArg, AreaChartProPointClickArg } from '../lines.types';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
@@ -25,6 +25,22 @@ const meta = {
       label: 'An area is clicked',
       properties: [
         {
+          name: 'segmentDimensionValue',
+          label: 'Clicked segment dimension value',
+          type: 'string',
+        },
+        {
+          name: 'segmentDimensionTimeRange',
+          label: 'Clicked segment dimension time range',
+          type: 'timeRange',
+        },
+      ],
+    },
+    {
+      name: 'onPointClicked',
+      label: 'A point is clicked',
+      properties: [
+        {
           name: 'axisDimensionValue',
           label: 'Clicked axis dimension value',
           type: 'string',
@@ -35,14 +51,9 @@ const meta = {
           type: 'timeRange',
         },
         {
-          name: 'segmentDimensionValue',
-          label: 'Clicked segment dimension value',
-          type: 'string',
-        },
-        {
-          name: 'segmentDimensionTimeRange',
-          label: 'Clicked segment dimension time range',
-          type: 'timeRange',
+          name: 'measureValue',
+          label: 'Clicked measure value',
+          type: 'number',
         },
       ],
     },
@@ -79,11 +90,14 @@ const loadDataResults = (
 ): DataResponse => loadData(loadDataResultsArgs(inputs, xAxis, clientContext));
 
 const events = {
-  onAreaClicked: (value: LineChartGroupedProOptionsClickArg) => ({
-    axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
-    axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
+  onAreaClicked: (value: AreaChartProAreaClickArg) => ({
     segmentDimensionValue: value.groupingDimensionValue ?? Value.noFilter(),
     segmentDimensionTimeRange: value.groupingDimensionTimeRange ?? Value.noFilter(),
+  }),
+  onPointClicked: (value: AreaChartProPointClickArg) => ({
+    axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
+    axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
+    measureValue: value.measureValue ?? Value.noFilter(),
   }),
 };
 
