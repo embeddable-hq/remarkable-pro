@@ -26,8 +26,13 @@ vi.mock('../utils/dimension.utils', () => ({
 const makeDimension = (name = 'category'): Dimension =>
   ({ name, __type__: 'dimension', inputs: {} }) as unknown as Dimension;
 
-const makeMeasure = (name = 'value'): Measure =>
-  ({ name, __type__: 'measure', inputs: {} }) as unknown as Measure;
+const makeMeasure = (name = 'value', aggType?: string): Measure =>
+  ({
+    name,
+    __type__: 'measure',
+    inputs: {},
+    meta: aggType ? { aggType } : {},
+  }) as unknown as Measure;
 
 describe('getDatalabelPercentage', () => {
   it('returns 25% when value is 25 out of 100', () => {
@@ -162,6 +167,77 @@ describe('groupTailAsOther', () => {
 
     // tail = B(20) + C(0) = 20
     expect(result[1]?.value).toBe(20);
+  });
+
+  it('averages tail values for avg measures', () => {
+    const measure = makeMeasure('score', 'avg');
+    const data = [
+      { category: 'A', score: 80 },
+      { category: 'B', score: 60 },
+      { category: 'C', score: 40 },
+    ];
+
+    const result = groupTailAsOther(data, dimension, [measure], 2);
+
+    // tail = B(60) + C(40) → avg = 50
+    expect(result[1]?.score).toBe(50);
+  });
+
+  it('takes min of tail values for min measures', () => {
+    const measure = makeMeasure('score', 'min');
+    const data = [
+      { category: 'A', score: 80 },
+      { category: 'B', score: 60 },
+      { category: 'C', score: 40 },
+    ];
+
+    const result = groupTailAsOther(data, dimension, [measure], 2);
+
+    // tail = B(60), C(40) → min = 40
+    expect(result[1]?.score).toBe(40);
+  });
+
+  it('takes max of tail values for max measures', () => {
+    const measure = makeMeasure('score', 'max');
+    const data = [
+      { category: 'A', score: 80 },
+      { category: 'B', score: 60 },
+      { category: 'C', score: 40 },
+    ];
+
+    const result = groupTailAsOther(data, dimension, [measure], 2);
+
+    // tail = B(60), C(40) → max = 60
+    expect(result[1]?.score).toBe(60);
+  });
+
+  it('aggregates mixed aggTypes correctly across multiple measures', () => {
+    const sumMeasure = makeMeasure('revenue');
+    const avgMeasure = makeMeasure('avg_order', 'avg');
+    const data = [
+      { category: 'A', revenue: 1000, avg_order: 100 },
+      { category: 'B', revenue: 200, avg_order: 50 },
+      { category: 'C', revenue: 300, avg_order: 30 },
+    ];
+
+    const result = groupTailAsOther(data, dimension, [sumMeasure, avgMeasure], 2);
+
+    expect(result[1]?.revenue).toBe(500); // B(200) + C(300)
+    expect(result[1]?.avg_order).toBe(40); // (B(50) + C(30)) / 2
+  });
+
+  it('falls back to sum when no meta.aggType is specified (backward compatibility)', () => {
+    const measure = makeMeasure('value');
+    const data = [
+      { category: 'A', value: 10 },
+      { category: 'B', value: 20 },
+      { category: 'C', value: 30 },
+    ];
+
+    const result = groupTailAsOther(data, dimension, [measure], 2);
+
+    // tail = B(20) + C(30) → sum = 50
+    expect(result[1]?.value).toBe(50);
   });
 
   it('defaults data to an empty array when undefined', () => {
