@@ -220,6 +220,9 @@ export * from './components/editors/GranularitySelectFieldPro/definition';
 export * as TextFieldPro from './components/editors/TextFieldPro';
 export type { TextFieldProProps } from './components/editors/TextFieldPro';
 export * from './components/editors/TextFieldPro/definition';
+export * as FilterBuilderPro from './components/editors/FilterBuilderPro';
+export type { FilterBuilderProProps } from './components/editors/FilterBuilderPro';
+export * from './components/editors/FilterBuilderPro/definition';
 
 // Editors - Shared
 export * from './components/editors/shared/EditorCard/EditorCard';
