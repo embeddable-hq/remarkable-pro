@@ -1,5 +1,12 @@
 # @embeddable/remarkable-ui
 
+## 0.3.1
+
+### Patch Changes
+
+- 9d328fb: Sort index file
+- d6db69b: Export FilterBuilderPro
+
 ## 0.3.0
 
 ### Minor Changes
