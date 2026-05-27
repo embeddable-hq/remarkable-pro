@@ -26,7 +26,7 @@ export const groupTailAsOther = (
   };
 
   for (const measure of measures) {
-    const vals = tail.map((row) => parseFloat(row[measure.name] ?? '0'));
+    const vals = tail.map((row) => Number.parseFloat(row[measure.name] ?? '0'));
     const aggType = (measure.meta as Record<string, unknown> | undefined)?.aggType;
 
     switch (aggType) {
