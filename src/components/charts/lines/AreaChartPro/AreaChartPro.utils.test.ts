@@ -252,15 +252,12 @@ describe('createAreaClickHandler', () => {
     ],
   };
 
-  // x defaults to 100 so most tests don't need to specify it
   const makeEvent = (y: number | null, x: number | null = 100) => ({
     x,
     y,
     native: {},
   });
 
-  // datasetPoints: datasetIndex → pixel-space points [{x, y}]
-  // numDatasets in chart.data.datasets is derived from max key + 1
   const makeChart = (
     pointElements: { index: number; datasetIndex: number }[] = [],
     datasetPoints: Record<number, { x: number; y: number }[]> = {},
@@ -313,9 +310,6 @@ describe('createAreaClickHandler', () => {
     });
 
     it('selects the dataset whose interpolated area contains the click', () => {
-      // ds=0 (Group A, bottom): line y=300, fills [300, chartBottom=500]
-      // ds=1 (Group B, top):    line y=200, fills [200, 300]
-      // click y=250 → Group B
       const onAreaClicked = vi.fn();
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
       const chart = makeChart([], {
@@ -329,9 +323,6 @@ describe('createAreaClickHandler', () => {
     });
 
     it('interpolates the line y-value between two data points', () => {
-      // ds=0: x=[0,200] y=[400,200] → at x=100: y=300
-      // ds=1: x=[0,200] y=[300,100] → at x=100: y=200
-      // Group B fills [200, 300], click y=250 → Group B
       const onAreaClicked = vi.fn();
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
       const chart = makeChart([], {
@@ -357,7 +348,6 @@ describe('createAreaClickHandler', () => {
         0: [{ x: 100, y: 300 }],
         1: [{ x: 100, y: 200 }],
       });
-      // y=305 → inside Group A [300, 500], outside Group B [200, 300]
       handler(makeEvent(305) as never, [] as never, chart as never);
       expect(onAreaClicked).toHaveBeenCalledWith(
         expect.objectContaining({ groupingDimensionValue: 'Group A' }),
@@ -371,7 +361,6 @@ describe('createAreaClickHandler', () => {
         0: [{ x: 100, y: 300 }],
         1: [{ x: 100, y: 200 }],
       });
-      // y=295 → inside Group B [200, 300]
       handler(makeEvent(295) as never, [] as never, chart as never);
       expect(onAreaClicked).toHaveBeenCalledWith(
         expect.objectContaining({ groupingDimensionValue: 'Group B' }),
@@ -385,7 +374,6 @@ describe('createAreaClickHandler', () => {
         0: [{ x: 100, y: 300 }],
         1: [{ x: 100, y: 200 }],
       });
-      // y=50 → above all areas (topmost starts at y=200)
       handler(makeEvent(50) as never, [] as never, chart as never);
       expect(onAreaClicked).not.toHaveBeenCalled();
     });
@@ -393,7 +381,6 @@ describe('createAreaClickHandler', () => {
     it('passes groupingDimensionValue from dataset rawLabel', () => {
       const onAreaClicked = vi.fn();
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
-      // ds=0 only: fills [300, 500], click y=350 → Group A
       const chart = makeChart([], { 0: [{ x: 100, y: 300 }] });
       handler(makeEvent(350) as never, [] as never, chart as never);
       expect(onAreaClicked).toHaveBeenCalledWith(
@@ -436,8 +423,6 @@ describe('createAreaClickHandler', () => {
         onPointClicked,
         onAreaClicked,
       });
-      // click y=200, point at y=300 — 100px apart, well beyond 8px threshold
-      // Group B fills [200, 300], so area click should fire for Group B
       const chart = makeChart([{ index: 0, datasetIndex: 0 }], {
         0: [{ x: 100, y: 300 }],
         1: [{ x: 100, y: 200 }],
@@ -493,6 +478,81 @@ describe('createAreaClickHandler', () => {
         makeChart([{ index: 0, datasetIndex: 0 }], { 0: [{ x: 100, y: 50 }] }) as never,
       );
       expect(getTimeRangeFromDimensionValue).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls through to onAreaClicked when no point element is under the cursor', () => {
+      const onPointClicked = vi.fn();
+      const onAreaClicked = vi.fn();
+      const handler = createAreaClickHandler({
+        ...defaultHandlerProps,
+        onPointClicked,
+        onAreaClicked,
+      });
+      const chart = makeChart([], { 0: [{ x: 100, y: 300 }] });
+      handler(makeEvent(350) as never, [] as never, chart as never);
+      expect(onPointClicked).not.toHaveBeenCalled();
+      expect(onAreaClicked).toHaveBeenCalled();
+    });
+
+    it('does not call onPointClicked when pointY pixel is not available', () => {
+      const onPointClicked = vi.fn();
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onPointClicked });
+      const chart = makeChart([{ index: 5, datasetIndex: 0 }], {});
+      handler(makeEvent(50) as never, [] as never, chart as never);
+      expect(onPointClicked).not.toHaveBeenCalled();
+    });
+
+    it('treats event.y=null as on-point (proximity check skipped)', () => {
+      const onPointClicked = vi.fn();
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onPointClicked });
+      const chart = makeChart([{ index: 0, datasetIndex: 0 }], { 0: [{ x: 100, y: 300 }] });
+      handler({ x: 100, y: null, native: {} } as never, [] as never, chart as never);
+      expect(onPointClicked).toHaveBeenCalled();
+    });
+  });
+
+  describe('edge cases', () => {
+    it('uses Infinity as chartBottom when chart.chartArea is undefined', () => {
+      const onAreaClicked = vi.fn();
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
+      const chart = {
+        getElementsAtEventForMode: vi.fn(() => []),
+        getDatasetMeta: vi.fn(() => ({ data: [{ x: 100, y: 300 }] })),
+        chartArea: undefined,
+        data: { datasets: [{}] },
+      };
+      handler(makeEvent(400) as never, [] as never, chart as never);
+      expect(onAreaClicked).toHaveBeenCalledWith(
+        expect.objectContaining({ groupingDimensionValue: 'Group A' }),
+      );
+    });
+
+    it('skips a dataset when interpolated lineY is null (clickX outside all segments)', () => {
+      const onAreaClicked = vi.fn();
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
+      const chart = makeChart([], {
+        0: [
+          { x: 0, y: 400 },
+          { x: 50, y: 300 },
+        ],
+        1: [
+          { x: 0, y: 200 },
+          { x: 50, y: 150 },
+        ],
+      });
+      handler(makeEvent(250, 200) as never, [] as never, chart as never);
+      expect(onAreaClicked).not.toHaveBeenCalled();
+    });
+
+    it('skips a dataset when its previous line interpolation returns null', () => {
+      const onAreaClicked = vi.fn();
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
+      const chart = makeChart([], {
+        0: [],
+        1: [{ x: 100, y: 200 }],
+      });
+      handler(makeEvent(300) as never, [] as never, chart as never);
+      expect(onAreaClicked).not.toHaveBeenCalled();
     });
   });
 });
