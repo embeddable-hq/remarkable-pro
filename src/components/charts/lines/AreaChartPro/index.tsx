@@ -58,17 +58,18 @@ const AreaChartPro = (props: AreaChartProProps) => {
     theme,
   );
 
+  const handleClick = createAreaClickHandler({
+    data,
+    dimension: xAxis,
+    groupBy,
+    granularity,
+    onPointClicked,
+    onAreaClicked,
+  });
+
   const options = {
     ...getAreaChartProOptions({ data, dimension: xAxis, groupDimension: groupBy, measure }, theme),
-    interaction: { mode: 'index' as const, intersect: false },
-    onClick: createAreaClickHandler({
-      data,
-      dimension: xAxis,
-      groupBy,
-      granularity,
-      onPointClicked,
-      onAreaClicked,
-    }),
+    onClick: handleClick,
   };
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;

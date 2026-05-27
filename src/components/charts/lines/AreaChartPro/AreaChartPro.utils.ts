@@ -159,6 +159,7 @@ export const getAreaChartProOptions = (
 
   return mergician(lineOptions, {
     scales: { y: { stacked: true } },
+    interaction: { mode: 'index' as const, intersect: false },
     ...(theme.charts?.areaChartPro?.options || {}),
   });
 };
