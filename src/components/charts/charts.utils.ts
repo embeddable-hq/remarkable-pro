@@ -26,10 +26,22 @@ export const groupTailAsOther = (
   };
 
   for (const measure of measures) {
-    aggregatedRow[measure.name] = tail.reduce(
-      (sum, row) => sum + parseFloat(row[measure.name] ?? '0'),
-      0,
-    );
+    const vals = tail.map((row) => Number.parseFloat(row[measure.name] ?? '0'));
+    const aggType = (measure.meta as Record<string, unknown> | undefined)?.aggType;
+
+    switch (aggType) {
+      case 'avg':
+        aggregatedRow[measure.name] = vals.reduce((s, v) => s + v, 0) / (vals.length || 1);
+        break;
+      case 'min':
+        aggregatedRow[measure.name] = Math.min(...vals);
+        break;
+      case 'max':
+        aggregatedRow[measure.name] = Math.max(...vals);
+        break;
+      default:
+        aggregatedRow[measure.name] = vals.reduce((s, v) => s + v, 0);
+    }
   }
 
   return [...head, aggregatedRow];
