@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Dimension, Measure } from '@embeddable.com/core';
+import { Chart } from 'chart.js';
 import {
   createAreaClickHandler,
   getAreaChartProData,
@@ -252,28 +253,31 @@ describe('createAreaClickHandler', () => {
     ],
   };
 
-  const makeEvent = (y: number | null, x: number | null = 100) => ({
-    x,
-    y,
-    native: {},
-  });
-
-  const makeChart = (
-    pointElements: { index: number; datasetIndex: number }[] = [],
+  const makeChartInstance = (
     datasetPoints: Record<number, { x: number; y: number }[]> = {},
-    chartAreaBottom = 500,
+    chartAreaBottom: number | undefined = 500,
   ) => {
     const keys = Object.keys(datasetPoints).map(Number);
     const numDatasets = keys.length > 0 ? Math.max(...keys) + 1 : 0;
     return {
-      getElementsAtEventForMode: vi.fn(() => pointElements),
       getDatasetMeta: vi.fn((datasetIndex: number) => ({
         data: datasetPoints[datasetIndex] ?? [],
       })),
-      chartArea: { bottom: chartAreaBottom },
+      chartArea: chartAreaBottom != null ? { bottom: chartAreaBottom } : undefined,
       data: { datasets: Array.from({ length: numDatasets }) },
     };
   };
+
+  const makeArgs = (
+    offsetX: number,
+    offsetY: number,
+    elementAtEvent: { index: number; datasetIndex: number }[] = [],
+  ) => ({
+    event: { target: {}, nativeEvent: { offsetX, offsetY } },
+    elementAtEvent,
+    elementsAtEvent: [],
+    datasetAtEvent: [],
+  });
 
   const defaultHandlerProps = {
     data: chartData as never,
@@ -281,42 +285,38 @@ describe('createAreaClickHandler', () => {
     groupBy: makeDimension({ name: 'category' }),
   };
 
+  let mockChartInstance: ReturnType<typeof makeChartInstance>;
+
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(getTimeRangeFromDimensionValue).mockReturnValue(undefined);
+    mockChartInstance = makeChartInstance({ 0: [{ x: 100, y: 300 }] });
+    vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
   });
 
   describe('onAreaClicked', () => {
     it('does not throw when onAreaClicked is not provided', () => {
       const handler = createAreaClickHandler(defaultHandlerProps);
-      const chart = makeChart([], { 0: [{ x: 100, y: 300 }] });
-      expect(() => handler(makeEvent(350) as never, [] as never, chart as never)).not.toThrow();
+      expect(() => handler(makeArgs(100, 350) as never)).not.toThrow();
     });
 
-    it('does not call onAreaClicked when clickX is null', () => {
+    it('does not call onAreaClicked when Chart.getChart returns null', () => {
       const onAreaClicked = vi.fn();
+      vi.spyOn(Chart, 'getChart').mockReturnValue(undefined as never);
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
-      const chart = makeChart([], { 0: [{ x: 100, y: 300 }] });
-      handler({ x: null, y: 350, native: {} } as never, [] as never, chart as never);
-      expect(onAreaClicked).not.toHaveBeenCalled();
-    });
-
-    it('does not call onAreaClicked when clickY is null', () => {
-      const onAreaClicked = vi.fn();
-      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
-      const chart = makeChart([], { 0: [{ x: 100, y: 300 }] });
-      handler({ x: 100, y: null, native: {} } as never, [] as never, chart as never);
+      handler(makeArgs(100, 350) as never);
       expect(onAreaClicked).not.toHaveBeenCalled();
     });
 
     it('selects the dataset whose interpolated area contains the click', () => {
       const onAreaClicked = vi.fn();
-      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
-      const chart = makeChart([], {
+      mockChartInstance = makeChartInstance({
         0: [{ x: 100, y: 300 }],
         1: [{ x: 100, y: 200 }],
       });
-      handler(makeEvent(250) as never, [] as never, chart as never);
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
+      handler(makeArgs(100, 250) as never);
       expect(onAreaClicked).toHaveBeenCalledWith(
         expect.objectContaining({ groupingDimensionValue: 'Group B' }),
       );
@@ -324,8 +324,7 @@ describe('createAreaClickHandler', () => {
 
     it('interpolates the line y-value between two data points', () => {
       const onAreaClicked = vi.fn();
-      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
-      const chart = makeChart([], {
+      mockChartInstance = makeChartInstance({
         0: [
           { x: 0, y: 400 },
           { x: 200, y: 200 },
@@ -335,7 +334,9 @@ describe('createAreaClickHandler', () => {
           { x: 200, y: 100 },
         ],
       });
-      handler(makeEvent(250, 100) as never, [] as never, chart as never);
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
+      handler(makeArgs(100, 250) as never);
       expect(onAreaClicked).toHaveBeenCalledWith(
         expect.objectContaining({ groupingDimensionValue: 'Group B' }),
       );
@@ -343,12 +344,13 @@ describe('createAreaClickHandler', () => {
 
     it('selects the lower segment when clicking just below the shared boundary', () => {
       const onAreaClicked = vi.fn();
-      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
-      const chart = makeChart([], {
+      mockChartInstance = makeChartInstance({
         0: [{ x: 100, y: 300 }],
         1: [{ x: 100, y: 200 }],
       });
-      handler(makeEvent(305) as never, [] as never, chart as never);
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
+      handler(makeArgs(100, 305) as never);
       expect(onAreaClicked).toHaveBeenCalledWith(
         expect.objectContaining({ groupingDimensionValue: 'Group A' }),
       );
@@ -356,12 +358,13 @@ describe('createAreaClickHandler', () => {
 
     it('selects the upper segment when clicking just above the shared boundary', () => {
       const onAreaClicked = vi.fn();
-      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
-      const chart = makeChart([], {
+      mockChartInstance = makeChartInstance({
         0: [{ x: 100, y: 300 }],
         1: [{ x: 100, y: 200 }],
       });
-      handler(makeEvent(295) as never, [] as never, chart as never);
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
+      handler(makeArgs(100, 295) as never);
       expect(onAreaClicked).toHaveBeenCalledWith(
         expect.objectContaining({ groupingDimensionValue: 'Group B' }),
       );
@@ -369,20 +372,20 @@ describe('createAreaClickHandler', () => {
 
     it('does not call onAreaClicked when click is outside all filled areas', () => {
       const onAreaClicked = vi.fn();
-      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
-      const chart = makeChart([], {
+      mockChartInstance = makeChartInstance({
         0: [{ x: 100, y: 300 }],
         1: [{ x: 100, y: 200 }],
       });
-      handler(makeEvent(50) as never, [] as never, chart as never);
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
+      handler(makeArgs(100, 50) as never);
       expect(onAreaClicked).not.toHaveBeenCalled();
     });
 
     it('passes groupingDimensionValue from dataset rawLabel', () => {
       const onAreaClicked = vi.fn();
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
-      const chart = makeChart([], { 0: [{ x: 100, y: 300 }] });
-      handler(makeEvent(350) as never, [] as never, chart as never);
+      handler(makeArgs(100, 350) as never);
       expect(onAreaClicked).toHaveBeenCalledWith(
         expect.objectContaining({ groupingDimensionValue: 'Group A' }),
       );
@@ -391,8 +394,7 @@ describe('createAreaClickHandler', () => {
     it('calls getTimeRangeFromDimensionValue for the grouping dimension', () => {
       const onAreaClicked = vi.fn();
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
-      const chart = makeChart([], { 0: [{ x: 100, y: 300 }] });
-      handler(makeEvent(350) as never, [] as never, chart as never);
+      handler(makeArgs(100, 350) as never);
       expect(getTimeRangeFromDimensionValue).toHaveBeenCalledTimes(1);
     });
   });
@@ -401,16 +403,14 @@ describe('createAreaClickHandler', () => {
     it('calls onPointClicked instead of onAreaClicked when a point is hit', () => {
       const onPointClicked = vi.fn();
       const onAreaClicked = vi.fn();
+      mockChartInstance = makeChartInstance({ 0: [{ x: 100, y: 50 }] });
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
       const handler = createAreaClickHandler({
         ...defaultHandlerProps,
         onPointClicked,
         onAreaClicked,
       });
-      handler(
-        makeEvent(50) as never,
-        [] as never,
-        makeChart([{ index: 0, datasetIndex: 0 }], { 0: [{ x: 100, y: 50 }] }) as never,
-      );
+      handler(makeArgs(100, 50, [{ index: 0, datasetIndex: 0 }]) as never);
       expect(onPointClicked).toHaveBeenCalled();
       expect(onAreaClicked).not.toHaveBeenCalled();
     });
@@ -418,16 +418,17 @@ describe('createAreaClickHandler', () => {
     it('falls through to onAreaClicked when click is far from the detected point', () => {
       const onPointClicked = vi.fn();
       const onAreaClicked = vi.fn();
+      mockChartInstance = makeChartInstance({
+        0: [{ x: 100, y: 300 }],
+        1: [{ x: 100, y: 200 }],
+      });
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
       const handler = createAreaClickHandler({
         ...defaultHandlerProps,
         onPointClicked,
         onAreaClicked,
       });
-      const chart = makeChart([{ index: 0, datasetIndex: 0 }], {
-        0: [{ x: 100, y: 300 }],
-        1: [{ x: 100, y: 200 }],
-      });
-      handler(makeEvent(200) as never, [] as never, chart as never);
+      handler(makeArgs(100, 200, [{ index: 0, datasetIndex: 0 }]) as never);
       expect(onPointClicked).not.toHaveBeenCalled();
       expect(onAreaClicked).toHaveBeenCalledWith(
         expect.objectContaining({ groupingDimensionValue: 'Group B' }),
@@ -436,17 +437,15 @@ describe('createAreaClickHandler', () => {
 
     it('passes dimensionValue from labels at the clicked element index', () => {
       const onPointClicked = vi.fn();
+      mockChartInstance = makeChartInstance({
+        0: [
+          { x: 100, y: 0 },
+          { x: 100, y: 50 },
+        ],
+      });
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onPointClicked });
-      handler(
-        makeEvent(50) as never,
-        [] as never,
-        makeChart([{ index: 1, datasetIndex: 0 }], {
-          0: [
-            { x: 100, y: 0 },
-            { x: 100, y: 50 },
-          ],
-        }) as never,
-      );
+      handler(makeArgs(100, 50, [{ index: 1, datasetIndex: 0 }]) as never);
       expect(onPointClicked).toHaveBeenCalledWith(
         expect.objectContaining({ dimensionValue: 'Feb' }),
       );
@@ -454,29 +453,25 @@ describe('createAreaClickHandler', () => {
 
     it('passes measureValue from the dataset at the clicked element index', () => {
       const onPointClicked = vi.fn();
+      mockChartInstance = makeChartInstance({
+        1: [
+          { x: 100, y: 0 },
+          { x: 100, y: 0 },
+          { x: 100, y: 50 },
+        ],
+      });
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onPointClicked });
-      handler(
-        makeEvent(50) as never,
-        [] as never,
-        makeChart([{ index: 2, datasetIndex: 1 }], {
-          1: [
-            { x: 100, y: 0 },
-            { x: 100, y: 0 },
-            { x: 100, y: 50 },
-          ],
-        }) as never,
-      );
+      handler(makeArgs(100, 50, [{ index: 2, datasetIndex: 1 }]) as never);
       expect(onPointClicked).toHaveBeenCalledWith(expect.objectContaining({ measureValue: 90 }));
     });
 
     it('calls getTimeRangeFromDimensionValue for the x dimension', () => {
       const onPointClicked = vi.fn();
+      mockChartInstance = makeChartInstance({ 0: [{ x: 100, y: 50 }] });
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onPointClicked });
-      handler(
-        makeEvent(50) as never,
-        [] as never,
-        makeChart([{ index: 0, datasetIndex: 0 }], { 0: [{ x: 100, y: 50 }] }) as never,
-      );
+      handler(makeArgs(100, 50, [{ index: 0, datasetIndex: 0 }]) as never);
       expect(getTimeRangeFromDimensionValue).toHaveBeenCalledTimes(1);
     });
 
@@ -488,40 +483,28 @@ describe('createAreaClickHandler', () => {
         onPointClicked,
         onAreaClicked,
       });
-      const chart = makeChart([], { 0: [{ x: 100, y: 300 }] });
-      handler(makeEvent(350) as never, [] as never, chart as never);
+      handler(makeArgs(100, 350) as never);
       expect(onPointClicked).not.toHaveBeenCalled();
       expect(onAreaClicked).toHaveBeenCalled();
     });
 
     it('does not call onPointClicked when pointY pixel is not available', () => {
       const onPointClicked = vi.fn();
+      mockChartInstance = makeChartInstance({});
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onPointClicked });
-      const chart = makeChart([{ index: 5, datasetIndex: 0 }], {});
-      handler(makeEvent(50) as never, [] as never, chart as never);
+      handler(makeArgs(100, 50, [{ index: 5, datasetIndex: 0 }]) as never);
       expect(onPointClicked).not.toHaveBeenCalled();
-    });
-
-    it('treats event.y=null as on-point (proximity check skipped)', () => {
-      const onPointClicked = vi.fn();
-      const handler = createAreaClickHandler({ ...defaultHandlerProps, onPointClicked });
-      const chart = makeChart([{ index: 0, datasetIndex: 0 }], { 0: [{ x: 100, y: 300 }] });
-      handler({ x: 100, y: null, native: {} } as never, [] as never, chart as never);
-      expect(onPointClicked).toHaveBeenCalled();
     });
   });
 
   describe('edge cases', () => {
     it('uses Infinity as chartBottom when chart.chartArea is undefined', () => {
       const onAreaClicked = vi.fn();
+      mockChartInstance = makeChartInstance({ 0: [{ x: 100, y: 300 }] }, undefined);
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
-      const chart = {
-        getElementsAtEventForMode: vi.fn(() => []),
-        getDatasetMeta: vi.fn(() => ({ data: [{ x: 100, y: 300 }] })),
-        chartArea: undefined,
-        data: { datasets: [{}] },
-      };
-      handler(makeEvent(400) as never, [] as never, chart as never);
+      handler(makeArgs(100, 400) as never);
       expect(onAreaClicked).toHaveBeenCalledWith(
         expect.objectContaining({ groupingDimensionValue: 'Group A' }),
       );
@@ -529,8 +512,7 @@ describe('createAreaClickHandler', () => {
 
     it('skips a dataset when interpolated lineY is null (clickX outside all segments)', () => {
       const onAreaClicked = vi.fn();
-      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
-      const chart = makeChart([], {
+      mockChartInstance = makeChartInstance({
         0: [
           { x: 0, y: 400 },
           { x: 50, y: 300 },
@@ -540,18 +522,21 @@ describe('createAreaClickHandler', () => {
           { x: 50, y: 150 },
         ],
       });
-      handler(makeEvent(250, 200) as never, [] as never, chart as never);
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
+      handler(makeArgs(200, 250) as never);
       expect(onAreaClicked).not.toHaveBeenCalled();
     });
 
     it('skips a dataset when its previous line interpolation returns null', () => {
       const onAreaClicked = vi.fn();
-      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
-      const chart = makeChart([], {
+      mockChartInstance = makeChartInstance({
         0: [],
         1: [{ x: 100, y: 200 }],
       });
-      handler(makeEvent(300) as never, [] as never, chart as never);
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
+      handler(makeArgs(100, 300) as never);
       expect(onAreaClicked).not.toHaveBeenCalled();
     });
   });

@@ -1,6 +1,6 @@
 import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
-import { ActiveElement, Chart, ChartData, ChartEvent, ChartOptions } from 'chart.js';
+import { Chart, ChartData, ChartOptions } from 'chart.js';
 import { mergician } from 'mergician';
 import {
   getLineChartGroupedProData,
@@ -9,6 +9,7 @@ import {
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { setColorAlpha } from '../../../../utils/color.utils';
 import { AreaChartProAreaClickArg, AreaChartProPointClickArg } from '../lines.types';
+import { ChartClickArgs } from '@embeddable.com/remarkable-ui';
 
 export const getAreaChartProData = (
   props: {
@@ -53,26 +54,20 @@ const interpolateLineY = (chart: Chart, datasetIndex: number, clickX: number): n
 
 const handlePointClick = (
   chart: Chart,
-  event: ChartEvent,
+  elementAtEvent: ChartClickArgs['elementAtEvent'],
+  clickY: number,
   data: ChartData<'line'>,
   dimension: Dimension,
   granularity: Granularity | undefined,
   onPointClicked: (arg: AreaChartProPointClickArg) => void,
 ): boolean => {
-  const pointElements = chart.getElementsAtEventForMode(
-    event.native as Event,
-    'nearest',
-    { intersect: true },
-    false,
-  );
-  if (!pointElements.length) return false;
+  if (!elementAtEvent.length) return false;
 
-  const clicked = pointElements[0]!;
+  const clicked = elementAtEvent[0]!;
   const pointY = getPixelPoints(chart, clicked.datasetIndex)[clicked.index]?.y;
   if (pointY == null) return false;
 
-  const isOnPoint = event.y == null || Math.abs(event.y - pointY) <= 8;
-  if (!isOnPoint) return false;
+  if (Math.abs(clickY - pointY) > 8) return false;
 
   const dimensionValue = data?.labels?.[clicked.index] as string | undefined;
   const measureValue = (data?.datasets?.[clicked.datasetIndex] as { data?: unknown[] })?.data?.[
@@ -93,14 +88,12 @@ const handlePointClick = (
 
 const handleAreaClick = (
   chart: Chart,
-  event: ChartEvent,
+  clickX: number,
+  clickY: number,
   data: ChartData<'line'>,
   groupBy: Dimension,
   onAreaClicked: (arg: AreaChartProAreaClickArg) => void,
 ): void => {
-  const { x: clickX, y: clickY } = event;
-  if (clickX == null || clickY == null) return;
-
   const chartBottom = chart.chartArea?.bottom ?? Infinity;
 
   for (let i = chart.data.datasets.length - 1; i >= 0; i--) {
@@ -137,13 +130,19 @@ export const createAreaClickHandler =
     onPointClicked?: (arg: AreaChartProPointClickArg) => void;
     onAreaClicked?: (arg: AreaChartProAreaClickArg) => void;
   }) =>
-  (event: ChartEvent, _elements: ActiveElement[], chart: Chart): void => {
+  ({ event, elementAtEvent }: ChartClickArgs): void => {
+    const chart = Chart.getChart(event.target as HTMLCanvasElement);
+    if (!chart) return;
+
+    const clickX = event.nativeEvent.offsetX;
+    const clickY = event.nativeEvent.offsetY;
+
     if (
       onPointClicked &&
-      handlePointClick(chart, event, data, dimension, granularity, onPointClicked)
+      handlePointClick(chart, elementAtEvent, clickY, data, dimension, granularity, onPointClicked)
     )
       return;
-    if (onAreaClicked) handleAreaClick(chart, event, data, groupBy, onAreaClicked);
+    if (onAreaClicked) handleAreaClick(chart, clickX, clickY, data, groupBy, onAreaClicked);
   };
 
 export const getAreaChartProOptions = (

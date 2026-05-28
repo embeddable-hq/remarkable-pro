@@ -67,10 +67,10 @@ const AreaChartPro = (props: AreaChartProProps) => {
     onAreaClicked,
   });
 
-  const options = {
-    ...getAreaChartProOptions({ data, dimension: xAxis, groupDimension: groupBy, measure }, theme),
-    onClick: handleClick,
-  };
+  const options = getAreaChartProOptions(
+    { data, dimension: xAxis, groupDimension: groupBy, measure },
+    theme,
+  );
 
   const granularitySelectorHasMarginTop = !title && !description && !tooltip;
 
@@ -103,6 +103,7 @@ const AreaChartPro = (props: AreaChartProProps) => {
         yAxisRangeMax={yAxisRangeMax}
         yAxisRangeMin={yAxisRangeMin}
         options={options}
+        onClick={handleClick}
       />
     </ChartCard>
   );
