@@ -102,7 +102,12 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     ro.observe(el);
     el.addEventListener('scroll', updateScrollState);
     updateScrollState();
+    // Run again after a short delay to catch layout updates that haven't settled yet
+    // (e.g. when filters reload from saved state, item widths may not be fully computed
+    // by the time the synchronous call above executes).
+    const timeoutId = setTimeout(updateScrollState, 50);
     return () => {
+      clearTimeout(timeoutId);
       ro.disconnect();
       el.removeEventListener('scroll', updateScrollState);
     };
