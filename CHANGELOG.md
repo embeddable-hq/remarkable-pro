@@ -1,5 +1,12 @@
 # @embeddable/remarkable-ui
 
+## 0.3.2
+
+### Patch Changes
+
+- b4501a7: Introduce aggType on meta object for proper data aggregation
+- a5596bb: Add AreaChartPro chart
+
 ## 0.3.1
 
 ### Patch Changes
