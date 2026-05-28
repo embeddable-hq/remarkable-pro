@@ -24,6 +24,9 @@ const FilterBuilderTextValueField = ({
   }, [value, debouncedSelectValue]);
 
   useEffect(() => {
+    // Don't auto-focus if the field already has a value — this means it was restored
+    // from saved state (e.g. page reload), not freshly selected by the user.
+    if (filter.value != null) return;
     setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
