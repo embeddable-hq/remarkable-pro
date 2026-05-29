@@ -27,6 +27,7 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
   const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
   const {
     hideMenu,
+    exportOptions,
     measures,
     xAxis,
     reverseXAxis,
@@ -100,6 +101,7 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       <ChartTabs items={chartTabsItems} value={activeMeasureName} onChange={setActiveMeasureName} />
       {setGranularity && (

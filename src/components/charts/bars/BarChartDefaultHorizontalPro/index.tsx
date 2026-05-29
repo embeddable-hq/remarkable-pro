@@ -24,6 +24,7 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
 
   const {
     hideMenu,
+    exportOptions,
     dimension,
     measures,
     showValueLabels,
@@ -74,6 +75,7 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       {setGranularity && (
         <ChartGranularitySelectField

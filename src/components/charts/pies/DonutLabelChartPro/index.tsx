@@ -35,7 +35,7 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
 
   const { description, title, tooltip, innerLabelText, onSegmentClick } = resolveI18nProps(props);
 
-  const { hideMenu } = props;
+  const { hideMenu, exportOptions } = props;
 
   const data = getPieChartProData(
     { data: results.data, dimension, measure, maxLegendItems },
@@ -63,6 +63,7 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       <DonutChart
         label={label}

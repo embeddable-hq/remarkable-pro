@@ -30,6 +30,7 @@ const DonutChartPro = (props: DonutChartProProps) => {
     showTooltips,
     showValueLabels,
     hideMenu,
+    exportOptions,
     onSegmentClick,
   } = props;
 
@@ -54,6 +55,7 @@ const DonutChartPro = (props: DonutChartProProps) => {
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       <DonutChart
         data={data}

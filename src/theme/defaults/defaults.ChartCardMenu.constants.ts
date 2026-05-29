@@ -14,6 +14,7 @@ export type ChartCardMenuOptionOnClickProps = {
 };
 
 export type ChartCardMenuOption = {
+  key: string;
   labelKey: string;
   iconSrc?: string;
   onClick: (props: ChartCardMenuOptionOnClickProps) => void;
@@ -21,16 +22,19 @@ export type ChartCardMenuOption = {
 
 export const defaultChartMenuProOptions: ChartCardMenuOption[] = [
   {
+    key: 'csv',
     labelKey: 'charts.menuOptions.downloadCSV',
     onClick: exportCSV,
     iconSrc: CloudDownload,
   },
   {
+    key: 'xlsx',
     labelKey: 'charts.menuOptions.downloadXLSX',
     onClick: exportXLSX,
     iconSrc: CloudDownload,
   },
   {
+    key: 'png',
     labelKey: 'charts.menuOptions.downloadPNG',
     onClick: exportPNG,
     iconSrc: PhotoDown,

@@ -47,6 +47,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
     columnWidth,
     firstColumnWidth,
     hideMenu,
+    exportOptions,
     expandedRowKeys,
     setExpandedRowKey,
   } = props;
@@ -144,6 +145,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
       dimensionsAndMeasures={[rowDimension, columnDimension, ...measures]}
       errorMessage={props.results?.error}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       <PivotTable
         firstColumnWidth={firstColumnWidth}

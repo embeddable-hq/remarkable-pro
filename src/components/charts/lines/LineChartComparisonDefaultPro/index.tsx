@@ -47,6 +47,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
   const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
   const {
     hideMenu,
+    exportOptions,
     comparisonPeriod,
     measures,
     xAxis,
@@ -137,6 +138,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
       description={description}
       title={title}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       {setGranularity && (
         <ChartGranularitySelectField

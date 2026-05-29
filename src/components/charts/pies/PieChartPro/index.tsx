@@ -27,7 +27,7 @@ const PieChartPro = (props: PieChartProProps) => {
     onSegmentClick,
   } = props;
 
-  const { hideMenu } = props;
+  const { hideMenu, exportOptions } = props;
 
   const data = getPieChartProData(
     { data: results.data, dimension, measure, maxLegendItems },
@@ -50,6 +50,7 @@ const PieChartPro = (props: PieChartProProps) => {
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       <PieChart
         data={data}

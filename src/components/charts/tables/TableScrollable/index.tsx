@@ -58,6 +58,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   const { title, description, tooltip } = resolveI18nProps(props);
   const {
     hideMenu,
+    exportOptions,
     dataset,
     results,
     allResults,
@@ -186,6 +187,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
       errorMessage={results?.error}
       onCustomDownload={handleCustomDownload}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       <TableScrollable
         ref={tableRef}

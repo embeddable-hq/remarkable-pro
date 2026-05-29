@@ -76,6 +76,7 @@ const meta = {
       category: 'Component Settings',
     },
     inputs.maxResults,
+    inputs.exportOptions,
   ],
 } as const satisfies EmbeddedComponentMeta;
 

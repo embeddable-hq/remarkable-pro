@@ -61,6 +61,7 @@ const meta = {
       category: 'Component Settings',
     },
     { ...inputs.sortDirection, label: 'Default sort direction', category: 'Component Settings' },
+    inputs.exportOptions,
   ],
   events: [
     {

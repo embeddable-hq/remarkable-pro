@@ -65,6 +65,7 @@ const BubbleChartPro = (props: BubbleChartProProps) => {
     bubbleRadiusMax,
     onPointClick,
     hideMenu,
+    exportOptions,
   } = props;
 
   const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
@@ -126,6 +127,7 @@ const BubbleChartPro = (props: BubbleChartProProps) => {
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       <BubbleChart
         data={chartData}

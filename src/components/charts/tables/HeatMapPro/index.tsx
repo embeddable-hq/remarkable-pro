@@ -72,6 +72,7 @@ const HeatMapPro = (props: HeatMapProProps) => {
   const { title, description, tooltip } = resolveI18nProps(props);
   const {
     hideMenu,
+    exportOptions,
     measure,
     rowDimension,
     columnDimension,
@@ -148,6 +149,7 @@ const HeatMapPro = (props: HeatMapProProps) => {
       dimensionsAndMeasures={[rowDimension, columnDimension, measure]}
       errorMessage={props.results?.error}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       <HeatMap
         data={results}

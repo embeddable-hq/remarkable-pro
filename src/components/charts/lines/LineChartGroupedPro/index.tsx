@@ -40,6 +40,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
   const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
   const {
     hideMenu,
+    exportOptions,
     measure,
     xAxis,
     groupBy,
@@ -94,6 +95,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       {setGranularity && (
         <ChartGranularitySelectField

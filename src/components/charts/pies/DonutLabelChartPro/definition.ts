@@ -33,6 +33,7 @@ const meta = {
     inputs.maxLegendItems,
     inputs.showTooltips,
     inputs.showValueLabels,
+    inputs.exportOptions,
   ],
   events: [
     {

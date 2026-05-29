@@ -20,7 +20,7 @@ const KpiChartNumberPro = (props: KpiChartNumberProProp) => {
   i18nSetup(theme);
 
   const { title, description, tooltip, displayNullAs } = resolveI18nProps(props);
-  const { measure, fontSize, hideMenu, results } = props;
+  const { measure, fontSize, hideMenu, exportOptions, results } = props;
 
   const value = results.data?.[0]?.[measure.name];
 
@@ -38,6 +38,7 @@ const KpiChartNumberPro = (props: KpiChartNumberProProp) => {
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       <KpiChart
         displayNullAs={displayNullAs}

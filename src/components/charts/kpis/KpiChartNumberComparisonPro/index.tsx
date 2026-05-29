@@ -36,6 +36,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
   const { title, description, tooltip, displayNullAs } = resolveI18nProps(props);
   const {
     hideMenu,
+    exportOptions,
     changeFontSize,
     comparisonPeriod,
     comparisonDateRange,
@@ -105,6 +106,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       <KpiChart
         displayNullAs={displayNullAs}

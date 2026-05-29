@@ -36,6 +36,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
     yAxisSecondaryMax,
     reverseXAxis,
     hideMenu,
+    exportOptions,
     dimension,
     granularity,
     setGranularity,
@@ -97,6 +98,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       {setGranularity && (
         <ChartGranularitySelectField

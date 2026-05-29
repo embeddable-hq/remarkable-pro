@@ -59,6 +59,7 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
     reverseXAxis,
     onPointClick,
     hideMenu,
+    exportOptions,
   } = props;
 
   const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
@@ -107,6 +108,7 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       <ScatterChart
         data={chartData}

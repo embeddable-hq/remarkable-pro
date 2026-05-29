@@ -43,6 +43,7 @@ const meta = {
     inputs.xAxisRangeMax,
     inputs.yAxisMaxItems,
     inputs.maxResults,
+    inputs.exportOptions,
   ],
   events: [
     {

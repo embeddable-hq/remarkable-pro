@@ -38,6 +38,7 @@ const LineChartPro = (props: LineChartProProps) => {
   const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
   const {
     hideMenu,
+    exportOptions,
     measures,
     granularity,
     xAxis,
@@ -86,6 +87,7 @@ const LineChartPro = (props: LineChartProProps) => {
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       {setGranularity && (
         <ChartGranularitySelectField

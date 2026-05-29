@@ -41,6 +41,7 @@ const meta = {
     inputs.xAxisRangeMin,
     inputs.xAxisRangeMax,
     inputs.showTotalLabels,
+    inputs.exportOptions,
   ],
   events: [
     {

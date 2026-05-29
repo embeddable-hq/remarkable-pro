@@ -33,6 +33,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     showValueLabels,
     reverseXAxis,
     hideMenu,
+    exportOptions,
     dimension,
     granularity,
     setGranularity,
@@ -74,6 +75,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       {setGranularity && (
         <ChartGranularitySelectField

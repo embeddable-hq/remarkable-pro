@@ -30,6 +30,7 @@ const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabs
   const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
   const {
     hideMenu,
+    exportOptions,
     measures,
     xAxis,
     reverseXAxis,
@@ -140,6 +141,7 @@ const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabs
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       <ChartTabs items={chartTabsItems} value={activeMeasureName} onChange={setActiveMeasureName} />
       {setGranularity && (

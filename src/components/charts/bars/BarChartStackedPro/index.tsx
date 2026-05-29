@@ -28,6 +28,7 @@ const BarChartStackedPro = (props: BarChartStackedProProps) => {
 
   const {
     hideMenu,
+    exportOptions,
     groupBy,
     measure,
     reverseXAxis,
@@ -104,6 +105,7 @@ const BarChartStackedPro = (props: BarChartStackedProProps) => {
       title={title}
       tooltip={tooltip}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       {setGranularity && (
         <ChartGranularitySelectField

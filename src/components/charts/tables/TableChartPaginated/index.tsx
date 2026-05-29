@@ -66,6 +66,7 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
   const { title, description, tooltip } = resolveI18nProps(props);
   const {
     hideMenu,
+    exportOptions,
     totalResults,
     results,
     allResults,
@@ -164,6 +165,7 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
       errorMessage={results?.error}
       onCustomDownload={handleCustomDownload}
       hideMenu={hideMenu}
+      exportOptions={exportOptions}
     >
       <TablePaginated
         onRowIndexClick={handleRowIndexClick}
