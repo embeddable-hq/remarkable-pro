@@ -109,6 +109,7 @@ export const getPieChartProOptions = (
 ): Partial<ChartOptions<'pie'>> => {
   const { dimension, measure } = props;
   const themeFormatter = getThemeFormatter(theme);
+  const decimalPlaces = measure.inputs?.decimalPlaces as number | undefined;
 
   return {
     plugins: {
@@ -135,7 +136,7 @@ export const getPieChartProOptions = (
       datalabels: {
         formatter: (value: string | number, context) => {
           if (measure.inputs?.showValueAsPercentage) {
-            return getDatalabelPercentage(Number(value), context.dataset.data);
+            return getDatalabelPercentage(Number(value), context.dataset.data, decimalPlaces);
           }
           return themeFormatter.data(measure, value);
         },
@@ -148,7 +149,7 @@ export const getPieChartProOptions = (
           },
           label(context) {
             const raw = context.raw as number;
-            return `${themeFormatter.data(measure, raw)} (${getDatalabelPercentage(raw, context.dataset.data)})`;
+            return `${themeFormatter.data(measure, raw)} (${getDatalabelPercentage(raw, context.dataset.data, decimalPlaces)})`;
           },
         },
       },
