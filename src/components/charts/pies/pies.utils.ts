@@ -109,7 +109,7 @@ export const getPieChartProOptions = (
 ): Partial<ChartOptions<'pie'>> => {
   const { dimension, measure } = props;
   const themeFormatter = getThemeFormatter(theme);
-  const decimalPlaces = measure.inputs?.decimalPlaces as number | undefined;
+  const decimalPlaces = measure.inputs?.decimalPlaces;
 
   return {
     plugins: {
