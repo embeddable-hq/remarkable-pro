@@ -35,10 +35,10 @@ export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
   const [isLoading, setIsLoading] = React.useState(false);
 
   const allOptions = theme.defaults.chartMenuOptions ?? [];
-  const options =
-    props.enabledExportOptions !== undefined
-      ? allOptions.filter((option) => props.enabledExportOptions!.includes(option.key))
-      : allOptions;
+  const { enabledExportOptions } = props;
+  const options = enabledExportOptions
+    ? allOptions.filter((option) => enabledExportOptions.includes(option.key))
+    : allOptions;
 
   if (options.length === 0) {
     return null;
