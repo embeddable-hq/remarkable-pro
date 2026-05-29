@@ -21,6 +21,8 @@ const meta = {
   description:
     'Line chart split into multiple lines by a grouping dimension — one time dim + one grouping dim + one measure.',
   category: 'Line Charts',
+  defaultWidth: 630,
+  defaultHeight: 442,
   inputs: [
     inputs.dataset,
     {

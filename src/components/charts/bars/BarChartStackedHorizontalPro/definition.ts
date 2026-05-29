@@ -20,6 +20,8 @@ const meta = {
   description:
     'Same as BarChartStackedPro but with horizontal bars. Pick when category labels are long or numerous.',
   category: 'Bar Charts',
+  defaultWidth: 630,
+  defaultHeight: 442,
   inputs: [
     inputs.dataset,
     inputs.measure,

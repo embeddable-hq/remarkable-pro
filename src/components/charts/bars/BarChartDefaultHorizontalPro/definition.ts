@@ -22,6 +22,8 @@ const meta = {
   description:
     'Same as BarChartDefaultPro but with horizontal bars. Pick when category labels are long or numerous.',
   category: 'Bar Charts',
+  defaultWidth: 630,
+  defaultHeight: 442,
   inputs: [
     inputs.dataset,
     {

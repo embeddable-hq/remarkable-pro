@@ -20,6 +20,8 @@ const meta = {
   description:
     'Vertical bar chart with side-by-side bars — one x-axis dimension, one grouping dimension, one measure. Use to compare sub-categories at each x value.',
   category: 'Bar Charts',
+  defaultWidth: 630,
+  defaultHeight: 442,
   inputs: [
     inputs.dataset,
     inputs.measure,

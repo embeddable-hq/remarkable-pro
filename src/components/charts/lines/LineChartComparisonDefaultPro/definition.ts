@@ -24,6 +24,8 @@ const meta = {
   description:
     'Line chart overlaying the current period and a comparison period. Pairs with a comparisonPeriod variable and a timeRange variable.',
   category: 'Line Charts',
+  defaultWidth: 630,
+  defaultHeight: 442,
   inputs: [
     inputs.dataset,
     {

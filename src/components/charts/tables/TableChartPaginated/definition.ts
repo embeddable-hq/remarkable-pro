@@ -21,6 +21,8 @@ const meta = {
   label: 'Table Chart - Paginated',
   description: 'Server-side paginated table. Pick over TableScrollable for large datasets.',
   category: 'Table Charts',
+  defaultWidth: 800,
+  defaultHeight: 500,
   inputs: [
     { ...inputs.dataset, config: { hideSort: true } },
     {

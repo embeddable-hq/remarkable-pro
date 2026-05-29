@@ -12,6 +12,8 @@ const meta = {
   description:
     'Heat map of one measure over two dimensions (rows × columns). Use to spot density or correlation patterns.',
   category: 'Table Charts',
+  defaultWidth: 630,
+  defaultHeight: 442,
   inputs: [
     inputs.dataset,
     inputs.measure,

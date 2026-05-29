@@ -12,6 +12,8 @@ const meta = {
   name: 'BubbleChartPro',
   label: 'Bubble Chart',
   category: 'Scatter Charts',
+  defaultWidth: 630,
+  defaultHeight: 442,
   inputs: [
     inputs.dataset,
     inputs.xMeasure,

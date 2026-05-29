@@ -22,6 +22,8 @@ const meta = {
   label: 'Table Chart - Scrollable',
   description: 'Scrollable table that loads all rows at once. Pick for small or medium datasets.',
   category: 'Table Charts',
+  defaultWidth: 800,
+  defaultHeight: 500,
   inputs: [
     { ...inputs.dataset, config: { hideSort: true } },
     {

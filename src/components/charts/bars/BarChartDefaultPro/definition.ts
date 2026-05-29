@@ -22,6 +22,8 @@ const meta = {
   description:
     'Vertical bar chart with one categorical x-axis dimension and one or more measures. Use to compare values across discrete categories.',
   category: 'Bar Charts',
+  defaultWidth: 630,
+  defaultHeight: 442,
   inputs: [
     inputs.dataset,
     {

@@ -20,6 +20,8 @@ const meta = {
   name: 'BarLineChartPro',
   label: 'Bar + Line Chart',
   category: 'Combo Charts',
+  defaultWidth: 630,
+  defaultHeight: 442,
   inputs: [
     inputs.dataset,
     {

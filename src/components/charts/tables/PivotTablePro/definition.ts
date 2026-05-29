@@ -13,6 +13,8 @@ const meta = {
   description:
     'Cross-tabulated table — row and column dimensions intersected by one or more measures.',
   category: 'Table Charts',
+  defaultWidth: 800,
+  defaultHeight: 500,
   inputs: [
     inputs.dataset,
     {

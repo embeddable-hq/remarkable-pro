@@ -22,6 +22,8 @@ const meta = {
   description:
     'Line chart with one time dimension on the x-axis and one or more measures. Use for time-series trends.',
   category: 'Line Charts',
+  defaultWidth: 630,
+  defaultHeight: 442,
   inputs: [
     inputs.dataset,
     {
