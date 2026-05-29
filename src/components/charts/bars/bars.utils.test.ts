@@ -505,7 +505,7 @@ describe('getBarChartProOptions', () => {
       const context = { datasetIndex: 0, dataset: { data: [50] } } as never;
       const result = options.plugins!.datalabels!.labels!.value!.formatter!(50, context);
 
-      expect(getDatalabelPercentage).toHaveBeenCalledWith(50, [50]);
+      expect(getDatalabelPercentage).toHaveBeenCalledWith(50, [50], undefined);
       expect(result).toBe('50%');
     });
   });
@@ -567,7 +567,7 @@ describe('getBarChartProOptions', () => {
       } as never;
       const result = options.plugins!.tooltip!.callbacks!.label!.call({} as never, context);
 
-      expect(getDatalabelPercentage).toHaveBeenCalledWith(50, [50]);
+      expect(getDatalabelPercentage).toHaveBeenCalledWith(50, [50], undefined);
       expect(result).toBe('Revenue: fmt:50 (50%)');
     });
   });
@@ -724,7 +724,7 @@ describe('getBarStackedChartProOptions', () => {
       } as never;
       const result = options.plugins!.tooltip!.callbacks!.label!.call({} as never, context);
 
-      expect(getDatalabelPercentage).toHaveBeenCalledWith(50, [50]);
+      expect(getDatalabelPercentage).toHaveBeenCalledWith(50, [50], undefined);
       expect(result).toBe('fmt:North: fmt:50 (33%)');
     });
 
