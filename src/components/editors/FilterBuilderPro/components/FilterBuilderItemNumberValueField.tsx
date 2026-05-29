@@ -43,12 +43,12 @@ const FilterBuilderItemNumberValueField = ({
   }, [value, debouncedSelectValue]);
 
   useEffect(() => {
-    if (filter?.value) return;
+    if (filter.value) return;
 
     setTimeout(() => {
       firstInputRef.current?.focus();
     }, 100);
-  }, [filter?.value, filter.operator]);
+  }, [filter.value, filter.operator]);
 
   if (filter.operator === 'between') {
     return (

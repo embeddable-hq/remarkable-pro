@@ -24,12 +24,12 @@ const FilterBuilderTextValueField = ({
   }, [value, debouncedSelectValue]);
 
   useEffect(() => {
-    if (filter?.value) return;
+    if (filter.value) return;
 
     setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
-  }, [filter?.value, filter.operator]);
+  }, [filter.value, filter.operator]);
 
   return (
     <input
