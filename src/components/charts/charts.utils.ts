@@ -50,13 +50,12 @@ export const groupTailAsOther = (
 export const getDatalabelPercentage = (
   value: number,
   data: unknown[],
-  decimalPlaces?: number,
+  decimalPlaces = 2,
 ): string => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const total = data.reduce((sum: number, v: any) => sum + Number.parseFloat(v), 0);
   if (total === 0) return '0%';
-  const places = decimalPlaces ?? 2;
-  return `${Number.parseFloat(((value / total) * 100).toFixed(places))}%`;
+  return `${Number.parseFloat(((value / total) * 100).toFixed(decimalPlaces))}%`;
 };
 
 export const createSimpleClickHandler = ({

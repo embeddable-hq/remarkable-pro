@@ -169,7 +169,11 @@ export const getBarChartProOptions = (
               const measure = measures[context.datasetIndex % measures.length]!;
 
               if (measure.inputs?.showValueAsPercentage) {
-                return getDatalabelPercentage(Number(value), context.dataset.data);
+                return getDatalabelPercentage(
+                  Number(value),
+                  context.dataset.data,
+                  measure.inputs?.decimalPlaces as number | undefined,
+                );
               }
               return themeFormatter.data(measure, value);
             },
@@ -191,7 +195,7 @@ export const getBarChartProOptions = (
 
             let percentage = '';
             if (measure.inputs?.showValueAsPercentage) {
-              percentage = `(${getDatalabelPercentage(raw, context.dataset.data)})`;
+              percentage = `(${getDatalabelPercentage(raw, context.dataset.data, measure.inputs?.decimalPlaces as number | undefined)})`;
             }
 
             return `${context.dataset.label}: ${measureValue} ${percentage}`;
@@ -255,7 +259,7 @@ export const getBarStackedChartProOptions = (
 
         let percentage = '';
         if (measure.inputs?.showValueAsPercentage) {
-          percentage = `(${getDatalabelPercentage(raw, context.dataset.data)})`;
+          percentage = `(${getDatalabelPercentage(raw, context.dataset.data, measure.inputs?.decimalPlaces as number | undefined)})`;
         }
 
         const label = themeFormatter.data(
