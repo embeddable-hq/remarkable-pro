@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.3
+
+### Patch Changes
+
+- 00d3785: FilterBuilderPro improvements
+
 ## 0.3.2
 
 ### Patch Changes
