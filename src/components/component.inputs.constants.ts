@@ -492,18 +492,24 @@ const yMeasure = {
   label: 'Y-axis measure',
 } as const;
 
+export const ExportOption = {
+  csv: 'csv',
+  xlsx: 'xlsx',
+  png: 'png',
+} as const;
+
 const exportOptions = {
   name: 'exportOptions',
   type: 'string',
   label: 'Export options',
   array: true,
-  defaultValue: ['csv', 'xlsx', 'png'],
+  defaultValue: [ExportOption.csv, ExportOption.xlsx, ExportOption.png],
   category: 'Component Settings',
   config: {
     options: [
-      { value: 'csv', label: 'Export CSV' },
-      { value: 'xlsx', label: 'Export XLSX' },
-      { value: 'png', label: 'Export PNG' },
+      { value: ExportOption.csv, label: 'Export CSV' },
+      { value: ExportOption.xlsx, label: 'Export XLSX' },
+      { value: ExportOption.png, label: 'Export PNG' },
     ],
   },
 } as const;
