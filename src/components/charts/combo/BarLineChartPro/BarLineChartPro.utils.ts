@@ -163,7 +163,11 @@ export const getBarLineChartProOptions = (
               const measure = measures[context.datasetIndex];
               if (!measure) return value;
               if (measure.inputs?.showValueAsPercentage) {
-                return getDatalabelPercentage(Number(value), context.dataset.data);
+                return getDatalabelPercentage(
+                  Number(value),
+                  context.dataset.data,
+                  measure.inputs?.decimalPlaces,
+                );
               }
               return themeFormatter.data(measure, value);
             },
@@ -187,7 +191,7 @@ export const getBarLineChartProOptions = (
             const raw = context.raw as number;
             const formatted = themeFormatter.data(measure, raw);
             const percentage = measure.inputs?.showValueAsPercentage
-              ? ` (${getDatalabelPercentage(raw, context.dataset.data)})`
+              ? ` (${getDatalabelPercentage(raw, context.dataset.data, measure.inputs?.decimalPlaces)})`
               : '';
             return `${context.dataset.label}: ${formatted}${percentage}`;
           },

@@ -64,6 +64,22 @@ describe('getDatalabelPercentage', () => {
     // data is unknown[], so strings are valid — parseFloat handles them
     expect(getDatalabelPercentage(50, ['50', '50'] as unknown[])).toBe('50%');
   });
+
+  it('respects decimalPlaces=0 (rounds to integer)', () => {
+    expect(getDatalabelPercentage(1, [1, 1, 1], 0)).toBe('33%');
+  });
+
+  it('respects decimalPlaces=1', () => {
+    expect(getDatalabelPercentage(1, [1, 1, 1], 1)).toBe('33.3%');
+  });
+
+  it('respects decimalPlaces=4', () => {
+    expect(getDatalabelPercentage(1, [1, 1, 1], 4)).toBe('33.3333%');
+  });
+
+  it('defaults to 2 decimal places when decimalPlaces is undefined', () => {
+    expect(getDatalabelPercentage(1, [1, 1, 1], undefined)).toBe('33.33%');
+  });
 });
 
 describe('getDimensionWithoutTruncation', () => {
