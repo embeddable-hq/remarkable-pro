@@ -197,6 +197,44 @@ describe('createComparisonClickHandler', () => {
 
     expect(() => handler(makeClick(0))).not.toThrow();
   });
+
+  it('passes measureValue from the clicked dataset data point', () => {
+    const onClicked = vi.fn();
+    const chartData = {
+      labels: ['Jan', 'Feb', 'Mar'],
+      datasets: [{ data: [100, 250, 300] }],
+    } as unknown as ChartData<'line'>;
+
+    const handler = createComparisonClickHandler({
+      data: chartData,
+      measures: [makeMeasure()],
+      dimension: makeClickDimension(),
+      onClicked,
+    });
+
+    handler(makeClick(1, 0));
+
+    expect(onClicked).toHaveBeenCalledWith(expect.objectContaining({ measureValue: 250 }));
+  });
+
+  it('passes measureValue as undefined when the data point is null', () => {
+    const onClicked = vi.fn();
+    const chartData = {
+      labels: ['Jan', 'Feb', 'Mar'],
+      datasets: [{ data: [100, null, 300] }],
+    } as unknown as ChartData<'line'>;
+
+    const handler = createComparisonClickHandler({
+      data: chartData,
+      measures: [makeMeasure()],
+      dimension: makeClickDimension(),
+      onClicked,
+    });
+
+    handler(makeClick(1, 0));
+
+    expect(onClicked).toHaveBeenCalledWith(expect.objectContaining({ measureValue: undefined }));
+  });
 });
 
 describe('getLineChartComparisonProOptions', () => {

@@ -3,6 +3,7 @@ import { TimeRange } from '@embeddable.com/core';
 export type LineChartProOptionsClickArg = {
   dimensionValue: string | number | undefined;
   dimensionTimeRange: TimeRange | undefined;
+  measureValue?: number;
 };
 
 export type LineChartGroupedProOptionsClickArg = {

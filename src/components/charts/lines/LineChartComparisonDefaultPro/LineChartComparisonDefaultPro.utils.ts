@@ -405,7 +405,10 @@ export const createComparisonClickHandler = ({
       dimension,
     });
 
-    onClicked?.({ dimensionValue, dimensionTimeRange });
+    const rawMeasureValue = data.datasets[element.datasetIndex]?.data?.[element.index];
+    const measureValue = typeof rawMeasureValue === 'number' ? rawMeasureValue : undefined;
+
+    onClicked?.({ dimensionValue, dimensionTimeRange, measureValue });
   };
 };
 
