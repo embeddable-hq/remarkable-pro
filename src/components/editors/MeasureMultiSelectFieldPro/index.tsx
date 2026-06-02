@@ -35,6 +35,28 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
     onChange([first]);
   }, [clearable, selectedMeasures.length, measureOptions, onChange]);
 
+  // Normalize selectedMeasures titles by resolving them against measureOptions.
+  // Variable defaults may store measures with model-qualified titles (e.g. "Products # of orders"),
+  // while measureOptions always has the correct display title (e.g. "# of orders").
+  // Firing onChange with the resolved measure objects ensures the variable and any dependent
+  // components (e.g. charts) receive correctly-formatted measures.
+  useEffect(() => {
+    if (!selectedMeasures.length || !measureOptions.length) return;
+
+    const normalized = selectedMeasures.map(
+      (m) => measureOptions.find((o) => o.name === m.name) ?? m,
+    );
+
+    if (normalized.every((norm, i) => norm.title === selectedMeasures[i]?.title)) return;
+
+    onChange(normalized);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    JSON.stringify(selectedMeasures.map((m) => `${m.name}:${m.title}`)),
+    JSON.stringify(measureOptions.map((m) => `${m.name}:${m.title}`)),
+    onChange,
+  ]);
+
   const currentMeasureName = selectedMeasures.map((m) => m.name);
 
   const options = getDimensionAndMeasureOptions({

@@ -40,6 +40,29 @@ const DimensionMeasureMultiSelectFieldPro = (props: DimensionMeasureMultiSelectF
     onChange([first]);
   }, [clearable, selectedDimensionsAndMeasures.length, dimensionAndMeasureOptions, onChange]);
 
+  // Normalize selectedDimensionsAndMeasures titles by resolving them against dimensionAndMeasureOptions.
+  // Variable defaults may store items with model-qualified titles (e.g. "Products # of orders"),
+  // while dimensionAndMeasureOptions always has the correct display title (e.g. "# of orders").
+  // Firing onChange with the resolved objects ensures the variable and any dependent
+  // components (e.g. charts) receive correctly-formatted measures/dimensions.
+  useEffect(() => {
+    if (!selectedDimensionsAndMeasures.length || !dimensionAndMeasureOptions.length) return;
+
+    const normalized = selectedDimensionsAndMeasures.map(
+      (d) => dimensionAndMeasureOptions.find((o) => o.name === d.name) ?? d,
+    );
+
+    if (normalized.every((norm, i) => norm.title === selectedDimensionsAndMeasures[i]?.title))
+      return;
+
+    onChange(normalized);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    JSON.stringify(selectedDimensionsAndMeasures.map((d) => `${d.name}:${d.title}`)),
+    JSON.stringify(dimensionAndMeasureOptions.map((d) => `${d.name}:${d.title}`)),
+    onChange,
+  ]);
+
   const currentDimensionAndMeasureNames = selectedDimensionsAndMeasures.map((d) => d.name);
 
   const options = getDimensionAndMeasureOptions({
