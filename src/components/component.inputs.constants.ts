@@ -1,4 +1,5 @@
 import ColorType from '../editors/ColorEditor/Color.type.emb';
+import ExportOptionType from './types/ExportOption.type.emb';
 import { Granularity } from '../theme/defaults/defaults.GranularityOptions.constants';
 import {
   dimensionMeasureSubInputs,
@@ -492,26 +493,13 @@ const yMeasure = {
   label: 'Y-axis measure',
 } as const;
 
-export const ExportOption = {
-  csv: 'csv',
-  xlsx: 'xlsx',
-  png: 'png',
-} as const;
-
 const exportOptions = {
   name: 'exportOptions',
-  type: 'string',
+  type: ExportOptionType,
   label: 'Export options',
   array: true,
-  defaultValue: [ExportOption.csv, ExportOption.xlsx, ExportOption.png],
+  defaultValue: ['csv', 'xlsx', 'png'],
   category: 'Component Settings',
-  config: {
-    options: [
-      { value: ExportOption.csv, label: 'Export CSV' },
-      { value: ExportOption.xlsx, label: 'Export XLSX' },
-      { value: ExportOption.png, label: 'Export PNG' },
-    ],
-  },
 } as const;
 
 export const inputs = {

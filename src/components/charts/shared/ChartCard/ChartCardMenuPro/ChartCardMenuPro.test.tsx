@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { ChartCardMenuPro } from './ChartCardMenuPro';
 
@@ -31,8 +31,10 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
   SelectFieldContent: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="select-field-content">{children}</div>
   ),
-  SelectListOption: ({ label }: { label: string }) => (
-    <div data-testid="select-list-option">{label}</div>
+  SelectListOption: ({ label, onClick }: { label: string; onClick?: () => void }) => (
+    <div data-testid="select-list-option" onClick={onClick}>
+      {label}
+    </div>
   ),
 }));
 
@@ -93,5 +95,74 @@ describe('ChartCardMenuPro', () => {
     const { container } = render(<ChartCardMenuPro />);
 
     expect(container.firstChild).toBeNull();
+  });
+
+  it('calls the option onClick with theme and props when an option is clicked', async () => {
+    vi.useFakeTimers();
+    const onClickMock = vi.fn().mockResolvedValue(undefined);
+    (useTheme as ReturnType<typeof vi.fn>).mockReturnValue({
+      defaults: {
+        chartMenuOptions: [{ value: 'csv', labelKey: 'export.csv', onClick: onClickMock }],
+      },
+    });
+
+    render(<ChartCardMenuPro title="My Chart" />);
+    fireEvent.click(screen.getByText('export.csv'));
+
+    await vi.runAllTimersAsync();
+
+    expect(onClickMock).toHaveBeenCalledWith(expect.objectContaining({ title: 'My Chart' }));
+    vi.useRealTimers();
+  });
+
+  it('calls onCustomDownload instead of onClick directly when provided', async () => {
+    vi.useFakeTimers();
+    const onClickMock = vi.fn().mockResolvedValue(undefined);
+    const onCustomDownload = vi.fn((cb) => cb({ title: 'custom' }));
+    (useTheme as ReturnType<typeof vi.fn>).mockReturnValue({
+      defaults: {
+        chartMenuOptions: [{ value: 'csv', labelKey: 'export.csv', onClick: onClickMock }],
+      },
+    });
+
+    render(<ChartCardMenuPro onCustomDownload={onCustomDownload} />);
+    fireEvent.click(screen.getByText('export.csv'));
+
+    await vi.runAllTimersAsync();
+
+    expect(onCustomDownload).toHaveBeenCalled();
+    expect(onClickMock).toHaveBeenCalledWith(expect.objectContaining({ title: 'custom' }));
+    vi.useRealTimers();
+  });
+
+  it('shows loading state while export is in progress', async () => {
+    vi.useFakeTimers();
+    let resolveExport!: () => void;
+    const onClickMock = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveExport = resolve;
+        }),
+    );
+    (useTheme as ReturnType<typeof vi.fn>).mockReturnValue({
+      defaults: {
+        chartMenuOptions: [{ value: 'csv', labelKey: 'export.csv', onClick: onClickMock }],
+      },
+    });
+
+    render(<ChartCardMenuPro />);
+    fireEvent.click(screen.getByText('export.csv'));
+
+    await vi.advanceTimersByTimeAsync(150);
+
+    expect(screen.getByTestId('chart-card-loading')).toBeInTheDocument();
+
+    await act(async () => {
+      resolveExport();
+      await vi.runAllTimersAsync();
+    });
+
+    expect(screen.queryByTestId('chart-card-loading')).not.toBeInTheDocument();
+    vi.useRealTimers();
   });
 });

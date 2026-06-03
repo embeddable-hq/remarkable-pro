@@ -22,7 +22,7 @@ export type ChartCardHeaderProps = {
   description?: string;
   tooltip?: string;
   hideMenu?: boolean;
-  exportOptions?: string[];
+  exportOptions?: (string | unknown)[];
 };
 
 type ChartCardProps = {
@@ -105,7 +105,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
                   data={data?.data}
                   dimensionsAndMeasures={dimensionsAndMeasures}
                   onCustomDownload={onCustomDownload}
-                  enabledExportOptions={exportOptions}
+                  enabledExportOptions={exportOptions as string[]}
                 />
               </div>
             </div>

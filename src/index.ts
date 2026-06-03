@@ -237,6 +237,10 @@ export * from './components/editors/utils/dimensionsAndMeasures.utils';
 
 // Custom types
 export { default as ComparisonPeriodType } from './components/types/ComparisonPeriod.type.emb';
+export {
+  default as ExportOptionType,
+  ExportOption,
+} from './components/types/ExportOption.type.emb';
 
 // Custom Editors
 export * as ColorEditorPro from './editors/ColorEditor';

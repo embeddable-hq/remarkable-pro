@@ -3,7 +3,7 @@ import CloudDownload from '../../assets/icons/cloud-download.svg';
 import PhotoDown from '../../assets/icons/photo-down.svg';
 import { exportCSV, exportPNG, exportXLSX } from '../utils/export.utils';
 import { Theme } from '../theme.types';
-import { ExportOption } from '../../components/component.inputs.constants';
+import { ExportOption } from '../../components/types/ExportOption.type.emb';
 
 export type ChartCardMenuOptionOnClickProps = {
   title?: string;
