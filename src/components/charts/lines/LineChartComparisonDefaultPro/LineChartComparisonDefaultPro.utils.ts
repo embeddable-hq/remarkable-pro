@@ -405,7 +405,11 @@ export const createComparisonClickHandler = ({
       dimension,
     });
 
-    onClicked?.({ dimensionValue, dimensionTimeRange });
+    const rawMeasureValue = data.datasets[element.datasetIndex]?.data?.[element.index];
+    const numericValue = rawMeasureValue === null ? Number.NaN : Number(rawMeasureValue);
+    const measureValue = Number.isFinite(numericValue) ? numericValue : undefined;
+
+    onClicked?.({ dimensionValue, dimensionTimeRange, measureValue });
   };
 };
 
