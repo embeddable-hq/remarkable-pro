@@ -406,7 +406,8 @@ export const createComparisonClickHandler = ({
     });
 
     const rawMeasureValue = data.datasets[element.datasetIndex]?.data?.[element.index];
-    const measureValue = typeof rawMeasureValue === 'number' ? rawMeasureValue : undefined;
+    const coercedMeasureValue = rawMeasureValue != null ? Number(rawMeasureValue) : NaN;
+    const measureValue = Number.isFinite(coercedMeasureValue) ? coercedMeasureValue : undefined;
 
     onClicked?.({ dimensionValue, dimensionTimeRange, measureValue });
   };
