@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
-import { ChartCardMenuPro } from './ChartCardMenuPro';
+import { ChartCardMenuPro, InlineSvgFromData } from './ChartCardMenuPro';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({
@@ -50,6 +50,31 @@ vi.mock('../ChartCardLoading/ChartCardLoading', () => ({
 }));
 
 import { useTheme } from '@embeddable.com/react';
+
+describe('InlineSvgFromData', () => {
+  it('decodes and renders an SVG from a data URL', () => {
+    const svgContent = '<svg><circle cx="50" cy="50" r="40"/></svg>';
+    const encoded = `data:image/svg+xml,${encodeURIComponent(svgContent)}`;
+
+    const { container } = render(<InlineSvgFromData src={encoded} />);
+
+    expect(container.querySelector('div')).toBeTruthy();
+    expect(container.innerHTML).toContain('circle');
+  });
+
+  it('forwards className and extra props to the wrapper div', () => {
+    const { container } = render(
+      <InlineSvgFromData
+        src="data:image/svg+xml,%3Csvg%2F%3E"
+        className="icon"
+        data-testid="svg-wrapper"
+      />,
+    );
+
+    expect(container.querySelector('.icon')).toBeTruthy();
+    expect(container.querySelector('[data-testid="svg-wrapper"]')).toBeTruthy();
+  });
+});
 
 describe('ChartCardMenuPro', () => {
   beforeEach(() => {
