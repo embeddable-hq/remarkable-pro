@@ -63,7 +63,7 @@
     "@changesets/cli": "^2.29.6",
     "@embeddable.com/core": "^2.13.7",
     "@embeddable.com/react": "^2.13.7",
-    "@embeddable.com/remarkable-ui": "^3.0.16",
+    "@embeddable.com/remarkable-ui": "^3.0.18",
     "@tabler/icons-react": "^3.34.1",
     "chart.js": "^4.5.0",
     "chartjs-plugin-datalabels": "^2.2.0",
@@ -77,8 +77,8 @@
     "xlsx": "npm:@e965/xlsx@^0.20.3"
   },
   "devDependencies": {
-    "@embeddable.com/sdk-core": "4.6.0",
-    "@embeddable.com/sdk-react": "4.3.9",
+    "@embeddable.com/sdk-core": "4.7.2",
+    "@embeddable.com/sdk-react": "4.3.12",
     "@eslint/css": "^0.13.0",
     "@testing-library/react": "^16.3.2",
     "@types/chroma-js": "^3.1.1",
