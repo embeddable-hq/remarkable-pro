@@ -1,7 +1,11 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
+import {
+  ChartCard,
+  ChartCardHeaderProps,
+  pickChartCardHeaderProps,
+} from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { PivotTable } from '@embeddable.com/remarkable-ui';
@@ -36,7 +40,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { title, description, tooltip } = resolveI18nProps(props);
+  const resolvedProps = resolveI18nProps(props);
   const {
     resultsSubRows,
     measures,
@@ -46,8 +50,6 @@ const PivotTablePro = (props: PivotTableProProps) => {
     displayNullAs,
     columnWidth,
     firstColumnWidth,
-    hideMenu,
-    exportOptions,
     expandedRowKeys,
     setExpandedRowKey,
   } = props;
@@ -138,14 +140,10 @@ const PivotTablePro = (props: PivotTableProProps) => {
   return (
     <ChartCard
       ref={cardContentRef}
-      title={title}
-      description={description}
-      tooltip={tooltip}
       data={data}
       dimensionsAndMeasures={[rowDimension, columnDimension, ...measures]}
       errorMessage={props.results?.error}
-      hideMenu={hideMenu}
-      exportOptions={exportOptions}
+      {...pickChartCardHeaderProps(resolvedProps)}
     >
       <PivotTable
         firstColumnWidth={firstColumnWidth}

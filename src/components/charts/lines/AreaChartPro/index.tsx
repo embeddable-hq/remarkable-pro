@@ -2,7 +2,7 @@ import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, pickChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { LineChartGroupedProProp } from '../LineChartGroupedPro';
 import {
   createAreaClickHandler,
@@ -23,10 +23,9 @@ const AreaChartPro = (props: AreaChartProProps) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const resolvedProps = resolveI18nProps(props);
+  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolvedProps;
   const {
-    hideMenu,
-    exportOptions,
     measure,
     xAxis,
     groupBy,
@@ -80,11 +79,7 @@ const AreaChartPro = (props: AreaChartProProps) => {
       data={results}
       dimensionsAndMeasures={[measure, xAxis, groupBy]}
       errorMessage={results.error}
-      description={description}
-      title={title}
-      tooltip={tooltip}
-      hideMenu={hideMenu}
-      exportOptions={exportOptions}
+      {...pickChartCardHeaderProps(resolvedProps)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

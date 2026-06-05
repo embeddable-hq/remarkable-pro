@@ -1,7 +1,11 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
+import {
+  ChartCard,
+  ChartCardHeaderProps,
+  pickChartCardHeaderProps,
+} from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import {
   DataResponse,
@@ -55,10 +59,9 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   const [isDownloadingData, setIsDownloadingData] = useState(false);
   const [rowsToDisplay, setRowsToDisplay] = useState<any[]>([]);
 
-  const { title, description, tooltip } = resolveI18nProps(props);
+  const resolvedProps = resolveI18nProps(props);
+  const { title } = resolvedProps;
   const {
-    hideMenu,
-    exportOptions,
     dataset,
     results,
     allResults,
@@ -176,9 +179,6 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   return (
     <ChartCard
       ref={cardContentRef}
-      title={title}
-      description={description}
-      tooltip={tooltip}
       data={{
         isLoading,
         data: rowsToDisplay,
@@ -186,8 +186,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
       dimensionsAndMeasures={dimensionsAndMeasures}
       errorMessage={results?.error}
       onCustomDownload={handleCustomDownload}
-      hideMenu={hideMenu}
-      exportOptions={exportOptions}
+      {...pickChartCardHeaderProps(resolvedProps)}
     >
       <TableScrollable
         ref={tableRef}

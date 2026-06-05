@@ -3,7 +3,11 @@ import { Theme } from '../../../../theme/theme.types';
 import { DataResponse, Measure, TimeRange } from '@embeddable.com/core';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
-import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
+import {
+  ChartCard,
+  ChartCardHeaderProps,
+  pickChartCardHeaderProps,
+} from '../../shared/ChartCard/ChartCard';
 import { KpiChart } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { useEffect } from 'react';
@@ -33,10 +37,9 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { title, description, tooltip, displayNullAs } = resolveI18nProps(props);
+  const resolvedProps = resolveI18nProps(props);
+  const { displayNullAs } = resolvedProps;
   const {
-    hideMenu,
-    exportOptions,
     changeFontSize,
     comparisonPeriod,
     comparisonDateRange,
@@ -102,11 +105,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
         measure,
       ]}
       errorMessage={results.error}
-      description={description}
-      title={title}
-      tooltip={tooltip}
-      hideMenu={hideMenu}
-      exportOptions={exportOptions}
+      {...pickChartCardHeaderProps(resolvedProps)}
     >
       <KpiChart
         displayNullAs={displayNullAs}

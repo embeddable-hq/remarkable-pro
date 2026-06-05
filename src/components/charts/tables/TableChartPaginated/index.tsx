@@ -1,7 +1,11 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
+import {
+  ChartCard,
+  ChartCardHeaderProps,
+  pickChartCardHeaderProps,
+} from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import {
   DataResponse,
@@ -63,10 +67,9 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
 
   const [isDownloadingData, setIsDownloadingData] = useState(false);
 
-  const { title, description, tooltip } = resolveI18nProps(props);
+  const resolvedProps = resolveI18nProps(props);
+  const { title } = resolvedProps;
   const {
-    hideMenu,
-    exportOptions,
     totalResults,
     results,
     allResults,
@@ -157,15 +160,11 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
   return (
     <ChartCard
       ref={cardContentRef}
-      title={title}
-      description={description}
-      tooltip={tooltip}
       data={results}
       dimensionsAndMeasures={dimensionsAndMeasures}
       errorMessage={results?.error}
       onCustomDownload={handleCustomDownload}
-      hideMenu={hideMenu}
-      exportOptions={exportOptions}
+      {...pickChartCardHeaderProps(resolvedProps)}
     >
       <TablePaginated
         onRowIndexClick={handleRowIndexClick}

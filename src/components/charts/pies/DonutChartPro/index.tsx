@@ -3,7 +3,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { getPieChartProOptions, getPieChartProData, createPieClickHandler } from '../pies.utils';
 import { DefaultPieChartProps } from '../pies.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, pickChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { DonutChart } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
 import { resolveI18nProps } from '../../../component.utils';
@@ -14,12 +14,7 @@ const DonutChartPro = (props: DonutChartProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const {
-    description,
-
-    title,
-    tooltip,
-  } = resolveI18nProps(props);
+  const resolvedProps = resolveI18nProps(props);
 
   const {
     dimension,
@@ -29,8 +24,6 @@ const DonutChartPro = (props: DonutChartProProps) => {
     showLegend,
     showTooltips,
     showValueLabels,
-    hideMenu,
-    exportOptions,
     onSegmentClick,
   } = props;
 
@@ -51,11 +44,7 @@ const DonutChartPro = (props: DonutChartProProps) => {
       data={results}
       dimensionsAndMeasures={[dimension, measure]}
       errorMessage={results.error}
-      description={description}
-      title={title}
-      tooltip={tooltip}
-      hideMenu={hideMenu}
-      exportOptions={exportOptions}
+      {...pickChartCardHeaderProps(resolvedProps)}
     >
       <DonutChart
         data={data}

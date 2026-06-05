@@ -4,7 +4,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { DataResponse } from '@embeddable.com/core';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, pickChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartTabs, ChartTabsProps, LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
@@ -24,10 +24,9 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const resolvedProps = resolveI18nProps(props);
+  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolvedProps;
   const {
-    hideMenu,
-    exportOptions,
     measures,
     xAxis,
     reverseXAxis,
@@ -97,11 +96,7 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
       data={results}
       dimensionsAndMeasures={[...measures, xAxis]}
       errorMessage={results.error}
-      description={description}
-      title={title}
-      tooltip={tooltip}
-      hideMenu={hideMenu}
-      exportOptions={exportOptions}
+      {...pickChartCardHeaderProps(resolvedProps)}
     >
       <ChartTabs items={chartTabsItems} value={activeMeasureName} onChange={setActiveMeasureName} />
       {setGranularity && (

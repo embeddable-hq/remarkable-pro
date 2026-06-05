@@ -3,7 +3,11 @@ import { Theme } from '../../../../theme/theme.types';
 import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
-import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
+import {
+  ChartCard,
+  ChartCardHeaderProps,
+  pickChartCardHeaderProps,
+} from '../../shared/ChartCard/ChartCard';
 import {
   getLineChartGroupedProData,
   getLineChartGroupedProOptions,
@@ -37,10 +41,9 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const resolvedProps = resolveI18nProps(props);
+  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolvedProps;
   const {
-    hideMenu,
-    exportOptions,
     measure,
     xAxis,
     groupBy,
@@ -91,11 +94,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
       data={results}
       dimensionsAndMeasures={[measure, xAxis, groupBy]}
       errorMessage={results.error}
-      description={description}
-      title={title}
-      tooltip={tooltip}
-      hideMenu={hideMenu}
-      exportOptions={exportOptions}
+      {...pickChartCardHeaderProps(resolvedProps)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

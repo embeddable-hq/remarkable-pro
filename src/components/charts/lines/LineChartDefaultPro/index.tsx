@@ -3,7 +3,11 @@ import { Theme } from '../../../../theme/theme.types';
 import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
-import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
+import {
+  ChartCard,
+  ChartCardHeaderProps,
+  pickChartCardHeaderProps,
+} from '../../shared/ChartCard/ChartCard';
 import { getLineChartProData, getLineChartProOptions } from './LineChartDefaultPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartProOptionsClick } from '../lines.types';
@@ -35,10 +39,9 @@ const LineChartPro = (props: LineChartProProps) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const resolvedProps = resolveI18nProps(props);
+  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolvedProps;
   const {
-    hideMenu,
-    exportOptions,
     measures,
     granularity,
     xAxis,
@@ -83,11 +86,7 @@ const LineChartPro = (props: LineChartProProps) => {
       data={results}
       dimensionsAndMeasures={[...measures, xAxis]}
       errorMessage={results.error}
-      description={description}
-      title={title}
-      tooltip={tooltip}
-      hideMenu={hideMenu}
-      exportOptions={exportOptions}
+      {...pickChartCardHeaderProps(resolvedProps)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

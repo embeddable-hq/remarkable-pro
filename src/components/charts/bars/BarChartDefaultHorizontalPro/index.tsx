@@ -1,7 +1,7 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, pickChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarChartProData, getBarChartProOptions } from '../bars.utils';
@@ -23,8 +23,6 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
   i18nSetup(theme);
 
   const {
-    hideMenu,
-    exportOptions,
     dimension,
     measures,
     showValueLabels,
@@ -40,7 +38,8 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
     onBarClicked,
   } = props;
 
-  const { description, title, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const resolvedProps = resolveI18nProps(props);
+  const { description, title, tooltip, xAxisLabel, yAxisLabel } = resolvedProps;
 
   const results = useFillGaps({
     results: props.results,
@@ -71,11 +70,7 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
       data={results}
       dimensionsAndMeasures={[dimension, ...measures]}
       errorMessage={results.error}
-      description={description}
-      title={title}
-      tooltip={tooltip}
-      hideMenu={hideMenu}
-      exportOptions={exportOptions}
+      {...pickChartCardHeaderProps(resolvedProps)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

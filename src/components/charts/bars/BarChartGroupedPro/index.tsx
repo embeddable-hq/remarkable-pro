@@ -1,7 +1,7 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, pickChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { BarChart } from '@embeddable.com/remarkable-ui';
 import { getBarStackedChartProData, getBarStackedChartProOptions } from '../bars.utils';
@@ -24,11 +24,10 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const resolvedProps = resolveI18nProps(props);
+  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolvedProps;
 
   const {
-    hideMenu,
-    exportOptions,
     groupBy,
     measure,
     reverseXAxis,
@@ -101,11 +100,7 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
       data={results}
       dimensionsAndMeasures={[measure, xAxis, groupBy]}
       errorMessage={results?.error || resultsAxisOrder?.error}
-      description={description}
-      title={title}
-      tooltip={tooltip}
-      hideMenu={hideMenu}
-      exportOptions={exportOptions}
+      {...pickChartCardHeaderProps(resolvedProps)}
     >
       {setGranularity && (
         <ChartGranularitySelectField
