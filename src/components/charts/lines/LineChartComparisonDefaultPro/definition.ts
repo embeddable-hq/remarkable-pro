@@ -121,6 +121,11 @@ const meta = {
           label: 'Clicked axis dimension time range',
           type: 'timeRange',
         },
+        {
+          name: 'measureValue',
+          label: 'Clicked measure value',
+          type: 'number',
+        },
       ],
     },
   ],
@@ -227,6 +232,7 @@ const events = {
     return {
       axisDimensionValue: value.dimensionValue ?? Value.noFilter(),
       axisDimensionTimeRange: value.dimensionTimeRange ?? Value.noFilter(),
+      measureValue: value.measureValue,
     };
   },
 };
