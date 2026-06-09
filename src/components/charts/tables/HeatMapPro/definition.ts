@@ -1,10 +1,11 @@
-import { DataResponse, LoadDataRequest, loadData } from '@embeddable.com/core';
+import { DataResponse, LoadDataRequest, Value, loadData } from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
+import { HeatMapProOptionsClickArg } from './HeatMapPro.types';
 
 const meta = {
   name: 'HeatMapPro',
@@ -81,6 +82,34 @@ const meta = {
     },
     inputs.maxResults,
   ],
+  events: [
+    {
+      name: 'onCellClicked',
+      label: 'A cell is clicked',
+      properties: [
+        {
+          name: 'rowDimensionValue',
+          label: 'Clicked row dimension value',
+          type: 'string',
+        },
+        {
+          name: 'rowDimensionTimeRange',
+          label: 'Clicked row dimension time range',
+          type: 'timeRange',
+        },
+        {
+          name: 'columnDimensionValue',
+          label: 'Clicked column dimension value',
+          type: 'string',
+        },
+        {
+          name: 'columnDimensionTimeRange',
+          label: 'Clicked column dimension time range',
+          type: 'timeRange',
+        },
+      ],
+    },
+  ],
 } as const satisfies EmbeddedComponentMeta;
 
 const previewConfig = {
@@ -118,6 +147,15 @@ const props = (
   results: loadDataResults(inputs, clientContext),
 });
 
+const events = {
+  onCellClicked: (value: HeatMapProOptionsClickArg) => ({
+    rowDimensionValue: value.rowDimensionValue ?? Value.noFilter(),
+    rowDimensionTimeRange: value.rowDimensionTimeRange ?? Value.noFilter(),
+    columnDimensionValue: value.columnDimensionValue ?? Value.noFilter(),
+    columnDimensionTimeRange: value.columnDimensionTimeRange ?? Value.noFilter(),
+  }),
+};
+
 export const heatMapPro = {
   Component,
   meta,
@@ -125,6 +163,7 @@ export const heatMapPro = {
   previewConfig,
   config: {
     props,
+    events,
   },
   results: {
     loadDataArgs: loadDataResultsArgs,
