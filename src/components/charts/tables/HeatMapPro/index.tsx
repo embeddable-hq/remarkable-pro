@@ -163,7 +163,7 @@ const HeatMapPro = (props: HeatMapProProps) => {
         columnWidth={columnWidth}
         firstColumnWidth={firstColumnWidth}
         displayNullAs={displayNullAs}
-        onCellClick={onCellClicked ? handleCellClick : undefined}
+        onCellClick={handleCellClick}
       />
     </ChartCard>
   );
