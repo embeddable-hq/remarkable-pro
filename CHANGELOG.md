@@ -1,5 +1,12 @@
 # @embeddable/remarkable-ui
 
+## 0.3.4
+
+### Patch Changes
+
+- ccdeca9: Consider decimal places in the percentage values
+- b4fd408: Fixes minor pie chart percentage bug, adds measureValue to comparison line chart click handler, upgrades Remarkable UI
+
 ## 0.3.3
 
 ### Patch Changes
