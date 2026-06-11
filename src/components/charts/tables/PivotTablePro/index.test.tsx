@@ -35,7 +35,7 @@ vi.mock('../../shared/ChartCard/ChartCard', () => ({
       </div>
     ),
   ),
-  pickChartCardHeaderProps: (props: Record<string, unknown>) => props,
+  asChartCardHeaderProps: (props: Record<string, unknown>) => props,
 }));
 
 vi.mock('../../charts.fillGaps.hooks', () => ({

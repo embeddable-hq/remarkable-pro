@@ -4,7 +4,7 @@ import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import {
   ChartCard,
   ChartCardHeaderProps,
-  pickChartCardHeaderProps,
+  asChartCardHeaderProps,
 } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import {
@@ -59,8 +59,8 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   const [isDownloadingData, setIsDownloadingData] = useState(false);
   const [rowsToDisplay, setRowsToDisplay] = useState<any[]>([]);
 
-  const resolvedProps = resolveI18nProps(props);
-  const { title } = resolvedProps;
+  const resolvedI18nProps = resolveI18nProps(props);
+  const { title } = resolvedI18nProps;
   const {
     dataset,
     results,
@@ -186,7 +186,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
       dimensionsAndMeasures={dimensionsAndMeasures}
       errorMessage={results?.error}
       onCustomDownload={handleCustomDownload}
-      {...pickChartCardHeaderProps(resolvedProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps)}
     >
       <TableScrollable
         ref={tableRef}

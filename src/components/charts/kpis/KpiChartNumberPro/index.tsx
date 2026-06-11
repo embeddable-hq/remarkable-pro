@@ -6,7 +6,7 @@ import { resolveI18nProps } from '../../../component.utils';
 import {
   ChartCard,
   ChartCardHeaderProps,
-  pickChartCardHeaderProps,
+  asChartCardHeaderProps,
 } from '../../shared/ChartCard/ChartCard';
 import { KpiChart } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
@@ -23,8 +23,8 @@ const KpiChartNumberPro = (props: KpiChartNumberProProp) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const resolvedProps = resolveI18nProps(props);
-  const { displayNullAs } = resolvedProps;
+  const resolvedI18nProps = resolveI18nProps(props);
+  const { displayNullAs } = resolvedI18nProps;
   const { measure, fontSize, results } = props;
 
   const value = results.data?.[0]?.[measure.name];
@@ -39,7 +39,7 @@ const KpiChartNumberPro = (props: KpiChartNumberProProp) => {
       data={resultsWithNullsHandled}
       dimensionsAndMeasures={[measure]}
       errorMessage={results.error}
-      {...pickChartCardHeaderProps(resolvedProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps)}
     >
       <KpiChart
         displayNullAs={displayNullAs}

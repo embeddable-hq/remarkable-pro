@@ -4,7 +4,7 @@ import { i18nSetup } from '../../../../theme/i18n/i18n';
 import {
   ChartCard,
   ChartCardHeaderProps,
-  pickChartCardHeaderProps,
+  asChartCardHeaderProps,
 } from '../../shared/ChartCard/ChartCard';
 import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
@@ -73,7 +73,7 @@ const HeatMapPro = (props: HeatMapProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const resolvedProps = resolveI18nProps(props);
+  const resolvedI18nProps = resolveI18nProps(props);
   const {
     measure,
     rowDimension,
@@ -147,7 +147,7 @@ const HeatMapPro = (props: HeatMapProProps) => {
       data={props.results}
       dimensionsAndMeasures={[rowDimension, columnDimension, measure]}
       errorMessage={props.results?.error}
-      {...pickChartCardHeaderProps(resolvedProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps)}
     >
       <HeatMap
         data={results}

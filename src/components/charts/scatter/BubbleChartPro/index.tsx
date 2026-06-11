@@ -8,7 +8,7 @@ import { resolveI18nProps } from '../../../component.utils';
 import {
   ChartCard,
   ChartCardHeaderProps,
-  pickChartCardHeaderProps,
+  asChartCardHeaderProps,
 } from '../../shared/ChartCard/ChartCard';
 import {
   createBubbleClickHandler,
@@ -70,8 +70,8 @@ const BubbleChartPro = (props: BubbleChartProProps) => {
     onPointClick,
   } = props;
 
-  const resolvedProps = resolveI18nProps(props);
-  const { xAxisLabel, yAxisLabel } = resolvedProps;
+  const resolvedI18nProps = resolveI18nProps(props);
+  const { xAxisLabel, yAxisLabel } = resolvedI18nProps;
 
   const noValueLabel = i18n.t('charts.scatterChart.noValue');
 
@@ -126,7 +126,7 @@ const BubbleChartPro = (props: BubbleChartProProps) => {
         ...(groupByDimension ? [groupByDimension] : []),
       ]}
       errorMessage={results.error}
-      {...pickChartCardHeaderProps(resolvedProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps)}
     >
       <BubbleChart
         data={chartData}

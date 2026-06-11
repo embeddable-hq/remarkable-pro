@@ -6,7 +6,7 @@ import { resolveI18nProps } from '../../../component.utils';
 import {
   ChartCard,
   ChartCardHeaderProps,
-  pickChartCardHeaderProps,
+  asChartCardHeaderProps,
 } from '../../shared/ChartCard/ChartCard';
 import { useEffect } from 'react';
 import { getComparisonPeriodDateRange } from '../../../utils/timeRange.utils';
@@ -48,8 +48,8 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const resolvedProps = resolveI18nProps(props);
-  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolvedProps;
+  const resolvedI18nProps = resolveI18nProps(props);
+  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolvedI18nProps;
   const {
     comparisonPeriod,
     measures,
@@ -138,7 +138,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
       data={resultsCombined}
       dimensionsAndMeasures={[...measures, xAxis]}
       errorMessage={results.error || resultsComparison?.error}
-      {...pickChartCardHeaderProps(resolvedProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

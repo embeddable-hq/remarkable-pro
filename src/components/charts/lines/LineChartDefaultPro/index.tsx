@@ -6,7 +6,7 @@ import { resolveI18nProps } from '../../../component.utils';
 import {
   ChartCard,
   ChartCardHeaderProps,
-  pickChartCardHeaderProps,
+  asChartCardHeaderProps,
 } from '../../shared/ChartCard/ChartCard';
 import { getLineChartProData, getLineChartProOptions } from './LineChartDefaultPro.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
@@ -39,8 +39,8 @@ const LineChartPro = (props: LineChartProProps) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const resolvedProps = resolveI18nProps(props);
-  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolvedProps;
+  const resolvedI18nProps = resolveI18nProps(props);
+  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolvedI18nProps;
   const {
     measures,
     granularity,
@@ -86,7 +86,7 @@ const LineChartPro = (props: LineChartProProps) => {
       data={results}
       dimensionsAndMeasures={[...measures, xAxis]}
       errorMessage={results.error}
-      {...pickChartCardHeaderProps(resolvedProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

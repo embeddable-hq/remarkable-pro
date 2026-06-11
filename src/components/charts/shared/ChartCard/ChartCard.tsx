@@ -25,7 +25,7 @@ export type ChartCardHeaderProps = {
   exportOptions?: (string | unknown)[];
 };
 
-export const pickChartCardHeaderProps = <T extends ChartCardHeaderProps>(
+export const asChartCardHeaderProps = <T extends ChartCardHeaderProps>(
   props: T,
 ): ChartCardHeaderProps => {
   const { title, description, tooltip, hideMenu, exportOptions } = props;

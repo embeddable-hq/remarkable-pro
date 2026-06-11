@@ -3,7 +3,7 @@ import { Theme } from '../../../../theme/theme.types';
 import { getPieChartProOptions, getPieChartProData, createPieClickHandler } from '../pies.utils';
 import { DefaultPieChartProps } from '../pies.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard, pickChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, asChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { DonutChart } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
 import { resolveI18nProps } from '../../../component.utils';
@@ -14,7 +14,7 @@ const DonutChartPro = (props: DonutChartProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const resolvedProps = resolveI18nProps(props);
+  const resolvedI18nProps = resolveI18nProps(props);
 
   const {
     dimension,
@@ -44,7 +44,7 @@ const DonutChartPro = (props: DonutChartProProps) => {
       data={results}
       dimensionsAndMeasures={[dimension, measure]}
       errorMessage={results.error}
-      {...pickChartCardHeaderProps(resolvedProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps)}
     >
       <DonutChart
         data={data}

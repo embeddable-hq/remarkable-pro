@@ -6,7 +6,7 @@ import { resolveI18nProps } from '../../../component.utils';
 import {
   ChartCard,
   ChartCardHeaderProps,
-  pickChartCardHeaderProps,
+  asChartCardHeaderProps,
 } from '../../shared/ChartCard/ChartCard';
 import { KpiChart } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
@@ -37,8 +37,8 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const resolvedProps = resolveI18nProps(props);
-  const { displayNullAs } = resolvedProps;
+  const resolvedI18nProps = resolveI18nProps(props);
+  const { displayNullAs } = resolvedI18nProps;
   const {
     changeFontSize,
     comparisonPeriod,
@@ -105,7 +105,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
         measure,
       ]}
       errorMessage={results.error}
-      {...pickChartCardHeaderProps(resolvedProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps)}
     >
       <KpiChart
         displayNullAs={displayNullAs}

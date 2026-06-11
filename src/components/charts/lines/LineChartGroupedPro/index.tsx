@@ -6,7 +6,7 @@ import { resolveI18nProps } from '../../../component.utils';
 import {
   ChartCard,
   ChartCardHeaderProps,
-  pickChartCardHeaderProps,
+  asChartCardHeaderProps,
 } from '../../shared/ChartCard/ChartCard';
 import {
   getLineChartGroupedProData,
@@ -41,8 +41,8 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const resolvedProps = resolveI18nProps(props);
-  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolvedProps;
+  const resolvedI18nProps = resolveI18nProps(props);
+  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolvedI18nProps;
   const {
     measure,
     xAxis,
@@ -94,7 +94,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
       data={results}
       dimensionsAndMeasures={[measure, xAxis, groupBy]}
       errorMessage={results.error}
-      {...pickChartCardHeaderProps(resolvedProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps)}
     >
       {setGranularity && (
         <ChartGranularitySelectField
