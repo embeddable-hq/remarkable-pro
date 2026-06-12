@@ -2,7 +2,7 @@ import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/re
 import { DimensionOrMeasure, FilterOperator, loadData, Value } from '@embeddable.com/core';
 import Component from '.';
 import { inputs } from '../../component.inputs.constants';
-import { FilterBuilderClause } from './FilterBuilderPro.utils';
+import { FilterBuilderClause, filterToLoadDataFilters } from './FilterBuilderPro.utils';
 
 const meta = {
   name: 'FilterBuilderPro',
@@ -26,6 +26,13 @@ const meta = {
       name: 'defaultFilters',
       label: 'Default filters',
       defaultValue: null,
+    },
+    {
+      ...inputs.boolean,
+      name: 'applyCascadingFilters',
+      label: 'Apply cascading filters',
+      defaultValue: false,
+      category: 'Component Settings',
     },
     inputs.title,
     inputs.description,
@@ -81,15 +88,25 @@ const props = (
     }
 
     const { dimensionOrMeasure } = item;
-    const operator =
+    const searchOperator =
       dimensionOrMeasure.nativeType === 'string' ? FilterOperator.contains : FilterOperator.equals;
+
+    const searchFilter = item.search
+      ? [{ operator: searchOperator, property: dimensionOrMeasure, value: item.search }]
+      : [];
+
+    const cascadingFilters = inputs.applyCascadingFilters
+      ? (state.filters ?? [])
+          .filter((other) => other.id !== item.id)
+          .flatMap(filterToLoadDataFilters)
+      : [];
+
+    const filters = [...cascadingFilters, ...searchFilter];
 
     acc[`filterResults${item.id}`] = loadData({
       from: inputs.dataset,
       select: [item.dimensionOrMeasure],
-      filters: item.search
-        ? [{ operator, property: dimensionOrMeasure, value: item.search }]
-        : undefined,
+      filters: filters.length > 0 ? filters : undefined,
     });
     return acc;
   }, {});
