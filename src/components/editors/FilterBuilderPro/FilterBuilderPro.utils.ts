@@ -59,6 +59,38 @@ export type FilterBuilderClause =
     }
   | { operator: FilterBuilderAndOrOperator; clauses: FilterBuilderClause[] };
 
+export type LoadDataFilter = {
+  operator: FilterOperator;
+  property: DimensionOrMeasure;
+  value: NonNullable<FilterBuilderFilter['value']>;
+};
+
+export const filterToLoadDataFilters = (filter: FilterBuilderFilter): LoadDataFilter[] => {
+  const { dimensionOrMeasure, operator, value } = filter;
+  if (!dimensionOrMeasure || !operator || value == null) return [];
+
+  if (
+    operator === operatorNumber.between &&
+    dimensionOrMeasure.nativeType === NativeDataType.number &&
+    Array.isArray(value)
+  ) {
+    const numValue = value as [number, number];
+    return [
+      { operator: FilterOperator.gte, property: dimensionOrMeasure, value: numValue[0] },
+      { operator: FilterOperator.lte, property: dimensionOrMeasure, value: numValue[1] },
+    ];
+  }
+
+  const map =
+    dimensionOrMeasure.nativeType === NativeDataType.number
+      ? operatorNumberMappedFilterOperator
+      : operatorStringBooleanMappedFilterOperator;
+  const mappedOperator = map[operator];
+  if (!mappedOperator) return [];
+
+  return [{ operator: mappedOperator, property: dimensionOrMeasure, value }];
+};
+
 const filterToClause = (f: FilterBuilderFilter): FilterBuilderClause[] => {
   if (
     f.operator === operatorNumber.between &&
