@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.5
+
+### Patch Changes
+
+- 8502805: Extend filter builder to allow cascading filtering
+
 ## 0.3.4
 
 ### Patch Changes
