@@ -30,9 +30,10 @@ const meta = {
     {
       ...inputs.boolean,
       name: 'applyCascadingFilters',
-      label: 'Apply cascading filters',
+      label: 'Apply dynamic filters',
       defaultValue: false,
       category: 'Component Settings',
+      description: "Each filter's available options update based on the other active filters.",
     },
     inputs.title,
     inputs.description,
