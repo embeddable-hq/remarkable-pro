@@ -284,6 +284,7 @@ describe('getPieChartProOptions', () => {
   describe('legend.labels.generateLabels', () => {
     const makeChart = (labels: string[], visibilities: boolean[] = []) => ({
       data: { labels },
+      options: { plugins: { legend: { labels: { color: '#000' } } } },
       getDatasetMeta: vi.fn(() => ({
         controller: {
           getStyle: vi.fn((i: number) => ({
