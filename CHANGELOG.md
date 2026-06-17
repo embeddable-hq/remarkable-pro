@@ -1,5 +1,12 @@
 # @embeddable/remarkable-ui
 
+## 0.3.6
+
+### Patch Changes
+
+- 3186e5e: Fix tooltip positioning
+- b472382: Pass color for labels in pie chart
+
 ## 0.3.5
 
 ### Patch Changes
