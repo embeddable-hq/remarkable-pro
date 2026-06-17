@@ -112,7 +112,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
                   data={data?.data}
                   dimensionsAndMeasures={dimensionsAndMeasures}
                   onCustomDownload={onCustomDownload}
-                  enabledExportOptions={exportOptions as string[]}
+                  exportOptions={exportOptions as string[]}
                 />
               </div>
             </div>

@@ -99,7 +99,7 @@ describe('ChartCardMenuPro', () => {
   });
 
   it('renders only the enabled options when enabledExportOptions filters to a subset', () => {
-    render(<ChartCardMenuPro enabledExportOptions={['csv', 'png']} />);
+    render(<ChartCardMenuPro exportOptions={['csv', 'png']} />);
 
     expect(screen.getByText('export.csv')).toBeInTheDocument();
     expect(screen.getByText('export.png')).toBeInTheDocument();
@@ -107,7 +107,7 @@ describe('ChartCardMenuPro', () => {
   });
 
   it('renders nothing when enabledExportOptions is an empty array', () => {
-    const { container } = render(<ChartCardMenuPro enabledExportOptions={[]} />);
+    const { container } = render(<ChartCardMenuPro exportOptions={[]} />);
 
     expect(container.firstChild).toBeNull();
   });
