@@ -22,14 +22,14 @@ export type ChartCardHeaderProps = {
   description?: string;
   tooltip?: string;
   hideMenu?: boolean;
-  exportOptions?: (string | unknown)[];
+  menuOptions?: (string | unknown)[];
 };
 
 export const asChartCardHeaderProps = <T extends ChartCardHeaderProps>(
   props: T,
 ): ChartCardHeaderProps => {
-  const { title, description, tooltip, hideMenu, exportOptions } = props;
-  return { title, description, tooltip, hideMenu, exportOptions };
+  const { title, description, tooltip, hideMenu, menuOptions } = props;
+  return { title, description, tooltip, hideMenu, menuOptions };
 };
 
 type ChartCardProps = {
@@ -53,7 +53,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
       dimensionsAndMeasures = [],
       hideMenu = false,
       onCustomDownload,
-      exportOptions,
+      menuOptions,
     },
     ref,
   ) => {
@@ -112,7 +112,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
                   data={data?.data}
                   dimensionsAndMeasures={dimensionsAndMeasures}
                   onCustomDownload={onCustomDownload}
-                  exportOptions={exportOptions as string[]}
+                  menuOptions={menuOptions as string[]}
                 />
               </div>
             </div>

@@ -57,7 +57,7 @@ const meta = {
     inputs.reverseXAxis,
     inputs.yAxisRangeMin,
     inputs.yAxisRangeMax,
-    inputs.exportOptions,
+    inputs.menuOptions,
   ],
   events: [
     {

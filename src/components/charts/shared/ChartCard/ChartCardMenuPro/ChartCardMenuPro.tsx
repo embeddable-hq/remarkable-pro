@@ -25,7 +25,7 @@ export function InlineSvgFromData({ src, className, ...rest }: InlineSvgFromData
 }
 
 type ChartCardMenuProProps = Omit<ChartCardMenuOptionOnClickProps, 'theme'> & {
-  exportOptions?: string[];
+  menuOptions?: string[];
 };
 
 export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
@@ -35,9 +35,9 @@ export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
   const [isLoading, setIsLoading] = React.useState(false);
 
   const allOptions = theme.defaults.chartMenuOptions ?? [];
-  const { exportOptions } = props;
-  const options = exportOptions
-    ? allOptions.filter((option) => exportOptions.includes(option.value))
+  const { menuOptions } = props;
+  const options = menuOptions
+    ? allOptions.filter((option) => menuOptions.includes(option.value))
     : allOptions;
 
   if (options.length === 0) {

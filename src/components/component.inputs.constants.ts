@@ -493,10 +493,10 @@ const yMeasure = {
   label: 'Y-axis measure',
 } as const;
 
-const exportOptions = {
-  name: 'exportOptions',
+const menuOptions = {
+  name: 'menuOptions',
   type: ExportOptionType,
-  label: 'Export options',
+  label: 'Menu options',
   array: true,
   defaultValue: ['csv', 'xlsx', 'png'],
   category: 'Component Settings',
@@ -561,5 +561,5 @@ export const inputs = {
   granularities,
   markdown,
   filters,
-  exportOptions,
+  menuOptions,
 } as const;

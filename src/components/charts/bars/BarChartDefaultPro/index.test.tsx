@@ -21,14 +21,14 @@ vi.mock('../../shared/ChartCard/ChartCard', () => ({
   ChartCard: vi.fn(
     ({
       children,
-      exportOptions,
+      menuOptions,
     }: {
       children: React.ReactNode;
-      exportOptions?: (string | unknown)[];
+      menuOptions?: (string | unknown)[];
     }) => (
       <div
         data-testid="chart-card"
-        {...(exportOptions ? { 'data-export-options': JSON.stringify(exportOptions) } : {})}
+        {...(menuOptions ? { 'data-menu-options': JSON.stringify(menuOptions) } : {})}
       >
         {children}
       </div>
@@ -80,17 +80,17 @@ describe('BarChartDefaultPro', () => {
     expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
   });
 
-  it('passes exportOptions to ChartCard', () => {
-    render(<BarChartDefaultPro {...defaultProps} exportOptions={['csv', 'png']} />);
+  it('passes menuOptions to ChartCard', () => {
+    render(<BarChartDefaultPro {...defaultProps} menuOptions={['csv', 'png']} />);
     const card = screen.getByTestId('chart-card');
-    expect(JSON.parse(card.getAttribute('data-export-options') || '[]')).toEqual(['csv', 'png']);
+    expect(JSON.parse(card.getAttribute('data-menu-options') || '[]')).toEqual(['csv', 'png']);
   });
 
-  it('passes no exportOptions to ChartCard when not provided', () => {
+  it('passes no menuOptions to ChartCard when not provided', () => {
     render(<BarChartDefaultPro {...defaultProps} />);
     const card = screen.getByTestId('chart-card');
-    // exportOptions is undefined (not set), so JSON.stringify renders 'undefined'
-    expect(card.getAttribute('data-export-options')).toBeNull();
+    // menuOptions is undefined (not set), so JSON.stringify renders 'undefined'
+    expect(card.getAttribute('data-menu-options')).toBeNull();
   });
 
   it('renders granularity selector when setGranularity is provided', () => {

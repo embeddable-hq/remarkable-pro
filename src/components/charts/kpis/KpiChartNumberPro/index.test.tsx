@@ -20,14 +20,14 @@ vi.mock('../../shared/ChartCard/ChartCard', () => ({
   ChartCard: vi.fn(
     ({
       children,
-      exportOptions,
+      menuOptions,
     }: {
       children: React.ReactNode;
-      exportOptions?: (string | unknown)[];
+      menuOptions?: (string | unknown)[];
     }) => (
       <div
         data-testid="chart-card"
-        {...(exportOptions ? { 'data-export-options': JSON.stringify(exportOptions) } : {})}
+        {...(menuOptions ? { 'data-menu-options': JSON.stringify(menuOptions) } : {})}
       >
         {children}
       </div>
@@ -68,10 +68,10 @@ describe('KpiChartNumberPro', () => {
     expect(screen.getByTestId('chart-card')).toBeInTheDocument();
   });
 
-  it('passes exportOptions to ChartCard when provided', () => {
-    render(<KpiChartNumberPro {...defaultProps} exportOptions={['csv', 'png']} />);
+  it('passes menuOptions to ChartCard when provided', () => {
+    render(<KpiChartNumberPro {...defaultProps} menuOptions={['csv', 'png']} />);
     const card = screen.getByTestId('chart-card');
-    expect(JSON.parse(card.getAttribute('data-export-options') || '[]')).toEqual(['csv', 'png']);
+    expect(JSON.parse(card.getAttribute('data-menu-options') || '[]')).toEqual(['csv', 'png']);
   });
 
   it('renders KpiChart', () => {

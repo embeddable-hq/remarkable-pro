@@ -66,7 +66,7 @@ const meta = {
     inputs.yAxisRangeMin,
     inputs.yAxisRangeMax,
     inputs.maxResults,
-    inputs.exportOptions,
+    inputs.menuOptions,
   ],
   events: [
     {

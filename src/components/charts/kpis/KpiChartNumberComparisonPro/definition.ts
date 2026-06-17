@@ -62,7 +62,7 @@ const meta = {
       name: 'changeFontSize',
       label: 'Trend font-size',
     },
-    inputs.exportOptions,
+    inputs.menuOptions,
   ],
 } as const satisfies EmbeddedComponentMeta;
 
