@@ -12,6 +12,7 @@ import TableScrollableChart, {
   TableScrollableProState,
 } from './index';
 import { inputs } from '../../../component.inputs.constants';
+import { ExportOption } from '../../../types/ExportOption.type.emb';
 import { getSortDirectionValue } from '../../../types/SortDirection.type.emb';
 import { subInputs } from '../../../component.subinputs.constants';
 import { TABLE_SCROLLABLE_SIZE } from './TableScrollable.utils';
@@ -61,7 +62,7 @@ const meta = {
       category: 'Component Settings',
     },
     { ...inputs.sortDirection, label: 'Default sort direction', category: 'Component Settings' },
-    { ...inputs.menuOptions, defaultValue: ['csv', 'xlsx'] },
+    { ...inputs.menuOptions, defaultValue: [ExportOption.csv, ExportOption.xlsx] },
   ],
   events: [
     {

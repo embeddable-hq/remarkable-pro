@@ -1,5 +1,5 @@
 import ColorType from '../editors/ColorEditor/Color.type.emb';
-import ExportOptionType from './types/ExportOption.type.emb';
+import ExportOptionType, { ExportOption } from './types/ExportOption.type.emb';
 import { Granularity } from '../theme/defaults/defaults.GranularityOptions.constants';
 import {
   dimensionMeasureSubInputs,
@@ -498,7 +498,7 @@ const menuOptions = {
   type: ExportOptionType,
   label: 'Menu options',
   array: true,
-  defaultValue: ['csv', 'xlsx', 'png'],
+  defaultValue: [ExportOption.csv, ExportOption.xlsx, ExportOption.png],
   category: 'Component Settings',
 } as const;
 
