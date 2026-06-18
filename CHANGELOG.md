@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.7
+
+### Patch Changes
+
+- 8569541: Add export options input to component builder settings
+
 ## 0.3.6
 
 ### Patch Changes
