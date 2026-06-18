@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { Tooltip } from '@embeddable.com/remarkable-ui';
 import styles from '../FilterBuilderPro.module.css';
 import { i18n } from '../../../../theme/i18n/i18n';
 import { filterBuilderAndOrOperator, FilterBuilderAndOrOperator } from '../FilterBuilderPro.utils';
@@ -6,13 +7,16 @@ import { filterBuilderAndOrOperator, FilterBuilderAndOrOperator } from '../Filte
 type FilterBuilderProAndOrButtonProps = {
   operator: FilterBuilderAndOrOperator;
   onChange: (value: FilterBuilderAndOrOperator) => void;
+  disabled?: boolean;
 };
 
 export const FilterBuilderProAndOrButton: FC<FilterBuilderProAndOrButtonProps> = ({
   operator,
   onChange,
+  disabled = false,
 }) => {
   const handleChange = () => {
+    if (disabled) return;
     onChange(
       operator === filterBuilderAndOrOperator.AND
         ? filterBuilderAndOrOperator.OR
@@ -24,12 +28,27 @@ export const FilterBuilderProAndOrButton: FC<FilterBuilderProAndOrButtonProps> =
   const activeLabel = operator === filterBuilderAndOrOperator.AND ? andLabel : orLabel;
   const inactiveLabel = operator === filterBuilderAndOrOperator.AND ? orLabel : andLabel;
 
-  return (
-    <button className={styles.andOrButton} onClick={handleChange}>
+  const button = (
+    <button
+      className={styles.andOrButton}
+      onClick={handleChange}
+      aria-disabled={disabled}
+      data-disabled={disabled || undefined}
+    >
       <span>{activeLabel}</span>
       <span className={styles.andOrButtonSizer} aria-hidden>
         {inactiveLabel}
       </span>
     </button>
+  );
+
+  if (!disabled) {
+    return button;
+  }
+
+  return (
+    <Tooltip side="top" trigger={button}>
+      {i18n.t('editors.filterBuilder.orDisabledMixedTypes')}
+    </Tooltip>
   );
 };

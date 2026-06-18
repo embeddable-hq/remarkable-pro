@@ -3,6 +3,7 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import FilterBuilderPro from './index';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
 import type { FilterBuilderFilter, FilterBuilderState } from './definition';
+import { filterBuilderAndOrOperator } from './FilterBuilderPro.utils';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -60,6 +61,12 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
     <button data-testid="action-icon">
       <Icon />
     </button>
+  ),
+  Tooltip: ({ trigger, children }: { trigger: React.ReactNode; children: React.ReactNode }) => (
+    <div data-testid="tooltip">
+      {trigger}
+      <span data-testid="tooltip-content">{children}</span>
+    </div>
   ),
 }));
 
@@ -122,12 +129,16 @@ vi.mock('../../component.utils', () => ({
 // Helpers
 // ---------------------------------------------------------------------------
 
-const makeDim = (name = 'country', nativeType = 'string'): DimensionOrMeasure =>
+const makeDim = (
+  name = 'country',
+  nativeType = 'string',
+  type: 'dimension' | 'measure' = 'dimension',
+): DimensionOrMeasure =>
   ({
     name,
     title: name.charAt(0).toUpperCase() + name.slice(1),
     nativeType,
-    __type__: 'dimension',
+    __type__: type,
   }) as unknown as DimensionOrMeasure;
 
 const makeFilter = (overrides: Partial<FilterBuilderFilter> = {}): FilterBuilderFilter => ({
@@ -193,6 +204,7 @@ describe('FilterBuilderPro', () => {
 
     it('renders a FilterBuilderItem for each filter in embeddableState', () => {
       const embeddableState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
         filters: [makeFilter({ id: 1 }), makeFilter({ id: 2 })],
       };
       render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
@@ -207,6 +219,7 @@ describe('FilterBuilderPro', () => {
 
     it('renders the add-filter (+) button when the first filter has a dimensionOrMeasure', () => {
       const embeddableState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
         filters: [makeFilter({ id: 1, dimensionOrMeasure: makeDim('country') })],
       };
       render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
@@ -220,6 +233,7 @@ describe('FilterBuilderPro', () => {
 
     it('renders the clear-all button when at least one filter is fully set', () => {
       const embeddableState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
         filters: [
           makeFilter({
             id: 1,
@@ -236,7 +250,10 @@ describe('FilterBuilderPro', () => {
 
   describe('handleSelectDimensionOrMeasure', () => {
     it('calls setEmbeddableState with an updated filter when a dimension is selected', () => {
-      const prevState: FilterBuilderState = { filters: [makeFilter({ id: 1 })] };
+      const prevState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
+        filters: [makeFilter({ id: 1 })],
+      };
       render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
 
       fireEvent.click(screen.getByTestId('select-dim-1'));
@@ -249,7 +266,10 @@ describe('FilterBuilderPro', () => {
     });
 
     it('preserves the existing filter id when updating the dimension', () => {
-      const prevState: FilterBuilderState = { filters: [makeFilter({ id: 5 })] };
+      const prevState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
+        filters: [makeFilter({ id: 5 })],
+      };
       render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
 
       fireEvent.click(screen.getByTestId('select-dim-5'));
@@ -262,6 +282,7 @@ describe('FilterBuilderPro', () => {
   describe('handleSelectOperator', () => {
     it('calls setEmbeddableState with the new operator and resets value', () => {
       const prevState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
         filters: [makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), value: 'old' })],
       };
       render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
@@ -277,6 +298,7 @@ describe('FilterBuilderPro', () => {
   describe('handleSelectValue', () => {
     it('calls setEmbeddableState with the new value', () => {
       const prevState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
         filters: [makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), operator: 'is' })],
       };
       render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
@@ -290,7 +312,10 @@ describe('FilterBuilderPro', () => {
 
   describe('handleDimensionSearch', () => {
     it('calls setEmbeddableState with the updated search string', () => {
-      const prevState: FilterBuilderState = { filters: [makeFilter({ id: 1 })] };
+      const prevState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
+        filters: [makeFilter({ id: 1 })],
+      };
       render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
 
       fireEvent.click(screen.getByTestId('search-1'));
@@ -303,6 +328,7 @@ describe('FilterBuilderPro', () => {
   describe('handleDeleteFilter', () => {
     it('removes the filter at the given index', () => {
       const prevState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
         filters: [makeFilter({ id: 1 }), makeFilter({ id: 2 })],
       };
       render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
@@ -316,6 +342,7 @@ describe('FilterBuilderPro', () => {
 
     it('removes the correct filter when deleting the second of two', () => {
       const prevState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
         filters: [makeFilter({ id: 1 }), makeFilter({ id: 2 })],
       };
       render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
@@ -331,6 +358,7 @@ describe('FilterBuilderPro', () => {
   describe('handleAddFilter', () => {
     it('appends a new filter when an option is selected from the add-filter dropdown', () => {
       const prevState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
         filters: [makeFilter({ id: 3, dimensionOrMeasure: makeDim('country') })],
       };
       render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
@@ -344,6 +372,7 @@ describe('FilterBuilderPro', () => {
 
     it('assigns an id one greater than the last filter id', () => {
       const prevState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
         filters: [makeFilter({ id: 7, dimensionOrMeasure: makeDim('country') })],
       };
       render(<FilterBuilderPro {...defaultProps} embeddableState={prevState} />);
@@ -358,6 +387,7 @@ describe('FilterBuilderPro', () => {
   describe('handleClearAll', () => {
     it('resets filters to a single empty filter when clear-all is clicked', () => {
       const prevState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
         filters: [
           makeFilter({
             id: 1,
@@ -393,6 +423,7 @@ describe('FilterBuilderPro', () => {
 
     it('calls onChange with a filter clause when a complete filter is present', () => {
       const embeddableState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
         filters: [
           makeFilter({
             id: 1,
@@ -410,6 +441,7 @@ describe('FilterBuilderPro', () => {
 
     it('does not call onChange again when the filter value has not changed', () => {
       const embeddableState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
         filters: [
           makeFilter({
             id: 1,
@@ -427,6 +459,77 @@ describe('FilterBuilderPro', () => {
       rerender(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
 
       expect(defaultProps.onChange).toHaveBeenCalledTimes(callCount);
+    });
+  });
+
+  describe('AND/OR operator with mixed dimension and measure types', () => {
+    const measureFilter = (overrides: Partial<FilterBuilderFilter> = {}): FilterBuilderFilter =>
+      makeFilter({
+        id: 1,
+        dimensionOrMeasure: makeDim('total_listens', 'number', 'measure'),
+        operator: 'gt',
+        value: 10,
+        ...overrides,
+      });
+    const dimensionFilter = (overrides: Partial<FilterBuilderFilter> = {}): FilterBuilderFilter =>
+      makeFilter({
+        id: 2,
+        dimensionOrMeasure: makeDim('age_group'),
+        operator: 'is',
+        value: '13-17',
+        ...overrides,
+      });
+
+    it('disables the AND/OR toggle and shows a tooltip when a dimension and a measure are mixed', () => {
+      const embeddableState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
+        filters: [measureFilter(), dimensionFilter()],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
+
+      expect(screen.getByTestId('tooltip-content')).toHaveTextContent(
+        'editors.filterBuilder.orDisabledMixedTypes',
+      );
+      expect(screen.getByRole('button', { name: 'editors.filterBuilder.and' })).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      );
+    });
+
+    it('keeps the AND/OR toggle enabled when all filters share the same type', () => {
+      const embeddableState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
+        filters: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'France',
+          }),
+          dimensionFilter(),
+        ],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
+
+      expect(screen.queryByTestId('tooltip')).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'editors.filterBuilder.and' })).toHaveAttribute(
+        'aria-disabled',
+        'false',
+      );
+    });
+
+    it('detects a mix from the selected member even when the measure value is incomplete (regression)', () => {
+      // Changing a clause's operator clears its value, making the measure "incomplete".
+      // The mix must still be detected from the selected member, otherwise OR slips through.
+      const embeddableState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.OR,
+        filters: [measureFilter({ value: null }), dimensionFilter()],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
+
+      expect(defaultProps.setEmbeddableState).toHaveBeenCalled();
+      const next = applyUpdater(defaultProps.setEmbeddableState, embeddableState);
+      expect(next.operator).toBe(filterBuilderAndOrOperator.AND);
     });
   });
 

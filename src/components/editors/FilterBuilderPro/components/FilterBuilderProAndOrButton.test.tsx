@@ -14,6 +14,15 @@ vi.mock('../../../../theme/i18n/i18n', () => ({
   i18n: { t: vi.fn((key: string) => key) },
 }));
 
+vi.mock('@embeddable.com/remarkable-ui', () => ({
+  Tooltip: ({ trigger, children }: { trigger: React.ReactNode; children: React.ReactNode }) => (
+    <div data-testid="tooltip">
+      {trigger}
+      <span data-testid="tooltip-content">{children}</span>
+    </div>
+  ),
+}));
+
 describe('FilterBuilderProAndOrButton', () => {
   const onChange = vi.fn();
 
@@ -63,5 +72,47 @@ describe('FilterBuilderProAndOrButton', () => {
     fireEvent.click(screen.getByRole('button'));
     expect(onChange).toHaveBeenCalledOnce();
     expect(onChange).toHaveBeenCalledWith(filterBuilderAndOrOperator.AND);
+  });
+
+  it('does not call onChange when disabled and clicked', () => {
+    render(
+      <FilterBuilderProAndOrButton
+        operator={filterBuilderAndOrOperator.AND}
+        onChange={onChange}
+        disabled
+      />,
+    );
+    fireEvent.click(screen.getByRole('button'));
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('marks the button aria-disabled when disabled', () => {
+    render(
+      <FilterBuilderProAndOrButton
+        operator={filterBuilderAndOrOperator.AND}
+        onChange={onChange}
+        disabled
+      />,
+    );
+    expect(screen.getByRole('button')).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('shows the explanatory tooltip only when disabled', () => {
+    const { rerender } = render(
+      <FilterBuilderProAndOrButton operator={filterBuilderAndOrOperator.AND} onChange={onChange} />,
+    );
+    expect(screen.queryByTestId('tooltip')).not.toBeInTheDocument();
+
+    rerender(
+      <FilterBuilderProAndOrButton
+        operator={filterBuilderAndOrOperator.AND}
+        onChange={onChange}
+        disabled
+      />,
+    );
+    expect(screen.getByTestId('tooltip')).toBeInTheDocument();
+    expect(screen.getByTestId('tooltip-content')).toHaveTextContent(
+      'editors.filterBuilder.orDisabledMixedTypes',
+    );
   });
 });

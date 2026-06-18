@@ -1,6 +1,6 @@
-import { DataResponse, DimensionOrMeasure } from '@embeddable.com/core';
+import { DataResponse, DimensionOrMeasure, isDimension, isMeasure } from '@embeddable.com/core';
 import { useTheme } from '@embeddable.com/react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Theme } from '../../../theme/theme.types';
 import FilterBuilderItem from './components/FilterBuilderItem';
 import { FilterBuilderFilter, FilterBuilderState } from './definition';
@@ -9,11 +9,13 @@ import { IconPlus, IconChevronRight, IconChevronLeft } from '@tabler/icons-react
 import styles from './FilterBuilderPro.module.css';
 import {
   filterBuilderAndOrOperator,
+  FilterBuilderAndOrOperator,
   filtersToClause,
   getSupportedDimensionsAndMeasures,
   clauseToFilters,
   FilterBuilderClause,
 } from './FilterBuilderPro.utils';
+import { FilterBuilderProAndOrButton } from './components/FilterBuilderProAndOrButton';
 import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
 import { resolveI18nProps } from '../../component.utils';
@@ -50,10 +52,6 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const prevFilterValueRef = useRef<unknown>(undefined);
   const disableAutoScroll = useRef(true);
 
-  // Update embeddableState.filters from defaultFilters if any, but only when there
-  // is no existing filter state (i.e. on initial mount / after a remount). This prevents
-  // the variable feedback loop (inputs: ['defaultFilters']) from overwriting user edits
-  // mid-session when the platform re-sends props with the previous clause value.
   useEffect(() => {
     if (!defaultFilters || !dimensionsAndMeasures?.length) {
       return;
@@ -75,7 +73,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     setTimeout(() => {
       disableAutoScroll.current = false;
     }, 100);
-  }, [defaultFilters, dimensionsAndMeasures]);
+  }, [defaultFilters, dimensionsAndMeasures, setEmbeddableState]);
 
   const updateScrollState = useCallback(() => {
     const el = scrollRef.current;
@@ -118,14 +116,25 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     }, 100);
   }, [lastFilterKey]);
 
-  const newFilter = (dimensionOrMeasureValue: string | null = null): FilterBuilderFilter => {
-    const dimensionOrMeasure =
-      dimensionsAndMeasures.find((d) => d.name === dimensionOrMeasureValue) ?? null;
+  const newFilter = useCallback(
+    (dimensionOrMeasureValue: string | null = null): FilterBuilderFilter => {
+      const dimensionOrMeasure =
+        dimensionsAndMeasures.find((d) => d.name === dimensionOrMeasureValue) ?? null;
 
-    return { id: lastFilterId + 1, dimensionOrMeasure, search: '', operator: null, value: null };
+      return { id: lastFilterId + 1, dimensionOrMeasure, search: '', operator: null, value: null };
+    },
+    [dimensionsAndMeasures, lastFilterId],
+  );
+
+  const filters = useMemo(
+    () => (embeddableState?.filters?.length ? embeddableState.filters : [newFilter()]),
+    [embeddableState?.filters, newFilter],
+  );
+  const operator = embeddableState?.operator ?? filterBuilderAndOrOperator.AND;
+
+  const handleOperatorChange = (value: FilterBuilderAndOrOperator) => {
+    setEmbeddableState?.((prev) => ({ ...prev, operator: value }));
   };
-
-  const filters = embeddableState?.filters?.length ? embeddableState.filters : [newFilter()];
 
   const handleSelectDimensionOrMeasure = (index: number, name: string | null) => {
     setEmbeddableState?.((prev: FilterBuilderState) => {
@@ -184,14 +193,6 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     }, 0);
   };
 
-  useEffect(() => {
-    const filterValue = filtersToClause(filterBuilderAndOrOperator.AND, filters);
-    const serialized = JSON.stringify(filterValue);
-    if (serialized === JSON.stringify(prevFilterValueRef.current)) return;
-    prevFilterValueRef.current = filterValue;
-    onChange?.(filterValue);
-  }, [filters]);
-
   const supportedDimensionsAndMeasures = getSupportedDimensionsAndMeasures(dimensionsAndMeasures);
 
   const dimensionOptionsNew = getDimensionAndMeasureOptions({
@@ -202,8 +203,34 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
 
   const hasClearAll = filters.some((f) => f.dimensionOrMeasure && f.operator && f.value != null);
 
+  // OR cannot combine dimensions (row-level WHERE) with measures (aggregate HAVING)
+  // in Cube. This depends on which members are *selected*, not whether their values
+  // are filled in — a measure mid-edit (e.g. value cleared after an operator change)
+  // still makes the set mixed, so we must not look only at "complete" filters.
+  const hasMixedTypes =
+    filters.some((f) => isDimension(f.dimensionOrMeasure ?? undefined)) &&
+    filters.some((f) => isMeasure(f.dimensionOrMeasure ?? undefined));
+
+  useEffect(() => {
+    if (hasMixedTypes && operator === filterBuilderAndOrOperator.OR) {
+      setEmbeddableState?.((prev) => ({ ...prev, operator: filterBuilderAndOrOperator.AND }));
+    }
+  }, [hasMixedTypes, operator, setEmbeddableState]);
+
+  useEffect(() => {
+    const filterValue = filtersToClause(operator, filters);
+    const serialized = JSON.stringify(filterValue);
+    if (serialized === JSON.stringify(prevFilterValueRef.current)) return;
+    prevFilterValueRef.current = filterValue;
+    onChange?.(filterValue);
+  }, [filters, operator, onChange]);
+
   const handleClearAll = () => {
-    setEmbeddableState?.((prev: FilterBuilderState) => ({ ...prev, filters: [newFilter()] }));
+    setEmbeddableState?.((prev: FilterBuilderState) => ({
+      ...prev,
+      filters: [newFilter()],
+      operator: filterBuilderAndOrOperator.AND,
+    }));
   };
 
   return (
@@ -217,6 +244,13 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
         <div className={styles.scroll} ref={scrollRef}>
           {filters.map((filter, index) => (
             <React.Fragment key={filter.id}>
+              {index > 0 && (
+                <FilterBuilderProAndOrButton
+                  operator={operator}
+                  onChange={handleOperatorChange}
+                  disabled={hasMixedTypes}
+                />
+              )}
               <FilterBuilderItem
                 filter={filter}
                 dimensionsAndMeasures={dimensionsAndMeasures}
