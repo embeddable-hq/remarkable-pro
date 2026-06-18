@@ -107,7 +107,7 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
         ...(groupByDimension ? [groupByDimension] : []),
       ]}
       errorMessage={results.error}
-      {...asChartCardHeaderProps(resolvedI18nProps, props)}
+      {...asChartCardHeaderProps(props)}
     >
       <ScatterChart
         data={chartData}

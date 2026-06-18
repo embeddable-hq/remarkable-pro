@@ -6,7 +6,6 @@ import {
   ChartCardHeaderProps,
   asChartCardHeaderProps,
 } from '../../shared/ChartCard/ChartCard';
-import { resolveI18nProps } from '../../../component.utils';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { PivotTable } from '@embeddable.com/remarkable-ui';
 import { useEffect, useRef, useState } from 'react';
@@ -40,7 +39,6 @@ const PivotTablePro = (props: PivotTableProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const resolvedI18nProps = resolveI18nProps(props);
   const {
     resultsSubRows,
     measures,
@@ -143,7 +141,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
       data={data}
       dimensionsAndMeasures={[rowDimension, columnDimension, ...measures]}
       errorMessage={props.results?.error}
-      {...asChartCardHeaderProps(resolvedI18nProps, props)}
+      {...asChartCardHeaderProps(props)}
     >
       <PivotTable
         firstColumnWidth={firstColumnWidth}

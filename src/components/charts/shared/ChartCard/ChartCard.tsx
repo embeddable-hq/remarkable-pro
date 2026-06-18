@@ -14,6 +14,7 @@ import { ChartCardLoading } from './ChartCardLoading/ChartCardLoading';
 import { ChartCardMenuPro } from './ChartCardMenuPro/ChartCardMenuPro';
 import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
+import { resolveI18nString } from '../../../component.utils';
 import clsx from 'clsx';
 import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
 
@@ -26,11 +27,9 @@ export type ChartCardHeaderProps = {
 };
 
 export const asChartCardHeaderProps = <T extends ChartCardHeaderProps>(
-  resolvedProps: T,
-  originalProps?: T,
+  props: T,
 ): Omit<ChartCardHeaderProps, 'menuOptions'> & { menuOptions?: string[] } => {
-  const { title, description, tooltip, hideMenu } = resolvedProps;
-  const { menuOptions } = originalProps ?? resolvedProps;
+  const { title, description, tooltip, hideMenu, menuOptions } = props;
   return {
     title,
     description,
@@ -67,6 +66,10 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
   ) => {
     const theme: Theme = useTheme() as Theme;
     i18nSetup(theme);
+
+    const resolvedTitle = title ? resolveI18nString(title) : title;
+    const resolvedDescription = description ? resolveI18nString(description) : description;
+    const resolvedTooltip = tooltip ? resolveI18nString(tooltip) : tooltip;
 
     const chartRef = useRef<HTMLDivElement>(null);
 
@@ -107,7 +110,11 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
         {hideMenu ? null : (
           <>
             <div className={styles.chartCardHeader}>
-              <CardHeader title={title} subtitle={description} tooltip={tooltip} />
+              <CardHeader
+                title={resolvedTitle}
+                subtitle={resolvedDescription}
+                tooltip={resolvedTooltip}
+              />
             </div>
             <div className={styles.chartCardRightContent}>
               <div className={clsx(!isLoading && styles.hidden)}>

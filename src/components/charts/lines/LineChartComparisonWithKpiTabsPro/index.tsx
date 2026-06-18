@@ -136,7 +136,7 @@ const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabs
       data={resultsCombined}
       dimensionsAndMeasures={[...measures, xAxis]}
       errorMessage={results.error || resultsComparison?.error}
-      {...asChartCardHeaderProps(resolvedI18nProps, props)}
+      {...asChartCardHeaderProps(props)}
     >
       <ChartTabs items={chartTabsItems} value={activeMeasureName} onChange={setActiveMeasureName} />
       {setGranularity && (

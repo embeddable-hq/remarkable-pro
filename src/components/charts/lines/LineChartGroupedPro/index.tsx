@@ -94,7 +94,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
       data={results}
       dimensionsAndMeasures={[measure, xAxis, groupBy]}
       errorMessage={results.error}
-      {...asChartCardHeaderProps(resolvedI18nProps, props)}
+      {...asChartCardHeaderProps(props)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

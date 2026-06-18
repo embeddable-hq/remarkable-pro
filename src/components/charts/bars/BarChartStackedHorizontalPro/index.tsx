@@ -100,7 +100,7 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
       data={results}
       dimensionsAndMeasures={[measure, yAxis, groupBy]}
       errorMessage={results?.error || resultsAxisOrder?.error}
-      {...asChartCardHeaderProps(resolvedI18nProps, props)}
+      {...asChartCardHeaderProps(props)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

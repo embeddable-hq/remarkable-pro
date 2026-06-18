@@ -70,7 +70,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
       data={results}
       dimensionsAndMeasures={[dimension, ...measures]}
       errorMessage={results.error}
-      {...asChartCardHeaderProps(resolvedI18nProps, props)}
+      {...asChartCardHeaderProps(props)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

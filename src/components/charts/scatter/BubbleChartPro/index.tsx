@@ -126,7 +126,7 @@ const BubbleChartPro = (props: BubbleChartProProps) => {
         ...(groupByDimension ? [groupByDimension] : []),
       ]}
       errorMessage={results.error}
-      {...asChartCardHeaderProps(resolvedI18nProps, props)}
+      {...asChartCardHeaderProps(props)}
     >
       <BubbleChart
         data={chartData}

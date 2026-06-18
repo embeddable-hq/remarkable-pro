@@ -96,7 +96,7 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
       data={results}
       dimensionsAndMeasures={[...measures, xAxis]}
       errorMessage={results.error}
-      {...asChartCardHeaderProps(resolvedI18nProps, props)}
+      {...asChartCardHeaderProps(props)}
     >
       <ChartTabs items={chartTabsItems} value={activeMeasureName} onChange={setActiveMeasureName} />
       {setGranularity && (

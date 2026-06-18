@@ -86,7 +86,7 @@ const LineChartPro = (props: LineChartProProps) => {
       data={results}
       dimensionsAndMeasures={[...measures, xAxis]}
       errorMessage={results.error}
-      {...asChartCardHeaderProps(resolvedI18nProps, props)}
+      {...asChartCardHeaderProps(props)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

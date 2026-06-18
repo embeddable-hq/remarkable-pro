@@ -105,7 +105,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
         measure,
       ]}
       errorMessage={results.error}
-      {...asChartCardHeaderProps(resolvedI18nProps, props)}
+      {...asChartCardHeaderProps(props)}
     >
       <KpiChart
         displayNullAs={displayNullAs}

@@ -58,7 +58,7 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
       data={results}
       dimensionsAndMeasures={[dimension, measure]}
       errorMessage={results.error}
-      {...asChartCardHeaderProps(resolvedI18nProps, props)}
+      {...asChartCardHeaderProps(props)}
     >
       <DonutChart
         label={label}
