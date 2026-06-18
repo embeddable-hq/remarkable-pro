@@ -143,7 +143,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
       data={data}
       dimensionsAndMeasures={[rowDimension, columnDimension, ...measures]}
       errorMessage={props.results?.error}
-      {...asChartCardHeaderProps(resolvedI18nProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps, props)}
     >
       <PivotTable
         firstColumnWidth={firstColumnWidth}

@@ -186,7 +186,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
       dimensionsAndMeasures={dimensionsAndMeasures}
       errorMessage={results?.error}
       onCustomDownload={handleCustomDownload}
-      {...asChartCardHeaderProps(resolvedI18nProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps, props)}
     >
       <TableScrollable
         ref={tableRef}

@@ -100,7 +100,7 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
       data={results}
       dimensionsAndMeasures={[measure, xAxis, groupBy]}
       errorMessage={results?.error || resultsAxisOrder?.error}
-      {...asChartCardHeaderProps(resolvedI18nProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps, props)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

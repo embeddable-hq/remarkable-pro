@@ -39,7 +39,7 @@ const KpiChartNumberPro = (props: KpiChartNumberProProp) => {
       data={resultsWithNullsHandled}
       dimensionsAndMeasures={[measure]}
       errorMessage={results.error}
-      {...asChartCardHeaderProps(resolvedI18nProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps, props)}
     >
       <KpiChart
         displayNullAs={displayNullAs}

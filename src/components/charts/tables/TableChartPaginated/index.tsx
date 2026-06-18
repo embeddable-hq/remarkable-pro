@@ -164,7 +164,7 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
       dimensionsAndMeasures={dimensionsAndMeasures}
       errorMessage={results?.error}
       onCustomDownload={handleCustomDownload}
-      {...asChartCardHeaderProps(resolvedI18nProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps, props)}
     >
       <TablePaginated
         onRowIndexClick={handleRowIndexClick}

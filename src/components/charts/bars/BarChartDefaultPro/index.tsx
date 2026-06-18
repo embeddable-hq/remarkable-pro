@@ -39,8 +39,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
   } = props;
 
   const resolvedI18nProps = resolveI18nProps(props);
-  const { xAxisLabel, yAxisLabel } = resolvedI18nProps;
-  const { tooltip, description, title } = resolvedI18nProps;
+  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolvedI18nProps;
 
   const results = useFillGaps({
     results: props.results,
@@ -71,7 +70,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
       data={results}
       dimensionsAndMeasures={[dimension, ...measures]}
       errorMessage={results.error}
-      {...asChartCardHeaderProps(resolvedI18nProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps, props)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

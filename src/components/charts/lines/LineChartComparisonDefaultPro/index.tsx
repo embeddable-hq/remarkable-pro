@@ -138,7 +138,7 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
       data={resultsCombined}
       dimensionsAndMeasures={[...measures, xAxis]}
       errorMessage={results.error || resultsComparison?.error}
-      {...asChartCardHeaderProps(resolvedI18nProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps, props)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

@@ -26,9 +26,11 @@ export type ChartCardHeaderProps = {
 };
 
 export const asChartCardHeaderProps = <T extends ChartCardHeaderProps>(
-  props: T,
+  resolvedProps: T,
+  originalProps?: T,
 ): ChartCardHeaderProps => {
-  const { title, description, tooltip, hideMenu, menuOptions } = props;
+  const { title, description, tooltip, hideMenu } = resolvedProps;
+  const { menuOptions } = originalProps ?? resolvedProps;
   return { title, description, tooltip, hideMenu, menuOptions };
 };
 

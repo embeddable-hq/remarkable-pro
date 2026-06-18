@@ -147,7 +147,7 @@ const HeatMapPro = (props: HeatMapProProps) => {
       data={props.results}
       dimensionsAndMeasures={[rowDimension, columnDimension, measure]}
       errorMessage={props.results?.error}
-      {...asChartCardHeaderProps(resolvedI18nProps)}
+      {...asChartCardHeaderProps(resolvedI18nProps, props)}
     >
       <HeatMap
         data={results}
