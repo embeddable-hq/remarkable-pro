@@ -1,4 +1,5 @@
 import ColorType from '../editors/ColorEditor/Color.type.emb';
+import ExportOptionType, { ExportOptionTypeOptions } from './types/ExportOption.type.emb';
 import { Granularity } from '../theme/defaults/defaults.GranularityOptions.constants';
 import {
   dimensionMeasureSubInputs,
@@ -492,6 +493,19 @@ const yMeasure = {
   label: 'Y-axis measure',
 } as const;
 
+const menuOptions = {
+  name: 'menuOptions',
+  type: ExportOptionType,
+  label: 'Menu options',
+  array: true,
+  defaultValue: [
+    ExportOptionTypeOptions.csv,
+    ExportOptionTypeOptions.xlsx,
+    ExportOptionTypeOptions.png,
+  ],
+  category: 'Component Settings',
+} as const;
+
 export const inputs = {
   boolean,
   timeRange,
@@ -551,4 +565,5 @@ export const inputs = {
   granularities,
   markdown,
   filters,
+  menuOptions,
 } as const;

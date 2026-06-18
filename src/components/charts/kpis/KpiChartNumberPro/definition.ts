@@ -20,6 +20,7 @@ const meta = {
     inputs.displayNullAs,
     inputs.tooltip,
     inputs.fontSize,
+    inputs.menuOptions,
   ],
 } as const satisfies EmbeddedComponentMeta;
 

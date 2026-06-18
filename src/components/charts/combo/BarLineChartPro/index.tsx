@@ -3,7 +3,7 @@ import { useTheme } from '@embeddable.com/react';
 import { BarChart } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, asChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { resolveI18nProps } from '../../../component.utils';
@@ -35,7 +35,6 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
     yAxisSecondaryMin,
     yAxisSecondaryMax,
     reverseXAxis,
-    hideMenu,
     dimension,
     granularity,
     setGranularity,
@@ -43,7 +42,8 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
     onLineClicked,
   } = props;
 
-  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const resolvedI18nProps = resolveI18nProps(props);
+  const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolvedI18nProps;
 
   const showSecondaryAxis = lineMeasures.some((m) => Boolean(m.inputs?.['useSecondaryAxis']));
 
@@ -93,10 +93,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
       data={results}
       dimensionsAndMeasures={[dimension, ...measures, ...lineMeasures]}
       errorMessage={results.error}
-      description={description}
-      title={title}
-      tooltip={tooltip}
-      hideMenu={hideMenu}
+      {...asChartCardHeaderProps(props)}
     >
       {setGranularity && (
         <ChartGranularitySelectField

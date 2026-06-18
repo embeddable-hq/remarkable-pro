@@ -5,7 +5,11 @@ import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup, i18n } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
-import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
+import {
+  ChartCard,
+  ChartCardHeaderProps,
+  asChartCardHeaderProps,
+} from '../../shared/ChartCard/ChartCard';
 import {
   createBubbleClickHandler,
   getBubbleChartProData,
@@ -64,10 +68,10 @@ const BubbleChartPro = (props: BubbleChartProProps) => {
     bubbleRadiusMin,
     bubbleRadiusMax,
     onPointClick,
-    hideMenu,
   } = props;
 
-  const { title, description, tooltip, xAxisLabel, yAxisLabel } = resolveI18nProps(props);
+  const resolvedI18nProps = resolveI18nProps(props);
+  const { xAxisLabel, yAxisLabel } = resolvedI18nProps;
 
   const noValueLabel = i18n.t('charts.scatterChart.noValue');
 
@@ -122,10 +126,7 @@ const BubbleChartPro = (props: BubbleChartProProps) => {
         ...(groupByDimension ? [groupByDimension] : []),
       ]}
       errorMessage={results.error}
-      description={description}
-      title={title}
-      tooltip={tooltip}
-      hideMenu={hideMenu}
+      {...asChartCardHeaderProps(props)}
     >
       <BubbleChart
         data={chartData}

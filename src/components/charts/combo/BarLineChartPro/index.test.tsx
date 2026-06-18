@@ -32,6 +32,7 @@ vi.mock('../../shared/ChartCard/ChartCard', () => ({
   ChartCard: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="chart-card">{children}</div>
   ),
+  asChartCardHeaderProps: (props: Record<string, unknown>) => props,
 }));
 
 vi.mock('../../charts.fillGaps.hooks', () => ({
