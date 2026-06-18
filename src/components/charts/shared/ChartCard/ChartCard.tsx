@@ -28,10 +28,16 @@ export type ChartCardHeaderProps = {
 export const asChartCardHeaderProps = <T extends ChartCardHeaderProps>(
   resolvedProps: T,
   originalProps?: T,
-): ChartCardHeaderProps => {
+): Omit<ChartCardHeaderProps, 'menuOptions'> & { menuOptions?: string[] } => {
   const { title, description, tooltip, hideMenu } = resolvedProps;
   const { menuOptions } = originalProps ?? resolvedProps;
-  return { title, description, tooltip, hideMenu, menuOptions };
+  return {
+    title,
+    description,
+    tooltip,
+    hideMenu,
+    menuOptions: menuOptions as string[] | undefined,
+  };
 };
 
 type ChartCardProps = {
@@ -41,7 +47,7 @@ type ChartCardProps = {
   style?: CSSProperties;
   dimensionsAndMeasures?: (Dimension | Measure)[];
   onCustomDownload?: (props: (props: ChartCardMenuOptionOnClickProps) => void) => void;
-} & ChartCardHeaderProps;
+} & Omit<ChartCardHeaderProps, 'menuOptions'> & { menuOptions?: string[] };
 
 export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
   (
@@ -114,7 +120,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
                   data={data?.data}
                   dimensionsAndMeasures={dimensionsAndMeasures}
                   onCustomDownload={onCustomDownload}
-                  menuOptions={menuOptions as string[]}
+                  menuOptions={menuOptions}
                 />
               </div>
             </div>
