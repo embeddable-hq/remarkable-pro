@@ -1,6 +1,6 @@
 import { defineOption, defineType } from '@embeddable.com/core';
 
-export const ExportOption = {
+export const ExportOptionTypeOptions = {
   csv: 'csv',
   xlsx: 'xlsx',
   png: 'png',
@@ -11,8 +11,8 @@ const ExportOptionType = defineType('exportOption', {
   optionLabel: (value: string) => value,
 });
 
-defineOption(ExportOptionType, ExportOption.csv);
-defineOption(ExportOptionType, ExportOption.xlsx);
-defineOption(ExportOptionType, ExportOption.png);
+defineOption(ExportOptionType, ExportOptionTypeOptions.csv);
+defineOption(ExportOptionType, ExportOptionTypeOptions.xlsx);
+defineOption(ExportOptionType, ExportOptionTypeOptions.png);
 
 export default ExportOptionType;

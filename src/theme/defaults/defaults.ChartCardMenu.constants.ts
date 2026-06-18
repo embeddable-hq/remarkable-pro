@@ -3,7 +3,7 @@ import CloudDownload from '../../assets/icons/cloud-download.svg';
 import PhotoDown from '../../assets/icons/photo-down.svg';
 import { exportCSV, exportPNG, exportXLSX } from '../utils/export.utils';
 import { Theme } from '../theme.types';
-import { ExportOption } from '../../components/types/ExportOption.type.emb';
+import { ExportOptionTypeOptions } from '../../components/types/ExportOption.type.emb';
 
 export type ChartCardMenuOptionOnClickProps = {
   title?: string;
@@ -23,19 +23,19 @@ export type ChartCardMenuOption = {
 
 export const defaultChartMenuProOptions: ChartCardMenuOption[] = [
   {
-    value: ExportOption.csv,
+    value: ExportOptionTypeOptions.csv,
     labelKey: 'charts.menuOptions.downloadCSV',
     onClick: exportCSV,
     iconSrc: CloudDownload,
   },
   {
-    value: ExportOption.xlsx,
+    value: ExportOptionTypeOptions.xlsx,
     labelKey: 'charts.menuOptions.downloadXLSX',
     onClick: exportXLSX,
     iconSrc: CloudDownload,
   },
   {
-    value: ExportOption.png,
+    value: ExportOptionTypeOptions.png,
     labelKey: 'charts.menuOptions.downloadPNG',
     onClick: exportPNG,
     iconSrc: PhotoDown,

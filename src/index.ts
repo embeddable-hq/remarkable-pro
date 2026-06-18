@@ -239,7 +239,7 @@ export * from './components/editors/utils/dimensionsAndMeasures.utils';
 export { default as ComparisonPeriodType } from './components/types/ComparisonPeriod.type.emb';
 export {
   default as ExportOptionType,
-  ExportOption,
+  ExportOptionTypeOptions,
 } from './components/types/ExportOption.type.emb';
 
 // Custom Editors

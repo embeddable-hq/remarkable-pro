@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import ExportOptionType, { ExportOption } from './ExportOption.type.emb';
+import ExportOptionType, { ExportOptionTypeOptions } from './ExportOption.type.emb';
 
-describe('ExportOption', () => {
+describe('ExportOptionTypeOptions', () => {
   it('exports the expected option keys', () => {
-    expect(ExportOption.csv).toBe('csv');
-    expect(ExportOption.xlsx).toBe('xlsx');
-    expect(ExportOption.png).toBe('png');
+    expect(ExportOptionTypeOptions.csv).toBe('csv');
+    expect(ExportOptionTypeOptions.xlsx).toBe('xlsx');
+    expect(ExportOptionTypeOptions.png).toBe('png');
   });
 });
 
