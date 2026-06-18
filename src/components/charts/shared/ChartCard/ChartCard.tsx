@@ -14,7 +14,7 @@ import { ChartCardLoading } from './ChartCardLoading/ChartCardLoading';
 import { ChartCardMenuPro } from './ChartCardMenuPro/ChartCardMenuPro';
 import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
-import { resolveI18nString } from '../../../component.utils';
+import { resolveI18nProps } from '../../../component.utils';
 import clsx from 'clsx';
 import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
 
@@ -48,96 +48,80 @@ type ChartCardProps = {
   onCustomDownload?: (props: (props: ChartCardMenuOptionOnClickProps) => void) => void;
 } & Omit<ChartCardHeaderProps, 'menuOptions'> & { menuOptions?: string[] };
 
-export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
-  (
-    {
-      tooltip,
-      title,
-      description,
-      children,
-      data,
-      errorMessage,
-      dimensionsAndMeasures = [],
-      hideMenu = false,
-      onCustomDownload,
-      menuOptions,
-    },
-    ref,
-  ) => {
-    const theme: Theme = useTheme() as Theme;
-    i18nSetup(theme);
+export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props, ref) => {
+  const theme: Theme = useTheme() as Theme;
+  i18nSetup(theme);
 
-    const resolvedTitle = title ? resolveI18nString(title) : title;
-    const resolvedDescription = description ? resolveI18nString(description) : description;
-    const resolvedTooltip = tooltip ? resolveI18nString(tooltip) : tooltip;
+  const { title, description, tooltip } = resolveI18nProps(props);
+  const {
+    children,
+    data,
+    errorMessage,
+    dimensionsAndMeasures = [],
+    hideMenu = false,
+    onCustomDownload,
+    menuOptions,
+  } = props;
 
-    const chartRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<HTMLDivElement>(null);
 
-    const hasData = Boolean(data?.data && data.data?.length > 0);
+  const hasData = Boolean(data?.data && data.data?.length > 0);
 
-    const isLoading = !data || data?.isLoading;
+  const isLoading = !data || data?.isLoading;
 
-    const getDisplay = () => {
-      if (isLoading && !hasData) {
-        return <Skeleton />;
-      }
+  const getDisplay = () => {
+    if (isLoading && !hasData) {
+      return <Skeleton />;
+    }
 
-      if (errorMessage) {
-        return (
-          <CardFeedback
-            variant="error"
-            icon={IconAlertCircle}
-            title={i18n.t('charts.errorTitle')}
-            message={errorMessage}
-          />
-        );
-      }
+    if (errorMessage) {
+      return (
+        <CardFeedback
+          variant="error"
+          icon={IconAlertCircle}
+          title={i18n.t('charts.errorTitle')}
+          message={errorMessage}
+        />
+      );
+    }
 
-      if (!hasData) {
-        return (
-          <CardFeedback
-            title={i18n.t('charts.emptyTitle')}
-            message={i18n.t('charts.emptyMessage')}
-          />
-        );
-      }
+    if (!hasData) {
+      return (
+        <CardFeedback title={i18n.t('charts.emptyTitle')} message={i18n.t('charts.emptyMessage')} />
+      );
+    }
 
-      return children;
-    };
+    return children;
+  };
 
-    return (
-      <Card className={styles.chartCard}>
-        {hideMenu ? null : (
-          <>
-            <div className={styles.chartCardHeader}>
-              <CardHeader
-                title={resolvedTitle}
-                subtitle={resolvedDescription}
-                tooltip={resolvedTooltip}
+  return (
+    <Card className={styles.chartCard}>
+      {hideMenu ? null : (
+        <>
+          <div className={styles.chartCardHeader}>
+            <CardHeader title={title} subtitle={description} tooltip={tooltip} />
+          </div>
+          <div className={styles.chartCardRightContent}>
+            <div className={clsx(!isLoading && styles.hidden)}>
+              <ChartCardLoading />
+            </div>
+            <div className={clsx(isLoading && styles.hidden)}>
+              <ChartCardMenuPro
+                title={title}
+                containerRef={chartRef}
+                data={data?.data}
+                dimensionsAndMeasures={dimensionsAndMeasures}
+                onCustomDownload={onCustomDownload}
+                menuOptions={menuOptions}
               />
             </div>
-            <div className={styles.chartCardRightContent}>
-              <div className={clsx(!isLoading && styles.hidden)}>
-                <ChartCardLoading />
-              </div>
-              <div className={clsx(isLoading && styles.hidden)}>
-                <ChartCardMenuPro
-                  title={title}
-                  containerRef={chartRef}
-                  data={data?.data}
-                  dimensionsAndMeasures={dimensionsAndMeasures}
-                  onCustomDownload={onCustomDownload}
-                  menuOptions={menuOptions}
-                />
-              </div>
-            </div>
-          </>
-        )}
+          </div>
+        </>
+      )}
 
-        <CardContent ref={onCustomDownload ? ref : chartRef}>{getDisplay()}</CardContent>
-      </Card>
-    );
-  },
-);
+      <CardContent ref={onCustomDownload ? ref : chartRef}>{getDisplay()}</CardContent>
+    </Card>
+  );
+});
 
 ChartCard.displayName = 'ChartCard';
