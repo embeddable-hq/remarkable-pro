@@ -136,58 +136,54 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     setEmbeddableState?.((prev) => ({ ...prev, operator: value }));
   };
 
+  const updateFilters = useCallback(
+    (updater: (filters: FilterBuilderFilter[]) => FilterBuilderFilter[]) => {
+      setEmbeddableState?.((prev) => ({
+        ...prev,
+        filters: updater([...(prev?.filters ?? [])]),
+      }));
+    },
+    [setEmbeddableState],
+  );
+
   const handleSelectDimensionOrMeasure = (index: number, name: string | null) => {
-    setEmbeddableState?.((prev: FilterBuilderState) => {
-      const newFilters = [...(prev?.filters ?? [])];
-
-      const existing = newFilters[index];
-
-      newFilters[index] = {
-        ...newFilter(name),
-        ...(existing?.id ? { id: existing.id } : {}),
-      };
-
-      return { ...prev, filters: newFilters };
+    updateFilters((f) => {
+      const existing = f[index];
+      f[index] = { ...newFilter(name), ...(existing?.id ? { id: existing.id } : {}) };
+      return f;
     });
   };
 
   const handleSelectOperator = (index: number, operator: string | null) => {
-    setEmbeddableState?.((prev: FilterBuilderState) => {
-      const newFilters = [...(prev?.filters ?? [])];
-      newFilters[index] = { ...newFilters[index]!, operator, value: null };
-      return { ...prev, filters: newFilters };
+    updateFilters((f) => {
+      f[index] = { ...f[index]!, operator, value: null };
+      return f;
     });
   };
 
   const handleSelectValue = (index: number, value: FilterBuilderFilter['value']) => {
-    setEmbeddableState?.((prev: FilterBuilderState) => {
-      const newFilters = [...(prev?.filters ?? [])];
-      newFilters[index] = { ...newFilters[index]!, value };
-      return { ...prev, filters: newFilters };
+    updateFilters((f) => {
+      f[index] = { ...f[index]!, value };
+      return f;
     });
   };
 
   const handleDimensionSearch = (index: number, search: string) => {
-    setEmbeddableState?.((prev: FilterBuilderState) => {
-      const newFilters = [...(prev?.filters ?? [])];
-      newFilters[index] = { ...newFilters[index]!, search };
-      return { ...prev, filters: newFilters };
+    updateFilters((f) => {
+      f[index] = { ...f[index]!, search };
+      return f;
     });
   };
 
   const handleDeleteFilter = (index: number) => {
-    setEmbeddableState?.((prev: FilterBuilderState) => {
-      const newFilters = [...(prev?.filters ?? [])];
-      newFilters.splice(index, 1);
-      return { ...prev, filters: newFilters };
+    updateFilters((f) => {
+      f.splice(index, 1);
+      return f;
     });
   };
 
   const handleAddFilter = (value: string | null) => {
-    setEmbeddableState?.((prev: FilterBuilderState) => {
-      const newFilters = [...(prev?.filters ?? []), newFilter(value)];
-      return { ...prev, filters: newFilters };
-    });
+    updateFilters((f) => [...f, newFilter(value)]);
     setTimeout(() => {
       scrollRef.current?.scrollTo({ left: scrollRef.current.scrollWidth, behavior: 'smooth' });
     }, 0);
