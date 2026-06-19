@@ -16,7 +16,6 @@ export const FilterBuilderProAndOrButton: FC<FilterBuilderProAndOrButtonProps> =
   disabled = false,
 }) => {
   const handleChange = () => {
-    if (disabled) return;
     onChange(
       operator === filterBuilderAndOrOperator.AND
         ? filterBuilderAndOrOperator.OR
@@ -29,12 +28,7 @@ export const FilterBuilderProAndOrButton: FC<FilterBuilderProAndOrButtonProps> =
   const inactiveLabel = operator === filterBuilderAndOrOperator.AND ? orLabel : andLabel;
 
   const button = (
-    <button
-      className={styles.andOrButton}
-      onClick={handleChange}
-      aria-disabled={disabled}
-      data-disabled={disabled || undefined}
-    >
+    <button className={styles.andOrButton} onClick={handleChange} disabled={disabled}>
       <span>{activeLabel}</span>
       <span className={styles.andOrButtonSizer} aria-hidden>
         {inactiveLabel}
@@ -47,7 +41,7 @@ export const FilterBuilderProAndOrButton: FC<FilterBuilderProAndOrButtonProps> =
   }
 
   return (
-    <Tooltip side="top" trigger={button}>
+    <Tooltip side="top" trigger={<span>{button}</span>}>
       {i18n.t('editors.filterBuilder.orDisabledMixedTypes')}
     </Tooltip>
   );

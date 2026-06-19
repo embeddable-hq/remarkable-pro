@@ -317,11 +317,11 @@
   background: var(--em-filterbuilder-andor-button-background--hover, #e4e4ea);
 }
 
-.andOrButton[data-disabled] {
+.andOrButton:disabled {
   cursor: not-allowed;
   opacity: var(--em-filterbuilder-andor-button-opacity--disabled, 0.5);
 }
 
-.andOrButton[data-disabled]:hover {
+.andOrButton:disabled:hover {
   background: var(--em-filterbuilder-andor-button-background, #ededf1);
 }
