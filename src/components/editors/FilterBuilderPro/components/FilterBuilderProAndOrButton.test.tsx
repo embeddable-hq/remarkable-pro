@@ -86,7 +86,7 @@ describe('FilterBuilderProAndOrButton', () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it('marks the button aria-disabled when disabled', () => {
+  it('marks the button disabled when disabled', () => {
     render(
       <FilterBuilderProAndOrButton
         operator={filterBuilderAndOrOperator.AND}
@@ -94,7 +94,7 @@ describe('FilterBuilderProAndOrButton', () => {
         disabled
       />,
     );
-    expect(screen.getByRole('button')).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button')).toBeDisabled();
   });
 
   it('shows the explanatory tooltip only when disabled', () => {

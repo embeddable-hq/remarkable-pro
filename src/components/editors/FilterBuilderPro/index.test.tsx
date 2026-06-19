@@ -490,10 +490,7 @@ describe('FilterBuilderPro', () => {
       expect(screen.getByTestId('tooltip-content')).toHaveTextContent(
         'editors.filterBuilder.disableOrOperatorToolTip',
       );
-      expect(screen.getByRole('button', { name: 'editors.filterBuilder.and' })).toHaveAttribute(
-        'aria-disabled',
-        'true',
-      );
+      expect(screen.getByRole('button', { name: 'editors.filterBuilder.and' })).toBeDisabled();
     });
 
     it('keeps the AND/OR toggle enabled when all filters share the same type', () => {
@@ -512,10 +509,7 @@ describe('FilterBuilderPro', () => {
       render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
 
       expect(screen.queryByTestId('tooltip')).not.toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'editors.filterBuilder.and' })).toHaveAttribute(
-        'aria-disabled',
-        'false',
-      );
+      expect(screen.getByRole('button', { name: 'editors.filterBuilder.and' })).not.toBeDisabled();
     });
 
     it('detects a mix from the selected member even when the measure value is incomplete (regression)', () => {
