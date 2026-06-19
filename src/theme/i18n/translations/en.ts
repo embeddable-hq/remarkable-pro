@@ -48,7 +48,7 @@ export const en: ResourceLanguage = {
         betweenAnd: 'and',
         and: 'and',
         or: 'or',
-        orDisabledMixedTypes: "'or' can't combine metrics and attributes",
+        orDisabledMixedTypes: 'Use "and" only when combining calculations with category filters',
         is: 'is',
         isNot: 'is not',
         isOneOf: 'is one of',

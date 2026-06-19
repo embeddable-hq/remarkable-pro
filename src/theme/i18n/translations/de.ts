@@ -59,7 +59,8 @@ export const de: ResourceLanguage = {
         betweenAnd: 'und',
         and: 'und',
         or: 'oder',
-        orDisabledMixedTypes: "'oder' kann Kennzahlen und Attribute nicht kombinieren",
+        orDisabledMixedTypes:
+          'Verwende "und" nur, wenn Berechnungen mit Kategoriefiltern kombiniert werden',
         is: 'ist',
         isNot: 'ist nicht',
         isOneOf: 'ist eines von',
