@@ -42,7 +42,7 @@ export const FilterBuilderProAndOrButton: FC<FilterBuilderProAndOrButtonProps> =
 
   return (
     <Tooltip side="top" trigger={<span>{button}</span>}>
-      {i18n.t('editors.filterBuilder.orDisabledMixedTypes')}
+      {i18n.t('editors.filterBuilder.disableOrOperatorToolTip')}
     </Tooltip>
   );
 };

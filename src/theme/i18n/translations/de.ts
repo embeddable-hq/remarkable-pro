@@ -59,7 +59,7 @@ export const de: ResourceLanguage = {
         betweenAnd: 'und',
         and: 'und',
         or: 'oder',
-        orDisabledMixedTypes:
+        disableOrOperatorToolTip:
           'Berechnungen und Kategoriefilter können nur mit "und" kombiniert werden, nicht mit "oder".',
         is: 'ist',
         isNot: 'ist nicht',

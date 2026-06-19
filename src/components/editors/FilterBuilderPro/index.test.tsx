@@ -488,7 +488,7 @@ describe('FilterBuilderPro', () => {
       render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
 
       expect(screen.getByTestId('tooltip-content')).toHaveTextContent(
-        'editors.filterBuilder.orDisabledMixedTypes',
+        'editors.filterBuilder.disableOrOperatorToolTip',
       );
       expect(screen.getByRole('button', { name: 'editors.filterBuilder.and' })).toHaveAttribute(
         'aria-disabled',

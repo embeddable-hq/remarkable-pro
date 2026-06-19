@@ -112,7 +112,7 @@ describe('FilterBuilderProAndOrButton', () => {
     );
     expect(screen.getByTestId('tooltip')).toBeInTheDocument();
     expect(screen.getByTestId('tooltip-content')).toHaveTextContent(
-      'editors.filterBuilder.orDisabledMixedTypes',
+      'editors.filterBuilder.disableOrOperatorToolTip',
     );
   });
 });
