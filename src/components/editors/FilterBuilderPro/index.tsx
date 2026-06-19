@@ -211,20 +211,22 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     filters.some((f) => isDimension(f.dimensionOrMeasure ?? undefined)) &&
     filters.some((f) => isMeasure(f.dimensionOrMeasure ?? undefined));
 
-  useEffect(() => {
-    if (hasMixedTypes && operator === filterBuilderAndOrOperator.OR) {
-      setEmbeddableState?.((prev) => ({ ...prev, operator: filterBuilderAndOrOperator.AND }));
-    }
-  }, [hasMixedTypes, operator, setEmbeddableState]);
+  const isMixedOrOperator = hasMixedTypes && operator === filterBuilderAndOrOperator.OR;
 
   useEffect(() => {
-    if (hasMixedTypes && operator === filterBuilderAndOrOperator.OR) return;
+    if (isMixedOrOperator) {
+      setEmbeddableState?.((prev) => ({ ...prev, operator: filterBuilderAndOrOperator.AND }));
+    }
+  }, [isMixedOrOperator, setEmbeddableState]);
+
+  useEffect(() => {
+    if (isMixedOrOperator) return;
     const filterValue = filtersToClause(operator, filters);
     const serialized = JSON.stringify(filterValue);
     if (serialized === JSON.stringify(prevFilterValueRef.current)) return;
     prevFilterValueRef.current = filterValue;
     onChange?.(filterValue);
-  }, [filters, operator, onChange, hasMixedTypes]);
+  }, [filters, operator, onChange, isMixedOrOperator]);
 
   const handleClearAll = () => {
     setEmbeddableState?.((prev: FilterBuilderState) => ({
