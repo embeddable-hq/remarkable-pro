@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.8
+
+### Patch Changes
+
+- 423bcd2: Add support for custom canvas overlay customization
+
 ## 0.3.7
 
 ### Patch Changes
