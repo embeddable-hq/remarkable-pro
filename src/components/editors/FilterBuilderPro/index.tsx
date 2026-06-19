@@ -218,12 +218,13 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   }, [hasMixedTypes, operator, setEmbeddableState]);
 
   useEffect(() => {
+    if (hasMixedTypes && operator === filterBuilderAndOrOperator.OR) return;
     const filterValue = filtersToClause(operator, filters);
     const serialized = JSON.stringify(filterValue);
     if (serialized === JSON.stringify(prevFilterValueRef.current)) return;
     prevFilterValueRef.current = filterValue;
     onChange?.(filterValue);
-  }, [filters, operator, onChange]);
+  }, [filters, operator, onChange, hasMixedTypes]);
 
   const handleClearAll = () => {
     setEmbeddableState?.((prev: FilterBuilderState) => ({
