@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.9
+
+### Patch Changes
+
+- 00f75b3: Add support for or operator
+
 ## 0.3.8
 
 ### Patch Changes
