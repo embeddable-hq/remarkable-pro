@@ -34,41 +34,39 @@ vi.mock('@tabler/icons-react', () => ({
   IconChevronLeft: () => <span data-testid="icon-chevron-left" />,
 }));
 
-vi.mock('@embeddable.com/remarkable-ui', () => ({
-  SingleSelectField: ({
-    triggerComponent,
-    onChange,
-    options,
-  }: {
-    triggerComponent: React.ReactNode;
-    onChange: (v: string | null) => void;
-    options: { value: string; label: string }[];
-  }) => (
-    <div data-testid="new-filter-select">
-      {triggerComponent}
-      {options.map((o) => (
-        <button
-          key={o.value}
-          data-testid={`add-option-${o.value}`}
-          onClick={() => onChange(o.value)}
-        >
-          {o.label}
-        </button>
-      ))}
-    </div>
-  ),
-  ActionIcon: ({ icon: Icon }: { icon: React.ComponentType }) => (
-    <button data-testid="action-icon">
-      <Icon />
-    </button>
-  ),
-  Tooltip: ({ trigger, children }: { trigger: React.ReactNode; children: React.ReactNode }) => (
-    <div data-testid="tooltip">
-      {trigger}
-      <span data-testid="tooltip-content">{children}</span>
-    </div>
-  ),
-}));
+vi.mock('@embeddable.com/remarkable-ui', async () => {
+  const { TooltipMock } = await import('./test-utils');
+  return {
+    SingleSelectField: ({
+      triggerComponent,
+      onChange,
+      options,
+    }: {
+      triggerComponent: React.ReactNode;
+      onChange: (v: string | null) => void;
+      options: { value: string; label: string }[];
+    }) => (
+      <div data-testid="new-filter-select">
+        {triggerComponent}
+        {options.map((o) => (
+          <button
+            key={o.value}
+            data-testid={`add-option-${o.value}`}
+            onClick={() => onChange(o.value)}
+          >
+            {o.label}
+          </button>
+        ))}
+      </div>
+    ),
+    ActionIcon: ({ icon: Icon }: { icon: React.ComponentType }) => (
+      <button data-testid="action-icon">
+        <Icon />
+      </button>
+    ),
+    Tooltip: TooltipMock,
+  };
+});
 
 vi.mock('./components/FilterBuilderItem', () => ({
   default: ({

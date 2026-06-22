@@ -14,14 +14,10 @@ vi.mock('../../../../theme/i18n/i18n', () => ({
   i18n: { t: vi.fn((key: string) => key) },
 }));
 
-vi.mock('@embeddable.com/remarkable-ui', () => ({
-  Tooltip: ({ trigger, children }: { trigger: React.ReactNode; children: React.ReactNode }) => (
-    <div data-testid="tooltip">
-      {trigger}
-      <span data-testid="tooltip-content">{children}</span>
-    </div>
-  ),
-}));
+vi.mock('@embeddable.com/remarkable-ui', async () => {
+  const { TooltipMock } = await import('../test-utils');
+  return { Tooltip: TooltipMock };
+});
 
 describe('FilterBuilderProAndOrButton', () => {
   const onChange = vi.fn();
