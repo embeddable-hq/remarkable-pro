@@ -70,27 +70,25 @@ describe('FilterBuilderProAndOrButton', () => {
     expect(onChange).toHaveBeenCalledWith(filterBuilderAndOrOperator.AND);
   });
 
-  it('does not call onChange when disabled and clicked', () => {
-    render(
-      <FilterBuilderProAndOrButton
-        operator={filterBuilderAndOrOperator.AND}
-        onChange={onChange}
-        disabled
-      />,
-    );
-    fireEvent.click(screen.getByRole('button'));
-    expect(onChange).not.toHaveBeenCalled();
-  });
+  describe('when disabled', () => {
+    beforeEach(() => {
+      render(
+        <FilterBuilderProAndOrButton
+          operator={filterBuilderAndOrOperator.AND}
+          onChange={onChange}
+          disabled
+        />,
+      );
+    });
 
-  it('marks the button disabled when disabled', () => {
-    render(
-      <FilterBuilderProAndOrButton
-        operator={filterBuilderAndOrOperator.AND}
-        onChange={onChange}
-        disabled
-      />,
-    );
-    expect(screen.getByRole('button')).toBeDisabled();
+    it('does not call onChange when clicked', () => {
+      fireEvent.click(screen.getByRole('button'));
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('marks the button as disabled', () => {
+      expect(screen.getByRole('button')).toBeDisabled();
+    });
   });
 
   it('shows the explanatory tooltip only when disabled', () => {
