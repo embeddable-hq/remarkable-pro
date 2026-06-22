@@ -32,6 +32,7 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
     const granularity = dimension.inputs?.granularity;
     const dimensionName = dimension.name;
     const dateBoundsTmp: TimeRange = dimension.inputs?.dateBounds;
+    const ignoreEmptyData: boolean = dimension.inputs?.ignoreEmptyData ?? false;
 
     const knownGranularities = defaultGranularitySelectFieldOptions.map(
       (opt) => opt.value as string,
@@ -100,7 +101,7 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
 
       if (records && records.length > 0) {
         filled.push(...records);
-      } else {
+      } else if (!ignoreEmptyData) {
         filled.push({ [dimensionName]: key });
       }
 
