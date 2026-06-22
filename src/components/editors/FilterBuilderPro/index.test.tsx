@@ -165,6 +165,29 @@ const applyUpdater = (
   return typeof updater === 'function' ? updater(prevState) : updater;
 };
 
+const emptyFilterState = (): FilterBuilderState => ({
+  filters: [],
+  operator: filterBuilderAndOrOperator.AND,
+});
+
+// A valid single-clause defaultFilters value used across multiple tests.
+const defaultFilterClause: FilterBuilderClause = {
+  operator: filterBuilderAndOrOperator.AND,
+  clauses: [{ property: 'country', operator: 'equals' as never, value: 'France' }],
+};
+
+const simulateScrollState = (
+  scrollEl: Element,
+  scrollLeft: number,
+  clientWidth: number,
+  scrollWidth: number,
+) => {
+  Object.defineProperty(scrollEl, 'scrollLeft', { value: scrollLeft, configurable: true });
+  Object.defineProperty(scrollEl, 'clientWidth', { value: clientWidth, configurable: true });
+  Object.defineProperty(scrollEl, 'scrollWidth', { value: scrollWidth, configurable: true });
+  fireEvent.scroll(scrollEl);
+};
+
 // ---------------------------------------------------------------------------
 // Setup
 // ---------------------------------------------------------------------------
@@ -249,25 +272,16 @@ describe('FilterBuilderPro', () => {
   });
 
   describe('defaultFilters', () => {
-    const clause: FilterBuilderClause = {
-      operator: filterBuilderAndOrOperator.AND,
-      clauses: [{ property: 'country', operator: 'equals' as never, value: 'France' }],
-    };
-
     it('seeds filters from defaultFilters when embeddableState has no existing filters', () => {
       render(
         <FilterBuilderPro
           {...defaultProps}
           dimensionsAndMeasures={[makeDim('country')]}
-          defaultFilters={clause}
+          defaultFilters={defaultFilterClause}
         />,
       );
       expect(defaultProps.setEmbeddableState).toHaveBeenCalled();
-      const emptyState: FilterBuilderState = {
-        filters: [],
-        operator: filterBuilderAndOrOperator.AND,
-      };
-      const next = applyUpdater(defaultProps.setEmbeddableState, emptyState);
+      const next = applyUpdater(defaultProps.setEmbeddableState, emptyFilterState());
       expect(next.filters).toHaveLength(1);
       expect(next.filters[0]!.value).toBe('France');
     });
@@ -288,7 +302,7 @@ describe('FilterBuilderPro', () => {
         <FilterBuilderPro
           {...defaultProps}
           dimensionsAndMeasures={[makeDim('country')]}
-          defaultFilters={clause}
+          defaultFilters={defaultFilterClause}
           embeddableState={existing}
         />,
       );
@@ -313,13 +327,11 @@ describe('FilterBuilderPro', () => {
           defaultFilters={emptyClause}
         />,
       );
-      const emptyState: FilterBuilderState = {
-        filters: [],
-        operator: filterBuilderAndOrOperator.AND,
-      };
       const seedCall = defaultProps.setEmbeddableState.mock.calls.find((call) => {
         if (typeof call[0] !== 'function') return false;
-        const result = (call[0] as (s: FilterBuilderState) => FilterBuilderState)(emptyState);
+        const result = (call[0] as (s: FilterBuilderState) => FilterBuilderState)(
+          emptyFilterState(),
+        );
         return Array.isArray(result.filters) && result.filters.length > 0;
       });
       expect(seedCall).toBeUndefined();
@@ -650,12 +662,7 @@ describe('FilterBuilderPro', () => {
 
     it('renders the scroll-right button and calls scrollBy when content overflows', () => {
       render(<FilterBuilderPro {...defaultProps} />);
-      const scrollEl = document.querySelector('.scroll')!;
-
-      Object.defineProperty(scrollEl, 'scrollLeft', { value: 0, configurable: true });
-      Object.defineProperty(scrollEl, 'clientWidth', { value: 100, configurable: true });
-      Object.defineProperty(scrollEl, 'scrollWidth', { value: 300, configurable: true });
-      fireEvent.scroll(scrollEl);
+      simulateScrollState(document.querySelector('.scroll')!, 0, 100, 300);
 
       fireEvent.click(screen.getByTestId('icon-chevron-right').closest('button')!);
       expect(Element.prototype.scrollBy).toHaveBeenCalledWith({ left: 200, behavior: 'smooth' });
@@ -663,12 +670,7 @@ describe('FilterBuilderPro', () => {
 
     it('renders the scroll-left button and calls scrollBy when scrolled right', () => {
       render(<FilterBuilderPro {...defaultProps} />);
-      const scrollEl = document.querySelector('.scroll')!;
-
-      Object.defineProperty(scrollEl, 'scrollLeft', { value: 10, configurable: true });
-      Object.defineProperty(scrollEl, 'clientWidth', { value: 100, configurable: true });
-      Object.defineProperty(scrollEl, 'scrollWidth', { value: 100, configurable: true });
-      fireEvent.scroll(scrollEl);
+      simulateScrollState(document.querySelector('.scroll')!, 10, 100, 100);
 
       fireEvent.click(screen.getByTestId('icon-chevron-left').closest('button')!);
       expect(Element.prototype.scrollBy).toHaveBeenCalledWith({ left: -200, behavior: 'smooth' });
@@ -677,13 +679,13 @@ describe('FilterBuilderPro', () => {
     it('auto-scrolls to the end when a filter changes after initialisation', () => {
       vi.useFakeTimers();
       const dims = [makeDim('country')];
-      const clause: FilterBuilderClause = {
-        operator: filterBuilderAndOrOperator.AND,
-        clauses: [{ property: 'country', operator: 'equals' as never, value: 'France' }],
-      };
 
       const { rerender } = render(
-        <FilterBuilderPro {...defaultProps} dimensionsAndMeasures={dims} defaultFilters={clause} />,
+        <FilterBuilderPro
+          {...defaultProps}
+          dimensionsAndMeasures={dims}
+          defaultFilters={defaultFilterClause}
+        />,
       );
 
       // Clear the disableAutoScroll guard set by defaultFilters effect
@@ -693,7 +695,7 @@ describe('FilterBuilderPro', () => {
         <FilterBuilderPro
           {...defaultProps}
           dimensionsAndMeasures={dims}
-          defaultFilters={clause}
+          defaultFilters={defaultFilterClause}
           embeddableState={{
             operator: filterBuilderAndOrOperator.AND,
             filters: [
