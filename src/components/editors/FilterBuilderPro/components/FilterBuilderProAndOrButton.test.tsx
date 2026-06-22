@@ -14,6 +14,11 @@ vi.mock('../../../../theme/i18n/i18n', () => ({
   i18n: { t: vi.fn((key: string) => key) },
 }));
 
+vi.mock('@embeddable.com/remarkable-ui', async () => {
+  const { TooltipMock } = await import('../test-utils');
+  return { Tooltip: TooltipMock };
+});
+
 describe('FilterBuilderProAndOrButton', () => {
   const onChange = vi.fn();
 
@@ -63,5 +68,45 @@ describe('FilterBuilderProAndOrButton', () => {
     fireEvent.click(screen.getByRole('button'));
     expect(onChange).toHaveBeenCalledOnce();
     expect(onChange).toHaveBeenCalledWith(filterBuilderAndOrOperator.AND);
+  });
+
+  describe('when disabled', () => {
+    beforeEach(() => {
+      render(
+        <FilterBuilderProAndOrButton
+          operator={filterBuilderAndOrOperator.AND}
+          onChange={onChange}
+          disabled
+        />,
+      );
+    });
+
+    it('does not call onChange when clicked', () => {
+      fireEvent.click(screen.getByRole('button'));
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('marks the button as disabled', () => {
+      expect(screen.getByRole('button')).toBeDisabled();
+    });
+  });
+
+  it('shows the explanatory tooltip only when disabled', () => {
+    const { rerender } = render(
+      <FilterBuilderProAndOrButton operator={filterBuilderAndOrOperator.AND} onChange={onChange} />,
+    );
+    expect(screen.queryByTestId('tooltip')).not.toBeInTheDocument();
+
+    rerender(
+      <FilterBuilderProAndOrButton
+        operator={filterBuilderAndOrOperator.AND}
+        onChange={onChange}
+        disabled
+      />,
+    );
+    expect(screen.getByTestId('tooltip')).toBeInTheDocument();
+    expect(screen.getByTestId('tooltip-content')).toHaveTextContent(
+      'editors.filterBuilder.disableOrOperatorToolTip',
+    );
   });
 });

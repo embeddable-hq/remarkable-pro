@@ -59,6 +59,8 @@ export const de: ResourceLanguage = {
         betweenAnd: 'und',
         and: 'und',
         or: 'oder',
+        disableOrOperatorToolTip:
+          'Berechnungen und Kategoriefilter können nur mit "und" kombiniert werden, nicht mit "oder".',
         is: 'ist',
         isNot: 'ist nicht',
         isOneOf: 'ist eines von',
