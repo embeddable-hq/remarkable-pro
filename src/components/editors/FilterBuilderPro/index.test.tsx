@@ -1,9 +1,9 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import FilterBuilderPro from './index';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
 import type { FilterBuilderFilter, FilterBuilderState } from './definition';
-import { filterBuilderAndOrOperator } from './FilterBuilderPro.utils';
+import { filterBuilderAndOrOperator, FilterBuilderClause } from './FilterBuilderPro.utils';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -245,6 +245,84 @@ describe('FilterBuilderPro', () => {
       };
       render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
       expect(screen.getByText('editors.filterBuilder.clearAll')).toBeInTheDocument();
+    });
+  });
+
+  describe('defaultFilters', () => {
+    const clause: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [{ property: 'country', operator: 'equals' as never, value: 'France' }],
+    };
+
+    it('seeds filters from defaultFilters when embeddableState has no existing filters', () => {
+      render(
+        <FilterBuilderPro
+          {...defaultProps}
+          dimensionsAndMeasures={[makeDim('country')]}
+          defaultFilters={clause}
+        />,
+      );
+      expect(defaultProps.setEmbeddableState).toHaveBeenCalled();
+      const emptyState: FilterBuilderState = {
+        filters: [],
+        operator: filterBuilderAndOrOperator.AND,
+      };
+      const next = applyUpdater(defaultProps.setEmbeddableState, emptyState);
+      expect(next.filters).toHaveLength(1);
+      expect(next.filters[0]!.value).toBe('France');
+    });
+
+    it('preserves existing filters when embeddableState already has filters', () => {
+      const existing: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
+        filters: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'UK',
+          }),
+        ],
+      };
+      render(
+        <FilterBuilderPro
+          {...defaultProps}
+          dimensionsAndMeasures={[makeDim('country')]}
+          defaultFilters={clause}
+          embeddableState={existing}
+        />,
+      );
+      const seedCall = defaultProps.setEmbeddableState.mock.calls.find(
+        (call) => typeof call[0] === 'function',
+      );
+      if (seedCall) {
+        const result = (seedCall[0] as (s: FilterBuilderState) => FilterBuilderState)(existing);
+        expect(result.filters).toEqual(existing.filters);
+      }
+    });
+
+    it('does not seed filters when defaultFilters has no matching clauses', () => {
+      const emptyClause: FilterBuilderClause = {
+        operator: filterBuilderAndOrOperator.AND,
+        clauses: [],
+      };
+      render(
+        <FilterBuilderPro
+          {...defaultProps}
+          dimensionsAndMeasures={[makeDim('country')]}
+          defaultFilters={emptyClause}
+        />,
+      );
+      const emptyState: FilterBuilderState = {
+        filters: [],
+        operator: filterBuilderAndOrOperator.AND,
+      };
+      const seedCall = defaultProps.setEmbeddableState.mock.calls.find((call) => {
+        if (typeof call[0] !== 'function') return false;
+        const result = (call[0] as (s: FilterBuilderState) => FilterBuilderState)(emptyState);
+        return Array.isArray(result.filters) && result.filters.length > 0;
+      });
+      expect(seedCall).toBeUndefined();
     });
   });
 
@@ -512,6 +590,42 @@ describe('FilterBuilderPro', () => {
       expect(screen.getByRole('button', { name: 'editors.filterBuilder.and' })).not.toBeDisabled();
     });
 
+    it('toggles the operator from AND to OR when the AND/OR button is clicked', () => {
+      const embeddableState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
+        filters: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'France',
+          }),
+          makeFilter({
+            id: 2,
+            dimensionOrMeasure: makeDim('city'),
+            operator: 'is',
+            value: 'Paris',
+          }),
+        ],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
+
+      fireEvent.click(screen.getByRole('button', { name: 'editors.filterBuilder.and' }));
+
+      const next = applyUpdater(defaultProps.setEmbeddableState, embeddableState);
+      expect(next.operator).toBe(filterBuilderAndOrOperator.OR);
+    });
+
+    it('does not call onChange while operator is OR with mixed filter types', () => {
+      const embeddableState: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.OR,
+        filters: [measureFilter(), dimensionFilter()],
+      };
+      render(<FilterBuilderPro {...defaultProps} embeddableState={embeddableState} />);
+
+      expect(defaultProps.onChange).not.toHaveBeenCalled();
+    });
+
     it('detects a mix from the selected member even when the measure value is incomplete (regression)', () => {
       // Changing a clause's operator clears its value, making the measure "incomplete".
       // The mix must still be detected from the selected member, otherwise OR slips through.
@@ -532,6 +646,72 @@ describe('FilterBuilderPro', () => {
       render(<FilterBuilderPro {...defaultProps} />);
       expect(screen.queryByTestId('icon-chevron-left')).not.toBeInTheDocument();
       expect(screen.queryByTestId('icon-chevron-right')).not.toBeInTheDocument();
+    });
+
+    it('renders the scroll-right button and calls scrollBy when content overflows', () => {
+      render(<FilterBuilderPro {...defaultProps} />);
+      const scrollEl = document.querySelector('.scroll')!;
+
+      Object.defineProperty(scrollEl, 'scrollLeft', { value: 0, configurable: true });
+      Object.defineProperty(scrollEl, 'clientWidth', { value: 100, configurable: true });
+      Object.defineProperty(scrollEl, 'scrollWidth', { value: 300, configurable: true });
+      fireEvent.scroll(scrollEl);
+
+      fireEvent.click(screen.getByTestId('icon-chevron-right').closest('button')!);
+      expect(Element.prototype.scrollBy).toHaveBeenCalledWith({ left: 200, behavior: 'smooth' });
+    });
+
+    it('renders the scroll-left button and calls scrollBy when scrolled right', () => {
+      render(<FilterBuilderPro {...defaultProps} />);
+      const scrollEl = document.querySelector('.scroll')!;
+
+      Object.defineProperty(scrollEl, 'scrollLeft', { value: 10, configurable: true });
+      Object.defineProperty(scrollEl, 'clientWidth', { value: 100, configurable: true });
+      Object.defineProperty(scrollEl, 'scrollWidth', { value: 100, configurable: true });
+      fireEvent.scroll(scrollEl);
+
+      fireEvent.click(screen.getByTestId('icon-chevron-left').closest('button')!);
+      expect(Element.prototype.scrollBy).toHaveBeenCalledWith({ left: -200, behavior: 'smooth' });
+    });
+
+    it('auto-scrolls to the end when a filter changes after initialisation', () => {
+      vi.useFakeTimers();
+      const dims = [makeDim('country')];
+      const clause: FilterBuilderClause = {
+        operator: filterBuilderAndOrOperator.AND,
+        clauses: [{ property: 'country', operator: 'equals' as never, value: 'France' }],
+      };
+
+      const { rerender } = render(
+        <FilterBuilderPro {...defaultProps} dimensionsAndMeasures={dims} defaultFilters={clause} />,
+      );
+
+      // Clear the disableAutoScroll guard set by defaultFilters effect
+      act(() => vi.advanceTimersByTime(100));
+
+      rerender(
+        <FilterBuilderPro
+          {...defaultProps}
+          dimensionsAndMeasures={dims}
+          defaultFilters={clause}
+          embeddableState={{
+            operator: filterBuilderAndOrOperator.AND,
+            filters: [
+              makeFilter({
+                id: 1,
+                dimensionOrMeasure: makeDim('country'),
+                operator: 'is',
+                value: 'France',
+              }),
+            ],
+          }}
+        />,
+      );
+
+      act(() => vi.advanceTimersByTime(100));
+
+      expect(Element.prototype.scrollTo).toHaveBeenCalled();
+      vi.useRealTimers();
     });
   });
 });
