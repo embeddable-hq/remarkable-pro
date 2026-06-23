@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.11
+
+### Patch Changes
+
+- 6d8ed63: feat: add ignoreEmptyDate subinput to time dimension to skip gap-filling in charts
+
 ## 0.3.9
 
 ### Patch Changes
