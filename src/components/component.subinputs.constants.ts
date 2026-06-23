@@ -153,9 +153,9 @@ const showGranularityDropdown = {
   defaultValue: false,
 } as const;
 
-const ignoreEmptyData = {
+const ignoreEmptyDate = {
   type: 'boolean',
-  name: 'ignoreEmptyData',
+  name: 'ignoreEmptyDate',
   label: 'Ignore empty dates',
   description: 'When enabled, dates with no data will be omitted instead of shown as empty.',
   supportedTypes: ['time'],
@@ -184,7 +184,7 @@ export const timeDimensionSubInputs: any[] = [
   abbreviateLargeNumber,
   granularity,
   dateBounds,
-  ignoreEmptyData,
+  ignoreEmptyDate,
 ];
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -205,7 +205,7 @@ export const timeDimensionWithGranularitySelectFieldSubInputs: any[] = [
     description:
       'Set a date range or connect your primary date-range variable to define the x-axis min and max. If "Show granularity dropdown" is enabled, this also enables auto-selection of the most appropriate granularity',
   },
-  ignoreEmptyData,
+  ignoreEmptyDate,
 ];
 
 export const subInputs = {
@@ -230,5 +230,5 @@ export const subInputs = {
   tableCellStyle,
   showGranularityDropdown,
   showValueAsPercentage,
-  ignoreEmptyData,
+  ignoreEmptyDate,
 };
