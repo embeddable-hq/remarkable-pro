@@ -1,5 +1,49 @@
 # @embeddable/remarkable-ui
 
+## 0.3.11
+
+### Patch Changes
+
+- 6d8ed63: feat: add ignoreEmptyDate subinput to time dimension to skip gap-filling in charts
+
+## 0.3.9
+
+### Patch Changes
+
+- 00f75b3: Add support for or operator
+
+## 0.3.8
+
+### Patch Changes
+
+- 423bcd2: Add support for custom canvas overlay customization
+
+## 0.3.7
+
+### Patch Changes
+
+- 8569541: Add export options input to component builder settings
+
+## 0.3.6
+
+### Patch Changes
+
+- 3186e5e: Fix tooltip positioning
+- b472382: Pass color for labels in pie chart
+
+## 0.3.5
+
+### Patch Changes
+
+- 8502805: Extend filter builder to allow cascading filtering
+
+## 0.3.4
+
+### Patch Changes
+
+- ccdeca9: Consider decimal places in the percentage values
+- b4fd408: Fixes minor pie chart percentage bug, adds measureValue to comparison line chart click handler, upgrades Remarkable UI
+
 ## 0.3.3
 
 ### Patch Changes

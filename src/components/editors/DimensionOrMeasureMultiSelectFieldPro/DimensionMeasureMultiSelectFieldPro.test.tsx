@@ -167,4 +167,35 @@ describe('DimensionMeasureMultiSelectFieldPro', () => {
       }),
     );
   });
+
+  it('normalizes selectedDimensionsAndMeasures with model-qualified titles against dimensionAndMeasureOptions on mount', () => {
+    const onChange = vi.fn();
+    // Simulate a variable default storing an item with a model-qualified title
+    const revenueWithModelTitle = { ...revenue, title: 'Products Revenue' };
+
+    render(
+      <DimensionMeasureMultiSelectFieldPro
+        dimensionAndMeasureOptions={[revenue, country]}
+        selectedDimensionsAndMeasures={[revenueWithModelTitle]}
+        onChange={onChange}
+      />,
+    );
+
+    // Should call onChange with the resolved item from dimensionAndMeasureOptions (correct title)
+    expect(onChange).toHaveBeenCalledWith([revenue]);
+  });
+
+  it('does not call onChange for normalization when titles already match dimensionAndMeasureOptions', () => {
+    const onChange = vi.fn();
+
+    render(
+      <DimensionMeasureMultiSelectFieldPro
+        dimensionAndMeasureOptions={[revenue, country]}
+        selectedDimensionsAndMeasures={[revenue]}
+        onChange={onChange}
+      />,
+    );
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });

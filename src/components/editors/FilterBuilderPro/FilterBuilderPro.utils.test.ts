@@ -4,6 +4,7 @@ import {
   clauseToFilter,
   clauseToFilters,
   filterBuilderAndOrOperator,
+  filterToLoadDataFilters,
   filtersToClause,
   getSupportedDimensionsAndMeasures,
   operatorNumber,
@@ -37,6 +38,103 @@ const makeFilter = (overrides: Partial<FilterBuilderFilter> = {}): FilterBuilder
 
 const generate = (...args: Parameters<typeof filtersToClause>): ClauseGroup | null =>
   filtersToClause(...args) as ClauseGroup | null;
+
+// ---------------------------------------------------------------------------
+// filterToLoadDataFilters
+// ---------------------------------------------------------------------------
+
+describe('filterToLoadDataFilters', () => {
+  it('returns [] for a filter missing dimensionOrMeasure', () => {
+    expect(filterToLoadDataFilters(makeFilter({ dimensionOrMeasure: null }))).toEqual([]);
+  });
+
+  it('returns [] for a filter missing operator', () => {
+    expect(filterToLoadDataFilters(makeFilter({ operator: null }))).toEqual([]);
+  });
+
+  it('returns [] for a filter with null value', () => {
+    expect(filterToLoadDataFilters(makeFilter({ value: null }))).toEqual([]);
+  });
+
+  it('maps a string "is" filter to a single equals load-data filter', () => {
+    const result = filterToLoadDataFilters(
+      makeFilter({ operator: operatorStringBoolean.is, value: 'Alice' }),
+    );
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({ operator: FilterOperator.equals, value: 'Alice' });
+  });
+
+  it('maps a string "isNot" filter to notEquals', () => {
+    const result = filterToLoadDataFilters(
+      makeFilter({ operator: operatorStringBoolean.isNot, value: 'Bob' }),
+    );
+    expect(result[0]?.operator).toBe(FilterOperator.notEquals);
+  });
+
+  it('maps a string "isOneOf" filter to contains', () => {
+    const result = filterToLoadDataFilters(
+      makeFilter({ operator: operatorStringBoolean.isOneOf, value: ['a', 'b'] }),
+    );
+    expect(result[0]?.operator).toBe(FilterOperator.contains);
+    expect(result[0]?.value).toEqual(['a', 'b']);
+  });
+
+  it('maps a string "isNotOneOf" filter to notContains', () => {
+    const result = filterToLoadDataFilters(
+      makeFilter({ operator: operatorStringBoolean.isNotOneOf, value: ['x'] }),
+    );
+    expect(result[0]?.operator).toBe(FilterOperator.notContains);
+  });
+
+  it('maps a number gte filter correctly', () => {
+    const result = filterToLoadDataFilters(
+      makeFilter({
+        dimensionOrMeasure: makeDim(NativeDataType.number, 'age'),
+        operator: operatorNumber.gte,
+        value: 18,
+      }),
+    );
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({ operator: FilterOperator.gte, value: 18 });
+  });
+
+  it('maps a number lte filter correctly', () => {
+    const result = filterToLoadDataFilters(
+      makeFilter({
+        dimensionOrMeasure: makeDim(NativeDataType.number, 'age'),
+        operator: operatorNumber.lte,
+        value: 65,
+      }),
+    );
+    expect(result[0]?.operator).toBe(FilterOperator.lte);
+  });
+
+  it('expands a number "between" filter into gte + lte load-data filters', () => {
+    const result = filterToLoadDataFilters(
+      makeFilter({
+        dimensionOrMeasure: makeDim(NativeDataType.number, 'price'),
+        operator: operatorNumber.between,
+        value: [10, 50] as unknown as FilterBuilderFilter['value'],
+      }),
+    );
+    expect(result).toHaveLength(2);
+    expect(result[0]).toMatchObject({ operator: FilterOperator.gte, value: 10 });
+    expect(result[1]).toMatchObject({ operator: FilterOperator.lte, value: 50 });
+  });
+
+  it('returns [] for an unrecognised operator', () => {
+    const result = filterToLoadDataFilters(makeFilter({ operator: 'unknown_op' }));
+    expect(result).toEqual([]);
+  });
+
+  it('sets the property field to the dimensionOrMeasure object', () => {
+    const dim = makeDim(NativeDataType.string, 'country');
+    const result = filterToLoadDataFilters(
+      makeFilter({ dimensionOrMeasure: dim, operator: operatorStringBoolean.is, value: 'USA' }),
+    );
+    expect(result[0]?.property).toBe(dim);
+  });
+});
 
 // ---------------------------------------------------------------------------
 // getSupportedDimensionsAndMeasures

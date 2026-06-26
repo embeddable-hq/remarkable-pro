@@ -75,6 +75,7 @@ const meta = {
       description: 'Maximum value for the right-hand Y-axis used by line series.',
     },
     inputs.maxResults,
+    inputs.menuOptions,
   ],
   events: [
     {

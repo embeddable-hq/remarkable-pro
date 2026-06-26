@@ -5,7 +5,7 @@ import { DefaultPieChartProps } from '../pies.types';
 import { DataResponse, Measure } from '@embeddable.com/core';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard } from '../../shared/ChartCard/ChartCard';
+import { ChartCard, asChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { DonutChart } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
 import { resolveI18nProps } from '../../../component.utils';
@@ -33,9 +33,8 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
     innerLabelMeasure,
   } = props;
 
-  const { description, title, tooltip, innerLabelText, onSegmentClick } = resolveI18nProps(props);
-
-  const { hideMenu } = props;
+  const resolvedI18nProps = resolveI18nProps(props);
+  const { innerLabelText, onSegmentClick } = resolvedI18nProps;
 
   const data = getPieChartProData(
     { data: results.data, dimension, measure, maxLegendItems },
@@ -59,10 +58,7 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
       data={results}
       dimensionsAndMeasures={[dimension, measure]}
       errorMessage={results.error}
-      description={description}
-      title={title}
-      tooltip={tooltip}
-      hideMenu={hideMenu}
+      {...asChartCardHeaderProps(props)}
     >
       <DonutChart
         label={label}

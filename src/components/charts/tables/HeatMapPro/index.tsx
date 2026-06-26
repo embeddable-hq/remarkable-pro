@@ -1,8 +1,11 @@
 import { useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard, ChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
-import { resolveI18nProps } from '../../../component.utils';
+import {
+  ChartCard,
+  ChartCardHeaderProps,
+  asChartCardHeaderProps,
+} from '../../shared/ChartCard/ChartCard';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import {
   getStyle,
@@ -13,6 +16,9 @@ import {
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { useGetTableSortedResults } from '../tables.hooks';
+import { useCallback } from 'react';
+import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import { HeatMapCellClickArg, HeatMapProOptionsClickArg } from './HeatMapPro.types';
 
 export type HeatMapProProps = {
   columnDimension: Dimension;
@@ -29,6 +35,7 @@ export type HeatMapProProps = {
   results: DataResponse;
   rowDimension: Dimension;
   showValues?: boolean;
+  onCellClicked?: (args: HeatMapProOptionsClickArg) => void;
 } & ChartCardHeaderProps;
 
 export const getHeatMeasure = (
@@ -65,9 +72,7 @@ const HeatMapPro = (props: HeatMapProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { title, description, tooltip } = resolveI18nProps(props);
   const {
-    hideMenu,
     measure,
     rowDimension,
     columnDimension,
@@ -80,7 +85,27 @@ const HeatMapPro = (props: HeatMapProProps) => {
     showValues,
     minThreshold,
     maxThreshold,
+    onCellClicked,
   } = props;
+
+  const handleCellClick = useCallback(
+    ({ rowDimensionValue, columnDimensionValue }: HeatMapCellClickArg) => {
+      if (!onCellClicked) return;
+      onCellClicked({
+        rowDimensionValue,
+        rowDimensionTimeRange: getTimeRangeFromDimensionValue({
+          value: rowDimensionValue,
+          dimension: rowDimension,
+        }),
+        columnDimensionValue,
+        columnDimensionTimeRange: getTimeRangeFromDimensionValue({
+          value: columnDimensionValue,
+          dimension: columnDimension,
+        }),
+      });
+    },
+    [onCellClicked, rowDimension, columnDimension],
+  );
 
   const columnOrder = Array.from(
     new Set((props.results.data ?? []).filter(Boolean).map((d) => d[columnDimension.name])),
@@ -117,13 +142,10 @@ const HeatMapPro = (props: HeatMapProProps) => {
 
   return (
     <ChartCard
-      title={title}
-      description={description}
-      tooltip={tooltip}
       data={props.results}
       dimensionsAndMeasures={[rowDimension, columnDimension, measure]}
       errorMessage={props.results?.error}
-      hideMenu={hideMenu}
+      {...asChartCardHeaderProps(props)}
     >
       <HeatMap
         data={results}
@@ -139,6 +161,7 @@ const HeatMapPro = (props: HeatMapProProps) => {
         columnWidth={columnWidth}
         firstColumnWidth={firstColumnWidth}
         displayNullAs={displayNullAs}
+        onCellClick={handleCellClick}
       />
     </ChartCard>
   );

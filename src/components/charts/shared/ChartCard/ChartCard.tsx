@@ -14,6 +14,7 @@ import { ChartCardLoading } from './ChartCardLoading/ChartCardLoading';
 import { ChartCardMenuPro } from './ChartCardMenuPro/ChartCardMenuPro';
 import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
+import { resolveI18nProps } from '../../../component.utils';
 import clsx from 'clsx';
 import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
 
@@ -22,6 +23,20 @@ export type ChartCardHeaderProps = {
   description?: string;
   tooltip?: string;
   hideMenu?: boolean;
+  menuOptions?: (string | unknown)[];
+};
+
+export const asChartCardHeaderProps = <T extends ChartCardHeaderProps>(
+  props: T,
+): Omit<ChartCardHeaderProps, 'menuOptions'> & { menuOptions?: string[] } => {
+  const { title, description, tooltip, hideMenu, menuOptions } = props;
+  return {
+    title,
+    description,
+    tooltip,
+    hideMenu,
+    menuOptions: menuOptions as string[] | undefined,
+  };
 };
 
 type ChartCardProps = {
@@ -31,88 +46,82 @@ type ChartCardProps = {
   style?: CSSProperties;
   dimensionsAndMeasures?: (Dimension | Measure)[];
   onCustomDownload?: (props: (props: ChartCardMenuOptionOnClickProps) => void) => void;
-} & ChartCardHeaderProps;
+} & Omit<ChartCardHeaderProps, 'menuOptions'> & { menuOptions?: string[] };
 
-export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>(
-  (
-    {
-      tooltip,
-      title,
-      description,
-      children,
-      data,
-      errorMessage,
-      dimensionsAndMeasures = [],
-      hideMenu = false,
-      onCustomDownload,
-    },
-    ref,
-  ) => {
-    const theme: Theme = useTheme() as Theme;
-    i18nSetup(theme);
+export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props, ref) => {
+  const theme: Theme = useTheme() as Theme;
+  i18nSetup(theme);
 
-    const chartRef = useRef<HTMLDivElement>(null);
+  const { title, description, tooltip } = resolveI18nProps(props);
+  const {
+    children,
+    data,
+    errorMessage,
+    dimensionsAndMeasures = [],
+    hideMenu = false,
+    onCustomDownload,
+    menuOptions,
+  } = props;
 
-    const hasData = Boolean(data?.data && data.data?.length > 0);
+  const chartRef = useRef<HTMLDivElement>(null);
 
-    const isLoading = !data || data?.isLoading;
+  const hasData = Boolean(data?.data && data.data?.length > 0);
 
-    const getDisplay = () => {
-      if (isLoading && !hasData) {
-        return <Skeleton />;
-      }
+  const isLoading = !data || data?.isLoading;
 
-      if (errorMessage) {
-        return (
-          <CardFeedback
-            variant="error"
-            icon={IconAlertCircle}
-            title={i18n.t('charts.errorTitle')}
-            message={errorMessage}
-          />
-        );
-      }
+  const getDisplay = () => {
+    if (isLoading && !hasData) {
+      return <Skeleton />;
+    }
 
-      if (!hasData) {
-        return (
-          <CardFeedback
-            title={i18n.t('charts.emptyTitle')}
-            message={i18n.t('charts.emptyMessage')}
-          />
-        );
-      }
+    if (errorMessage) {
+      return (
+        <CardFeedback
+          variant="error"
+          icon={IconAlertCircle}
+          title={i18n.t('charts.errorTitle')}
+          message={errorMessage}
+        />
+      );
+    }
 
-      return children;
-    };
+    if (!hasData) {
+      return (
+        <CardFeedback title={i18n.t('charts.emptyTitle')} message={i18n.t('charts.emptyMessage')} />
+      );
+    }
 
-    return (
-      <Card className={styles.chartCard}>
-        {hideMenu ? null : (
-          <>
-            <div className={styles.chartCardHeader}>
-              <CardHeader title={title} subtitle={description} tooltip={tooltip} />
+    return children;
+  };
+
+  return (
+    <Card className={styles.chartCard}>
+      {hideMenu ? null : (
+        <>
+          <div className={styles.chartCardHeader}>
+            <CardHeader title={title} subtitle={description} tooltip={tooltip} />
+          </div>
+          <div className={styles.chartCardRightContent}>
+            <div className={clsx(!isLoading && styles.hidden)}>
+              <ChartCardLoading />
             </div>
-            <div className={styles.chartCardRightContent}>
-              <div className={clsx(!isLoading && styles.hidden)}>
-                <ChartCardLoading />
-              </div>
-              <div className={clsx(isLoading && styles.hidden)}>
-                <ChartCardMenuPro
-                  title={title}
-                  containerRef={chartRef}
-                  data={data?.data}
-                  dimensionsAndMeasures={dimensionsAndMeasures}
-                  onCustomDownload={onCustomDownload}
-                />
-              </div>
+            <div className={clsx(isLoading && styles.hidden)}>
+              <ChartCardMenuPro
+                title={title}
+                containerRef={chartRef}
+                data={data?.data}
+                dimensionsAndMeasures={dimensionsAndMeasures}
+                onCustomDownload={onCustomDownload}
+                menuOptions={menuOptions}
+              />
             </div>
-          </>
-        )}
+          </div>
+        </>
+      )}
 
-        <CardContent ref={onCustomDownload ? ref : chartRef}>{getDisplay()}</CardContent>
-      </Card>
-    );
-  },
-);
+      <CardContent ref={onCustomDownload ? ref : chartRef}>{getDisplay()}</CardContent>
+    </Card>
+  );
+});
 
 ChartCard.displayName = 'ChartCard';

@@ -118,6 +118,7 @@ export const getPieChartProOptions = (
         labels: {
           generateLabels: (chart) => {
             const labels = chart.data.labels ?? [];
+            const labelColor = chart.options.plugins?.legend?.labels?.color as string | undefined;
             return labels.map((label, i) => {
               const meta = chart.getDatasetMeta(0);
               const style = meta.controller.getStyle(i, false);
@@ -128,6 +129,7 @@ export const getPieChartProOptions = (
                 lineWidth: style.borderWidth,
                 hidden: !chart.getDataVisibility(i),
                 index: i,
+                fontColor: labelColor,
               };
             });
           },

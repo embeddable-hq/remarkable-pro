@@ -141,4 +141,35 @@ describe('MeasureMultiSelectFieldPro', () => {
       }),
     );
   });
+
+  it('normalizes selectedMeasures with model-qualified titles against measureOptions on mount', () => {
+    const onChange = vi.fn();
+    // Simulate a variable default storing a measure with a model-qualified title
+    const revenueWithModelTitle = { ...revenue, title: 'Products Revenue' };
+
+    render(
+      <MeasureMultiSelectFieldPro
+        measureOptions={[revenue, count]}
+        selectedMeasures={[revenueWithModelTitle]}
+        onChange={onChange}
+      />,
+    );
+
+    // Should call onChange with the resolved measure from measureOptions (correct title)
+    expect(onChange).toHaveBeenCalledWith([revenue]);
+  });
+
+  it('does not call onChange for normalization when titles already match measureOptions', () => {
+    const onChange = vi.fn();
+
+    render(
+      <MeasureMultiSelectFieldPro
+        measureOptions={[revenue, count]}
+        selectedMeasures={[revenue]}
+        onChange={onChange}
+      />,
+    );
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
 });
