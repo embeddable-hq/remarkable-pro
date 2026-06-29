@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.12
+
+### Patch Changes
+
+- e153b5b: Include Timezone on the kpi chart
+
 ## 0.3.11
 
 ### Patch Changes
