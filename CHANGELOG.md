@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.13
+
+### Patch Changes
+
+- adad13e: Increase Remarkable-Ui version
+
 ## 0.3.12
 
 ### Patch Changes
