@@ -3,9 +3,7 @@ import { Granularity } from '../theme/defaults/defaults.GranularityOptions.const
 import AlignType from './types/Align.type.emb';
 import DisplayFormatType from './types/DisplayFormat.type.emb';
 import TableCellStyleType from './types/TableCellStyle.type.emb';
-import PivotAggregationType, {
-  PivotAggregationTypeOptions,
-} from './types/PivotAggregation.type.emb';
+import PivotAggregationType from './types/PivotAggregation.type.emb';
 
 /* -------------------- */
 /* ----- Generics ----- */
@@ -151,8 +149,6 @@ const columnAggregation = {
   type: PivotAggregationType,
   label: 'Show column calculation',
   array: true,
-  defaultValue:
-    [] as (typeof PivotAggregationTypeOptions)[keyof typeof PivotAggregationTypeOptions][],
 } as const;
 
 const rowAggregation = {
@@ -160,8 +156,6 @@ const rowAggregation = {
   type: PivotAggregationType,
   label: 'Show row calculation',
   array: true,
-  defaultValue:
-    [] as (typeof PivotAggregationTypeOptions)[keyof typeof PivotAggregationTypeOptions][],
 } as const;
 
 const showGranularityDropdown = {
