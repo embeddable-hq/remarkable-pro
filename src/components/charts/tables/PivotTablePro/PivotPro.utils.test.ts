@@ -1,9 +1,4 @@
-import {
-  getPivotMeasures,
-  getPivotDimension,
-  getPivotColumnAggregationsFor,
-  getPivotRowAggregationsFor,
-} from './PivotPro.utils';
+import { getPivotMeasures, getPivotDimension, getPivotAggregationsFor } from './PivotPro.utils';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
@@ -168,15 +163,15 @@ describe('getPivotDimension', () => {
 
 // ---------------------------------------------------------------------------
 
-describe('getPivotColumnAggregationsFor', () => {
-  it('maps columnAggregation values to the correct prop keys', () => {
+describe('getPivotAggregationsFor', () => {
+  it('maps columnAggregation selections to column props', () => {
     const measures = [
       measure({ name: 'a', inputs: { columnAggregation: ['sum', 'min'] } }),
       measure({ name: 'b', inputs: { columnAggregation: ['max'] } }),
       measure({ name: 'c', inputs: { columnAggregation: ['average', 'sum'] } }),
     ];
 
-    const result = getPivotColumnAggregationsFor(measures);
+    const result = getPivotAggregationsFor(measures);
 
     expect(result.columnSumFor).toEqual(['a', 'c']);
     expect(result.columnMinFor).toEqual(['a']);
@@ -184,36 +179,14 @@ describe('getPivotColumnAggregationsFor', () => {
     expect(result.columnAverageFor).toEqual(['c']);
   });
 
-  it('returns empty arrays when no measures have columnAggregation', () => {
-    const result = getPivotColumnAggregationsFor([measure({ name: 'a' })]);
-
-    expect(result.columnSumFor).toEqual([]);
-    expect(result.columnMinFor).toEqual([]);
-    expect(result.columnMaxFor).toEqual([]);
-    expect(result.columnAverageFor).toEqual([]);
-  });
-
-  it('returns empty arrays for empty measures list', () => {
-    const result = getPivotColumnAggregationsFor([]);
-
-    expect(result.columnSumFor).toEqual([]);
-    expect(result.columnMinFor).toEqual([]);
-    expect(result.columnMaxFor).toEqual([]);
-    expect(result.columnAverageFor).toEqual([]);
-  });
-});
-
-// ---------------------------------------------------------------------------
-
-describe('getPivotRowAggregationsFor', () => {
-  it('maps rowAggregation values to the correct prop keys', () => {
+  it('maps rowAggregation selections to row props', () => {
     const measures = [
       measure({ name: 'x', inputs: { rowAggregation: ['sum', 'average'] } }),
       measure({ name: 'y', inputs: { rowAggregation: ['min'] } }),
       measure({ name: 'z', inputs: { rowAggregation: ['max', 'sum'] } }),
     ];
 
-    const result = getPivotRowAggregationsFor(measures);
+    const result = getPivotAggregationsFor(measures);
 
     expect(result.rowSumFor).toEqual(['x', 'z']);
     expect(result.rowMinFor).toEqual(['y']);
@@ -221,9 +194,13 @@ describe('getPivotRowAggregationsFor', () => {
     expect(result.rowAverageFor).toEqual(['x']);
   });
 
-  it('returns empty arrays when no measures have rowAggregation', () => {
-    const result = getPivotRowAggregationsFor([measure({ name: 'x' })]);
+  it('returns empty arrays when no measures have aggregation inputs', () => {
+    const result = getPivotAggregationsFor([measure({ name: 'a' })]);
 
+    expect(result.columnSumFor).toEqual([]);
+    expect(result.columnMinFor).toEqual([]);
+    expect(result.columnMaxFor).toEqual([]);
+    expect(result.columnAverageFor).toEqual([]);
     expect(result.rowSumFor).toEqual([]);
     expect(result.rowMinFor).toEqual([]);
     expect(result.rowMaxFor).toEqual([]);
@@ -231,11 +208,9 @@ describe('getPivotRowAggregationsFor', () => {
   });
 
   it('returns empty arrays for empty measures list', () => {
-    const result = getPivotRowAggregationsFor([]);
+    const result = getPivotAggregationsFor([]);
 
+    expect(result.columnSumFor).toEqual([]);
     expect(result.rowSumFor).toEqual([]);
-    expect(result.rowMinFor).toEqual([]);
-    expect(result.rowMaxFor).toEqual([]);
-    expect(result.rowAverageFor).toEqual([]);
   });
 });

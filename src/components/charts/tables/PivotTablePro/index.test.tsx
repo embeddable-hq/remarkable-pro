@@ -57,8 +57,7 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
 vi.mock('./PivotPro.utils', () => ({
   getPivotMeasures: vi.fn(() => []),
   getPivotDimension: vi.fn(() => ({})),
-  getPivotColumnAggregationsFor: vi.fn(() => ({})),
-  getPivotRowAggregationsFor: vi.fn(() => ({})),
+  getPivotAggregationsFor: vi.fn(() => ({})),
 }));
 
 vi.mock('../tables.hooks', () => ({

@@ -51,11 +51,18 @@ const measureKeysFor = (
     .filter((m) => (m.inputs?.[field] as string[] | undefined)?.includes(type))
     .map((m) => m.name);
 
-export const getPivotColumnAggregationsFor = (
+export const getPivotAggregationsFor = (
   measures: Measure[],
 ): Pick<
   PivotTableProps<any>,
-  'columnSumFor' | 'columnMinFor' | 'columnMaxFor' | 'columnAverageFor'
+  | 'columnSumFor'
+  | 'columnMinFor'
+  | 'columnMaxFor'
+  | 'columnAverageFor'
+  | 'rowSumFor'
+  | 'rowMinFor'
+  | 'rowMaxFor'
+  | 'rowAverageFor'
 > => ({
   columnSumFor: measureKeysFor(measures, 'columnAggregation', PivotAggregationTypeOptions.sum),
   columnMinFor: measureKeysFor(measures, 'columnAggregation', PivotAggregationTypeOptions.min),
@@ -65,11 +72,6 @@ export const getPivotColumnAggregationsFor = (
     'columnAggregation',
     PivotAggregationTypeOptions.average,
   ),
-});
-
-export const getPivotRowAggregationsFor = (
-  measures: Measure[],
-): Pick<PivotTableProps<any>, 'rowSumFor' | 'rowMinFor' | 'rowMaxFor' | 'rowAverageFor'> => ({
   rowSumFor: measureKeysFor(measures, 'rowAggregation', PivotAggregationTypeOptions.sum),
   rowMinFor: measureKeysFor(measures, 'rowAggregation', PivotAggregationTypeOptions.min),
   rowMaxFor: measureKeysFor(measures, 'rowAggregation', PivotAggregationTypeOptions.max),

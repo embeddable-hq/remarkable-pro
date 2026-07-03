@@ -10,12 +10,7 @@ import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { PivotTable } from '@embeddable.com/remarkable-ui';
 import { useEffect, useRef, useState } from 'react';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import {
-  getPivotColumnAggregationsFor,
-  getPivotDimension,
-  getPivotMeasures,
-  getPivotRowAggregationsFor,
-} from './PivotPro.utils';
+import { getPivotAggregationsFor, getPivotDimension, getPivotMeasures } from './PivotPro.utils';
 import { useGetTableSortedResults } from '../tables.hooks';
 import { sortArrayByProp } from '../../../../utils/array.utils';
 
@@ -89,8 +84,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
     ? getPivotDimension({ dimension: subRowDimension }, theme)
     : undefined;
   const pivotColumnDimension = getPivotDimension({ dimension: columnDimension }, theme);
-  const pivotColumnAggregations = getPivotColumnAggregationsFor(measures);
-  const pivotRowAggregations = getPivotRowAggregationsFor(measures);
+  const pivotAggregations = getPivotAggregationsFor(measures);
 
   const [loadingRows, setLoadingRows] = useState(new Set<string>());
   const [subRowsByRow, setSubRowsByRow] = useState(new Map<string, any[]>());
@@ -150,8 +144,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
         measures={pivotMeasures}
         rowDimension={pivotRowDimension}
         columnDimension={pivotColumnDimension}
-        {...pivotColumnAggregations}
-        {...pivotRowAggregations}
+        {...pivotAggregations}
         sumLabel={i18n.t('charts.pivotTable.sum')}
         minLabel={i18n.t('charts.pivotTable.min')}
         maxLabel={i18n.t('charts.pivotTable.max')}
