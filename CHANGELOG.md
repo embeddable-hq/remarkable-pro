@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.14
+
+### Patch Changes
+
+- 043fb0d: Discard border style on the EditorCard
+
 ## 0.3.13
 
 ### Patch Changes
