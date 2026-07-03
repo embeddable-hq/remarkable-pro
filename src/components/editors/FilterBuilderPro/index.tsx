@@ -255,8 +255,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
                 dimensionsAndMeasures={dimensionsAndMeasures}
                 results={
                   (props as Record<string, unknown>)[`filterResults${filter.id}`] as
-                    | DataResponse
-                    | undefined
+                    DataResponse | undefined
                 }
                 theme={theme}
                 onSelectDimensionOrMeasure={(value) => handleSelectDimensionOrMeasure(index, value)}

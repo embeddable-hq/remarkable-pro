@@ -11,7 +11,7 @@ vi.mock('@embeddable.com/react', () => ({
 
 vi.mock('../../../../theme/i18n/i18n', () => ({
   i18nSetup: vi.fn(),
-  i18n: { t: vi.fn(() => '') },
+  i18n: { t: vi.fn((key: string) => `t(${key})`) },
 }));
 
 vi.mock('../../../component.utils', () => ({
@@ -43,14 +43,22 @@ vi.mock('../../charts.fillGaps.hooks', () => ({
 }));
 
 vi.mock('@embeddable.com/remarkable-ui', () => ({
-  PivotTable: () => <div data-testid="pivot-table" />,
+  PivotTable: (props: Record<string, unknown>) => (
+    <div
+      data-testid="pivot-table"
+      data-sum-label={String(props.sumLabel)}
+      data-min-label={String(props.minLabel)}
+      data-max-label={String(props.maxLabel)}
+      data-average-label={String(props.averageLabel)}
+    />
+  ),
 }));
 
 vi.mock('./PivotPro.utils', () => ({
   getPivotMeasures: vi.fn(() => []),
   getPivotDimension: vi.fn(() => ({})),
-  getPivotColumnTotalsFor: vi.fn(() => []),
-  getPivotRowTotalsFor: vi.fn(() => []),
+  getPivotColumnAggregationsFor: vi.fn(() => ({})),
+  getPivotRowAggregationsFor: vi.fn(() => ({})),
 }));
 
 vi.mock('../tables.hooks', () => ({
@@ -95,5 +103,17 @@ describe('PivotTablePro', () => {
   it('renders PivotTable', () => {
     render(<PivotTablePro {...defaultProps} />);
     expect(screen.getByTestId('pivot-table')).toBeInTheDocument();
+  });
+
+  it('passes calculation labels resolved through i18n, not hardcoded English', () => {
+    render(<PivotTablePro {...defaultProps} />);
+    const pivotTable = screen.getByTestId('pivot-table');
+
+    // The mocked i18n.t echoes back "t(<key>)", so this proves PivotTablePro asks i18n
+    // for these specific keys instead of passing literal 'Sum' / 'Min' / etc.
+    expect(pivotTable.getAttribute('data-sum-label')).toBe('t(charts.pivotTable.sum)');
+    expect(pivotTable.getAttribute('data-min-label')).toBe('t(charts.pivotTable.min)');
+    expect(pivotTable.getAttribute('data-max-label')).toBe('t(charts.pivotTable.max)');
+    expect(pivotTable.getAttribute('data-average-label')).toBe('t(charts.pivotTable.average)');
   });
 });

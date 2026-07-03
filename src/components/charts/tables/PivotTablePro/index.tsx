@@ -11,10 +11,10 @@ import { PivotTable } from '@embeddable.com/remarkable-ui';
 import { useEffect, useRef, useState } from 'react';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import {
-  getPivotColumnTotalsFor,
+  getPivotColumnAggregationsFor,
   getPivotDimension,
   getPivotMeasures,
-  getPivotRowTotalsFor,
+  getPivotRowAggregationsFor,
 } from './PivotPro.utils';
 import { useGetTableSortedResults } from '../tables.hooks';
 import { sortArrayByProp } from '../../../../utils/array.utils';
@@ -89,8 +89,8 @@ const PivotTablePro = (props: PivotTableProProps) => {
     ? getPivotDimension({ dimension: subRowDimension }, theme)
     : undefined;
   const pivotColumnDimension = getPivotDimension({ dimension: columnDimension }, theme);
-  const pivotColumnTotalsFor = getPivotColumnTotalsFor(measures);
-  const pivotRowTotalsFor = getPivotRowTotalsFor(measures);
+  const pivotColumnAggregations = getPivotColumnAggregationsFor(measures);
+  const pivotRowAggregations = getPivotRowAggregationsFor(measures);
 
   const [loadingRows, setLoadingRows] = useState(new Set<string>());
   const [subRowsByRow, setSubRowsByRow] = useState(new Map<string, any[]>());
@@ -146,13 +146,16 @@ const PivotTablePro = (props: PivotTableProProps) => {
       <PivotTable
         firstColumnWidth={firstColumnWidth}
         columnWidth={columnWidth}
-        totalLabel={i18n.t('charts.pivotTable.total')}
         data={results}
         measures={pivotMeasures}
         rowDimension={pivotRowDimension}
         columnDimension={pivotColumnDimension}
-        columnTotalsFor={pivotColumnTotalsFor}
-        rowTotalsFor={pivotRowTotalsFor}
+        {...pivotColumnAggregations}
+        {...pivotRowAggregations}
+        sumLabel={i18n.t('charts.pivotTable.sum')}
+        minLabel={i18n.t('charts.pivotTable.min')}
+        maxLabel={i18n.t('charts.pivotTable.max')}
+        averageLabel={i18n.t('charts.pivotTable.average')}
         expandableRows={Boolean(subRowDimension)}
         subRowsByRow={subRowsByRow}
         loadingRows={loadingRows}

@@ -36,6 +36,10 @@ export const de: ResourceLanguage = {
       },
       pivotTable: {
         total: 'Gesamt',
+        sum: 'Summe',
+        min: 'Min',
+        max: 'Max',
+        average: 'Durchschnitt',
       },
       kpiChart: {
         noPreviousData: 'Keine vorherigen Daten',
