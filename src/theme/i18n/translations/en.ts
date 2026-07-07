@@ -25,6 +25,10 @@ export const en: ResourceLanguage = {
       },
       pivotTable: {
         total: 'Total',
+        sum: 'Sum',
+        min: 'Min',
+        max: 'Max',
+        average: 'Average',
       },
       kpiChart: {
         noPreviousData: 'No previous data',

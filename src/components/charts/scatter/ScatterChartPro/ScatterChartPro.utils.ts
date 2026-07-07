@@ -76,8 +76,7 @@ export const getScatterChartProOptions = (
             const orig =
               ds.originalData?.[ctx.dataIndex] ??
               (ctx.dataset.data[ctx.dataIndex] as
-                | { x: number | null; y: number | null }
-                | undefined);
+                { x: number | null; y: number | null } | undefined);
             const prefix = ds.label ? `${ds.label}: ` : '';
             if (!orig) return prefix;
             return `${prefix}(${formatValue(xMeasure, orig.x)}, ${formatValue(yMeasure, orig.y)})`;
