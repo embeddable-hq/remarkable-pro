@@ -9,7 +9,7 @@ export const resolveI18nString = (value: string, args?: Record<string, any>): st
 
   // i18n is not initialized, return the fallback or the key
   if (!i18n.isInitialized) {
-    return (fallback ?? key) as string;
+    return (fallback || key) as string;
   }
 
   return i18n.t(
