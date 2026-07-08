@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.16
+
+### Patch Changes
+
+- 8f1bb3c: Fallback string value when the i18n is not initialized
+
 ## 0.3.15
 
 ### Patch Changes
