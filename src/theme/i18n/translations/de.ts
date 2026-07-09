@@ -63,6 +63,8 @@ export const de: ResourceLanguage = {
         deleteFilter: 'Filter löschen',
         createFilterGroup: 'Filtergruppe erstellen',
         addToFilterGroup: 'Zur Filtergruppe hinzufügen',
+        noSelection: '...',
+        countSelected: '{{count}} ausgewählt',
         betweenAnd: 'und',
         and: 'und',
         or: 'oder',

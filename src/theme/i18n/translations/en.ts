@@ -52,6 +52,8 @@ export const en: ResourceLanguage = {
         deleteFilter: 'Delete filter',
         createFilterGroup: 'Create filter group',
         addToFilterGroup: 'Add to filter group',
+        noSelection: '...',
+        countSelected: '{{count}} selected',
         betweenAnd: 'and',
         and: 'and',
         or: 'or',
