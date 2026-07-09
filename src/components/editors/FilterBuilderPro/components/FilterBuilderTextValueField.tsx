@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from '@embeddable.com/remarkable-ui';
 import { FilterBuilderFilter } from '../definition';
-import styles from '../FilterBuilderPro.module.css';
+import defaultStyles from '../FilterBuilderPro.module.css';
 
 export type FilterBuilderTextValueFieldProps = {
   filter: FilterBuilderFilter;
   onSelectValue: (value: string | null) => void;
+  styles?: Record<string, string>;
 };
 
 const FilterBuilderTextValueField = ({
   filter,
   onSelectValue,
+  styles = defaultStyles,
 }: FilterBuilderTextValueFieldProps) => {
   const [value, setValue] = useState<string>((filter?.value as string) ?? '');
   const inputRef = useRef<HTMLInputElement>(null);

@@ -2,20 +2,16 @@ import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/re
 import { FilterOperator, loadData, Value } from '@embeddable.com/core';
 import Component from '.';
 import { inputs } from '../../component.inputs.constants';
-import {
-  FilterBuilderAndOrOperator,
-  FilterBuilderClause,
-  FilterBuilderFilter,
-  filterToLoadDataFilters,
-} from './FilterBuilderPro.utils';
+import { FilterBuilderClause, filterToLoadDataFilters } from '../utils/filterBuilder.utils';
+import { FilterBuilderGroupingState, getLeafFilters } from './FilterBuilderWithGrouping.utils';
 
-export type { FilterBuilderFilter };
+export type { FilterBuilderGroupingState };
 
 const meta = {
-  name: 'FilterBuilderPro',
-  label: 'Filter Builder',
+  name: 'FilterBuilderWithGrouping',
+  label: 'Filter Builder (with grouping)',
   description:
-    'Free-form filter builder that lets end users compose member/operator/value clauses. Use to expose ad-hoc filtering on a dataset.',
+    'Free-form filter builder that lets end users compose member/operator/value clauses and combine them into nested AND/OR groups. Use to expose advanced ad-hoc filtering on a dataset.',
   category: 'Filters',
   defaultWidth: 600,
   defaultHeight: 120,
@@ -71,19 +67,20 @@ const meta = {
 
 const preview = definePreview(Component, {});
 
-export type FilterBuilderState = {
-  filters: FilterBuilderFilter[];
-  operator: FilterBuilderAndOrOperator;
-};
-
 const props = (
   inputs: Inputs<typeof meta>,
   [state, setState]: [
-    FilterBuilderState,
-    (state: FilterBuilderState | ((prev: FilterBuilderState) => FilterBuilderState)) => void,
+    FilterBuilderGroupingState,
+    (
+      state:
+        | FilterBuilderGroupingState
+        | ((prev: FilterBuilderGroupingState) => FilterBuilderGroupingState),
+    ) => void,
   ],
 ) => {
-  const filterResults = state?.filters?.reduce<Record<string, unknown>>((acc, item) => {
+  const leafFilters = getLeafFilters(state);
+
+  const filterResults = leafFilters.reduce<Record<string, unknown>>((acc, item) => {
     if (item.dimensionOrMeasure?.__type__ !== 'dimension' || !item.operator) {
       return acc;
     }
@@ -97,9 +94,7 @@ const props = (
       : [];
 
     const cascadingFilters = inputs.applyCascadingFilters
-      ? (state.filters ?? [])
-          .filter((other) => other.id !== item.id)
-          .flatMap(filterToLoadDataFilters)
+      ? leafFilters.filter((other) => other.id !== item.id).flatMap(filterToLoadDataFilters)
       : [];
 
     const filters = [...cascadingFilters, ...searchFilter];
@@ -127,7 +122,7 @@ const events = {
   }),
 };
 
-export const filterBuilderPro = {
+export const filterBuilderWithGrouping = {
   Component,
   meta,
   preview,

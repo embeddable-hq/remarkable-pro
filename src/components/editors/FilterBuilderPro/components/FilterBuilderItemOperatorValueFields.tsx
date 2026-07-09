@@ -1,35 +1,11 @@
-import { DataResponse, DimensionOrMeasure, NativeDataType } from '@embeddable.com/core';
+import { DataResponse, DimensionOrMeasure } from '@embeddable.com/core';
 import { FilterBuilderFilter } from '../definition';
 import { SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../../theme/theme.types';
 import FilterBuilderItemValueField from './FilterBuilderItemValueField';
 import { useEffect } from 'react';
-import styles from '../FilterBuilderPro.module.css';
-import { i18n } from '../../../../theme/i18n/i18n';
-import { operatorNumber, operatorStringBoolean } from '../FilterBuilderPro.utils';
-
-const getOperatorsString = () => [
-  { value: operatorStringBoolean.is, label: i18n.t('editors.filterBuilder.is') },
-  { value: operatorStringBoolean.isNot, label: i18n.t('editors.filterBuilder.isNot') },
-  { value: operatorStringBoolean.isOneOf, label: i18n.t('editors.filterBuilder.isOneOf') },
-  { value: operatorStringBoolean.isNotOneOf, label: i18n.t('editors.filterBuilder.isNotOneOf') },
-  { value: operatorStringBoolean.contains, label: i18n.t('editors.filterBuilder.contains') },
-];
-
-const getOperatorsBoolean = () => [
-  { value: operatorStringBoolean.is, label: i18n.t('editors.filterBuilder.is') },
-  { value: operatorStringBoolean.isNot, label: i18n.t('editors.filterBuilder.isNot') },
-  { value: operatorStringBoolean.isOneOf, label: i18n.t('editors.filterBuilder.isOneOf') },
-  { value: operatorStringBoolean.isNotOneOf, label: i18n.t('editors.filterBuilder.isNotOneOf') },
-];
-
-const getOperatorsNumber = () => [
-  { value: operatorNumber.equals, label: i18n.t('editors.filterBuilder.equals') },
-  { value: operatorNumber.notEquals, label: i18n.t('editors.filterBuilder.doesNotEqual') },
-  { value: operatorNumber.gte, label: i18n.t('editors.filterBuilder.greaterThanOrEqualTo') },
-  { value: operatorNumber.lte, label: i18n.t('editors.filterBuilder.lessThanOrEqualTo') },
-  { value: operatorNumber.between, label: i18n.t('editors.filterBuilder.between') },
-];
+import defaultStyles from '../FilterBuilderPro.module.css';
+import { getOperatorOptions } from '../FilterBuilderPro.utils';
 
 type FilterBuilderItemOperatorValueFieldsProps = {
   dimensionOrMeasure: DimensionOrMeasure;
@@ -39,6 +15,8 @@ type FilterBuilderItemOperatorValueFieldsProps = {
   onSelectOperator: (value: string | null) => void;
   onSelectValue: (value: FilterBuilderFilter['value']) => void;
   onSearchValue: (value: string) => void;
+  styles?: Record<string, string>;
+  showInlineClear?: boolean;
 };
 
 const FilterBuilderItemOperatorValueFields = ({
@@ -49,15 +27,10 @@ const FilterBuilderItemOperatorValueFields = ({
   onSelectOperator,
   onSelectValue,
   onSearchValue,
+  styles = defaultStyles,
+  showInlineClear = true,
 }: FilterBuilderItemOperatorValueFieldsProps) => {
-  let operatorOptions;
-  if (dimensionOrMeasure.nativeType === NativeDataType.number) {
-    operatorOptions = getOperatorsNumber();
-  } else if (dimensionOrMeasure.nativeType === NativeDataType.boolean) {
-    operatorOptions = getOperatorsBoolean();
-  } else {
-    operatorOptions = getOperatorsString();
-  }
+  const operatorOptions = getOperatorOptions(dimensionOrMeasure);
 
   useEffect(() => {
     if (!filter.operator) {
@@ -85,6 +58,8 @@ const FilterBuilderItemOperatorValueFields = ({
         theme={theme}
         onSelectValue={onSelectValue}
         onSearchValue={onSearchValue}
+        styles={styles}
+        showInlineClear={showInlineClear}
       />
     </>
   );

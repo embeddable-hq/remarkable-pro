@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDebounce } from '@embeddable.com/remarkable-ui';
 import { FilterBuilderFilter } from '../definition';
-import styles from '../FilterBuilderPro.module.css';
+import defaultStyles from '../FilterBuilderPro.module.css';
 import { i18n } from '../../../../theme/i18n/i18n';
 
 export type FilterBuilderItemNumberValueFieldProps = {
   filter: FilterBuilderFilter;
   onSelectValue: (value: number | number[] | null) => void;
+  styles?: Record<string, string>;
 };
 
 const getOnChangeValue = (v: React.ChangeEvent<HTMLInputElement>) => {
@@ -16,6 +17,7 @@ const getOnChangeValue = (v: React.ChangeEvent<HTMLInputElement>) => {
 const FilterBuilderItemNumberValueField = ({
   filter,
   onSelectValue,
+  styles = defaultStyles,
 }: FilterBuilderItemNumberValueFieldProps) => {
   const [value, setValue] = useState<number | null>((filter?.value as number) ?? null);
   const [min, setMin] = useState<number | null>(

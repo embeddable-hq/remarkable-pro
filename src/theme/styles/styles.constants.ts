@@ -113,6 +113,27 @@ const stylesRemarkablePro = {
   '--em-filterbuilder-andor-button-border-radius': 'var(--em-core-border-radius--400)',
   '--em-filterbuilder-andor-button-color': 'var(--em-sem-text--neutral)',
 
+  // Filter Builder with grouping (segment tokens)
+  '--em-filter-gap--internal': 'var(--em-core-spacing--0050)',
+  '--em-filter-gap--external': 'var(--em-core-spacing--0300)',
+  '--em-filter-height': 'var(--em-core-size--0800)',
+  '--em-filter-icon-size': 'var(--em-core-size--0400)',
+  '--em-filter-padding-x': 'var(--em-core-spacing--0300)',
+  '--em-filter-padding-x--operator': 'var(--em-core-spacing--0100)',
+  '--em-filter-border-radius': 'var(--em-core-border-radius--000)',
+  '--em-filter-border-radius--group': 'var(--em-core-border-radius--400)',
+  '--em-filter-color': 'var(--em-sem-text--neutral)',
+  '--em-filter-color--operator': 'var(--em-sem-text--muted)',
+  '--em-filter-background--filter': 'var(--em-sem-background--light)',
+  '--em-filter-background--filter--hover': 'var(--em-sem-background--subtle)',
+  '--em-filter-background--operator': 'var(--em-sem-background)',
+  '--em-filter-background--operator--hover': 'var(--em-sem-background--subtle)',
+  '--em-filter-background--group': 'var(--em-sem-background--neutral)',
+  '--em-filter-background--chevron': 'var(--em-sem-background--neutral)',
+  '--em-filter-border-color--group': 'var(--em-sem-background--light)',
+  '--em-filter-border-width--group': 'var(--em-core-border-width--025)',
+  '--em-filter-padding--group': 'var(--em-core-spacing--0100)',
+
   // Drilldown Modal
   '--em-drilldown-modal-min-height': '100%',
   '--em-drilldown-modal-width': '100%',

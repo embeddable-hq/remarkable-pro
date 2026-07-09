@@ -49,6 +49,9 @@ export const en: ResourceLanguage = {
       filterBuilder: {
         clearAll: 'clear all',
         addFilter: 'add filter',
+        deleteFilter: 'Delete filter',
+        createFilterGroup: 'Create filter group',
+        addToFilterGroup: 'Add to filter group',
         betweenAnd: 'and',
         and: 'and',
         or: 'or',
