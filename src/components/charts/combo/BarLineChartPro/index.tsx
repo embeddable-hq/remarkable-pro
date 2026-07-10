@@ -13,6 +13,7 @@ import {
   getBarLineChartProData,
   getBarLineChartProOptions,
 } from './BarLineChartPro.utils';
+import { getMeasureTotals, isResultTruncated } from '../../charts.other.loadData.utils';
 
 ChartJS.register(LineController, LineElement, PointElement);
 
@@ -24,6 +25,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
     measures,
     lineMeasures = [],
     xAxisMaxItems,
+    maxResults,
     yAxisRangeMin,
     yAxisRangeMax,
     showLegend,
@@ -40,6 +42,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
     setGranularity,
     onBarClicked,
     onLineClicked,
+    resultsOtherTotal,
   } = props;
 
   const resolvedI18nProps = resolveI18nProps(props);
@@ -49,6 +52,11 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
 
   const results = useFillGaps({ results: props.results, dimension });
 
+  const otherOptions = {
+    isTruncated: isResultTruncated(props.results, maxResults),
+    measureTotals: getMeasureTotals(resultsOtherTotal, [...measures, ...lineMeasures]),
+  };
+
   const data = getBarLineChartProData(
     {
       data: results.data,
@@ -57,6 +65,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
       lineMeasures,
       maxItems: xAxisMaxItems,
       showSecondaryAxis,
+      otherOptions,
     },
     theme,
   );

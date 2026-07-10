@@ -5,6 +5,7 @@ import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { subInputs } from '../../../component.subinputs.constants';
+import { getTopItemsOrderBy, loadOtherTotal } from '../../charts.other.loadData.utils';
 
 const meta = {
   name: 'PieChartPro',
@@ -60,6 +61,10 @@ const preview = definePreview(Component, previewConfig);
 const loadDataResultsArgs = (inputs: Inputs<typeof meta>): LoadDataRequest => ({
   from: inputs.dataset,
   select: [inputs.measure, inputs.dimension],
+  // Deterministic top-N ordering + full group count so the "Other" bucket can
+  // be recovered correctly when the result set hits a query limit.
+  orderBy: getTopItemsOrderBy([inputs.measure]),
+  countRows: true,
 });
 
 const loadDataResults = (inputs: Inputs<typeof meta>): DataResponse =>
@@ -75,6 +80,11 @@ const events = {
 const props = (inputs: Inputs<typeof meta>) => ({
   ...inputs,
   results: loadDataResults(inputs),
+  resultsOtherTotal: loadOtherTotal({
+    dataset: inputs.dataset,
+    measures: [inputs.measure],
+    maxItems: inputs.maxLegendItems,
+  }),
 });
 
 export const pieChartPro = {

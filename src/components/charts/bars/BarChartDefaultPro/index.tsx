@@ -10,12 +10,16 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { BarChartBaseProps } from '../bars.types';
 import { createSimpleClickHandler } from '../../charts.utils';
+import { DataResponse } from '@embeddable.com/core';
+import { getMeasureTotals, isResultTruncated } from '../../charts.other.loadData.utils';
 
 export type BarChartDefaultProProps = BarChartBaseProps & {
   reverseXAxis?: boolean;
   xAxisMaxItems?: number;
+  maxResults?: number;
   yAxisRangeMin?: number;
   yAxisRangeMax?: number;
+  resultsOtherTotal?: DataResponse;
 };
 
 const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
@@ -26,6 +30,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     measures,
     yAxisRangeMin,
     xAxisMaxItems,
+    maxResults,
     yAxisRangeMax,
     showLegend,
     showTooltips,
@@ -36,6 +41,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     granularity,
     setGranularity,
     onBarClicked,
+    resultsOtherTotal,
   } = props;
 
   const resolvedI18nProps = resolveI18nProps(props);
@@ -46,8 +52,17 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     dimension,
   });
 
+  // Truncation is judged from the raw query response (before gap-filling, which
+  // can add synthetic rows). When truncated, the "Other" bucket for additive
+  // measures is recovered from the full-dataset totals rather than the
+  // incomplete front-end tail.
+  const otherOptions = {
+    isTruncated: isResultTruncated(props.results, maxResults),
+    measureTotals: getMeasureTotals(resultsOtherTotal, measures),
+  };
+
   const data = getBarChartProData(
-    { data: results.data, dimension, measures, maxItems: xAxisMaxItems },
+    { data: results.data, dimension, measures, maxItems: xAxisMaxItems, otherOptions },
     theme,
   );
 

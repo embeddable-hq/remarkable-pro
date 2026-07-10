@@ -385,6 +385,36 @@ describe('getBarLineChartProData', () => {
       dimension,
       [barMeasure, lineMeasure],
       undefined,
+      undefined,
+    );
+  });
+
+  it('forwards otherOptions (truncation + totals) to groupTailAsOther', () => {
+    const dimension = makeDimension();
+    const barMeasure = makeMeasure({ name: 'revenue' });
+    const lineMeasure = makeMeasure({ name: 'avg' });
+    const data = [{ date: 'Jan', revenue: 100, avg: 45 }];
+    const otherOptions = { isTruncated: true, measureTotals: { revenue: 951515 } };
+
+    getBarLineChartProData(
+      {
+        data,
+        dimension,
+        barMeasures: [barMeasure],
+        lineMeasures: [lineMeasure],
+        maxItems: 3,
+        showSecondaryAxis: false,
+        otherOptions,
+      },
+      makeTheme(),
+    );
+
+    expect(vi.mocked(groupTailAsOther)).toHaveBeenCalledWith(
+      data,
+      dimension,
+      [barMeasure, lineMeasure],
+      3,
+      otherOptions,
     );
   });
 });

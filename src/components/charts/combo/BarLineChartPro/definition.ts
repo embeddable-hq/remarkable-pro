@@ -15,6 +15,7 @@ import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
 import { BarLineChartProClickArg } from '../combo.types';
+import { getTopItemsOrderBy, loadOtherTotal } from '../../charts.other.loadData.utils';
 
 const meta = {
   name: 'BarLineChartPro',
@@ -131,6 +132,10 @@ const loadDataResultsArgs = (
     ...(inputs.lineMeasures ?? []),
     dimension ?? inputs.dimension,
   ],
+  // Order by the first bar measure so the top items (shown individually) are
+  // deterministic, and report the full group count for truncation detection.
+  orderBy: getTopItemsOrderBy(inputs.measures ?? []),
+  countRows: true,
   timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
@@ -167,6 +172,14 @@ const props = (
     granularity: state?.granularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
     results: loadDataResults(inputs, dimensionWithGranularity, clientContext),
+    // Parallel full-dataset totals across bar + line measures, for a correct
+    // "Other" bucket when the results query is truncated by its limit.
+    resultsOtherTotal: loadOtherTotal({
+      dataset: inputs.dataset,
+      measures: [...(inputs.measures ?? []), ...(inputs.lineMeasures ?? [])],
+      maxItems: inputs.xAxisMaxItems,
+      timezone: getClientContextTimezone(clientContext?.timezone),
+    }),
   };
 };
 
