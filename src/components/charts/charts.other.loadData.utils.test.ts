@@ -5,7 +5,7 @@ import {
   getMeasureTotals,
   getTopItemsOrderBy,
   isAdditiveMeasure,
-  isResultTruncated,
+  isOtherTotalPending,
   loadOtherTotal,
   otherTotalLoadDataArgs,
 } from './charts.other.loadData.utils';
@@ -124,19 +124,25 @@ describe('loadOtherTotal', () => {
   });
 });
 
-describe('isResultTruncated', () => {
-  it('uses server total when present', () => {
-    expect(isResultTruncated({ isLoading: false, data: [{}, {}], total: 8 })).toBe(true);
-    expect(isResultTruncated({ isLoading: false, data: [{}, {}], total: 2 })).toBe(false);
+describe('isOtherTotalPending', () => {
+  it('is false when no grand-total query is expected', () => {
+    expect(isOtherTotalPending(undefined)).toBe(false);
   });
 
-  it('falls back to comparing returned length against the limit', () => {
-    expect(isResultTruncated({ isLoading: false, data: [{}, {}, {}] }, 3)).toBe(true);
-    expect(isResultTruncated({ isLoading: false, data: [{}, {}] }, 3)).toBe(false);
+  it('is true while the grand-total query is loading', () => {
+    expect(isOtherTotalPending({ isLoading: true })).toBe(true);
   });
 
-  it('is false when there is no total and no limit', () => {
-    expect(isResultTruncated({ isLoading: false, data: [{}] })).toBe(false);
+  it('is true when the query has resolved but totals have not arrived yet', () => {
+    expect(isOtherTotalPending({ isLoading: false, data: undefined })).toBe(true);
+  });
+
+  it('is false once the totals have resolved', () => {
+    expect(isOtherTotalPending({ isLoading: false, data: [{ value: '100' }] })).toBe(false);
+  });
+
+  it('is false when the query errored (avoids a stuck loading state)', () => {
+    expect(isOtherTotalPending({ isLoading: false, data: undefined, error: 'boom' })).toBe(false);
   });
 });
 

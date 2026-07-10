@@ -373,7 +373,7 @@ describe('getBarChartProData', () => {
     const dimension = makeDimension({ name: 'product' });
     const measures = [makeMeasure({ name: 'revenue' })];
     const data = [{ product: 'Widget', revenue: '100' }];
-    const otherOptions = { isTruncated: true, measureTotals: { revenue: 951515 } };
+    const otherOptions = { measureTotals: { revenue: 951515 } };
 
     vi.mocked(groupTailAsOther).mockReturnValue(data);
 

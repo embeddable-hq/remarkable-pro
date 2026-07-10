@@ -11,7 +11,7 @@ import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelect
 import { BarChartBaseProps } from '../bars.types';
 import { createSimpleClickHandler } from '../../charts.utils';
 import { DataResponse } from '@embeddable.com/core';
-import { getMeasureTotals, isResultTruncated } from '../../charts.other.loadData.utils';
+import { getMeasureTotals, isOtherTotalPending } from '../../charts.other.loadData.utils';
 
 export type BarChartDefaultProProps = BarChartBaseProps & {
   reverseXAxis?: boolean;
@@ -30,7 +30,6 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     measures,
     yAxisRangeMin,
     xAxisMaxItems,
-    maxResults,
     yAxisRangeMax,
     showLegend,
     showTooltips,
@@ -52,14 +51,13 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     dimension,
   });
 
-  // Truncation is judged from the raw query response (before gap-filling, which
-  // can add synthetic rows). When truncated, the "Other" bucket for additive
-  // measures is recovered from the full-dataset totals rather than the
-  // incomplete front-end tail.
   const otherOptions = {
-    isTruncated: isResultTruncated(props.results, maxResults),
     measureTotals: getMeasureTotals(resultsOtherTotal, measures),
   };
+
+  const cardData = isOtherTotalPending(resultsOtherTotal)
+    ? { ...results, isLoading: true, data: undefined }
+    : results;
 
   const data = getBarChartProData(
     { data: results.data, dimension, measures, maxItems: xAxisMaxItems, otherOptions },
@@ -82,7 +80,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
 
   return (
     <ChartCard
-      data={results}
+      data={cardData}
       dimensionsAndMeasures={[dimension, ...measures]}
       errorMessage={results.error}
       {...asChartCardHeaderProps(props)}

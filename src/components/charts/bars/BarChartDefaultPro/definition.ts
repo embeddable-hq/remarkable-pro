@@ -90,12 +90,7 @@ const loadDataResultsArgs = (
   limit: inputs.maxResults,
   from: inputs.dataset,
   select: [...inputs.measures, dimension ?? inputs.dimension],
-  // Order by the first measure so the top items (the head that is shown
-  // individually) are deterministic even when the query hits its row limit.
   orderBy: getTopItemsOrderBy(inputs.measures),
-  // Report the full group count so the chart can tell whether the result set
-  // was truncated and the "Other" bucket must be recovered from totals.
-  countRows: true,
   timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
@@ -128,8 +123,6 @@ const props = (
     granularity: state?.granularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
     results: loadDataResults(inputs, dimensionWithGranularity, clientContext),
-    // Parallel full-dataset totals for additive measures, used to compute a
-    // correct "Other" bucket when the results query is truncated by its limit.
     resultsOtherTotal: loadOtherTotal({
       dataset: inputs.dataset,
       measures: inputs.measures,

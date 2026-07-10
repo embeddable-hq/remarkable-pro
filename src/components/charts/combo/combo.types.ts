@@ -11,7 +11,6 @@ export type BarLineChartProProps = {
   measures: Measure[];
   lineMeasures?: Measure[];
   results: DataResponse;
-  /** Full-dataset totals for additive measures, used to recover a correct "Other" bucket. */
   resultsOtherTotal?: DataResponse;
   maxResults?: number;
   showLegend?: boolean;

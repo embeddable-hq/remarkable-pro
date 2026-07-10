@@ -13,7 +13,7 @@ import {
   getBarLineChartProData,
   getBarLineChartProOptions,
 } from './BarLineChartPro.utils';
-import { getMeasureTotals, isResultTruncated } from '../../charts.other.loadData.utils';
+import { getMeasureTotals, isOtherTotalPending } from '../../charts.other.loadData.utils';
 
 ChartJS.register(LineController, LineElement, PointElement);
 
@@ -25,7 +25,6 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
     measures,
     lineMeasures = [],
     xAxisMaxItems,
-    maxResults,
     yAxisRangeMin,
     yAxisRangeMax,
     showLegend,
@@ -53,9 +52,12 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
   const results = useFillGaps({ results: props.results, dimension });
 
   const otherOptions = {
-    isTruncated: isResultTruncated(props.results, maxResults),
     measureTotals: getMeasureTotals(resultsOtherTotal, [...measures, ...lineMeasures]),
   };
+
+  const cardData = isOtherTotalPending(resultsOtherTotal)
+    ? { ...results, isLoading: true, data: undefined }
+    : results;
 
   const data = getBarLineChartProData(
     {
@@ -99,7 +101,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
 
   return (
     <ChartCard
-      data={results}
+      data={cardData}
       dimensionsAndMeasures={[dimension, ...measures, ...lineMeasures]}
       errorMessage={results.error}
       {...asChartCardHeaderProps(props)}

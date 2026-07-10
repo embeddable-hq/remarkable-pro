@@ -11,18 +11,6 @@ export const getDimensionWithoutTruncation = (dimension: Dimension): Dimension =
 });
 
 export type GroupTailAsOtherOptions = {
-  /**
-   * True when the initial chart query hit its row limit, so the rows available
-   * on the front-end are only a subset of the full result set.
-   */
-  isTruncated?: boolean;
-  /**
-   * Full-dataset totals per additive (sum/count) measure, keyed by measure
-   * name. Obtained from a separate no-dimension "grand total" query. When the
-   * result set is truncated, the "Other" value for these measures is recovered
-   * as `total - sum(head)` instead of being (incorrectly) summed from the
-   * incomplete front-end tail.
-   */
   measureTotals?: Record<string, number>;
 };
 
@@ -46,11 +34,7 @@ export const groupTailAsOther = (
     const aggType = (measure.meta as Record<string, unknown> | undefined)?.aggType;
     const grandTotal = options?.measureTotals?.[measure.name];
 
-    // When the query was truncated by a limit, the front-end tail is
-    // incomplete. For additive measures we recover the correct "Other" value
-    // from the full-dataset total: Other = grandTotal - sum(head). Only
-    // additive measures expose a total here (see getMeasureTotals).
-    if (options?.isTruncated && grandTotal != null) {
+    if (grandTotal != null) {
       const headSum = head.reduce((s, row) => s + Number.parseFloat(row[measure.name] ?? '0'), 0);
       aggregatedRow[measure.name] = grandTotal - headSum;
       continue;

@@ -6,7 +6,7 @@ import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard, asChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { DonutChart } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
-import { getMeasureTotals, isResultTruncated } from '../../charts.other.loadData.utils';
+import { getMeasureTotals, isOtherTotalPending } from '../../charts.other.loadData.utils';
 export type DonutChartProProps = DefaultPieChartProps;
 
 const DonutChartPro = (props: DonutChartProProps) => {
@@ -26,9 +26,12 @@ const DonutChartPro = (props: DonutChartProProps) => {
   } = props;
 
   const otherOptions = {
-    isTruncated: isResultTruncated(results),
     measureTotals: getMeasureTotals(resultsOtherTotal, [measure]),
   };
+
+  const cardData = isOtherTotalPending(resultsOtherTotal)
+    ? { ...results, isLoading: true, data: undefined }
+    : results;
 
   const data = getPieChartProData(
     { data: results.data, dimension, measure, maxLegendItems, otherOptions },
@@ -44,7 +47,7 @@ const DonutChartPro = (props: DonutChartProProps) => {
 
   return (
     <ChartCard
-      data={results}
+      data={cardData}
       dimensionsAndMeasures={[dimension, measure]}
       errorMessage={results.error}
       {...asChartCardHeaderProps(props)}

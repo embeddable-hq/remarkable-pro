@@ -81,10 +81,7 @@ const preview = definePreview(Component, previewConfig);
 const loadDataResultsArgs = (inputs: Inputs<typeof meta>): LoadDataRequest => ({
   from: inputs.dataset,
   select: [inputs.measure, inputs.dimension],
-  // Deterministic top-N ordering + full group count so the "Other" bucket can
-  // be recovered correctly when the result set hits a query limit.
   orderBy: getTopItemsOrderBy([inputs.measure]),
-  countRows: true,
 });
 
 const loadDataResults = (inputs: Inputs<typeof meta>): DataResponse =>

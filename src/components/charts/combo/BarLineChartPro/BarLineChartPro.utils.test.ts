@@ -394,7 +394,7 @@ describe('getBarLineChartProData', () => {
     const barMeasure = makeMeasure({ name: 'revenue' });
     const lineMeasure = makeMeasure({ name: 'avg' });
     const data = [{ date: 'Jan', revenue: 100, avg: 45 }];
-    const otherOptions = { isTruncated: true, measureTotals: { revenue: 951515 } };
+    const otherOptions = { measureTotals: { revenue: 951515 } };
 
     getBarLineChartProData(
       {

@@ -6,7 +6,7 @@ import { DefaultPieChartProps } from '../pies.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard, asChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { mergician } from 'mergician';
-import { getMeasureTotals, isResultTruncated } from '../../charts.other.loadData.utils';
+import { getMeasureTotals, isOtherTotalPending } from '../../charts.other.loadData.utils';
 export type PieChartProProps = DefaultPieChartProps;
 
 const PieChartPro = (props: PieChartProProps) => {
@@ -26,9 +26,12 @@ const PieChartPro = (props: PieChartProProps) => {
   } = props;
 
   const otherOptions = {
-    isTruncated: isResultTruncated(results),
     measureTotals: getMeasureTotals(resultsOtherTotal, [measure]),
   };
+
+  const cardData = isOtherTotalPending(resultsOtherTotal)
+    ? { ...results, isLoading: true, data: undefined }
+    : results;
 
   const data = getPieChartProData(
     { data: results.data, dimension, measure, maxLegendItems, otherOptions },
@@ -44,7 +47,7 @@ const PieChartPro = (props: PieChartProProps) => {
 
   return (
     <ChartCard
-      data={results}
+      data={cardData}
       dimensionsAndMeasures={[dimension, measure]}
       errorMessage={results.error}
       {...asChartCardHeaderProps(props)}

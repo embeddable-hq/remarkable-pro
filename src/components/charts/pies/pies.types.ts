@@ -11,7 +11,6 @@ export type DefaultPieChartProps = {
   maxLegendItems?: number;
   measure: Measure;
   results: DataResponse;
-  /** Full-dataset totals for the measure, used to recover a correct "Other" bucket. */
   resultsOtherTotal?: DataResponse;
   showLegend?: boolean;
   showTooltips?: boolean;

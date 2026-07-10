@@ -228,7 +228,7 @@ describe('getPieChartProData', () => {
 
   it('forwards otherOptions (truncation + totals) to groupTailAsOther', () => {
     const data = [{ category: 'A', value: 1 }];
-    const otherOptions = { isTruncated: true, measureTotals: { value: 951515 } };
+    const otherOptions = { measureTotals: { value: 951515 } };
 
     getPieChartProData({ data, dimension, measure, maxLegendItems: 3, otherOptions }, theme);
 
