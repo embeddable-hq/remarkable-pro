@@ -32,6 +32,20 @@ export const getLastFilterKey = (filters: FilterBuilderFilter[]): string => {
   return `${last?.id}-${last?.dimensionOrMeasure?.name}-${last?.operator}-${JSON.stringify(last?.value)}`;
 };
 
+/** A fresh, unconfigured filter for the given id — optionally pre-selecting a
+ * member by name (looked up from the available dimensions/measures). */
+export const createEmptyFilter = (
+  id: number,
+  dimensionsAndMeasures: DimensionOrMeasure[],
+  name: string | null = null,
+): FilterBuilderFilter => ({
+  id,
+  dimensionOrMeasure: dimensionsAndMeasures.find((d) => d.name === name) ?? null,
+  search: '',
+  operator: null,
+  value: null,
+});
+
 export const operatorStringBoolean = {
   is: 'is',
   isNot: 'isNot',

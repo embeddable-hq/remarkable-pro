@@ -3,6 +3,7 @@ import type { DimensionOrMeasure } from '@embeddable.com/core';
 import {
   clauseToFilter,
   clauseToFilters,
+  createEmptyFilter,
   filterBuilderAndOrOperator,
   filterToLoadDataFilters,
   filtersToClause,
@@ -740,5 +741,34 @@ describe('getLastFilterKey', () => {
 
   it('is stable (safe on undefined) for an empty list', () => {
     expect(getLastFilterKey([])).toBe('undefined-undefined-undefined-undefined');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// createEmptyFilter
+// ---------------------------------------------------------------------------
+
+describe('createEmptyFilter', () => {
+  const dims = [makeDim(NativeDataType.string, 'country'), makeDim(NativeDataType.number, 'age')];
+
+  it('creates a blank filter with the given id and no member when name is omitted', () => {
+    const filter = createEmptyFilter(5, dims);
+    expect(filter).toEqual({
+      id: 5,
+      dimensionOrMeasure: null,
+      search: '',
+      operator: null,
+      value: null,
+    });
+  });
+
+  it('resolves the member by name when provided', () => {
+    const filter = createEmptyFilter(1, dims, 'age');
+    expect(filter.dimensionOrMeasure?.name).toBe('age');
+  });
+
+  it('leaves dimensionOrMeasure null when the name matches nothing', () => {
+    const filter = createEmptyFilter(1, dims, 'unknown_field');
+    expect(filter.dimensionOrMeasure).toBeNull();
   });
 });

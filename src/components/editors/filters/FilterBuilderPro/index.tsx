@@ -12,6 +12,7 @@ import {
   FilterBuilderAndOrOperator,
   FilterBuilderFilter,
   filtersToClause,
+  createEmptyFilter,
   getLastFilterKey,
   getSupportedDimensionsAndMeasures,
   hasMixedDimensionsAndMeasures,
@@ -72,12 +73,8 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const lastFilterId = embeddableState?.filters?.[embeddableState.filters.length - 1]?.id ?? 0;
 
   const newFilter = useCallback(
-    (dimensionOrMeasureValue: string | null = null): FilterBuilderFilter => {
-      const dimensionOrMeasure =
-        dimensionsAndMeasures.find((d) => d.name === dimensionOrMeasureValue) ?? null;
-
-      return { id: lastFilterId + 1, dimensionOrMeasure, search: '', operator: null, value: null };
-    },
+    (dimensionOrMeasureValue: string | null = null): FilterBuilderFilter =>
+      createEmptyFilter(lastFilterId + 1, dimensionsAndMeasures, dimensionOrMeasureValue),
     [dimensionsAndMeasures, lastFilterId],
   );
 

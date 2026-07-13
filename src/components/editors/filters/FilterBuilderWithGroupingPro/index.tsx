@@ -10,6 +10,7 @@ import {
   filterBuilderAndOrOperator,
   FilterBuilderClause,
   FilterBuilderFilter,
+  createEmptyFilter,
   getLastFilterKey,
   getSupportedDimensionsAndMeasures,
   hasMixedDimensionsAndMeasures,
@@ -64,13 +65,8 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
   const prevFilterValueRef = useRef<unknown>(undefined);
 
   const makeFilter = useCallback(
-    (id: number, name: string | null = null): FilterBuilderFilter => ({
-      id,
-      dimensionOrMeasure: dimensionsAndMeasures.find((d) => d.name === name) ?? null,
-      search: '',
-      operator: null,
-      value: null,
-    }),
+    (id: number, name: string | null = null): FilterBuilderFilter =>
+      createEmptyFilter(id, dimensionsAndMeasures, name),
     [dimensionsAndMeasures],
   );
 
