@@ -226,18 +226,18 @@ describe('getPieChartProData', () => {
     );
   });
 
-  it('forwards otherOptions (truncation + totals) to groupTailAsOther', () => {
+  it('forwards measureTotals to groupTailAsOther', () => {
     const data = [{ category: 'A', value: 1 }];
-    const otherOptions = { measureTotals: { value: 951515 } };
+    const measureTotals = { value: 951515 };
 
-    getPieChartProData({ data, dimension, measure, maxLegendItems: 3, otherOptions }, theme);
+    getPieChartProData({ data, dimension, measure, maxLegendItems: 3, measureTotals }, theme);
 
     expect(vi.mocked(groupTailAsOther)).toHaveBeenCalledWith(
       data,
       dimension,
       [measure],
       3,
-      otherOptions,
+      measureTotals,
     );
   });
 });

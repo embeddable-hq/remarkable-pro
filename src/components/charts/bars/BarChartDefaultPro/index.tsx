@@ -10,16 +10,13 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { BarChartBaseProps } from '../bars.types';
 import { createSimpleClickHandler } from '../../charts.utils';
-import { DataResponse } from '@embeddable.com/core';
 import { getMeasureTotals, getResultsForCard } from '../../charts.other.loadData.utils';
 
 export type BarChartDefaultProProps = BarChartBaseProps & {
   reverseXAxis?: boolean;
   xAxisMaxItems?: number;
-  maxResults?: number;
   yAxisRangeMin?: number;
   yAxisRangeMax?: number;
-  resultsOtherTotal?: DataResponse;
 };
 
 const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
@@ -51,14 +48,16 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     dimension,
   });
 
-  const otherOptions = {
-    measureTotals: getMeasureTotals(resultsOtherTotal, measures),
-  };
-
   const cardData = getResultsForCard(results, resultsOtherTotal);
 
   const data = getBarChartProData(
-    { data: results.data, dimension, measures, maxItems: xAxisMaxItems, otherOptions },
+    {
+      data: results.data,
+      dimension,
+      measures,
+      maxItems: xAxisMaxItems,
+      measureTotals: getMeasureTotals(resultsOtherTotal, measures),
+    },
     theme,
   );
 

@@ -12,7 +12,6 @@ export type BarLineChartProProps = {
   lineMeasures?: Measure[];
   results: DataResponse;
   resultsOtherTotal?: DataResponse;
-  maxResults?: number;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
   showTooltips?: boolean;

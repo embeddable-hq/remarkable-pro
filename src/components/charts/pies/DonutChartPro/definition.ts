@@ -5,7 +5,7 @@ import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { subInputs } from '../../../component.subinputs.constants';
-import { getFirstMeasureOrderBy, loadOtherTotal } from '../../charts.other.loadData.utils';
+import { getFirstMeasureOrderBy, loadDataOtherTotal } from '../../charts.other.loadData.utils';
 
 const meta = {
   name: 'DonutChartPro',
@@ -77,7 +77,7 @@ const events = {
 const props = (inputs: Inputs<typeof meta>) => ({
   ...inputs,
   results: loadDataResults(inputs),
-  resultsOtherTotal: loadOtherTotal({
+  resultsOtherTotal: loadDataOtherTotal({
     dataset: inputs.dataset,
     measures: [inputs.measure],
     maxItems: inputs.maxLegendItems,

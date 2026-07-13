@@ -51,10 +51,6 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
 
   const results = useFillGaps({ results: props.results, dimension });
 
-  const otherOptions = {
-    measureTotals: getMeasureTotals(resultsOtherTotal, [...measures, ...lineMeasures]),
-  };
-
   const cardData = getResultsForCard(results, resultsOtherTotal);
 
   const data = getBarLineChartProData(
@@ -65,7 +61,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
       lineMeasures,
       maxItems: xAxisMaxItems,
       showSecondaryAxis,
-      otherOptions,
+      measureTotals: getMeasureTotals(resultsOtherTotal, [...measures, ...lineMeasures]),
     },
     theme,
   );

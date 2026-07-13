@@ -10,6 +10,7 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { BarChartBaseProps } from '../bars.types';
 import { createSimpleClickHandler } from '../../charts.utils';
+import { getMeasureTotals, getResultsForCard } from '../../charts.other.loadData.utils';
 
 export type BarChartDefaultHorizontalProProps = BarChartBaseProps & {
   reverseYAxis?: boolean;
@@ -36,6 +37,7 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
     granularity,
     setGranularity,
     onBarClicked,
+    resultsOtherTotal,
   } = props;
 
   const resolvedI18nProps = resolveI18nProps(props);
@@ -46,8 +48,16 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
     dimension,
   });
 
+  const cardData = getResultsForCard(results, resultsOtherTotal);
+
   const data = getBarChartProData(
-    { data: results.data, dimension, measures, maxItems: yAxisMaxItems },
+    {
+      data: results.data,
+      dimension,
+      measures,
+      maxItems: yAxisMaxItems,
+      measureTotals: getMeasureTotals(resultsOtherTotal, measures),
+    },
     theme,
   );
 
@@ -67,7 +77,7 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
 
   return (
     <ChartCard
-      data={results}
+      data={cardData}
       dimensionsAndMeasures={[dimension, ...measures]}
       errorMessage={results.error}
       {...asChartCardHeaderProps(props)}

@@ -15,6 +15,7 @@ import { subInputs } from '../../../component.subinputs.constants';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
 import { BarChartProOptionsClickArg } from '../bars.types';
+import { getFirstMeasureOrderBy, loadDataOtherTotal } from '../../charts.other.loadData.utils';
 
 const meta = {
   name: 'BarChartDefaultHorizontalPro',
@@ -86,6 +87,7 @@ const loadDataResultsArgs = (
   from: inputs.dataset,
   select: [...inputs.measures, dimension ?? inputs.dimension],
   limit: inputs.maxResults,
+  orderBy: getFirstMeasureOrderBy(inputs.measures),
   timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
@@ -120,6 +122,12 @@ const props = (
     dimension: dimensionWithGranularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
     results: loadDataResults(inputs, dimensionWithGranularity, clientContext),
+    resultsOtherTotal: loadDataOtherTotal({
+      dataset: inputs.dataset,
+      measures: inputs.measures,
+      maxItems: inputs.yAxisMaxItems,
+      timezone: getClientContextTimezone(clientContext?.timezone),
+    }),
   };
 };
 

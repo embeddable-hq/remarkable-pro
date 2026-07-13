@@ -5,7 +5,7 @@ import {
   getFirstMeasureOrderBy,
   getMeasureTotals,
   getResultsForCard,
-  loadOtherTotal,
+  loadDataOtherTotal,
 } from './charts.other.loadData.utils';
 
 const mockLoadData = vi.fn(
@@ -63,9 +63,9 @@ describe('getFirstMeasureOrderBy', () => {
   });
 });
 
-describe('loadOtherTotal', () => {
+describe('loadDataOtherTotal', () => {
   it('does not query when maxItems is not set', () => {
-    const result = loadOtherTotal({
+    const result = loadDataOtherTotal({
       dataset: makeDataset(),
       measures: [makeMeasure('revenue', 'sum')],
     });
@@ -74,7 +74,7 @@ describe('loadOtherTotal', () => {
   });
 
   it('does not query when there are no additive measures', () => {
-    const result = loadOtherTotal({
+    const result = loadDataOtherTotal({
       dataset: makeDataset(),
       measures: [makeMeasure('avg_order', 'avg')],
       maxItems: 5,
@@ -88,7 +88,7 @@ describe('loadOtherTotal', () => {
     const sum = makeMeasure('revenue', 'sum');
     const avg = makeMeasure('avg_order', 'avg');
 
-    loadOtherTotal({ dataset, measures: [sum, avg], maxItems: 5, timezone: 'UTC' });
+    loadDataOtherTotal({ dataset, measures: [sum, avg], maxItems: 5, timezone: 'UTC' });
 
     expect(mockLoadData).toHaveBeenCalledTimes(1);
     expect(mockLoadData).toHaveBeenCalledWith({ from: dataset, select: [sum], timezone: 'UTC' });

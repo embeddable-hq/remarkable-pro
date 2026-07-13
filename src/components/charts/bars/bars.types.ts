@@ -35,6 +35,7 @@ export type BarChartBaseProps = {
   dimension: Dimension;
   measures: Measure[];
   results: DataResponse;
+  resultsOtherTotal?: DataResponse;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
   showTooltips?: boolean;

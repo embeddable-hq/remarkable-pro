@@ -15,7 +15,7 @@ import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
 import { BarLineChartProClickArg } from '../combo.types';
-import { getFirstMeasureOrderBy, loadOtherTotal } from '../../charts.other.loadData.utils';
+import { getFirstMeasureOrderBy, loadDataOtherTotal } from '../../charts.other.loadData.utils';
 
 const meta = {
   name: 'BarLineChartPro',
@@ -169,7 +169,7 @@ const props = (
     granularity: state?.granularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
     results: loadDataResults(inputs, dimensionWithGranularity, clientContext),
-    resultsOtherTotal: loadOtherTotal({
+    resultsOtherTotal: loadDataOtherTotal({
       dataset: inputs.dataset,
       measures: [...(inputs.measures ?? []), ...(inputs.lineMeasures ?? [])],
       maxItems: inputs.xAxisMaxItems,

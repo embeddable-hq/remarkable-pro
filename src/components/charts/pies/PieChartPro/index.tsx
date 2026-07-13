@@ -25,14 +25,16 @@ const PieChartPro = (props: PieChartProProps) => {
     onSegmentClick,
   } = props;
 
-  const otherOptions = {
-    measureTotals: getMeasureTotals(resultsOtherTotal, [measure]),
-  };
-
   const cardData = getResultsForCard(results, resultsOtherTotal);
 
   const data = getPieChartProData(
-    { data: results.data, dimension, measure, maxLegendItems, otherOptions },
+    {
+      data: results.data,
+      dimension,
+      measure,
+      maxLegendItems,
+      measureTotals: getMeasureTotals(resultsOtherTotal, [measure]),
+    },
     theme,
   );
 

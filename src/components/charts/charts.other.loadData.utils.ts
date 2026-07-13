@@ -1,5 +1,6 @@
 import { DataResponse, Dataset, Measure, OrderBy, loadData } from '@embeddable.com/core';
 import { SortDirectionTypeOptions } from '../types/SortDirection.type.emb';
+import { MeasureTotals } from './charts.utils';
 
 const ADDITIVE_AGG_TYPES = new Set(['sum', 'count']);
 
@@ -15,19 +16,19 @@ export const getFirstMeasureOrderBy = (measures: Measure[]): OrderBy[] => {
   return [{ property: firstMeasure, direction: SortDirectionTypeOptions.desc }];
 };
 
-type LoadOtherTotalArgs = {
+type LoadDataOtherTotalArgs = {
   dataset: Dataset;
   measures: Measure[];
   maxItems?: number;
   timezone?: string;
 };
 
-export const loadOtherTotal = ({
+export const loadDataOtherTotal = ({
   dataset,
   measures,
   maxItems,
   timezone,
-}: LoadOtherTotalArgs): DataResponse | undefined => {
+}: LoadDataOtherTotalArgs): DataResponse | undefined => {
   if (!maxItems) return undefined;
   const additiveMeasures = getAdditiveMeasures(measures);
   if (!additiveMeasures.length) return undefined;
@@ -37,11 +38,11 @@ export const loadOtherTotal = ({
 export const getMeasureTotals = (
   otherTotalResults: DataResponse | undefined,
   measures: Measure[],
-): Record<string, number> => {
+): MeasureTotals => {
   const row = otherTotalResults?.data?.[0];
   if (!row) return {};
 
-  const totals: Record<string, number> = {};
+  const totals: MeasureTotals = {};
   for (const measure of getAdditiveMeasures(measures)) {
     const value = Number.parseFloat(row[measure.name]);
     if (Number.isFinite(value)) totals[measure.name] = value;

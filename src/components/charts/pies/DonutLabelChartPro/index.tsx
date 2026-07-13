@@ -38,14 +38,16 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
   const resolvedI18nProps = resolveI18nProps(props);
   const { innerLabelText, onSegmentClick } = resolvedI18nProps;
 
-  const otherOptions = {
-    measureTotals: getMeasureTotals(resultsOtherTotal, [measure]),
-  };
-
   const cardData = getResultsForCard(results, resultsOtherTotal);
 
   const data = getPieChartProData(
-    { data: results.data, dimension, measure, maxLegendItems, otherOptions },
+    {
+      data: results.data,
+      dimension,
+      measure,
+      maxLegendItems,
+      measureTotals: getMeasureTotals(resultsOtherTotal, [measure]),
+    },
     theme,
   );
 

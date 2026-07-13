@@ -272,9 +272,7 @@ describe('groupTailAsOther', () => {
     ];
 
     it('computes Other as grandTotal - sum(head) for additive measures', () => {
-      const result = groupTailAsOther(returnedTop5, dimension, [measure], 3, {
-        measureTotals: { value: 951515 },
-      });
+      const result = groupTailAsOther(returnedTop5, dimension, [measure], 3, { value: 951515 });
 
       expect(result).toHaveLength(3); // US, CA, Other
       expect(result[0]?.value).toBe(465235); // US
@@ -296,9 +294,7 @@ describe('groupTailAsOther', () => {
         { category: 'BR', value: 42886 },
         { category: 'FR', value: 23278 },
       ];
-      const withTotal = groupTailAsOther(allRows, dimension, [measure], 3, {
-        measureTotals: { value: 951515 },
-      });
+      const withTotal = groupTailAsOther(allRows, dimension, [measure], 3, { value: 951515 });
       const withoutTotal = groupTailAsOther(allRows, dimension, [measure], 3);
       expect(withTotal[2]?.value).toBe(347473);
       expect(withoutTotal[2]?.value).toBe(347473); // identical when all data is present
@@ -313,9 +309,8 @@ describe('groupTailAsOther', () => {
         { category: 'GB', value: 72056, avg_order: 40 },
       ];
 
-      const result = groupTailAsOther(data, dimension, [measure, avgMeasure], 3, {
-        measureTotals: { value: 951515 }, // only the additive measure has a total
-      });
+      // only the additive measure has a total
+      const result = groupTailAsOther(data, dimension, [measure, avgMeasure], 3, { value: 951515 });
 
       expect(result[2]?.value).toBe(347473); // additive → from grand total
       expect(result[2]?.avg_order).toBe(50); // avg → from returned tail (AU 60 + GB 40)/2

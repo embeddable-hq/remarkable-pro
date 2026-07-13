@@ -389,12 +389,12 @@ describe('getBarLineChartProData', () => {
     );
   });
 
-  it('forwards otherOptions (truncation + totals) to groupTailAsOther', () => {
+  it('forwards measureTotals to groupTailAsOther', () => {
     const dimension = makeDimension();
     const barMeasure = makeMeasure({ name: 'revenue' });
     const lineMeasure = makeMeasure({ name: 'avg' });
     const data = [{ date: 'Jan', revenue: 100, avg: 45 }];
-    const otherOptions = { measureTotals: { revenue: 951515 } };
+    const measureTotals = { revenue: 951515 };
 
     getBarLineChartProData(
       {
@@ -404,7 +404,7 @@ describe('getBarLineChartProData', () => {
         lineMeasures: [lineMeasure],
         maxItems: 3,
         showSecondaryAxis: false,
-        otherOptions,
+        measureTotals,
       },
       makeTheme(),
     );
@@ -414,7 +414,7 @@ describe('getBarLineChartProData', () => {
       dimension,
       [barMeasure, lineMeasure],
       3,
-      otherOptions,
+      measureTotals,
     );
   });
 });
