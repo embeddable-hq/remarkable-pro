@@ -10,8 +10,13 @@ import {
   isFilterBuilderGroup,
   itemsToClause,
   sanitizeMixedTypeOperators,
+  withItems,
 } from './FilterBuilderWithGroupingPro.utils';
-import type { FilterBuilderGroup, FilterBuilderNode } from './FilterBuilderWithGroupingPro.utils';
+import type {
+  FilterBuilderGroup,
+  FilterBuilderGroupingState,
+  FilterBuilderNode,
+} from './FilterBuilderWithGroupingPro.utils';
 import {
   FilterBuilderClause,
   filterBuilderAndOrOperator,
@@ -71,6 +76,25 @@ describe('getFilterNodes', () => {
     expect(getFilterNodes({ filters, operator: 'and' })).toBe(filters);
     expect(getFilterNodes(undefined)).toEqual([]);
     expect(getFilterNodes({ operator: 'and' })).toEqual([]);
+  });
+});
+
+describe('withItems', () => {
+  it('drops the legacy filters field so state never carries both shapes at once (regression)', () => {
+    const legacyState: FilterBuilderGroupingState = {
+      filters: [makeFilter(1, dimension('a'))],
+      operator: 'and',
+    };
+    const next = withItems(legacyState, [makeFilter(2, dimension('b'))]);
+    expect(next.filters).toBeUndefined();
+    expect(next.items).toEqual([makeFilter(2, dimension('b'))]);
+  });
+
+  it('merges in extra fields alongside the new items', () => {
+    const next = withItems({ operator: 'and' }, [makeFilter(1, dimension('a'))], {
+      operator: 'or',
+    });
+    expect(next.operator).toBe('or');
   });
 });
 

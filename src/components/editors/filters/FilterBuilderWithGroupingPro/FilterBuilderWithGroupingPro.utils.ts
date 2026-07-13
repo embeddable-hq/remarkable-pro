@@ -39,6 +39,17 @@ export const getFilterNodes = (
   return [];
 };
 
+/** Builds the next persisted state from a new items list. Explicitly drops
+ * the legacy `filters` field: once state has been read through
+ * `getFilterNodes` and re-written as `items`, keeping the old `filters`
+ * around would leave two conflicting shapes in the same persisted state,
+ * with `filters` silently going stale on every future edit. */
+export const withItems = (
+  prev: FilterBuilderGroupingState,
+  items: FilterBuilderNode[],
+  extra: Partial<FilterBuilderGroupingState> = {},
+): FilterBuilderGroupingState => ({ ...prev, ...extra, items, filters: undefined });
+
 /** All filters in the tree, flattened out of any groups they belong to. */
 export const getAllFilters = (
   state: FilterBuilderGroupingState | undefined,

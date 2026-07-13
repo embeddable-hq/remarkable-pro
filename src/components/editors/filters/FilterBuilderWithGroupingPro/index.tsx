@@ -25,6 +25,7 @@ import {
   isFilterBuilderGroup,
   itemsToClause,
   sanitizeMixedTypeOperators,
+  withItems,
 } from './FilterBuilderWithGroupingPro.utils';
 import FilterBuilderWithGroupingItem from './components/FilterBuilderWithGroupingItem';
 import FilterBuilderWithGroupingGroup from './components/FilterBuilderWithGroupingGroup';
@@ -84,7 +85,7 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
     if (newItems.length > 0) {
       setEmbeddableState?.((prev) => {
         if (getFilterNodes(prev).length) return prev;
-        return { ...prev, operator: defaultFilters.operator, items: newItems };
+        return withItems(prev, newItems, { operator: defaultFilters.operator });
       });
     }
   }, [defaultFilters, dimensionsAndMeasures, setEmbeddableState]);
@@ -106,7 +107,7 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
       setEmbeddableState?.((prev) => {
         const stored = getFilterNodes(prev);
         const base = stored.length ? stored : [makeFilter(1)];
-        return { ...prev, items: updater([...base]) };
+        return withItems(prev, updater([...base]));
       });
     },
     [setEmbeddableState, makeFilter],
@@ -225,7 +226,7 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
   };
 
   const handleClearAll = () => {
-    setEmbeddableState?.((prev) => ({ ...prev, items: [makeFilter(1)], operator: AND }));
+    setEmbeddableState?.((prev) => withItems(prev, [makeFilter(1)], { operator: AND }));
   };
 
   const supportedDimensionsAndMeasures = getSupportedDimensionsAndMeasures(dimensionsAndMeasures);
@@ -245,7 +246,7 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
     setEmbeddableState?.((prev) => {
       const next = sanitizeMixedTypeOperators(getFilterNodes(prev), prev?.operator ?? AND);
       if (!next.changed) return prev;
-      return { ...prev, items: next.items, operator: next.operator };
+      return withItems(prev, next.items, { operator: next.operator });
     });
   }, [sanitized.changed, setEmbeddableState]);
 
