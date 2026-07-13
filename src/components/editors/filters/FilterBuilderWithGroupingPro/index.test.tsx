@@ -497,4 +497,25 @@ describe('FilterBuilderWithGroupingPro', () => {
     });
     expect(itemsOf(next).length).toBeGreaterThan(0);
   });
+
+  it('preserves a top-level OR when seeding from defaultFilters, not just AND (regression)', () => {
+    const defaultFilters: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.OR,
+      clauses: [
+        { property: 'country', operator: 'equals' as never, value: 'AU' },
+        { property: 'country', operator: 'equals' as never, value: 'NZ' },
+      ],
+    };
+    render(
+      <FilterBuilderWithGroupingPro
+        {...defaultProps}
+        dimensionsAndMeasures={[makeDim('country')]}
+        defaultFilters={defaultFilters}
+      />,
+    );
+    const next = applyUpdater(defaultProps.setEmbeddableState, {
+      operator: filterBuilderAndOrOperator.AND,
+    });
+    expect(next.operator).toBe(filterBuilderAndOrOperator.OR);
+  });
 });
