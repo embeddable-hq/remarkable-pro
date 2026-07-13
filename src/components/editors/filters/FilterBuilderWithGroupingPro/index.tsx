@@ -118,7 +118,7 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
   // insertion elsewhere — an index captured at render time could then land on
   // the wrong item, whereas an id always finds the same item or no longer
   // matches at all.
-  const patchLeaf = (
+  const patchFilter = (
     id: number,
     patch: Partial<FilterBuilderFilter> | ((filter: FilterBuilderFilter) => FilterBuilderFilter),
   ) =>
@@ -131,15 +131,15 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
     });
 
   const handleSelectDimensionOrMeasure = (id: number, name: string | null) =>
-    patchLeaf(id, (node) => makeFilter(node.id, name));
+    patchFilter(id, (node) => makeFilter(node.id, name));
 
   const handleSelectOperator = (id: number, value: string | null) =>
-    patchLeaf(id, { operator: value, value: null });
+    patchFilter(id, { operator: value, value: null });
 
   const handleSelectValue = (id: number, value: FilterBuilderFilter['value']) =>
-    patchLeaf(id, { value });
+    patchFilter(id, { value });
 
-  const handleDimensionSearch = (id: number, search: string) => patchLeaf(id, { search });
+  const handleDimensionSearch = (id: number, search: string) => patchFilter(id, { search });
 
   const handleDeleteItem = (id: number) =>
     updateItems((current) => {
