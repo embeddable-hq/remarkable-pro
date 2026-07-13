@@ -385,36 +385,6 @@ describe('getBarLineChartProData', () => {
       dimension,
       [barMeasure, lineMeasure],
       undefined,
-      undefined,
-    );
-  });
-
-  it('forwards measureTotals to groupTailAsOther', () => {
-    const dimension = makeDimension();
-    const barMeasure = makeMeasure({ name: 'revenue' });
-    const lineMeasure = makeMeasure({ name: 'avg' });
-    const data = [{ date: 'Jan', revenue: 100, avg: 45 }];
-    const measureTotals = { revenue: 951515 };
-
-    getBarLineChartProData(
-      {
-        data,
-        dimension,
-        barMeasures: [barMeasure],
-        lineMeasures: [lineMeasure],
-        maxItems: 3,
-        showSecondaryAxis: false,
-        measureTotals,
-      },
-      makeTheme(),
-    );
-
-    expect(vi.mocked(groupTailAsOther)).toHaveBeenCalledWith(
-      data,
-      dimension,
-      [barMeasure, lineMeasure],
-      3,
-      measureTotals,
     );
   });
 });

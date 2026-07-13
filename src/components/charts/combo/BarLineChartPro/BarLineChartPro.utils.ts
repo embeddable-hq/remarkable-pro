@@ -11,7 +11,6 @@ import {
   getDatalabelPercentage,
   getDimensionWithoutTruncation,
   groupTailAsOther,
-  MeasureTotals,
 } from '../../charts.utils';
 import { getBarChartProOptions } from '../../bars/bars.utils';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
@@ -25,7 +24,6 @@ export const getBarLineChartProData = (
     lineMeasures: Measure[];
     maxItems?: number;
     showSecondaryAxis: boolean;
-    measureTotals?: MeasureTotals;
   },
   theme: Theme,
 ): ChartData<'bar'> => {
@@ -33,10 +31,9 @@ export const getBarLineChartProData = (
     return { labels: [], datasets: [{ data: [] }] };
   }
 
-  const { data, dimension, barMeasures, lineMeasures, maxItems, showSecondaryAxis, measureTotals } =
-    props;
+  const { data, dimension, barMeasures, lineMeasures, maxItems, showSecondaryAxis } = props;
   const measures = [...barMeasures, ...lineMeasures];
-  const groupedData = groupTailAsOther(data, dimension, measures, maxItems, measureTotals);
+  const groupedData = groupTailAsOther(data, dimension, measures, maxItems);
   const themeFormatter = getThemeFormatter(theme);
   const chartColors = getChartColors();
 

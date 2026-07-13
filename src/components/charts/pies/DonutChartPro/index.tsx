@@ -6,7 +6,7 @@ import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard, asChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
 import { DonutChart } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
-import { getMeasureTotals, getResultsForCard } from '../../charts.other.loadData.utils';
+import { getChartCardData } from '../../charts.other.loadData.utils';
 export type DonutChartProProps = DefaultPieChartProps;
 
 const DonutChartPro = (props: DonutChartProProps) => {
@@ -25,18 +25,15 @@ const DonutChartPro = (props: DonutChartProProps) => {
     onSegmentClick,
   } = props;
 
-  const cardData = getResultsForCard(results, resultsOtherTotal);
+  const cardData = getChartCardData({
+    results,
+    resultsOtherTotal,
+    dimension,
+    measures: [measure],
+    maxItems: maxLegendItems,
+  });
 
-  const data = getPieChartProData(
-    {
-      data: results.data,
-      dimension,
-      measure,
-      maxLegendItems,
-      measureTotals: getMeasureTotals(resultsOtherTotal, [measure]),
-    },
-    theme,
-  );
+  const data = getPieChartProData({ data: cardData.data, dimension, measure }, theme);
 
   const options = mergician(
     getPieChartProOptions({ measure, dimension }, theme),

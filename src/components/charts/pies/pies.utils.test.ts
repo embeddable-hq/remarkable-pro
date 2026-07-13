@@ -217,28 +217,7 @@ describe('getPieChartProData', () => {
 
     getPieChartProData({ data, dimension, measure, maxLegendItems: 3 }, theme);
 
-    expect(vi.mocked(groupTailAsOther)).toHaveBeenCalledWith(
-      data,
-      dimension,
-      [measure],
-      3,
-      undefined,
-    );
-  });
-
-  it('forwards measureTotals to groupTailAsOther', () => {
-    const data = [{ category: 'A', value: 1 }];
-    const measureTotals = { value: 951515 };
-
-    getPieChartProData({ data, dimension, measure, maxLegendItems: 3, measureTotals }, theme);
-
-    expect(vi.mocked(groupTailAsOther)).toHaveBeenCalledWith(
-      data,
-      dimension,
-      [measure],
-      3,
-      measureTotals,
-    );
+    expect(vi.mocked(groupTailAsOther)).toHaveBeenCalledWith(data, dimension, [measure], 3);
   });
 });
 

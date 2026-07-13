@@ -7,7 +7,6 @@ import {
   getDatalabelPercentage,
   getDimensionWithoutTruncation,
   groupTailAsOther,
-  MeasureTotals,
 } from '../charts.utils';
 import { getDimensionFieldName } from '../../../utils/data.utils';
 import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
@@ -80,7 +79,6 @@ export const getBarChartProData = (
     dimension: Dimension;
     measures: Measure[];
     maxItems?: number;
-    measureTotals?: MeasureTotals;
   },
   theme: Theme = remarkableTheme,
 ): ChartData<'bar'> => {
@@ -92,13 +90,7 @@ export const getBarChartProData = (
   }
 
   const themeFormatter = getThemeFormatter(theme);
-  const groupedData = groupTailAsOther(
-    props.data,
-    props.dimension,
-    props.measures,
-    props.maxItems,
-    props.measureTotals,
-  );
+  const groupedData = groupTailAsOther(props.data, props.dimension, props.measures, props.maxItems);
   const chartColors = getChartColors();
 
   return {

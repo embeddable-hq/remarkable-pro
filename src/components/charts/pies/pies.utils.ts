@@ -4,7 +4,6 @@ import {
   getDatalabelPercentage,
   getDimensionWithoutTruncation,
   groupTailAsOther,
-  MeasureTotals,
 } from '../charts.utils';
 import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
@@ -39,7 +38,6 @@ export const getPieChartProData = (
     dimension: Dimension;
     measure: Measure;
     maxLegendItems?: number;
-    measureTotals?: MeasureTotals;
   },
   theme: Theme = remarkableTheme,
 ): ChartData<'pie'> => {
@@ -54,7 +52,6 @@ export const getPieChartProData = (
     props.dimension,
     [props.measure],
     props.maxLegendItems,
-    props.measureTotals,
   );
 
   const chartColors = getChartColors();

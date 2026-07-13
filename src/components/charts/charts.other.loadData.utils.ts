@@ -1,6 +1,6 @@
-import { DataResponse, Dataset, Measure, OrderBy, loadData } from '@embeddable.com/core';
+import { DataResponse, Dataset, Dimension, Measure, OrderBy, loadData } from '@embeddable.com/core';
 import { SortDirectionTypeOptions } from '../types/SortDirection.type.emb';
-import { MeasureTotals } from './charts.utils';
+import { groupTailAsOther, MeasureTotals } from './charts.utils';
 
 const ADDITIVE_AGG_TYPES = new Set(['sum', 'count']);
 
@@ -50,13 +50,31 @@ export const getMeasureTotals = (
   return totals;
 };
 
-export const getResultsForCard = (
-  results: DataResponse,
-  otherTotalResults?: DataResponse,
-): DataResponse => {
+type ChartCardDataArgs = {
+  results: DataResponse;
+  resultsOtherTotal?: DataResponse;
+  dimension: Dimension;
+  measures: Measure[];
+  maxItems?: number;
+};
+
+export const getChartCardData = ({
+  results,
+  resultsOtherTotal,
+  dimension,
+  measures,
+  maxItems,
+}: ChartCardDataArgs): DataResponse => {
   const otherTotalPending =
-    otherTotalResults != null &&
-    !otherTotalResults.error &&
-    (otherTotalResults.isLoading || otherTotalResults.data == null);
-  return otherTotalPending ? { ...results, isLoading: true, data: undefined } : results;
+    resultsOtherTotal != null &&
+    !resultsOtherTotal.error &&
+    (resultsOtherTotal.isLoading || resultsOtherTotal.data == null);
+  if (otherTotalPending) return { ...results, isLoading: true, data: undefined };
+  if (!results.data) return results;
+
+  const measureTotals = getMeasureTotals(resultsOtherTotal, measures);
+  return {
+    ...results,
+    data: groupTailAsOther(results.data, dimension, measures, maxItems, measureTotals),
+  };
 };

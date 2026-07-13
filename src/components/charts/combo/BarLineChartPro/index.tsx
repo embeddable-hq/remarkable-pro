@@ -13,7 +13,7 @@ import {
   getBarLineChartProData,
   getBarLineChartProOptions,
 } from './BarLineChartPro.utils';
-import { getMeasureTotals, getResultsForCard } from '../../charts.other.loadData.utils';
+import { getChartCardData } from '../../charts.other.loadData.utils';
 
 ChartJS.register(LineController, LineElement, PointElement);
 
@@ -51,17 +51,21 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
 
   const results = useFillGaps({ results: props.results, dimension });
 
-  const cardData = getResultsForCard(results, resultsOtherTotal);
+  const cardData = getChartCardData({
+    results,
+    resultsOtherTotal,
+    dimension,
+    measures: [...measures, ...lineMeasures],
+    maxItems: xAxisMaxItems,
+  });
 
   const data = getBarLineChartProData(
     {
-      data: results.data,
+      data: cardData.data,
       dimension,
       barMeasures: measures,
       lineMeasures,
-      maxItems: xAxisMaxItems,
       showSecondaryAxis,
-      measureTotals: getMeasureTotals(resultsOtherTotal, [...measures, ...lineMeasures]),
     },
     theme,
   );

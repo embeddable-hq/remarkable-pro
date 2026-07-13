@@ -10,7 +10,7 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { BarChartBaseProps } from '../bars.types';
 import { createSimpleClickHandler } from '../../charts.utils';
-import { getMeasureTotals, getResultsForCard } from '../../charts.other.loadData.utils';
+import { getChartCardData } from '../../charts.other.loadData.utils';
 
 export type BarChartDefaultProProps = BarChartBaseProps & {
   reverseXAxis?: boolean;
@@ -48,18 +48,15 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     dimension,
   });
 
-  const cardData = getResultsForCard(results, resultsOtherTotal);
+  const cardData = getChartCardData({
+    results,
+    resultsOtherTotal,
+    dimension,
+    measures,
+    maxItems: xAxisMaxItems,
+  });
 
-  const data = getBarChartProData(
-    {
-      data: results.data,
-      dimension,
-      measures,
-      maxItems: xAxisMaxItems,
-      measureTotals: getMeasureTotals(resultsOtherTotal, measures),
-    },
-    theme,
-  );
+  const data = getBarChartProData({ data: cardData.data, dimension, measures }, theme);
 
   const options = mergician(
     getBarChartProOptions({ measures, horizontal: false, data, dimension }, theme), // Format Y axis based on first measure

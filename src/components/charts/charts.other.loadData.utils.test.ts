@@ -1,10 +1,10 @@
-import type { DataResponse, Dataset, Measure } from '@embeddable.com/core';
+import type { DataResponse, Dataset, Dimension, Measure } from '@embeddable.com/core';
 import { vi } from 'vitest';
 import {
   getAdditiveMeasures,
+  getChartCardData,
   getFirstMeasureOrderBy,
   getMeasureTotals,
-  getResultsForCard,
   loadDataOtherTotal,
 } from './charts.other.loadData.utils';
 
@@ -16,8 +16,15 @@ vi.mock('@embeddable.com/core', async (importOriginal) => {
   return { ...actual, loadData: (...args: unknown[]) => mockLoadData(...args) };
 });
 
+vi.mock('../../theme/i18n/i18n', () => ({
+  i18n: { t: (key: string) => `t(${key})` },
+}));
+
 const makeDataset = (): Dataset =>
   ({ embeddableId: 'e1', datasetId: 'ds1', inputName: 'dataset', variableValues: {} }) as Dataset;
+
+const makeDimension = (name = 'category'): Dimension =>
+  ({ name, __type__: 'dimension', inputs: {} }) as unknown as Dimension;
 
 const makeMeasure = (name = 'revenue', aggType?: string): Measure =>
   ({
@@ -95,37 +102,80 @@ describe('loadDataOtherTotal', () => {
   });
 });
 
-describe('getResultsForCard', () => {
-  const results: DataResponse = { isLoading: false, data: [{ value: '1' }] };
+describe('getChartCardData', () => {
+  const dimension = makeDimension('category');
+  const measure = makeMeasure('value', 'sum');
+  const results: DataResponse = {
+    isLoading: false,
+    data: [
+      { category: 'US', value: '465235' },
+      { category: 'CA', value: '138807' },
+      { category: 'AU', value: '81337' },
+      { category: 'GB', value: '72056' },
+      { category: 'ES', value: '70956' },
+    ],
+  };
 
-  it('returns the results unchanged when no grand-total query is expected', () => {
-    expect(getResultsForCard(results, undefined)).toBe(results);
-  });
-
-  it('returns a loading result while the grand-total query is loading', () => {
-    expect(getResultsForCard(results, { isLoading: true })).toEqual({
-      isLoading: true,
-      data: undefined,
-    });
-  });
-
-  it('returns a loading result when the query resolved but totals have not arrived', () => {
-    expect(getResultsForCard(results, { isLoading: false, data: undefined })).toEqual({
-      isLoading: true,
-      data: undefined,
-    });
-  });
-
-  it('returns the results once the totals have resolved', () => {
-    expect(getResultsForCard(results, { isLoading: false, data: [{ value: '100' }] })).toBe(
+  it('returns a loading response while the grand-total query is loading', () => {
+    const cardData = getChartCardData({
       results,
-    );
+      resultsOtherTotal: { isLoading: true },
+      dimension,
+      measures: [measure],
+      maxItems: 3,
+    });
+    expect(cardData.isLoading).toBe(true);
+    expect(cardData.data).toBeUndefined();
   });
 
-  it('returns the results when the grand-total query errored (avoids a stuck loading state)', () => {
-    expect(getResultsForCard(results, { isLoading: false, data: undefined, error: 'boom' })).toBe(
+  it('appends the Other row (from full-dataset totals) so the export matches the chart', () => {
+    const cardData = getChartCardData({
       results,
-    );
+      resultsOtherTotal: { isLoading: false, data: [{ value: '951515' }] },
+      dimension,
+      measures: [measure],
+      maxItems: 3,
+    });
+    // top-2 shown individually + a single "Other" row
+    expect(cardData.data).toHaveLength(3);
+    expect(cardData.data?.[2]?.category).toBe('t(common.other)');
+    // Other = 951515 - (465235 + 138807) = 347473
+    expect(cardData.data?.[2]?.value).toBe(347473);
+  });
+
+  it('returns the results unchanged when there is no Other bucket (no maxItems)', () => {
+    const cardData = getChartCardData({
+      results,
+      resultsOtherTotal: { isLoading: false, data: [{ value: '951515' }] },
+      dimension,
+      measures: [measure],
+    });
+    expect(cardData.data).toBe(results.data);
+  });
+
+  it('falls back to the returned tail when there is no grand-total query', () => {
+    const cardData = getChartCardData({
+      results,
+      resultsOtherTotal: undefined,
+      dimension,
+      measures: [measure],
+      maxItems: 3,
+    });
+    expect(cardData.data).toHaveLength(3);
+    // no totals → Other from the returned tail: AU + GB + ES = 224349
+    expect(cardData.data?.[2]?.value).toBe(224349);
+  });
+
+  it('does not get stuck loading when the grand-total query errored', () => {
+    const cardData = getChartCardData({
+      results,
+      resultsOtherTotal: { isLoading: false, data: undefined, error: 'boom' },
+      dimension,
+      measures: [measure],
+      maxItems: 3,
+    });
+    expect(cardData.isLoading).toBe(false);
+    expect(cardData.data).toHaveLength(3);
   });
 });
 
