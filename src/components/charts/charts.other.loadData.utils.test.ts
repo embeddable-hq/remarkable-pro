@@ -2,12 +2,10 @@ import type { DataResponse, Dataset, Measure } from '@embeddable.com/core';
 import { vi } from 'vitest';
 import {
   getAdditiveMeasures,
+  getFirstMeasureOrderBy,
   getMeasureTotals,
-  getTopItemsOrderBy,
-  isAdditiveMeasure,
-  isOtherTotalPending,
+  getResultsForCard,
   loadOtherTotal,
-  otherTotalLoadDataArgs,
 } from './charts.other.loadData.utils';
 
 const mockLoadData = vi.fn(
@@ -32,17 +30,19 @@ const makeMeasure = (name = 'revenue', aggType?: string): Measure =>
 
 beforeEach(() => mockLoadData.mockClear());
 
-describe('isAdditiveMeasure / getAdditiveMeasures', () => {
-  it('treats sum, count and undefined aggType as additive', () => {
-    expect(isAdditiveMeasure(makeMeasure('a', 'sum'))).toBe(true);
-    expect(isAdditiveMeasure(makeMeasure('b', 'count'))).toBe(true);
-    expect(isAdditiveMeasure(makeMeasure('c'))).toBe(true); // no aggType → legacy sum
+describe('getAdditiveMeasures', () => {
+  it('keeps sum, count and undefined aggType (legacy sum)', () => {
+    const sum = makeMeasure('a', 'sum');
+    const count = makeMeasure('b', 'count');
+    const legacy = makeMeasure('c');
+    expect(getAdditiveMeasures([sum, count, legacy])).toEqual([sum, count, legacy]);
   });
 
-  it('treats avg/min/max/median/countDistinct as non-additive', () => {
-    for (const aggType of ['avg', 'min', 'max', 'median', 'countDistinct']) {
-      expect(isAdditiveMeasure(makeMeasure('m', aggType))).toBe(false);
-    }
+  it('drops avg/min/max/median/countDistinct', () => {
+    const measures = ['avg', 'min', 'max', 'median', 'countDistinct'].map((aggType) =>
+      makeMeasure('m', aggType),
+    );
+    expect(getAdditiveMeasures(measures)).toEqual([]);
   });
 
   it('filters a mixed list down to the additive measures', () => {
@@ -52,44 +52,14 @@ describe('isAdditiveMeasure / getAdditiveMeasures', () => {
   });
 });
 
-describe('getTopItemsOrderBy', () => {
+describe('getFirstMeasureOrderBy', () => {
   it('orders by the first measure descending', () => {
     const measure = makeMeasure('revenue');
-    expect(getTopItemsOrderBy([measure])).toEqual([{ property: measure, direction: 'desc' }]);
+    expect(getFirstMeasureOrderBy([measure])).toEqual([{ property: measure, direction: 'desc' }]);
   });
 
   it('returns an empty array when there are no measures', () => {
-    expect(getTopItemsOrderBy([])).toEqual([]);
-  });
-});
-
-describe('otherTotalLoadDataArgs', () => {
-  it('selects only the additive measures with no dimension', () => {
-    const dataset = makeDataset();
-    const sum = makeMeasure('revenue', 'sum');
-    const avg = makeMeasure('avg_order', 'avg');
-
-    const args = otherTotalLoadDataArgs({ dataset, measures: [sum, avg], timezone: 'UTC' });
-
-    expect(args).toEqual({ from: dataset, select: [sum], timezone: 'UTC' });
-  });
-
-  it('returns undefined when there are no additive measures', () => {
-    const args = otherTotalLoadDataArgs({
-      dataset: makeDataset(),
-      measures: [makeMeasure('avg_order', 'avg')],
-    });
-    expect(args).toBeUndefined();
-  });
-
-  it('forwards filters when provided', () => {
-    const dataset = makeDataset();
-    const sum = makeMeasure('revenue', 'sum');
-    const filters = [{ property: sum, operator: 'gt' as const, value: 0 }];
-
-    const args = otherTotalLoadDataArgs({ dataset, measures: [sum], filters });
-
-    expect(args?.filters).toEqual(filters);
+    expect(getFirstMeasureOrderBy([])).toEqual([]);
   });
 });
 
@@ -113,36 +83,49 @@ describe('loadOtherTotal', () => {
     expect(mockLoadData).not.toHaveBeenCalled();
   });
 
-  it('issues the grand-total query when active', () => {
-    loadOtherTotal({
-      dataset: makeDataset(),
-      measures: [makeMeasure('revenue', 'sum')],
-      maxItems: 5,
-      timezone: 'UTC',
-    });
+  it('queries the additive measures with no dimension when active', () => {
+    const dataset = makeDataset();
+    const sum = makeMeasure('revenue', 'sum');
+    const avg = makeMeasure('avg_order', 'avg');
+
+    loadOtherTotal({ dataset, measures: [sum, avg], maxItems: 5, timezone: 'UTC' });
+
     expect(mockLoadData).toHaveBeenCalledTimes(1);
+    expect(mockLoadData).toHaveBeenCalledWith({ from: dataset, select: [sum], timezone: 'UTC' });
   });
 });
 
-describe('isOtherTotalPending', () => {
-  it('is false when no grand-total query is expected', () => {
-    expect(isOtherTotalPending(undefined)).toBe(false);
+describe('getResultsForCard', () => {
+  const results: DataResponse = { isLoading: false, data: [{ value: '1' }] };
+
+  it('returns the results unchanged when no grand-total query is expected', () => {
+    expect(getResultsForCard(results, undefined)).toBe(results);
   });
 
-  it('is true while the grand-total query is loading', () => {
-    expect(isOtherTotalPending({ isLoading: true })).toBe(true);
+  it('returns a loading result while the grand-total query is loading', () => {
+    expect(getResultsForCard(results, { isLoading: true })).toEqual({
+      isLoading: true,
+      data: undefined,
+    });
   });
 
-  it('is true when the query has resolved but totals have not arrived yet', () => {
-    expect(isOtherTotalPending({ isLoading: false, data: undefined })).toBe(true);
+  it('returns a loading result when the query resolved but totals have not arrived', () => {
+    expect(getResultsForCard(results, { isLoading: false, data: undefined })).toEqual({
+      isLoading: true,
+      data: undefined,
+    });
   });
 
-  it('is false once the totals have resolved', () => {
-    expect(isOtherTotalPending({ isLoading: false, data: [{ value: '100' }] })).toBe(false);
+  it('returns the results once the totals have resolved', () => {
+    expect(getResultsForCard(results, { isLoading: false, data: [{ value: '100' }] })).toBe(
+      results,
+    );
   });
 
-  it('is false when the query errored (avoids a stuck loading state)', () => {
-    expect(isOtherTotalPending({ isLoading: false, data: undefined, error: 'boom' })).toBe(false);
+  it('returns the results when the grand-total query errored (avoids a stuck loading state)', () => {
+    expect(getResultsForCard(results, { isLoading: false, data: undefined, error: 'boom' })).toBe(
+      results,
+    );
   });
 });
 

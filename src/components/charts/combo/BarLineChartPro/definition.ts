@@ -15,7 +15,7 @@ import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
 import { BarLineChartProClickArg } from '../combo.types';
-import { getTopItemsOrderBy, loadOtherTotal } from '../../charts.other.loadData.utils';
+import { getFirstMeasureOrderBy, loadOtherTotal } from '../../charts.other.loadData.utils';
 
 const meta = {
   name: 'BarLineChartPro',
@@ -132,7 +132,7 @@ const loadDataResultsArgs = (
     ...(inputs.lineMeasures ?? []),
     dimension ?? inputs.dimension,
   ],
-  orderBy: getTopItemsOrderBy(inputs.measures ?? []),
+  orderBy: getFirstMeasureOrderBy(inputs.measures ?? []),
   timezone: getClientContextTimezone(clientContext?.timezone),
 });
 

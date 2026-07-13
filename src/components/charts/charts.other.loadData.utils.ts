@@ -1,59 +1,25 @@
-import {
-  DataResponse,
-  Dataset,
-  LoadDataRequest,
-  Measure,
-  OrderBy,
-  QueryFilter,
-  loadData,
-} from '@embeddable.com/core';
+import { DataResponse, Dataset, Measure, OrderBy, loadData } from '@embeddable.com/core';
 import { SortDirectionTypeOptions } from '../types/SortDirection.type.emb';
 
 const ADDITIVE_AGG_TYPES = new Set(['sum', 'count']);
 
-export const getMeasureAggType = (measure: Measure): string | undefined =>
-  (measure.meta as Record<string, unknown> | undefined)?.aggType as string | undefined;
-
-export const isAdditiveMeasure = (measure: Measure): boolean => {
-  const aggType = getMeasureAggType(measure);
-  return aggType == null || ADDITIVE_AGG_TYPES.has(aggType);
-};
-
 export const getAdditiveMeasures = (measures: Measure[]): Measure[] =>
-  measures.filter(isAdditiveMeasure);
+  measures.filter((measure) => {
+    const aggType = (measure.meta as { aggType?: string } | undefined)?.aggType;
+    return aggType == null || ADDITIVE_AGG_TYPES.has(aggType);
+  });
 
-export const getTopItemsOrderBy = (measures: Measure[]): OrderBy[] => {
+export const getFirstMeasureOrderBy = (measures: Measure[]): OrderBy[] => {
   const [firstMeasure] = measures;
   if (!firstMeasure) return [];
   return [{ property: firstMeasure, direction: SortDirectionTypeOptions.desc }];
 };
 
-type OtherTotalLoadDataArgs = {
+type LoadOtherTotalArgs = {
   dataset: Dataset;
   measures: Measure[];
-  timezone?: string;
-  filters?: QueryFilter[];
-};
-
-export const otherTotalLoadDataArgs = ({
-  dataset,
-  measures,
-  timezone,
-  filters,
-}: OtherTotalLoadDataArgs): LoadDataRequest | undefined => {
-  const additiveMeasures = getAdditiveMeasures(measures);
-  if (!additiveMeasures.length) return undefined;
-
-  return {
-    from: dataset,
-    select: additiveMeasures,
-    timezone,
-    ...(filters?.length ? { filters } : {}),
-  };
-};
-
-type LoadOtherTotalArgs = OtherTotalLoadDataArgs & {
   maxItems?: number;
+  timezone?: string;
 };
 
 export const loadOtherTotal = ({
@@ -61,18 +27,12 @@ export const loadOtherTotal = ({
   measures,
   maxItems,
   timezone,
-  filters,
 }: LoadOtherTotalArgs): DataResponse | undefined => {
   if (!maxItems) return undefined;
-  const args = otherTotalLoadDataArgs({ dataset, measures, timezone, filters });
-  if (!args) return undefined;
-  return loadData(args);
+  const additiveMeasures = getAdditiveMeasures(measures);
+  if (!additiveMeasures.length) return undefined;
+  return loadData({ from: dataset, select: additiveMeasures, timezone });
 };
-
-export const isOtherTotalPending = (resultsOtherTotal?: DataResponse): boolean =>
-  resultsOtherTotal != null &&
-  !resultsOtherTotal.error &&
-  (resultsOtherTotal.isLoading || resultsOtherTotal.data == null);
 
 export const getMeasureTotals = (
   otherTotalResults: DataResponse | undefined,
@@ -87,4 +47,15 @@ export const getMeasureTotals = (
     if (Number.isFinite(value)) totals[measure.name] = value;
   }
   return totals;
+};
+
+export const getResultsForCard = (
+  results: DataResponse,
+  otherTotalResults?: DataResponse,
+): DataResponse => {
+  const otherTotalPending =
+    otherTotalResults != null &&
+    !otherTotalResults.error &&
+    (otherTotalResults.isLoading || otherTotalResults.data == null);
+  return otherTotalPending ? { ...results, isLoading: true, data: undefined } : results;
 };

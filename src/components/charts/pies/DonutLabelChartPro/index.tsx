@@ -9,7 +9,7 @@ import { ChartCard, asChartCardHeaderProps } from '../../shared/ChartCard/ChartC
 import { DonutChart } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
 import { resolveI18nProps } from '../../../component.utils';
-import { getMeasureTotals, isOtherTotalPending } from '../../charts.other.loadData.utils';
+import { getMeasureTotals, getResultsForCard } from '../../charts.other.loadData.utils';
 
 export type DonutLabelChartProProps = DefaultPieChartProps & {
   innerLabelMeasure: Measure;
@@ -42,9 +42,7 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
     measureTotals: getMeasureTotals(resultsOtherTotal, [measure]),
   };
 
-  const cardData = isOtherTotalPending(resultsOtherTotal)
-    ? { ...results, isLoading: true, data: undefined }
-    : results;
+  const cardData = getResultsForCard(results, resultsOtherTotal);
 
   const data = getPieChartProData(
     { data: results.data, dimension, measure, maxLegendItems, otherOptions },

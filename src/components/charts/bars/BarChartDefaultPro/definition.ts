@@ -15,7 +15,7 @@ import { subInputs } from '../../../component.subinputs.constants';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
 import { BarChartProOptionsClickArg } from '../bars.types';
-import { getTopItemsOrderBy, loadOtherTotal } from '../../charts.other.loadData.utils';
+import { getFirstMeasureOrderBy, loadOtherTotal } from '../../charts.other.loadData.utils';
 
 const meta = {
   name: 'BarChartDefaultPro',
@@ -90,7 +90,7 @@ const loadDataResultsArgs = (
   limit: inputs.maxResults,
   from: inputs.dataset,
   select: [...inputs.measures, dimension ?? inputs.dimension],
-  orderBy: getTopItemsOrderBy(inputs.measures),
+  orderBy: getFirstMeasureOrderBy(inputs.measures),
   timezone: getClientContextTimezone(clientContext?.timezone),
 });
 

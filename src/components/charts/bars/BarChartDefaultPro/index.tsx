@@ -11,7 +11,7 @@ import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelect
 import { BarChartBaseProps } from '../bars.types';
 import { createSimpleClickHandler } from '../../charts.utils';
 import { DataResponse } from '@embeddable.com/core';
-import { getMeasureTotals, isOtherTotalPending } from '../../charts.other.loadData.utils';
+import { getMeasureTotals, getResultsForCard } from '../../charts.other.loadData.utils';
 
 export type BarChartDefaultProProps = BarChartBaseProps & {
   reverseXAxis?: boolean;
@@ -55,9 +55,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     measureTotals: getMeasureTotals(resultsOtherTotal, measures),
   };
 
-  const cardData = isOtherTotalPending(resultsOtherTotal)
-    ? { ...results, isLoading: true, data: undefined }
-    : results;
+  const cardData = getResultsForCard(results, resultsOtherTotal);
 
   const data = getBarChartProData(
     { data: results.data, dimension, measures, maxItems: xAxisMaxItems, otherOptions },

@@ -5,7 +5,7 @@ import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { subInputs } from '../../../component.subinputs.constants';
-import { getTopItemsOrderBy, loadOtherTotal } from '../../charts.other.loadData.utils';
+import { getFirstMeasureOrderBy, loadOtherTotal } from '../../charts.other.loadData.utils';
 
 const meta = {
   name: 'PieChartPro',
@@ -61,7 +61,7 @@ const preview = definePreview(Component, previewConfig);
 const loadDataResultsArgs = (inputs: Inputs<typeof meta>): LoadDataRequest => ({
   from: inputs.dataset,
   select: [inputs.measure, inputs.dimension],
-  orderBy: getTopItemsOrderBy([inputs.measure]),
+  orderBy: getFirstMeasureOrderBy([inputs.measure]),
 });
 
 const loadDataResults = (inputs: Inputs<typeof meta>): DataResponse =>

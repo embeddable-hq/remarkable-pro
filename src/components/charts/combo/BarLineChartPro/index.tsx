@@ -13,7 +13,7 @@ import {
   getBarLineChartProData,
   getBarLineChartProOptions,
 } from './BarLineChartPro.utils';
-import { getMeasureTotals, isOtherTotalPending } from '../../charts.other.loadData.utils';
+import { getMeasureTotals, getResultsForCard } from '../../charts.other.loadData.utils';
 
 ChartJS.register(LineController, LineElement, PointElement);
 
@@ -55,9 +55,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
     measureTotals: getMeasureTotals(resultsOtherTotal, [...measures, ...lineMeasures]),
   };
 
-  const cardData = isOtherTotalPending(resultsOtherTotal)
-    ? { ...results, isLoading: true, data: undefined }
-    : results;
+  const cardData = getResultsForCard(results, resultsOtherTotal);
 
   const data = getBarLineChartProData(
     {
