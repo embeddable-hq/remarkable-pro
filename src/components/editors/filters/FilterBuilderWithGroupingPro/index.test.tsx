@@ -112,40 +112,52 @@ vi.mock('./components/FilterBuilderWithGroupingGroup', () => ({
   }: {
     group: { id: number; filters: FilterBuilderFilter[] };
     onAddFilter: (v: string | null) => void;
-    onDeleteFilter: (i: number) => void;
+    onDeleteFilter: (filterId: number) => void;
     onOperatorChange: (v: string) => void;
-    onSelectDimensionOrMeasure: (i: number, v: string | null) => void;
-    onSelectOperator: (i: number, v: string | null) => void;
-    onSelectValue: (i: number, v: FilterBuilderFilter['value']) => void;
-    onSearchValue: (i: number, v: string) => void;
-  }) => (
-    <div data-testid={`group-${group.id}`}>
-      <button data-testid={`group-add-${group.id}`} onClick={() => onAddFilter('country')}>
-        add
-      </button>
-      <button data-testid={`group-del-${group.id}`} onClick={() => onDeleteFilter(0)}>
-        del
-      </button>
-      <button data-testid={`group-op-${group.id}`} onClick={() => onOperatorChange('or')}>
-        op
-      </button>
-      <button
-        data-testid={`group-seldim-${group.id}`}
-        onClick={() => onSelectDimensionOrMeasure(0, 'country')}
-      >
-        seldim
-      </button>
-      <button data-testid={`group-selop-${group.id}`} onClick={() => onSelectOperator(0, 'is')}>
-        selop
-      </button>
-      <button data-testid={`group-selval-${group.id}`} onClick={() => onSelectValue(0, 'France')}>
-        selval
-      </button>
-      <button data-testid={`group-search-${group.id}`} onClick={() => onSearchValue(0, 'fr')}>
-        search
-      </button>
-    </div>
-  ),
+    onSelectDimensionOrMeasure: (filterId: number, v: string | null) => void;
+    onSelectOperator: (filterId: number, v: string | null) => void;
+    onSelectValue: (filterId: number, v: FilterBuilderFilter['value']) => void;
+    onSearchValue: (filterId: number, v: string) => void;
+  }) => {
+    const firstFilterId = group.filters[0]!.id;
+    return (
+      <div data-testid={`group-${group.id}`}>
+        <button data-testid={`group-add-${group.id}`} onClick={() => onAddFilter('country')}>
+          add
+        </button>
+        <button data-testid={`group-del-${group.id}`} onClick={() => onDeleteFilter(firstFilterId)}>
+          del
+        </button>
+        <button data-testid={`group-op-${group.id}`} onClick={() => onOperatorChange('or')}>
+          op
+        </button>
+        <button
+          data-testid={`group-seldim-${group.id}`}
+          onClick={() => onSelectDimensionOrMeasure(firstFilterId, 'country')}
+        >
+          seldim
+        </button>
+        <button
+          data-testid={`group-selop-${group.id}`}
+          onClick={() => onSelectOperator(firstFilterId, 'is')}
+        >
+          selop
+        </button>
+        <button
+          data-testid={`group-selval-${group.id}`}
+          onClick={() => onSelectValue(firstFilterId, 'France')}
+        >
+          selval
+        </button>
+        <button
+          data-testid={`group-search-${group.id}`}
+          onClick={() => onSearchValue(firstFilterId, 'fr')}
+        >
+          search
+        </button>
+      </div>
+    );
+  },
 }));
 
 vi.mock('./components/FilterBuilderWithGroupingAndOrButton', () => ({
@@ -395,6 +407,34 @@ describe('FilterBuilderWithGroupingPro', () => {
     // deleting one of two collapses the group back to a single top-level filter
     const afterDelete = applyUpdater(defaultProps.setEmbeddableState, groupState());
     expect(afterDelete.items![0]).toMatchObject({ id: 2 });
+  });
+
+  it('targets a group filter by its stable id, not its array position (regression)', () => {
+    // The filter carrying id 99 is deliberately placed first in the array so a
+    // position-based ("index 0") dispatch and an id-based dispatch would only
+    // coincide by accident here — using an id that doesn't double as a valid
+    // index (99) proves the update is keyed by id.
+    const state: FilterBuilderGroupingState = {
+      operator: filterBuilderAndOrOperator.AND,
+      items: [
+        {
+          id: 7,
+          operator: 'and',
+          filters: [
+            makeFilter({ id: 99, dimensionOrMeasure: makeDim('country'), value: 'UK' }),
+            makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), value: 'AU' }),
+          ],
+        },
+      ],
+    };
+    render(<FilterBuilderWithGroupingPro {...defaultProps} embeddableState={state} />);
+
+    fireEvent.click(screen.getByTestId('group-selval-7'));
+
+    const next = applyUpdater(defaultProps.setEmbeddableState, state);
+    const group = next.items![0] as { filters: FilterBuilderFilter[] };
+    expect(group.filters.find((f) => f.id === 99)!.value).toBe('France');
+    expect(group.filters.find((f) => f.id === 1)!.value).toBe('AU');
   });
 
   it('toggles the top-level operator', () => {

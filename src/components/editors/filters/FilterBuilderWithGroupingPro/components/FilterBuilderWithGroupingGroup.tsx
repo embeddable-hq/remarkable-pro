@@ -27,11 +27,14 @@ type FilterBuilderWithGroupingGroupProps = {
   disableOr: boolean;
   results: (filterId: number) => DataResponse | undefined;
   onOperatorChange: (operator: FilterBuilderAndOrOperator) => void;
-  onSelectDimensionOrMeasure: (filterIndex: number, value: string | null) => void;
-  onSelectOperator: (filterIndex: number, value: string | null) => void;
-  onSelectValue: (filterIndex: number, value: FilterBuilderFilter['value']) => void;
-  onSearchValue: (filterIndex: number, value: string) => void;
-  onDeleteFilter: (filterIndex: number) => void;
+  // Keyed by the filter's stable id rather than its array position, so an
+  // in-flight callback (e.g. a debounced value update) can't land on the wrong
+  // filter if the group's contents were deleted/reordered in the meantime.
+  onSelectDimensionOrMeasure: (filterId: number, value: string | null) => void;
+  onSelectOperator: (filterId: number, value: string | null) => void;
+  onSelectValue: (filterId: number, value: FilterBuilderFilter['value']) => void;
+  onSearchValue: (filterId: number, value: string) => void;
+  onDeleteFilter: (filterId: number) => void;
   onAddFilter: (value: string | null) => void;
 };
 
@@ -51,18 +54,23 @@ export const FilterBuilderWithGroupingGroup = ({
 }: FilterBuilderWithGroupingGroupProps) => {
   const [search, setSearch] = useState('');
 
-  const lockedType = getGroupMemberType(group.filters);
+  // The member type this group is already locked to (Cube can't combine
+  // dimensions and measures in one logical operator, so a group must stay
+  // single-type). Null while the group has no members yet.
+  const groupMemberType = getGroupMemberType(group.filters);
 
   const options = getDimensionAndMeasureOptions({
     dimensionsAndMeasures: filterByMemberType(
       getSupportedDimensionsAndMeasures(dimensionsAndMeasures),
-      lockedType,
+      groupMemberType,
     ),
     searchValue: search,
     theme,
   });
 
-  const extender = (
+  // The trailing "+" control that lets the user add another filter to this
+  // group — the pill's end cap, appended after the last filter.
+  const addToGroupControl = (
     <Tooltip
       side="top"
       trigger={
@@ -103,11 +111,11 @@ export const FilterBuilderWithGroupingGroup = ({
             dimensionsAndMeasures={dimensionsAndMeasures}
             results={results(filter.id)}
             theme={theme}
-            onSelectDimensionOrMeasure={(value) => onSelectDimensionOrMeasure(index, value)}
-            onSelectOperator={(value) => onSelectOperator(index, value)}
-            onSelectValue={(value) => onSelectValue(index, value)}
-            onSearchValue={(value) => onSearchValue(index, value)}
-            onDelete={() => onDeleteFilter(index)}
+            onSelectDimensionOrMeasure={(value) => onSelectDimensionOrMeasure(filter.id, value)}
+            onSelectOperator={(value) => onSelectOperator(filter.id, value)}
+            onSelectValue={(value) => onSelectValue(filter.id, value)}
+            onSearchValue={(value) => onSearchValue(filter.id, value)}
+            onDelete={() => onDeleteFilter(filter.id)}
           />
         );
 
@@ -124,7 +132,7 @@ export const FilterBuilderWithGroupingGroup = ({
             {isLast ? (
               <div className={styles.filter}>
                 {item}
-                {extender}
+                {addToGroupControl}
               </div>
             ) : (
               item

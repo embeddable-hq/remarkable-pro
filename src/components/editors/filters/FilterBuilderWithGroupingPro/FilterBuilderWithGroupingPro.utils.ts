@@ -1,4 +1,4 @@
-import { DimensionOrMeasure, isDimension, isMeasure } from '@embeddable.com/core';
+import { DimensionOrMeasure } from '@embeddable.com/core';
 import {
   clauseToFilter,
   FilterBuilderAndOrOperator,
@@ -6,6 +6,7 @@ import {
   FilterBuilderClause,
   FilterBuilderFilter,
   filterToClause,
+  hasMixedDimensionsAndMeasures,
 } from '../filters.utils';
 
 export type FilterBuilderGroup = {
@@ -28,18 +29,25 @@ export const isFilterBuilderGroup = (
   node: FilterBuilderNode | null | undefined,
 ): node is FilterBuilderGroup => Array.isArray((node as FilterBuilderGroup | undefined)?.filters);
 
-export const getItems = (state: FilterBuilderGroupingState | undefined): FilterBuilderNode[] => {
+/** Reads the top-level filter/group nodes from state, migrating the legacy
+ * flat `filters` shape (pre-grouping saved dashboards) if `items` isn't set. */
+export const getFilterNodes = (
+  state: FilterBuilderGroupingState | undefined,
+): FilterBuilderNode[] => {
   if (state?.items?.length) return state.items;
   if (state?.filters?.length) return state.filters;
   return [];
 };
 
-export const getLeafFilters = (
+/** All filters in the tree, flattened out of any groups they belong to. */
+export const getAllFilters = (
   state: FilterBuilderGroupingState | undefined,
 ): FilterBuilderFilter[] =>
-  getItems(state).flatMap((node) => (isFilterBuilderGroup(node) ? node.filters : [node]));
+  getFilterNodes(state).flatMap((node) => (isFilterBuilderGroup(node) ? node.filters : [node]));
 
-export const getMaxNodeId = (items: FilterBuilderNode[]): number =>
+/** Highest id in use across every top-level node and group member, so a new
+ * node/filter can be minted with a guaranteed-unique id. */
+export const getHighestNodeId = (items: FilterBuilderNode[]): number =>
   items.reduce((max, node) => {
     const groupChildMax = isFilterBuilderGroup(node)
       ? node.filters.reduce((m, f) => Math.max(m, f.id), 0)
@@ -67,10 +75,6 @@ export const filterByMemberType = (
 
 const isFilterComplete = (f: FilterBuilderFilter): boolean =>
   Boolean(f.dimensionOrMeasure && f.operator && f.value != null);
-
-export const scopeIsMixed = (leaves: FilterBuilderFilter[]): boolean =>
-  leaves.some((f) => isDimension(f.dimensionOrMeasure ?? undefined)) &&
-  leaves.some((f) => isMeasure(f.dimensionOrMeasure ?? undefined));
 
 export const itemsToClause = (
   operator: FilterBuilderAndOrOperator,
@@ -136,7 +140,9 @@ export const clauseToItems = (
   return items;
 };
 
-export const sanitizeOperators = (
+/** Clamps any OR that would illegally combine a dimension with a measure back
+ * to AND — checked independently for each group and for the top level. */
+export const sanitizeMixedTypeOperators = (
   items: FilterBuilderNode[],
   topOperator: FilterBuilderAndOrOperator,
 ): { items: FilterBuilderNode[]; operator: FilterBuilderAndOrOperator; changed: boolean } => {
@@ -145,7 +151,7 @@ export const sanitizeOperators = (
     if (
       isFilterBuilderGroup(node) &&
       node.operator === filterBuilderAndOrOperator.OR &&
-      scopeIsMixed(node.filters)
+      hasMixedDimensionsAndMeasures(node.filters)
     ) {
       changed = true;
       return { ...node, operator: filterBuilderAndOrOperator.AND };
@@ -153,8 +159,8 @@ export const sanitizeOperators = (
     return node;
   });
   let operator = topOperator;
-  const leaves = newItems.flatMap((n) => (isFilterBuilderGroup(n) ? n.filters : [n]));
-  if (operator === filterBuilderAndOrOperator.OR && scopeIsMixed(leaves)) {
+  const allFilters = newItems.flatMap((n) => (isFilterBuilderGroup(n) ? n.filters : [n]));
+  if (operator === filterBuilderAndOrOperator.OR && hasMixedDimensionsAndMeasures(allFilters)) {
     operator = filterBuilderAndOrOperator.AND;
     changed = true;
   }

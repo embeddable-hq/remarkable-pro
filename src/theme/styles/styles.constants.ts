@@ -120,6 +120,9 @@ const stylesRemarkablePro = {
   '--em-filter-icon-size': 'var(--em-core-size--0400)',
   '--em-filter-padding-x': 'var(--em-core-spacing--0300)',
   '--em-filter-padding-x--operator': 'var(--em-core-spacing--0100)',
+  '--em-filter-padding-y': 'var(--em-core-spacing--0000)',
+  '--em-filter-border-width': 'var(--em-core-border-width--000)',
+  '--em-filter-border-color': 'rgb(255 255 255 / 0%)',
   '--em-filter-border-radius': 'var(--em-core-border-radius--000)',
   '--em-filter-border-radius--group': 'var(--em-core-border-radius--400)',
   '--em-filter-color': 'var(--em-sem-text--neutral)',
@@ -133,6 +136,8 @@ const stylesRemarkablePro = {
   '--em-filter-border-color--group': 'var(--em-sem-background--light)',
   '--em-filter-border-width--group': 'var(--em-core-border-width--025)',
   '--em-filter-padding--group': 'var(--em-core-spacing--0100)',
+  '--em-filter-opacity--disabled': '0.5',
+  '--em-filter-value-input-min-width': 'var(--em-core-size--0800)',
 
   // Drilldown Modal
   '--em-drilldown-modal-min-height': '100%',

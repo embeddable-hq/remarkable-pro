@@ -3,7 +3,7 @@ import { FilterOperator, loadData, Value } from '@embeddable.com/core';
 import Component from '.';
 import { inputs } from '../../../component.inputs.constants';
 import { FilterBuilderClause, filterToLoadDataFilters } from '../filters.utils';
-import { FilterBuilderGroupingState, getLeafFilters } from './FilterBuilderWithGroupingPro.utils';
+import { FilterBuilderGroupingState, getAllFilters } from './FilterBuilderWithGroupingPro.utils';
 
 export type { FilterBuilderGroupingState };
 
@@ -78,9 +78,9 @@ const props = (
     ) => void,
   ],
 ) => {
-  const leafFilters = getLeafFilters(state);
+  const allFilters = getAllFilters(state);
 
-  const filterResults = leafFilters.reduce<Record<string, unknown>>((acc, item) => {
+  const filterResults = allFilters.reduce<Record<string, unknown>>((acc, item) => {
     if (item.dimensionOrMeasure?.__type__ !== 'dimension' || !item.operator) {
       return acc;
     }
@@ -94,7 +94,7 @@ const props = (
       : [];
 
     const cascadingFilters = inputs.applyCascadingFilters
-      ? leafFilters.filter((other) => other.id !== item.id).flatMap(filterToLoadDataFilters)
+      ? allFilters.filter((other) => other.id !== item.id).flatMap(filterToLoadDataFilters)
       : [];
 
     const filters = [...cascadingFilters, ...searchFilter];

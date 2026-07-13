@@ -1,20 +1,23 @@
-import { DataResponse, DimensionOrMeasure, isDimension, isMeasure } from '@embeddable.com/core';
+import { DataResponse, DimensionOrMeasure } from '@embeddable.com/core';
 import { useTheme } from '@embeddable.com/react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Theme } from '../../../../theme/theme.types';
 import FilterBuilderItem from './components/FilterBuilderItem';
-import { FilterBuilderFilter, FilterBuilderState } from './definition';
+import { FilterBuilderState } from './definition';
 import { ActionIcon, SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { IconPlus, IconChevronRight, IconChevronLeft } from '@tabler/icons-react';
 import styles from './FilterBuilderPro.module.css';
 import {
   filterBuilderAndOrOperator,
   FilterBuilderAndOrOperator,
+  FilterBuilderFilter,
   filtersToClause,
+  getLastFilterKey,
   getSupportedDimensionsAndMeasures,
+  hasMixedDimensionsAndMeasures,
   clauseToFilters,
   FilterBuilderClause,
-} from './FilterBuilderPro.utils';
+} from '../filters.utils';
 import { FilterBuilderProAndOrButton } from './components/FilterBuilderProAndOrButton';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../../utils/dimensionsAndMeasures.utils';
@@ -84,13 +87,10 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   );
   const operator = embeddableState?.operator ?? filterBuilderAndOrOperator.AND;
 
-  const lastFilter = filters[filters.length - 1];
-  const lastFilterKey = `${lastFilter?.id}-${lastFilter?.dimensionOrMeasure?.name}-${lastFilter?.operator}-${JSON.stringify(lastFilter?.value)}`;
-
   const { scrollRef, canScrollLeft, canScrollRight, scrollLeft, scrollRight, scrollToEnd } =
     useFilterBuilderScroll({
       itemsSignature: filters,
-      autoScrollKey: lastFilterKey,
+      autoScrollKey: getLastFilterKey(filters),
     });
 
   const handleOperatorChange = (value: FilterBuilderAndOrOperator) => {
@@ -158,13 +158,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
 
   const hasClearAll = filters.some((f) => f.dimensionOrMeasure && f.operator && f.value != null);
 
-  // OR cannot combine dimensions (row-level WHERE) with measures (aggregate HAVING)
-  // in Cube. This depends on which members are *selected*, not whether their values
-  // are filled in — a measure mid-edit (e.g. value cleared after an operator change)
-  // still makes the set mixed, so we must not look only at "complete" filters.
-  const hasMixedTypes =
-    filters.some((f) => isDimension(f.dimensionOrMeasure ?? undefined)) &&
-    filters.some((f) => isMeasure(f.dimensionOrMeasure ?? undefined));
+  const hasMixedTypes = hasMixedDimensionsAndMeasures(filters);
 
   const isMixedOrOperator = hasMixedTypes && operator === filterBuilderAndOrOperator.OR;
 

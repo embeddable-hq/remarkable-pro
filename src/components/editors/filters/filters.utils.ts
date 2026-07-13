@@ -1,4 +1,10 @@
-import { DimensionOrMeasure, FilterOperator, NativeDataType } from '@embeddable.com/core';
+import {
+  DimensionOrMeasure,
+  FilterOperator,
+  isDimension,
+  isMeasure,
+  NativeDataType,
+} from '@embeddable.com/core';
 import { i18n } from '../../../theme/i18n/i18n';
 
 export type FilterBuilderFilter = {
@@ -7,6 +13,23 @@ export type FilterBuilderFilter = {
   search: string;
   value: string | string[] | number | number[] | boolean | null;
   operator: string | null;
+};
+
+/**
+ * Cube cannot combine a dimension filter (row-level WHERE) with a measure
+ * filter (aggregate HAVING) in the same logical operator. Used to decide when
+ * an OR must be forced back to AND.
+ */
+export const hasMixedDimensionsAndMeasures = (filters: FilterBuilderFilter[]): boolean =>
+  filters.some((f) => isDimension(f.dimensionOrMeasure ?? undefined)) &&
+  filters.some((f) => isMeasure(f.dimensionOrMeasure ?? undefined));
+
+/** Identity key for the last filter in a list — changes whenever its member,
+ * operator, or value changes, used to trigger scrolling to a newly added or
+ * edited filter. */
+export const getLastFilterKey = (filters: FilterBuilderFilter[]): string => {
+  const last = filters[filters.length - 1];
+  return `${last?.id}-${last?.dimensionOrMeasure?.name}-${last?.operator}-${JSON.stringify(last?.value)}`;
 };
 
 export const operatorStringBoolean = {

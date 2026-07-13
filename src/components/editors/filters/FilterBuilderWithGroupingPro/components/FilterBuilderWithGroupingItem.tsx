@@ -47,21 +47,24 @@ const FilterBuilderWithGroupingItem = ({
 
   const canCreateGroup = !inGroup && Boolean(onCreateGroup);
 
-  const supported = getSupportedDimensionsAndMeasures(dimensionsAndMeasures);
+  const supportedDimensionsAndMeasures = getSupportedDimensionsAndMeasures(dimensionsAndMeasures);
 
   const allDimensionOptions = getDimensionAndMeasureOptions({
-    dimensionsAndMeasures: supported,
+    dimensionsAndMeasures: supportedDimensionsAndMeasures,
     theme,
   });
 
   const dimensionOptions = getDimensionAndMeasureOptions({
-    dimensionsAndMeasures: filterByMemberType(supported, allowedMemberType),
+    dimensionsAndMeasures: filterByMemberType(supportedDimensionsAndMeasures, allowedMemberType),
     searchValue: search,
     theme,
   });
 
   const createGroupOptions = getDimensionAndMeasureOptions({
-    dimensionsAndMeasures: filterByMemberType(supported, dimensionOrMeasure?.__type__),
+    dimensionsAndMeasures: filterByMemberType(
+      supportedDimensionsAndMeasures,
+      dimensionOrMeasure?.__type__,
+    ),
     searchValue: search,
     theme,
   });
@@ -105,7 +108,7 @@ const FilterBuilderWithGroupingItem = ({
             onSelectValue={onSelectValue}
             onSearchValue={onSearchValue}
             styles={styles}
-            showInlineClear={false}
+            showClear={false}
           />
           <Tooltip
             side="top"

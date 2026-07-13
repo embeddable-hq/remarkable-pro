@@ -10,19 +10,20 @@ import {
   filterBuilderAndOrOperator,
   FilterBuilderClause,
   FilterBuilderFilter,
+  getLastFilterKey,
   getSupportedDimensionsAndMeasures,
+  hasMixedDimensionsAndMeasures,
 } from '../filters.utils';
 import { useFilterBuilderScroll } from '../filters.hooks';
 import {
   clauseToItems,
   FilterBuilderGroupingState,
   FilterBuilderNode,
-  getItems,
-  getMaxNodeId,
+  getFilterNodes,
+  getHighestNodeId,
   isFilterBuilderGroup,
   itemsToClause,
-  sanitizeOperators,
-  scopeIsMixed,
+  sanitizeMixedTypeOperators,
 } from './FilterBuilderWithGroupingPro.utils';
 import FilterBuilderWithGroupingItem from './components/FilterBuilderWithGroupingItem';
 import FilterBuilderWithGroupingGroup from './components/FilterBuilderWithGroupingGroup';
@@ -75,7 +76,7 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
 
   const emptyItems = useMemo<FilterBuilderNode[]>(() => [makeFilter(1)], [makeFilter]);
 
-  const storedItems = getItems(embeddableState);
+  const storedItems = getFilterNodes(embeddableState);
   const items = storedItems.length ? storedItems : emptyItems;
   const operator = embeddableState?.operator ?? AND;
 
@@ -86,20 +87,18 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
 
     if (newItems.length > 0) {
       setEmbeddableState?.((prev) => {
-        if (getItems(prev).length) return prev;
+        if (getFilterNodes(prev).length) return prev;
         return { ...prev, operator: defaultFilters.operator, items: newItems };
       });
     }
   }, [defaultFilters, dimensionsAndMeasures, setEmbeddableState]);
 
-  const allLeaves = items.flatMap((node) => (isFilterBuilderGroup(node) ? node.filters : [node]));
-  const lastLeaf = allLeaves[allLeaves.length - 1];
-  const lastFilterKey = `${lastLeaf?.id}-${lastLeaf?.dimensionOrMeasure?.name}-${lastLeaf?.operator}-${JSON.stringify(lastLeaf?.value)}`;
+  const allFilters = items.flatMap((node) => (isFilterBuilderGroup(node) ? node.filters : [node]));
 
   const { scrollRef, canScrollLeft, canScrollRight, scrollLeft, scrollRight, scrollToEnd } =
     useFilterBuilderScroll({
       itemsSignature: items,
-      autoScrollKey: lastFilterKey,
+      autoScrollKey: getLastFilterKey(allFilters),
     });
 
   const handleOperatorChange = (value: FilterBuilderAndOrOperator) => {
@@ -109,7 +108,7 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
   const updateItems = useCallback(
     (updater: (items: FilterBuilderNode[]) => FilterBuilderNode[]) => {
       setEmbeddableState?.((prev) => {
-        const stored = getItems(prev);
+        const stored = getFilterNodes(prev);
         const base = stored.length ? stored : [makeFilter(1)];
         return { ...prev, items: updater([...base]) };
       });
@@ -117,39 +116,49 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
     [setEmbeddableState, makeFilter],
   );
 
+  // All the handlers below dispatch by the node/filter's stable id rather than
+  // its array position. Callbacks can resolve asynchronously (e.g. a debounced
+  // number/text input) after the list has been reordered by a delete or an
+  // insertion elsewhere — an index captured at render time could then land on
+  // the wrong item, whereas an id always finds the same item or no longer
+  // matches at all.
   const patchLeaf = (
-    index: number,
+    id: number,
     patch: Partial<FilterBuilderFilter> | ((filter: FilterBuilderFilter) => FilterBuilderFilter),
   ) =>
     updateItems((current) => {
-      const node = current[index];
-      if (!node || isFilterBuilderGroup(node)) return current;
+      const index = current.findIndex((node) => !isFilterBuilderGroup(node) && node.id === id);
+      if (index === -1) return current;
+      const node = current[index] as FilterBuilderFilter;
       current[index] = typeof patch === 'function' ? patch(node) : { ...node, ...patch };
       return current;
     });
 
-  const handleSelectDimensionOrMeasure = (index: number, name: string | null) =>
-    patchLeaf(index, (node) => makeFilter(node.id, name));
+  const handleSelectDimensionOrMeasure = (id: number, name: string | null) =>
+    patchLeaf(id, (node) => makeFilter(node.id, name));
 
-  const handleSelectOperator = (index: number, value: string | null) =>
-    patchLeaf(index, { operator: value, value: null });
+  const handleSelectOperator = (id: number, value: string | null) =>
+    patchLeaf(id, { operator: value, value: null });
 
-  const handleSelectValue = (index: number, value: FilterBuilderFilter['value']) =>
-    patchLeaf(index, { value });
+  const handleSelectValue = (id: number, value: FilterBuilderFilter['value']) =>
+    patchLeaf(id, { value });
 
-  const handleDimensionSearch = (index: number, search: string) => patchLeaf(index, { search });
+  const handleDimensionSearch = (id: number, search: string) => patchLeaf(id, { search });
 
-  const handleDeleteItem = (index: number) =>
+  const handleDeleteItem = (id: number) =>
     updateItems((current) => {
+      const index = current.findIndex((node) => node.id === id);
+      if (index === -1) return current;
       current.splice(index, 1);
       return current;
     });
 
-  const handleCreateGroup = (index: number, name: string | null) =>
+  const handleCreateGroup = (id: number, name: string | null) =>
     updateItems((current) => {
-      const node = current[index];
-      if (!node || isFilterBuilderGroup(node)) return current;
-      const maxId = getMaxNodeId(current);
+      const index = current.findIndex((node) => !isFilterBuilderGroup(node) && node.id === id);
+      if (index === -1) return current;
+      const node = current[index] as FilterBuilderFilter;
+      const maxId = getHighestNodeId(current);
       current[index] = {
         id: maxId + 1,
         operator: AND,
@@ -158,54 +167,64 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
       return current;
     });
 
+  const findGroupIndex = (current: FilterBuilderNode[], groupId: number) =>
+    current.findIndex((node) => isFilterBuilderGroup(node) && node.id === groupId);
+
   const patchGroupFilter = (
-    itemIndex: number,
-    filterIndex: number,
+    groupId: number,
+    filterId: number,
     patch: Partial<FilterBuilderFilter> | ((filter: FilterBuilderFilter) => FilterBuilderFilter),
   ) =>
     updateItems((current) => {
-      const group = current[itemIndex];
-      if (!isFilterBuilderGroup(group)) return current;
-      const filters = [...group.filters];
-      const filter = filters[filterIndex];
-      if (!filter) return current;
-      filters[filterIndex] = typeof patch === 'function' ? patch(filter) : { ...filter, ...patch };
-      current[itemIndex] = { ...group, filters };
+      const groupIndex = findGroupIndex(current, groupId);
+      const group = current[groupIndex];
+      if (!group || !isFilterBuilderGroup(group)) return current;
+      const filters = group.filters.map((filter) =>
+        filter.id === filterId
+          ? typeof patch === 'function'
+            ? patch(filter)
+            : { ...filter, ...patch }
+          : filter,
+      );
+      current[groupIndex] = { ...group, filters };
       return current;
     });
 
-  const handleGroupOperatorChange = (itemIndex: number, value: FilterBuilderAndOrOperator) =>
+  const handleGroupOperatorChange = (groupId: number, value: FilterBuilderAndOrOperator) =>
     updateItems((current) => {
-      const group = current[itemIndex];
-      if (!isFilterBuilderGroup(group)) return current;
-      current[itemIndex] = { ...group, operator: value };
+      const groupIndex = findGroupIndex(current, groupId);
+      const group = current[groupIndex];
+      if (!group || !isFilterBuilderGroup(group)) return current;
+      current[groupIndex] = { ...group, operator: value };
       return current;
     });
 
-  const handleDeleteGroupFilter = (itemIndex: number, filterIndex: number) =>
+  const handleDeleteGroupFilter = (groupId: number, filterId: number) =>
     updateItems((current) => {
-      const group = current[itemIndex];
-      if (!isFilterBuilderGroup(group)) return current;
-      const filters = group.filters.filter((_, i) => i !== filterIndex);
-      if (filters.length === 0) current.splice(itemIndex, 1);
-      else if (filters.length === 1) current[itemIndex] = filters[0]!;
-      else current[itemIndex] = { ...group, filters };
+      const groupIndex = findGroupIndex(current, groupId);
+      const group = current[groupIndex];
+      if (!group || !isFilterBuilderGroup(group)) return current;
+      const filters = group.filters.filter((filter) => filter.id !== filterId);
+      if (filters.length === 0) current.splice(groupIndex, 1);
+      else if (filters.length === 1) current[groupIndex] = filters[0]!;
+      else current[groupIndex] = { ...group, filters };
       return current;
     });
 
-  const handleAddToGroup = (itemIndex: number, name: string | null) =>
+  const handleAddToGroup = (groupId: number, name: string | null) =>
     updateItems((current) => {
-      const group = current[itemIndex];
-      if (!isFilterBuilderGroup(group)) return current;
-      current[itemIndex] = {
+      const groupIndex = findGroupIndex(current, groupId);
+      const group = current[groupIndex];
+      if (!group || !isFilterBuilderGroup(group)) return current;
+      current[groupIndex] = {
         ...group,
-        filters: [...group.filters, makeFilter(getMaxNodeId(current) + 1, name)],
+        filters: [...group.filters, makeFilter(getHighestNodeId(current) + 1, name)],
       };
       return current;
     });
 
   const handleAddFilter = (value: string | null) => {
-    updateItems((current) => [...current, makeFilter(getMaxNodeId(current) + 1, value)]);
+    updateItems((current) => [...current, makeFilter(getHighestNodeId(current) + 1, value)]);
     scrollToEnd();
   };
 
@@ -220,15 +239,15 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
     theme,
   });
 
-  const hasClearAll = allLeaves.some((f) => f.dimensionOrMeasure && f.operator && f.value != null);
-  const topDisabled = scopeIsMixed(allLeaves);
+  const hasClearAll = allFilters.some((f) => f.dimensionOrMeasure && f.operator && f.value != null);
+  const topDisabled = hasMixedDimensionsAndMeasures(allFilters);
 
-  const sanitized = sanitizeOperators(items, operator);
+  const sanitized = sanitizeMixedTypeOperators(items, operator);
 
   useEffect(() => {
     if (!sanitized.changed) return;
     setEmbeddableState?.((prev) => {
-      const next = sanitizeOperators(getItems(prev), prev?.operator ?? AND);
+      const next = sanitizeMixedTypeOperators(getFilterNodes(prev), prev?.operator ?? AND);
       if (!next.changed) return prev;
       return { ...prev, items: next.items, operator: next.operator };
     });
@@ -274,19 +293,23 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
                   group={node}
                   dimensionsAndMeasures={dimensionsAndMeasures}
                   theme={theme}
-                  disableOr={scopeIsMixed(node.filters)}
+                  disableOr={hasMixedDimensionsAndMeasures(node.filters)}
                   results={getResults}
-                  onOperatorChange={(value) => handleGroupOperatorChange(index, value)}
-                  onSelectDimensionOrMeasure={(fi, value) =>
-                    patchGroupFilter(index, fi, (f) => makeFilter(f.id, value))
+                  onOperatorChange={(value) => handleGroupOperatorChange(node.id, value)}
+                  onSelectDimensionOrMeasure={(filterId, value) =>
+                    patchGroupFilter(node.id, filterId, (f) => makeFilter(f.id, value))
                   }
-                  onSelectOperator={(fi, value) =>
-                    patchGroupFilter(index, fi, { operator: value, value: null })
+                  onSelectOperator={(filterId, value) =>
+                    patchGroupFilter(node.id, filterId, { operator: value, value: null })
                   }
-                  onSelectValue={(fi, value) => patchGroupFilter(index, fi, { value })}
-                  onSearchValue={(fi, value) => patchGroupFilter(index, fi, { search: value })}
-                  onDeleteFilter={(fi) => handleDeleteGroupFilter(index, fi)}
-                  onAddFilter={(value) => handleAddToGroup(index, value)}
+                  onSelectValue={(filterId, value) =>
+                    patchGroupFilter(node.id, filterId, { value })
+                  }
+                  onSearchValue={(filterId, value) =>
+                    patchGroupFilter(node.id, filterId, { search: value })
+                  }
+                  onDeleteFilter={(filterId) => handleDeleteGroupFilter(node.id, filterId)}
+                  onAddFilter={(value) => handleAddToGroup(node.id, value)}
                 />
               ) : (
                 <FilterBuilderWithGroupingItem
@@ -295,13 +318,13 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
                   results={getResults(node.id)}
                   theme={theme}
                   onSelectDimensionOrMeasure={(value) =>
-                    handleSelectDimensionOrMeasure(index, value)
+                    handleSelectDimensionOrMeasure(node.id, value)
                   }
-                  onSelectOperator={(value) => handleSelectOperator(index, value)}
-                  onSelectValue={(value) => handleSelectValue(index, value)}
-                  onSearchValue={(value) => handleDimensionSearch(index, value)}
-                  onDelete={() => handleDeleteItem(index)}
-                  onCreateGroup={(value) => handleCreateGroup(index, value)}
+                  onSelectOperator={(value) => handleSelectOperator(node.id, value)}
+                  onSelectValue={(value) => handleSelectValue(node.id, value)}
+                  onSearchValue={(value) => handleDimensionSearch(node.id, value)}
+                  onDelete={() => handleDeleteItem(node.id)}
+                  onCreateGroup={(value) => handleCreateGroup(node.id, value)}
                 />
               )}
             </React.Fragment>

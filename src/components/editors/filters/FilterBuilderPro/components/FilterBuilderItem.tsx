@@ -1,5 +1,4 @@
 import { DataResponse, DimensionOrMeasure } from '@embeddable.com/core';
-import { FilterBuilderFilter } from '../definition';
 import { SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../../../theme/theme.types';
 import { getDimensionAndMeasureOptions } from '../../../utils/dimensionsAndMeasures.utils';
@@ -8,7 +7,7 @@ import { i18n } from '../../../../../theme/i18n/i18n';
 import FilterBuilderItemOperatorValueFields from '../../components/FilterBuilderItemOperatorValueFields';
 import styles from '../FilterBuilderPro.module.css';
 import { IconPlus, IconX } from '@tabler/icons-react';
-import { getSupportedDimensionsAndMeasures } from '../FilterBuilderPro.utils';
+import { FilterBuilderFilter, getSupportedDimensionsAndMeasures } from '../../filters.utils';
 
 type FilterBuilderItemProps = {
   filter: FilterBuilderFilter;

@@ -3,14 +3,13 @@ import type { DimensionOrMeasure } from '@embeddable.com/core';
 import {
   clauseToItems,
   filterByMemberType,
+  getAllFilters,
+  getFilterNodes,
   getGroupMemberType,
-  getItems,
-  getLeafFilters,
-  getMaxNodeId,
+  getHighestNodeId,
   isFilterBuilderGroup,
   itemsToClause,
-  sanitizeOperators,
-  scopeIsMixed,
+  sanitizeMixedTypeOperators,
 } from './FilterBuilderWithGroupingPro.utils';
 import type { FilterBuilderGroup, FilterBuilderNode } from './FilterBuilderWithGroupingPro.utils';
 import {
@@ -64,33 +63,33 @@ describe('isFilterBuilderGroup', () => {
   });
 });
 
-describe('getItems', () => {
+describe('getFilterNodes', () => {
   it('prefers items, falls back to legacy filters, else []', () => {
     const items: FilterBuilderNode[] = [leaf(1, dimension('a'))];
-    expect(getItems({ items, operator: 'and' })).toBe(items);
+    expect(getFilterNodes({ items, operator: 'and' })).toBe(items);
     const filters = [leaf(1, dimension('a'))];
-    expect(getItems({ filters, operator: 'and' })).toBe(filters);
-    expect(getItems(undefined)).toEqual([]);
-    expect(getItems({ operator: 'and' })).toEqual([]);
+    expect(getFilterNodes({ filters, operator: 'and' })).toBe(filters);
+    expect(getFilterNodes(undefined)).toEqual([]);
+    expect(getFilterNodes({ operator: 'and' })).toEqual([]);
   });
 });
 
-describe('getLeafFilters', () => {
-  it('flattens leaves out of groups', () => {
+describe('getAllFilters', () => {
+  it('flattens filters out of groups', () => {
     const items: FilterBuilderNode[] = [
       leaf(1, dimension('a')),
       group(2, 'or', [leaf(3, dimension('b')), leaf(4, dimension('c'))]),
     ];
-    expect(getLeafFilters({ items, operator: 'and' }).map((f) => f.id)).toEqual([1, 3, 4]);
+    expect(getAllFilters({ items, operator: 'and' }).map((f) => f.id)).toEqual([1, 3, 4]);
   });
 });
 
-describe('getMaxNodeId', () => {
+describe('getHighestNodeId', () => {
   it('considers group ids and child ids', () => {
-    expect(getMaxNodeId([leaf(1, dimension('a')), group(2, 'or', [leaf(9, dimension('b'))])])).toBe(
-      9,
-    );
-    expect(getMaxNodeId([])).toBe(0);
+    expect(
+      getHighestNodeId([leaf(1, dimension('a')), group(2, 'or', [leaf(9, dimension('b'))])]),
+    ).toBe(9);
+    expect(getHighestNodeId([])).toBe(0);
   });
 });
 
@@ -112,15 +111,6 @@ describe('filterByMemberType', () => {
     expect(filterByMemberType(members, 'measure').map((d) => d.name)).toEqual(['m']);
     expect(filterByMemberType(members, null)).toHaveLength(3);
     expect(filterByMemberType(members, undefined)).toHaveLength(3);
-  });
-});
-
-describe('scopeIsMixed', () => {
-  it('is true only when both a dimension and a measure are present', () => {
-    expect(scopeIsMixed([leaf(1, dimension('a')), leaf(2, measure('m'))])).toBe(true);
-    expect(scopeIsMixed([leaf(1, dimension('a')), leaf(2, dimension('b'))])).toBe(false);
-    expect(scopeIsMixed([leaf(1, measure('m'))])).toBe(false);
-    expect(scopeIsMixed([leaf(1, null)])).toBe(false);
   });
 });
 
@@ -251,26 +241,26 @@ describe('clauseToItems', () => {
   });
 });
 
-describe('sanitizeOperators', () => {
+describe('sanitizeMixedTypeOperators', () => {
   it('clamps a mixed group OR to AND', () => {
     const items: FilterBuilderNode[] = [
       group(1, 'or', [leaf(2, dimension('a')), leaf(3, measure('m'))]),
     ];
-    const result = sanitizeOperators(items, 'and');
+    const result = sanitizeMixedTypeOperators(items, 'and');
     expect(result.changed).toBe(true);
     expect((result.items[0] as FilterBuilderGroup).operator).toBe('and');
   });
 
   it('clamps a mixed top-level OR to AND', () => {
     const items: FilterBuilderNode[] = [leaf(1, dimension('a')), leaf(2, measure('m'))];
-    const result = sanitizeOperators(items, 'or');
+    const result = sanitizeMixedTypeOperators(items, 'or');
     expect(result.changed).toBe(true);
     expect(result.operator).toBe('and');
   });
 
   it('leaves same-type OR untouched', () => {
     const items: FilterBuilderNode[] = [leaf(1, measure('m1')), leaf(2, measure('m2'))];
-    const result = sanitizeOperators(items, 'or');
+    const result = sanitizeMixedTypeOperators(items, 'or');
     expect(result.changed).toBe(false);
     expect(result.operator).toBe('or');
   });

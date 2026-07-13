@@ -13,6 +13,7 @@ import {
   sortOptionsWithSelectedFirst,
   getMultiSelectDisplayValue,
 } from '../filters.utils';
+import { CssModuleClasses } from '../../../../types/css-modules';
 import clsx from 'clsx';
 import { useRef } from 'react';
 
@@ -20,23 +21,21 @@ type ValueTriggerButtonProps = {
   hasValue: boolean;
   isLoading: boolean | undefined;
   displayValue: string;
-  showClearIcon: boolean;
-  onClear: () => void;
-  styles: Record<string, string>;
+  onClear?: () => void;
+  styles: CssModuleClasses;
 };
 
 const ValueTriggerButton = ({
   hasValue,
   isLoading,
   displayValue,
-  showClearIcon,
   onClear,
   styles,
   ...props
 }: ValueTriggerButtonProps) => (
   <button className={clsx(styles.valueButton, !hasValue && styles.valueButtonEmpty)} {...props}>
     {isLoading ? <IconLoader2 className={styles.loadingSpinner} /> : displayValue}
-    {showClearIcon && <IconX onClick={onClear} />}
+    {onClear && <IconX onClick={onClear} />}
   </button>
 );
 
@@ -47,8 +46,8 @@ export type FilterBuilderItemValueFieldProps = {
   theme: Theme;
   onSelectValue: (value: string | string[] | number | number[] | null) => void;
   onSearchValue: (value: string) => void;
-  styles: Record<string, string>;
-  showInlineClear?: boolean;
+  styles: CssModuleClasses;
+  showClear?: boolean;
 };
 
 const FilterBuilderItemValueField = ({
@@ -59,7 +58,7 @@ const FilterBuilderItemValueField = ({
   onSelectValue,
   onSearchValue,
   styles,
-  showInlineClear = true,
+  showClear = true,
 }: FilterBuilderItemValueFieldProps) => {
   const themeFormatter = getThemeFormatter(theme);
   const labelCache = useRef<Record<string, string>>({});
@@ -113,7 +112,7 @@ const FilterBuilderItemValueField = ({
     filter.operator === operatorStringBoolean.isNotOneOf;
 
   const hasValue = filter.value != null;
-  const showClearIcon = showInlineClear && !isLoading && hasValue;
+  const canClear = showClear && !isLoading && hasValue;
 
   if (isMultiSelectField) {
     const filterValue = (filter.value as string[]) ?? [];
@@ -127,8 +126,7 @@ const FilterBuilderItemValueField = ({
             hasValue={hasValue}
             isLoading={isLoading}
             displayValue={displayValue}
-            showClearIcon={showClearIcon}
-            onClear={() => onSelectValue(null)}
+            onClear={canClear ? () => onSelectValue(null) : undefined}
             styles={styles}
           />
         }
@@ -158,8 +156,7 @@ const FilterBuilderItemValueField = ({
             hasValue={hasValue}
             isLoading={isLoading}
             displayValue={displayValue}
-            showClearIcon={showClearIcon}
-            onClear={() => onSelectValue(null)}
+            onClear={canClear ? () => onSelectValue(null) : undefined}
             styles={styles}
           />
         }

@@ -2,8 +2,12 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import FilterBuilderPro from './index';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
-import type { FilterBuilderFilter, FilterBuilderState } from './definition';
-import { filterBuilderAndOrOperator, FilterBuilderClause } from './FilterBuilderPro.utils';
+import type { FilterBuilderState } from './definition';
+import {
+  filterBuilderAndOrOperator,
+  FilterBuilderClause,
+  FilterBuilderFilter,
+} from '../filters.utils';
 
 // ---------------------------------------------------------------------------
 // Mocks

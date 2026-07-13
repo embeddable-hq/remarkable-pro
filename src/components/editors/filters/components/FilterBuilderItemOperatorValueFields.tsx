@@ -4,6 +4,7 @@ import { Theme } from '../../../../theme/theme.types';
 import FilterBuilderItemValueField from './FilterBuilderItemValueField';
 import { useEffect } from 'react';
 import { FilterBuilderFilter, getOperatorOptions } from '../filters.utils';
+import { CssModuleClasses } from '../../../../types/css-modules';
 
 type FilterBuilderItemOperatorValueFieldsProps = {
   dimensionOrMeasure: DimensionOrMeasure;
@@ -13,8 +14,8 @@ type FilterBuilderItemOperatorValueFieldsProps = {
   onSelectOperator: (value: string | null) => void;
   onSelectValue: (value: FilterBuilderFilter['value']) => void;
   onSearchValue: (value: string) => void;
-  styles: Record<string, string>;
-  showInlineClear?: boolean;
+  styles: CssModuleClasses;
+  showClear?: boolean;
 };
 
 const FilterBuilderItemOperatorValueFields = ({
@@ -26,7 +27,7 @@ const FilterBuilderItemOperatorValueFields = ({
   onSelectValue,
   onSearchValue,
   styles,
-  showInlineClear = true,
+  showClear = true,
 }: FilterBuilderItemOperatorValueFieldsProps) => {
   const operatorOptions = getOperatorOptions(dimensionOrMeasure);
 
@@ -40,7 +41,7 @@ const FilterBuilderItemOperatorValueFields = ({
     <>
       <SingleSelectField
         triggerComponent={
-          <button className={styles.operatorButton}>
+          <button type="button" className={styles.operatorButton}>
             {operatorOptions.find((x) => x.value === filter.operator)?.label}
           </button>
         }
@@ -57,7 +58,7 @@ const FilterBuilderItemOperatorValueFields = ({
         onSelectValue={onSelectValue}
         onSearchValue={onSearchValue}
         styles={styles}
-        showInlineClear={showInlineClear}
+        showClear={showClear}
       />
     </>
   );

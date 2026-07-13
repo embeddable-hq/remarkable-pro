@@ -7,9 +7,7 @@ import {
   FilterBuilderClause,
   FilterBuilderFilter,
   filterToLoadDataFilters,
-} from './FilterBuilderPro.utils';
-
-export type { FilterBuilderFilter };
+} from '../filters.utils';
 
 const meta = {
   name: 'FilterBuilderPro',

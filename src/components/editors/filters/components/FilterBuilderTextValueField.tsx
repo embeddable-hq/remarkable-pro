@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDebounce } from '@embeddable.com/remarkable-ui';
 import { FilterBuilderFilter } from '../filters.utils';
+import { CssModuleClasses } from '../../../../types/css-modules';
 
 export type FilterBuilderTextValueFieldProps = {
   filter: FilterBuilderFilter;
   onSelectValue: (value: string | null) => void;
-  styles: Record<string, string>;
+  styles: CssModuleClasses;
 };
 
 const FilterBuilderTextValueField = ({

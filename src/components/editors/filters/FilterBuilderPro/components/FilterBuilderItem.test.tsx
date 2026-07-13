@@ -2,9 +2,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import FilterBuilderItem from './FilterBuilderItem';
 import { getDimensionAndMeasureOptions } from '../../../utils/dimensionsAndMeasures.utils';
-import { getSupportedDimensionsAndMeasures } from '../FilterBuilderPro.utils';
+import { getSupportedDimensionsAndMeasures } from '../../filters.utils';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
-import type { FilterBuilderFilter } from '../definition';
+import type { FilterBuilderFilter } from '../../filters.utils';
 import { Theme } from '../../../../../theme/theme.types';
 
 vi.mock('../FilterBuilderPro.module.css', () => ({
@@ -58,8 +58,8 @@ vi.mock('../../../utils/dimensionsAndMeasures.utils', () => ({
   ]),
 }));
 
-vi.mock('../FilterBuilderPro.utils', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../FilterBuilderPro.utils')>();
+vi.mock('../../filters.utils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../filters.utils')>();
   return {
     ...actual,
     getSupportedDimensionsAndMeasures: vi.fn((dims) => dims),

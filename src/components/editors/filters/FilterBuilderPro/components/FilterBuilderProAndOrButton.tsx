@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Tooltip } from '@embeddable.com/remarkable-ui';
 import styles from '../FilterBuilderPro.module.css';
 import { i18n } from '../../../../../theme/i18n/i18n';
-import { filterBuilderAndOrOperator, FilterBuilderAndOrOperator } from '../FilterBuilderPro.utils';
+import { filterBuilderAndOrOperator, FilterBuilderAndOrOperator } from '../../filters.utils';
 
 type FilterBuilderProAndOrButtonProps = {
   operator: FilterBuilderAndOrOperator;

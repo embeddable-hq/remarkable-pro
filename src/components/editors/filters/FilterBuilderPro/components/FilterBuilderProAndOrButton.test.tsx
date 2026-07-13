@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { FilterBuilderProAndOrButton } from './FilterBuilderProAndOrButton';
-import { filterBuilderAndOrOperator } from '../FilterBuilderPro.utils';
+import { filterBuilderAndOrOperator } from '../../filters.utils';
 
 vi.mock('../FilterBuilderPro.module.css', () => ({
   default: {

@@ -153,10 +153,10 @@ describe('FilterBuilderWithGroupingGroup', () => {
     expect(defaultProps.onAddFilter).toHaveBeenCalledWith('city');
   });
 
-  it('calls onDeleteFilter with the index', () => {
+  it('calls onDeleteFilter with the filter id (not its array position)', () => {
     render(<FilterBuilderWithGroupingGroup {...defaultProps} />);
     fireEvent.click(screen.getByTestId('group-delete-2'));
-    expect(defaultProps.onDeleteFilter).toHaveBeenCalledWith(1);
+    expect(defaultProps.onDeleteFilter).toHaveBeenCalledWith(2);
   });
 
   it('restricts the extender to the group member type', () => {
