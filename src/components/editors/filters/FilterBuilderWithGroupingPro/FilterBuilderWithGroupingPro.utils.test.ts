@@ -35,7 +35,7 @@ const measure = (name: string): DimensionOrMeasure =>
     __type__: 'measure',
   }) as unknown as DimensionOrMeasure;
 
-const leaf = (
+const makeFilter = (
   id: number,
   member: DimensionOrMeasure | null,
   overrides: Partial<FilterBuilderFilter> = {},
@@ -55,9 +55,9 @@ const group = (
 ): FilterBuilderGroup => ({ id, operator, filters });
 
 describe('isFilterBuilderGroup', () => {
-  it('detects groups vs leaves vs nullish', () => {
-    expect(isFilterBuilderGroup(group(1, 'and', [leaf(2, dimension('a'))]))).toBe(true);
-    expect(isFilterBuilderGroup(leaf(1, dimension('a')))).toBe(false);
+  it('detects groups vs plain filters vs nullish', () => {
+    expect(isFilterBuilderGroup(group(1, 'and', [makeFilter(2, dimension('a'))]))).toBe(true);
+    expect(isFilterBuilderGroup(makeFilter(1, dimension('a')))).toBe(false);
     expect(isFilterBuilderGroup(undefined)).toBe(false);
     expect(isFilterBuilderGroup(null)).toBe(false);
   });
@@ -65,9 +65,9 @@ describe('isFilterBuilderGroup', () => {
 
 describe('getFilterNodes', () => {
   it('prefers items, falls back to legacy filters, else []', () => {
-    const items: FilterBuilderNode[] = [leaf(1, dimension('a'))];
+    const items: FilterBuilderNode[] = [makeFilter(1, dimension('a'))];
     expect(getFilterNodes({ items, operator: 'and' })).toBe(items);
-    const filters = [leaf(1, dimension('a'))];
+    const filters = [makeFilter(1, dimension('a'))];
     expect(getFilterNodes({ filters, operator: 'and' })).toBe(filters);
     expect(getFilterNodes(undefined)).toEqual([]);
     expect(getFilterNodes({ operator: 'and' })).toEqual([]);
@@ -77,8 +77,8 @@ describe('getFilterNodes', () => {
 describe('getAllFilters', () => {
   it('flattens filters out of groups', () => {
     const items: FilterBuilderNode[] = [
-      leaf(1, dimension('a')),
-      group(2, 'or', [leaf(3, dimension('b')), leaf(4, dimension('c'))]),
+      makeFilter(1, dimension('a')),
+      group(2, 'or', [makeFilter(3, dimension('b')), makeFilter(4, dimension('c'))]),
     ];
     expect(getAllFilters({ items, operator: 'and' }).map((f) => f.id)).toEqual([1, 3, 4]);
   });
@@ -87,7 +87,10 @@ describe('getAllFilters', () => {
 describe('getHighestNodeId', () => {
   it('considers group ids and child ids', () => {
     expect(
-      getHighestNodeId([leaf(1, dimension('a')), group(2, 'or', [leaf(9, dimension('b'))])]),
+      getHighestNodeId([
+        makeFilter(1, dimension('a')),
+        group(2, 'or', [makeFilter(9, dimension('b'))]),
+      ]),
     ).toBe(9);
     expect(getHighestNodeId([])).toBe(0);
   });
@@ -95,12 +98,12 @@ describe('getHighestNodeId', () => {
 
 describe('getGroupMemberType', () => {
   it('returns the type in scope and honours excludeIndex', () => {
-    expect(getGroupMemberType([leaf(1, dimension('a'))])).toBe('dimension');
-    expect(getGroupMemberType([leaf(1, measure('m'))])).toBe('measure');
-    const filters = [leaf(1, measure('m')), leaf(2, null)];
+    expect(getGroupMemberType([makeFilter(1, dimension('a'))])).toBe('dimension');
+    expect(getGroupMemberType([makeFilter(1, measure('m'))])).toBe('measure');
+    const filters = [makeFilter(1, measure('m')), makeFilter(2, null)];
     expect(getGroupMemberType(filters, 0)).toBeNull();
     expect(getGroupMemberType(filters, 1)).toBe('measure');
-    expect(getGroupMemberType([leaf(1, null)])).toBeNull();
+    expect(getGroupMemberType([makeFilter(1, null)])).toBeNull();
   });
 });
 
@@ -117,8 +120,8 @@ describe('filterByMemberType', () => {
 describe('itemsToClause', () => {
   it('wraps a group as nested clause under the top operator', () => {
     const items: FilterBuilderNode[] = [
-      leaf(1, dimension('a')),
-      group(2, 'or', [leaf(3, dimension('b')), leaf(4, dimension('c'))]),
+      makeFilter(1, dimension('a')),
+      group(2, 'or', [makeFilter(3, dimension('b')), makeFilter(4, dimension('c'))]),
     ];
     const clause = itemsToClause('and', items) as Extract<
       FilterBuilderClause,
@@ -135,17 +138,16 @@ describe('itemsToClause', () => {
   });
 
   it('flattens a single-filter group to a bare clause', () => {
-    const clause = itemsToClause('and', [group(2, 'and', [leaf(3, dimension('b'))])]) as Extract<
-      FilterBuilderClause,
-      { clauses: FilterBuilderClause[] }
-    >;
+    const clause = itemsToClause('and', [
+      group(2, 'and', [makeFilter(3, dimension('b'))]),
+    ]) as Extract<FilterBuilderClause, { clauses: FilterBuilderClause[] }>;
     expect('clauses' in clause.clauses[0]!).toBe(false);
   });
 
   it('drops incomplete leaves and returns null when empty', () => {
-    expect(itemsToClause('and', [leaf(1, dimension('a'), { value: null })])).toBeNull();
+    expect(itemsToClause('and', [makeFilter(1, dimension('a'), { value: null })])).toBeNull();
     expect(
-      itemsToClause('and', [group(2, 'and', [leaf(3, dimension('b'), { value: null })])]),
+      itemsToClause('and', [group(2, 'and', [makeFilter(3, dimension('b'), { value: null })])]),
     ).toBeNull();
   });
 
@@ -156,7 +158,7 @@ describe('itemsToClause', () => {
       nativeType: NativeDataType.number,
       __type__: 'dimension',
     } as unknown as DimensionOrMeasure;
-    const betweenFilter = leaf(3, age, { operator: operatorNumber.between, value: [20, 40] });
+    const betweenFilter = makeFilter(3, age, { operator: operatorNumber.between, value: [20, 40] });
 
     const clause = itemsToClause('and', [group(2, 'and', [betweenFilter])]) as Extract<
       FilterBuilderClause,
@@ -179,8 +181,8 @@ describe('clauseToItems', () => {
 
   it('round-trips a top-level filter + group', () => {
     const items: FilterBuilderNode[] = [
-      leaf(1, dimension('a')),
-      group(2, 'or', [leaf(3, dimension('b')), leaf(4, dimension('c'))]),
+      makeFilter(1, dimension('a')),
+      group(2, 'or', [makeFilter(3, dimension('b')), makeFilter(4, dimension('c'))]),
     ];
     const restored = clauseToItems(itemsToClause('and', items), dims);
     expect(restored).toHaveLength(2);
@@ -227,7 +229,7 @@ describe('clauseToItems', () => {
       nativeType: NativeDataType.number,
       __type__: 'dimension',
     } as unknown as DimensionOrMeasure;
-    const betweenFilter = leaf(3, age, { operator: operatorNumber.between, value: [20, 40] });
+    const betweenFilter = makeFilter(3, age, { operator: operatorNumber.between, value: [20, 40] });
 
     const clause = itemsToClause('and', [group(2, 'and', [betweenFilter])]);
     const restored = clauseToItems(clause, [age]);
@@ -244,7 +246,7 @@ describe('clauseToItems', () => {
 describe('sanitizeMixedTypeOperators', () => {
   it('clamps a mixed group OR to AND', () => {
     const items: FilterBuilderNode[] = [
-      group(1, 'or', [leaf(2, dimension('a')), leaf(3, measure('m'))]),
+      group(1, 'or', [makeFilter(2, dimension('a')), makeFilter(3, measure('m'))]),
     ];
     const result = sanitizeMixedTypeOperators(items, 'and');
     expect(result.changed).toBe(true);
@@ -252,14 +254,14 @@ describe('sanitizeMixedTypeOperators', () => {
   });
 
   it('clamps a mixed top-level OR to AND', () => {
-    const items: FilterBuilderNode[] = [leaf(1, dimension('a')), leaf(2, measure('m'))];
+    const items: FilterBuilderNode[] = [makeFilter(1, dimension('a')), makeFilter(2, measure('m'))];
     const result = sanitizeMixedTypeOperators(items, 'or');
     expect(result.changed).toBe(true);
     expect(result.operator).toBe('and');
   });
 
   it('leaves same-type OR untouched', () => {
-    const items: FilterBuilderNode[] = [leaf(1, measure('m1')), leaf(2, measure('m2'))];
+    const items: FilterBuilderNode[] = [makeFilter(1, measure('m1')), makeFilter(2, measure('m2'))];
     const result = sanitizeMixedTypeOperators(items, 'or');
     expect(result.changed).toBe(false);
     expect(result.operator).toBe('or');

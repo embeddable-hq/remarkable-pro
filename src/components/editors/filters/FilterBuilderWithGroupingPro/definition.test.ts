@@ -46,7 +46,7 @@ describe('filterBuilderWithGroupingPro definition', () => {
     expect(filterBuilderWithGroupingPro.meta.category).toBe('Filters');
   });
 
-  it('builds filterResults for complete dimension leaf filters (incl. nested groups)', () => {
+  it('builds filterResults for complete dimension filters (incl. filters nested in groups)', () => {
     const state: FilterBuilderGroupingState = {
       operator: 'and',
       items: [
