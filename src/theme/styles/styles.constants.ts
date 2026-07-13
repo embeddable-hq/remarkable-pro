@@ -116,6 +116,7 @@ const stylesRemarkablePro = {
   // Filter Builder with grouping (segment tokens)
   '--em-filter-gap--internal': 'var(--em-core-spacing--0050)',
   '--em-filter-gap--external': 'var(--em-core-spacing--0300)',
+  '--em-filter-gap--andor': 'var(--em-core-spacing--0100)',
   '--em-filter-height': 'var(--em-core-size--0800)',
   '--em-filter-icon-size': 'var(--em-core-size--0400)',
   '--em-filter-padding-x': 'var(--em-core-spacing--0300)',

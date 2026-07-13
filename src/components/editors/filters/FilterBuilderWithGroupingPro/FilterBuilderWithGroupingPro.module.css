@@ -192,6 +192,10 @@
   padding: var(--em-filter-padding-y, 0) var(--em-filter-padding-x, 0.75rem);
   border-radius: var(--em-filter-border-radius--group, 2rem);
   color: var(--em-filter-color--operator, #5c5c66);
+  margin-left: calc(var(--em-filter-gap--andor, 0.25rem) - var(--em-filter-gap--external, 0.75rem));
+  margin-right: calc(
+    var(--em-filter-gap--andor, 0.25rem) - var(--em-filter-gap--external, 0.75rem)
+  );
 }
 
 .andOrButtonInGroup {
