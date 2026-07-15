@@ -49,6 +49,7 @@ const MultiSelectFieldPro = (props: MultiSelectFieldProProps) => {
 
   const firstOptionValue = options[0]?.value;
 
+  // Auto-select first option when not clearable and there is no selection
   useEffect(() => {
     if (clearable) return;
     if ((selectedValues?.length ?? 0) > 0) return;
