@@ -41,6 +41,7 @@ const meta = {
       category: 'Data Mapping for Interactions',
       description: 'Send a different dimension to embeddable when the user clicks. Must be unique.',
     },
+    inputs.clearable,
   ],
   events: [
     {

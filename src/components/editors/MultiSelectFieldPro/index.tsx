@@ -1,6 +1,7 @@
 import { DataResponse, Dimension } from '@embeddable.com/core';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { useTheme } from '@embeddable.com/react';
+import { useEffect } from 'react';
 import { Theme } from '../../../theme/theme.types';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 import { resolveI18nProps } from '../../component.utils';
@@ -16,6 +17,7 @@ export type MultiSelectFieldProProps = {
   results: DataResponse;
   selectedValues?: string[];
   maxOptions?: number;
+  clearable?: boolean;
   setSearchValue?: (search: string) => void;
   onChange?: (newValues: string[]) => void;
 } & EditorCardHeaderProps;
@@ -25,8 +27,15 @@ const MultiSelectFieldPro = (props: MultiSelectFieldProProps) => {
   const themeFormatter = getThemeFormatter(theme);
 
   const { tooltip, title, description, placeholder } = resolveI18nProps(props);
-  const { dimension, optionalSecondDimension, results, selectedValues, setSearchValue, onChange } =
-    props;
+  const {
+    dimension,
+    optionalSecondDimension,
+    results,
+    selectedValues,
+    clearable,
+    setSearchValue,
+    onChange,
+  } = props;
 
   const options =
     results.data?.map((data) => {
@@ -38,10 +47,20 @@ const MultiSelectFieldPro = (props: MultiSelectFieldProProps) => {
 
   const showNoOptionsMessage = Boolean(!results.isLoading && (results.data?.length ?? 0) === 0);
 
+  const firstOptionValue = options[0]?.value;
+
+  useEffect(() => {
+    if (clearable) return;
+    if ((selectedValues?.length ?? 0) > 0) return;
+    if (firstOptionValue === undefined) return;
+
+    onChange?.([firstOptionValue]);
+  }, [clearable, selectedValues, firstOptionValue, onChange]);
+
   return (
     <EditorCard title={title} description={description} tooltip={tooltip}>
       <MultiSelectField
-        isClearable
+        isClearable={clearable}
         isSearchable
         isLoading={results.isLoading}
         values={selectedValues ?? []}
