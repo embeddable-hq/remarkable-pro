@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.17
+
+### Patch Changes
+
+- 6c3f976: Add "can be cleared" field to the Single and Multi select field component
+
 ## 0.3.16
 
 ### Patch Changes
