@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { DataResponse, Dimension } from '@embeddable.com/core';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { useTheme } from '@embeddable.com/react';
@@ -16,6 +17,7 @@ export type SingleSelectFieldProProps = {
   results: DataResponse;
   selectedValue?: string;
   maxOptions?: number;
+  clearable?: boolean;
   setSearchValue?: (search: string) => void;
   onChange?: (selectedValue: string | null) => void;
 } & EditorCardHeaderProps;
@@ -25,7 +27,8 @@ const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
   const themeFormatter = getThemeFormatter(theme);
 
   const { title, description, dimension, placeholder, tooltip } = resolveI18nProps(props);
-  const { optionalSecondDimension, results, selectedValue, setSearchValue, onChange } = props;
+  const { optionalSecondDimension, results, selectedValue, clearable, setSearchValue, onChange } =
+    props;
 
   const options =
     results.data?.map((data) => {
@@ -37,10 +40,23 @@ const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
 
   const showNoOptionsMessage = Boolean(!results.isLoading && (results.data?.length ?? 0) === 0);
 
+  // Auto-select first option when not clearable and there is no selection
+  useEffect(() => {
+    const autoSelectActive = !clearable && !selectedValue;
+
+    if (!autoSelectActive) return;
+
+    const firstOption = options?.[0];
+
+    if (firstOption) {
+      onChange?.(firstOption.value);
+    }
+  }, [clearable, selectedValue, options, onChange]);
+
   return (
     <EditorCard title={title} description={description} tooltip={tooltip}>
       <SingleSelectField
-        clearable
+        clearable={clearable}
         searchable
         isLoading={results.isLoading}
         value={selectedValue}
