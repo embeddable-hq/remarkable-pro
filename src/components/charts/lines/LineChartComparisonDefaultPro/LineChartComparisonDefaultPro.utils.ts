@@ -15,6 +15,7 @@ import { mergician } from 'mergician';
 import { isColorValid, setColorAlpha } from '../../../../utils/color.utils';
 import { getDimensionWithoutTruncation } from '../../charts.utils';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 import { LineChartProOptionsClick } from '../lines.types';
 
 const AXIS_ID_MAIN = 'mainAxis';
@@ -377,12 +378,16 @@ export const createComparisonClickHandler = ({
   measures,
   dimension,
   granularity,
+  componentName,
+  trackingId,
   onClicked,
 }: {
   data: ChartData<'line'>;
   measures: Measure[];
   dimension: Dimension;
   granularity?: Granularity;
+  componentName?: string;
+  trackingId?: string;
   onClicked?: LineChartProOptionsClick;
 }): ((args: ChartClickArgs) => void) => {
   return ({ elementAtEvent }) => {
@@ -405,9 +410,32 @@ export const createComparisonClickHandler = ({
       dimension,
     });
 
+    if (dimensionTimeRange) {
+      dimensionValue = undefined;
+    }
+
     const rawMeasureValue = data.datasets[element.datasetIndex]?.data?.[element.index];
     const numericValue = rawMeasureValue === null ? Number.NaN : Number(rawMeasureValue);
     const measureValue = Number.isFinite(numericValue) ? numericValue : undefined;
+    const measure = measures[element.datasetIndex % measures.length];
+
+    const periodOffset = isComparisonPeriod ? measures.length : 0;
+    const measureValues = measures.reduce<Record<string, unknown>>((acc, m, index) => {
+      acc[m.name] = data.datasets[periodOffset + index]?.data?.[element.index];
+      return acc;
+    }, {});
+
+    dispatchEventUserInteraction({
+      componentName,
+      trackingId,
+      dimension,
+      dimensionValue,
+      dimensionTimeRange,
+      measures,
+      measureValues,
+      measure,
+      measureValue,
+    });
 
     onClicked?.({ dimensionValue, dimensionTimeRange, measureValue });
   };

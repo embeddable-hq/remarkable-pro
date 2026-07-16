@@ -14,6 +14,7 @@ import {
 } from '../../charts.utils';
 import { getBarChartProOptions } from '../../bars/bars.utils';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 import { BarLineChartProClickArg } from '../combo.types';
 
 export const getBarLineChartProData = (
@@ -245,8 +246,11 @@ export const getBarLineChartProOptions = (
 export const createBarLineClickHandler = ({
   data,
   dimension,
-  granularity,
+  lineMeasures,
   barMeasures,
+  granularity,
+  componentName,
+  trackingId,
   onBarClicked,
   onLineClicked,
 }: {
@@ -254,6 +258,9 @@ export const createBarLineClickHandler = ({
   dimension: Dimension;
   granularity?: Granularity;
   barMeasures: Measure[];
+  lineMeasures?: Measure[];
+  componentName?: string;
+  trackingId?: string;
   onBarClicked?: (args: BarLineChartProClickArg) => void;
   onLineClicked?: (args: BarLineChartProClickArg) => void;
 }): ((args: ChartClickArgs) => void) => {
@@ -261,13 +268,38 @@ export const createBarLineClickHandler = ({
     const element = elementAtEvent[0];
     if (!element) return;
 
-    const dimensionValue = data?.labels?.[element.index] as string | undefined;
+    let dimensionValue = data?.labels?.[element.index] as string | undefined;
     const dimensionTimeRange = getTimeRangeFromDimensionValue({
       value: dimensionValue,
       stateGranularity: granularity,
       dimension,
     });
+    if (dimensionTimeRange) {
+      dimensionValue = undefined;
+    }
+
+    const buildMeasureValues = (measuresList: Measure[], offset: number) =>
+      measuresList.reduce<Record<string, unknown>>((acc, measure, index) => {
+        acc[measure.name] = data?.datasets?.[offset + index]?.data?.[element.index];
+        return acc;
+      }, {});
+
+    const barMeasureValues = buildMeasureValues(barMeasures, 0);
+    const lineMeasureValues = buildMeasureValues(lineMeasures ?? [], barMeasures.length);
+
     const clickArg: BarLineChartProClickArg = { dimensionValue, dimensionTimeRange };
+
+    dispatchEventUserInteraction({
+      componentName,
+      trackingId,
+      dimension,
+      dimensionValue,
+      dimensionTimeRange,
+      barMeasures,
+      lineMeasures,
+      barMeasureValues,
+      lineMeasureValues,
+    });
 
     if (element.datasetIndex < barMeasures.length) {
       onBarClicked?.(clickArg);

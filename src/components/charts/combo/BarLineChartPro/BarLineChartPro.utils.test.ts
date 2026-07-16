@@ -892,7 +892,7 @@ describe('createBarLineClickHandler', () => {
       dimension,
     });
     expect(onBarClicked).toHaveBeenCalledWith({
-      dimensionValue: 'Jan',
+      dimensionValue: undefined,
       dimensionTimeRange: fakeTimeRange,
     });
   });

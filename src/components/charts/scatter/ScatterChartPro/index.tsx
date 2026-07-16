@@ -38,6 +38,8 @@ export type ScatterChartProProps = {
   yAxisRangeMax?: number;
   reverseXAxis?: boolean;
   onPointClick?: (payload: ScatterChartProOptionsClickArg) => void;
+  componentName?: string;
+  trackingId?: string;
 } & ChartCardHeaderProps;
 
 const ScatterChartPro = (props: ScatterChartProProps) => {
@@ -62,6 +64,8 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
     yAxisRangeMax,
     reverseXAxis,
     onPointClick,
+    componentName,
+    trackingId,
   } = props;
 
   const resolvedI18nProps = resolveI18nProps(props);
@@ -90,6 +94,8 @@ const ScatterChartPro = (props: ScatterChartProProps) => {
     pointDimension,
     groupByDimension,
     onPointClick,
+    componentName,
+    trackingId,
   });
 
   const chartOptions = mergician(

@@ -434,7 +434,7 @@ describe('createGroupedClickHandler', () => {
       dimension: groupBy,
     });
     expect(onClicked).toHaveBeenCalledWith({
-      dimensionValue: '2024-01-01',
+      dimensionValue: undefined,
       dimensionTimeRange: dimRange,
       groupingDimensionValue: '2024-02-01',
       groupingDimensionTimeRange: groupRange,

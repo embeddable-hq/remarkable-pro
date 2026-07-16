@@ -282,6 +282,7 @@ describe('createAreaClickHandler', () => {
   const defaultHandlerProps = {
     data: chartData as never,
     dimension: makeDimension(),
+    measure: makeMeasure(),
     groupBy: makeDimension({ name: 'category' }),
   };
 
@@ -472,7 +473,9 @@ describe('createAreaClickHandler', () => {
       vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onPointClicked });
       handler(makeArgs(100, 50, [{ index: 0, datasetIndex: 0 }]) as never);
-      expect(getTimeRangeFromDimensionValue).toHaveBeenCalledTimes(1);
+      expect(getTimeRangeFromDimensionValue).toHaveBeenCalledWith(
+        expect.objectContaining({ dimension: defaultHandlerProps.dimension }),
+      );
     });
 
     it('falls through to onAreaClicked when no point element is under the cursor', () => {

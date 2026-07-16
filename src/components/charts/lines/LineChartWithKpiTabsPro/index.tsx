@@ -40,6 +40,8 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
     setGranularity,
     onLineClicked,
     resultsKpis,
+    componentName,
+    trackingId,
   } = props;
 
   const [activeMeasureName, setActiveMeasureName] = useState(measures[0]?.name ?? '');
@@ -76,7 +78,10 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
   const handleClick = createSimpleClickHandler({
     data,
     dimension: xAxis,
+    measures,
     granularity,
+    componentName,
+    trackingId,
     onClicked: onLineClicked,
   });
 

@@ -506,6 +506,14 @@ const menuOptions = {
   category: 'Component Settings',
 } as const;
 
+const trackingId = {
+  name: 'trackingId',
+  type: 'string',
+  label: 'Tracking Id',
+  description: 'Optional tracking Id for analytics and event tracking.',
+  category: 'Component Settings',
+} as const;
+
 export const inputs = {
   boolean,
   timeRange,
@@ -566,4 +574,5 @@ export const inputs = {
   markdown,
   filters,
   menuOptions,
+  trackingId,
 } as const;

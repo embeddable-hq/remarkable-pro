@@ -12,10 +12,13 @@ import {
   Dataset,
   Dimension,
   DimensionOrMeasure,
+  isDimension,
+  isMeasure,
   OrderDirection,
   TimeRange,
 } from '@embeddable.com/core';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 import { TableScrollable, TableScrollableHandle, TableSort } from '@embeddable.com/remarkable-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getTableHeaders, getTableRows } from '../tables.utils';
@@ -27,7 +30,7 @@ import { deepEqual } from 'fast-equals';
 let downloadData: (data: DataResponse['data']) => void;
 
 export type TableScrollableProOnRowClickArg = {
-  dimensionValue: string | null;
+  dimensionValue: string | null | undefined;
   dimensionTimeRange: TimeRange | undefined;
 };
 export type TableScrollableProState = {
@@ -50,6 +53,8 @@ export type TableScrollableProProps = {
 
   onRowClicked?: (rowDimensionValue: TableScrollableProOnRowClickArg) => void;
   setState?: React.Dispatch<React.SetStateAction<TableScrollableProState>>;
+  componentName?: string;
+  trackingId?: string;
 } & ChartCardHeaderProps;
 
 const TableScrollablePro = (props: TableScrollableProProps) => {
@@ -71,6 +76,8 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     clickDimension,
     state,
     setState,
+    componentName,
+    trackingId,
     onRowClicked,
   } = props;
 
@@ -137,13 +144,45 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   };
 
   const handleRowIndexClick = (rowIndex: number) => {
-    if (!clickDimension) return;
+    const row = rowsToDisplay[rowIndex];
 
-    const dimensionValue = rowsToDisplay[rowIndex]?.[clickDimension.name];
-    const dimensionTimeRange = getTimeRangeFromDimensionValue({
-      value: dimensionValue ?? undefined,
+    let dimensionValue = clickDimension ? row?.[clickDimension.name] : undefined;
+    const dimensionTimeRange = clickDimension
+      ? getTimeRangeFromDimensionValue({
+          value: dimensionValue ?? undefined,
+          dimension: clickDimension,
+        })
+      : undefined;
+
+    if (dimensionTimeRange) {
+      dimensionValue = undefined;
+    }
+
+    const measures = dimensionsAndMeasures.filter(isMeasure);
+    const measureValues = measures.reduce<Record<string, unknown>>((acc, measure) => {
+      acc[measure.name] = row?.[measure.name];
+      return acc;
+    }, {});
+
+    const dimensions = dimensionsAndMeasures.filter(isDimension);
+    const dimensionValues = dimensions.reduce<Record<string, unknown>>((acc, dim) => {
+      acc[dim.name] = row?.[dim.name];
+      return acc;
+    }, {});
+
+    dispatchEventUserInteraction({
+      componentName,
+      trackingId,
       dimension: clickDimension,
+      dimensionValue,
+      dimensionTimeRange,
+      dimensions,
+      dimensionValues,
+      measures,
+      measureValues,
     });
+
+    if (!clickDimension) return;
 
     onRowClicked?.({ dimensionValue, dimensionTimeRange });
   };

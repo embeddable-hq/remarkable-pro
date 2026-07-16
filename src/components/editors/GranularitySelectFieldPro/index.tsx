@@ -6,6 +6,7 @@ import { resolveI18nProps } from '../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 import { TGranularityValue } from '../../../theme/defaults/defaults.GranularityOptions.constants';
 import { GranularitySelectField } from '../shared/GranularitySelectField/GranularitySelectField';
+import { dispatchEventUserInteraction } from '../../../utils/events.utils';
 
 export type GranularitySelectFieldProProps = {
   onChange: (newGranularity: string) => void;
@@ -14,14 +15,29 @@ export type GranularitySelectFieldProProps = {
   granularity?: TGranularityValue;
   granularities?: TGranularityValue[];
   clearable?: boolean;
+  componentName?: string;
+  trackingId?: string;
 } & EditorCardHeaderProps;
 
 const GranularitySelectFieldPro = (props: GranularitySelectFieldProProps) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { granularity, granularities, clearable, primaryTimeRange, onChange } = props;
+  const {
+    granularity,
+    granularities,
+    clearable,
+    primaryTimeRange,
+    componentName,
+    trackingId,
+    onChange,
+  } = props;
   const { description, tooltip, placeholder, title } = resolveI18nProps(props);
+
+  const handleChange = (newGranularity: string) => {
+    dispatchEventUserInteraction({ componentName, trackingId, value: newGranularity });
+    onChange(newGranularity);
+  };
 
   return (
     <EditorCard title={title} description={description} tooltip={tooltip}>
@@ -31,7 +47,7 @@ const GranularitySelectFieldPro = (props: GranularitySelectFieldProProps) => {
         granularity={granularity}
         granularities={granularities}
         primaryTimeRange={primaryTimeRange}
-        onChange={onChange}
+        onChange={handleChange}
       />
     </EditorCard>
   );

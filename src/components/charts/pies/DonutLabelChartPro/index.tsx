@@ -31,6 +31,8 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
     showValueLabels,
     resultsInnerLabel,
     innerLabelMeasure,
+    componentName,
+    trackingId,
   } = props;
 
   const resolvedI18nProps = resolveI18nProps(props);
@@ -41,7 +43,14 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
     theme,
   );
 
-  const handleClick = createPieClickHandler({ results, dimension, onClicked: onSegmentClick });
+  const handleClick = createPieClickHandler({
+    results,
+    dimension,
+    measure,
+    componentName,
+    trackingId,
+    onClicked: onSegmentClick,
+  });
 
   const label = themeFormatter.data(
     innerLabelMeasure,

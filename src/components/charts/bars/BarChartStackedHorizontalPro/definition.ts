@@ -42,6 +42,7 @@ const meta = {
     inputs.xAxisRangeMax,
     inputs.showTotalLabels,
     inputs.menuOptions,
+    inputs.trackingId,
   ],
   events: [
     {
@@ -149,6 +150,7 @@ const props = (
       axisOrder: cachedAxisOrder,
       timezone,
     }),
+    componentName: meta.name,
   };
 };
 

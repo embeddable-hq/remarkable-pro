@@ -2,6 +2,9 @@ import { ResourceLanguage } from 'i18next';
 
 export const en: ResourceLanguage = {
   translation: {
+    dimension: {
+      'daily_listens.country.US': 'United States of AMERICA',
+    },
     common: {
       other: 'Other',
       noOptionsFound: 'No options found',

@@ -11,10 +11,13 @@ import {
   DataResponse,
   Dimension,
   DimensionOrMeasure,
+  isDimension,
+  isMeasure,
   OrderDirection,
   TimeRange,
 } from '@embeddable.com/core';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 import {
   getStyleNumber,
   getTableTotalPages,
@@ -36,7 +39,7 @@ const footerHeight = getStyleNumber('--em-tablechart-pagination-height', '3rem')
 let downloadData: (data: DataResponse['data']) => void;
 
 export type TableChartPaginatedProOnRowClickArg = {
-  dimensionValue: string | null;
+  dimensionValue: string | null | undefined;
   dimensionTimeRange: TimeRange | undefined;
 };
 export type TableChartPaginatedProState = {
@@ -59,6 +62,8 @@ export type TableChartPaginatedProProps = {
   totalResults?: DataResponse;
   onRowClicked?: (rowDimensionValue: TableChartPaginatedProOnRowClickArg) => void;
   setState?: React.Dispatch<React.SetStateAction<TableChartPaginatedProState>>;
+  componentName?: string;
+  trackingId?: string;
 } & ChartCardHeaderProps;
 
 const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
@@ -79,6 +84,8 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
     clickDimension,
     state,
     setState,
+    componentName,
+    trackingId,
     onRowClicked,
   } = props;
 
@@ -120,13 +127,45 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
   };
 
   const handleRowIndexClick = (rowIndex: number) => {
-    if (!onRowClicked || !clickDimension) return;
+    const row = rows[rowIndex];
 
-    const dimensionValue = rows[rowIndex]?.[clickDimension.name];
-    const dimensionTimeRange = getTimeRangeFromDimensionValue({
-      value: dimensionValue ?? undefined,
-      dimension: clickDimension,
+    let dimensionValue = clickDimension ? row?.[clickDimension.name] : undefined;
+    const dimensionTimeRange = clickDimension
+      ? getTimeRangeFromDimensionValue({
+          value: dimensionValue ?? undefined,
+          dimension: clickDimension,
+        })
+      : undefined;
+
+    if (dimensionTimeRange) {
+      dimensionValue = undefined;
+    }
+
+    const measures = dimensionsAndMeasures.filter(isMeasure);
+    const measureValues = measures.reduce<Record<string, unknown>>((acc, measure) => {
+      acc[measure.name] = row?.[measure.name];
+      return acc;
+    }, {});
+
+    const dimensions = dimensionsAndMeasures.filter(isDimension);
+    const dimensionValues = dimensions.reduce<Record<string, unknown>>((acc, dim) => {
+      acc[dim.name] = row?.[dim.name];
+      return acc;
+    }, {});
+
+    dispatchEventUserInteraction({
+      componentName,
+      trackingId,
+      dimensionClick: clickDimension,
+      dimensionClickValue: dimensionValue,
+      dimensionTimeRange,
+      dimensions,
+      dimensionValues,
+      measures,
+      measureValues,
     });
+
+    if (!onRowClicked || !clickDimension) return;
 
     onRowClicked({ dimensionValue, dimensionTimeRange });
   };

@@ -20,6 +20,7 @@ import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
 import { resolveI18nProps } from '../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
+import { dispatchEventUserInteraction } from '../../../utils/events.utils';
 
 export type FilterBuilderProProps = {
   embeddableState?: FilterBuilderState;
@@ -29,6 +30,8 @@ export type FilterBuilderProProps = {
   dimensionsAndMeasures?: DimensionOrMeasure[];
   onChange?: (value: unknown) => void;
   defaultFilters?: FilterBuilderClause;
+  componentName?: string;
+  trackingId?: string;
 } & EditorCardHeaderProps;
 
 const FilterBuilderPro = (props: FilterBuilderProProps) => {
@@ -42,6 +45,8 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     embeddableState,
     onChange,
     defaultFilters,
+    componentName,
+    trackingId,
   } = props;
 
   const [searchNew, setSearchNew] = useState('');
@@ -221,8 +226,9 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     const serialized = JSON.stringify(filterValue);
     if (serialized === JSON.stringify(prevFilterValueRef.current)) return;
     prevFilterValueRef.current = filterValue;
+    dispatchEventUserInteraction({ componentName, trackingId, value: filterValue });
     onChange?.(filterValue);
-  }, [filters, operator, onChange, isMixedOrOperator]);
+  }, [filters, operator, onChange, isMixedOrOperator, componentName, trackingId]);
 
   const handleClearAll = () => {
     setEmbeddableState?.((prev: FilterBuilderState) => ({
