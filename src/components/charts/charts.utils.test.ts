@@ -365,6 +365,48 @@ describe('createSimpleClickHandler', () => {
 
     expect(onClicked).not.toHaveBeenCalled();
   });
+
+  it('builds measureValues from the datasets at the clicked index when measures are provided', () => {
+    const onClicked = vi.fn();
+    mockGetTimeRange.mockReturnValue(undefined);
+
+    const data = {
+      labels: ['Apple', 'Banana'],
+      datasets: [{ data: [10, 20] }, { data: [30, 40] }],
+    } as unknown as ChartData;
+
+    const handler = createSimpleClickHandler({
+      data,
+      dimension: makeDimension('category'),
+      measures: [makeMeasure('sales'), makeMeasure('profit')],
+      onClicked,
+    });
+
+    handler(makeClick(1));
+
+    expect(onClicked).toHaveBeenCalledWith(
+      expect.objectContaining({ measureValues: { sales: 20, profit: 40 } }),
+    );
+  });
+
+  it('sets dimensionValue to undefined when a dimensionTimeRange is derived', () => {
+    const onClicked = vi.fn();
+    mockGetTimeRange.mockReturnValue({
+      from: new Date('2024-01-01'),
+      to: new Date('2024-01-31'),
+      relativeTimeString: undefined,
+    });
+
+    const handler = createSimpleClickHandler({
+      data: makeChartData(['2024-01-01']),
+      dimension: makeTimeDimension(),
+      onClicked,
+    });
+
+    handler(makeClick(0));
+
+    expect(onClicked).toHaveBeenCalledWith(expect.objectContaining({ dimensionValue: undefined }));
+  });
 });
 
 describe('createGroupedClickHandler', () => {

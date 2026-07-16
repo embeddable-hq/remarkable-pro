@@ -480,6 +480,22 @@ describe('getPointClickData', () => {
       groupByDimensionTimeRange: undefined,
     });
   });
+
+  it('nulls out dimension values and returns time ranges for time dimensions', () => {
+    const result = getPointClickData(
+      { datasetIndex: 0, index: 0 },
+      makeDatasets(0),
+      [{ point: '2024-01-01', xVal: 10, yVal: 20, g: '2024-02-01' }],
+      xMeasure,
+      yMeasure,
+      makeDimension({ name: 'point', nativeType: 'time' }),
+      makeDimension({ name: 'g', nativeType: 'time' }),
+    );
+    expect(result?.pointDimensionValue).toBeUndefined();
+    expect(result?.groupByDimensionValue).toBeUndefined();
+    expect(result?.pointDimensionTimeRange).toBeDefined();
+    expect(result?.groupByDimensionTimeRange).toBeDefined();
+  });
 });
 
 describe('createScatterClickHandler', () => {
