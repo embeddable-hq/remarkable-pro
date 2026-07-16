@@ -159,7 +159,8 @@ describe('HeatMapPro', () => {
       );
       fireEvent.click(screen.getByTestId('cell-click'));
 
-      const arg = onCellClicked.mock.calls[0][0];
+      const arg = onCellClicked.mock.calls[0]?.[0];
+      expect(arg).toBeDefined();
       expect(arg.rowDimensionValue).toBeUndefined();
       expect(arg.columnDimensionValue).toBeUndefined();
       expect(arg.rowDimensionTimeRange).toBeDefined();
