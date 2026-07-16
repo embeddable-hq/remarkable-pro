@@ -66,12 +66,7 @@ describe('createSimpleClickHandler user interaction values', () => {
 
     const handler = createSimpleClickHandler({
       data,
-      dimension: {
-        name: 'date',
-        __type__: 'dimension',
-        nativeType: 'time',
-        inputs: {},
-      } as unknown as Dimension,
+      dimension: { name: 'date', __type__: 'dimension', nativeType: 'time', inputs: {} } as unknown as Dimension,
       onClicked,
     });
 
