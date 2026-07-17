@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.19
+
+### Patch Changes
+
+- 19896fe: Disable shadow for editor card
+
 ## 0.3.18
 
 ### Patch Changes
