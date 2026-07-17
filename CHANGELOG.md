@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.18
+
+### Patch Changes
+
+- 82b6ec6: Increase Remarkable Ui
+
 ## 0.3.17
 
 ### Patch Changes
