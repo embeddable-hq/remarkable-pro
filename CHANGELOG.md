@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.20
+
+### Patch Changes
+
+- 7c4bd9b: Introduice FilterBuilder with grouping component
+
 ## 0.3.19
 
 ### Patch Changes
