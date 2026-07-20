@@ -10,6 +10,7 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { BarChartBaseProps } from '../bars.types';
 import { createSimpleClickHandler } from '../../charts.utils';
+import { getChartCardData } from '../../charts.other.loadData.utils';
 
 export type BarChartDefaultHorizontalProProps = BarChartBaseProps & {
   reverseYAxis?: boolean;
@@ -36,6 +37,7 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
     granularity,
     setGranularity,
     onBarClicked,
+    resultsOtherTotal,
   } = props;
 
   const resolvedI18nProps = resolveI18nProps(props);
@@ -46,10 +48,15 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
     dimension,
   });
 
-  const data = getBarChartProData(
-    { data: results.data, dimension, measures, maxItems: yAxisMaxItems },
-    theme,
-  );
+  const cardData = getChartCardData({
+    results,
+    resultsOtherTotal,
+    dimension,
+    measures,
+    maxItems: yAxisMaxItems,
+  });
+
+  const data = getBarChartProData({ data: cardData.data, dimension, measures }, theme);
 
   const options = mergician(
     getBarChartProOptions({ measures, horizontal: true, data, dimension }, theme), // Format X axis based on first measure
@@ -67,7 +74,7 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
 
   return (
     <ChartCard
-      data={results}
+      data={cardData}
       dimensionsAndMeasures={[dimension, ...measures]}
       errorMessage={results.error}
       {...asChartCardHeaderProps(props)}

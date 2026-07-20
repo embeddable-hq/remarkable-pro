@@ -10,11 +10,14 @@ export const getDimensionWithoutTruncation = (dimension: Dimension): Dimension =
   inputs: { ...dimension.inputs, maxCharacters: null },
 });
 
+export type MeasureTotals = Record<string, number>;
+
 export const groupTailAsOther = (
   data: DataResponse['data'] = [],
   dimension: Dimension,
   measures: Measure[],
   maxItems?: number,
+  measureTotals?: MeasureTotals,
 ) => {
   if (!maxItems || data.length <= maxItems) return data;
 
@@ -26,8 +29,16 @@ export const groupTailAsOther = (
   };
 
   for (const measure of measures) {
-    const vals = tail.map((row) => Number.parseFloat(row[measure.name] ?? '0'));
     const aggType = (measure.meta as Record<string, unknown> | undefined)?.aggType;
+    const grandTotal = measureTotals?.[measure.name];
+
+    if (grandTotal != null) {
+      const headSum = head.reduce((s, row) => s + Number.parseFloat(row[measure.name] ?? '0'), 0);
+      aggregatedRow[measure.name] = grandTotal - headSum;
+      continue;
+    }
+
+    const vals = tail.map((row) => Number.parseFloat(row[measure.name] ?? '0'));
 
     switch (aggType) {
       case 'avg':

@@ -9,6 +9,7 @@ import { ChartCard, asChartCardHeaderProps } from '../../shared/ChartCard/ChartC
 import { DonutChart } from '@embeddable.com/remarkable-ui';
 import { mergician } from 'mergician';
 import { resolveI18nProps } from '../../../component.utils';
+import { getChartCardData } from '../../charts.other.loadData.utils';
 
 export type DonutLabelChartProProps = DefaultPieChartProps & {
   innerLabelMeasure: Measure;
@@ -26,6 +27,7 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
     maxLegendItems,
     measure,
     results,
+    resultsOtherTotal,
     showLegend,
     showTooltips,
     showValueLabels,
@@ -36,10 +38,15 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
   const resolvedI18nProps = resolveI18nProps(props);
   const { innerLabelText, onSegmentClick } = resolvedI18nProps;
 
-  const data = getPieChartProData(
-    { data: results.data, dimension, measure, maxLegendItems },
-    theme,
-  );
+  const cardData = getChartCardData({
+    results,
+    resultsOtherTotal,
+    dimension,
+    measures: [measure],
+    maxItems: maxLegendItems,
+  });
+
+  const data = getPieChartProData({ data: cardData.data, dimension, measure }, theme);
 
   const handleClick = createPieClickHandler({ results, dimension, onClicked: onSegmentClick });
 
@@ -55,7 +62,7 @@ const DonutChartPro = (props: DonutLabelChartProProps) => {
 
   return (
     <ChartCard
-      data={results}
+      data={cardData}
       dimensionsAndMeasures={[dimension, measure]}
       errorMessage={results.error}
       {...asChartCardHeaderProps(props)}

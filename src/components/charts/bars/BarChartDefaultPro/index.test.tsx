@@ -54,6 +54,10 @@ vi.mock('../../charts.utils', () => ({
   createSimpleClickHandler: vi.fn(() => vi.fn()),
 }));
 
+vi.mock('../../charts.other.loadData.utils', () => ({
+  getChartCardData: vi.fn(() => ({ data: [], isLoading: false })),
+}));
+
 vi.mock('../../shared/ChartGranularitySelectField/ChartGranularitySelectField', () => ({
   ChartGranularitySelectField: () => <div data-testid="granularity-select" />,
 }));

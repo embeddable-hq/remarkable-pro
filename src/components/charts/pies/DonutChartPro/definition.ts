@@ -5,6 +5,7 @@ import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { subInputs } from '../../../component.subinputs.constants';
+import { getFirstMeasureOrderBy, loadDataOtherTotal } from '../../charts.other.loadData.utils';
 
 const meta = {
   name: 'DonutChartPro',
@@ -60,6 +61,7 @@ const preview = definePreview(Component, previewConfig);
 const loadDataResultsArgs = (inputs: Inputs<typeof meta>): LoadDataRequest => ({
   from: inputs.dataset,
   select: [inputs.measure, inputs.dimension],
+  orderBy: getFirstMeasureOrderBy([inputs.measure]),
 });
 
 const loadDataResults = (inputs: Inputs<typeof meta>): DataResponse =>
@@ -75,6 +77,11 @@ const events = {
 const props = (inputs: Inputs<typeof meta>) => ({
   ...inputs,
   results: loadDataResults(inputs),
+  resultsOtherTotal: loadDataOtherTotal({
+    dataset: inputs.dataset,
+    measures: [inputs.measure],
+    maxItems: inputs.maxLegendItems,
+  }),
 });
 
 export const donutChartPro = {

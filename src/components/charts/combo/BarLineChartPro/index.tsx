@@ -13,6 +13,7 @@ import {
   getBarLineChartProData,
   getBarLineChartProOptions,
 } from './BarLineChartPro.utils';
+import { getChartCardData } from '../../charts.other.loadData.utils';
 
 ChartJS.register(LineController, LineElement, PointElement);
 
@@ -40,6 +41,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
     setGranularity,
     onBarClicked,
     onLineClicked,
+    resultsOtherTotal,
   } = props;
 
   const resolvedI18nProps = resolveI18nProps(props);
@@ -49,13 +51,20 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
 
   const results = useFillGaps({ results: props.results, dimension });
 
+  const cardData = getChartCardData({
+    results,
+    resultsOtherTotal,
+    dimension,
+    measures: [...measures, ...lineMeasures],
+    maxItems: xAxisMaxItems,
+  });
+
   const data = getBarLineChartProData(
     {
-      data: results.data,
+      data: cardData.data,
       dimension,
       barMeasures: measures,
       lineMeasures,
-      maxItems: xAxisMaxItems,
       showSecondaryAxis,
     },
     theme,
@@ -90,7 +99,7 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
 
   return (
     <ChartCard
-      data={results}
+      data={cardData}
       dimensionsAndMeasures={[dimension, ...measures, ...lineMeasures]}
       errorMessage={results.error}
       {...asChartCardHeaderProps(props)}

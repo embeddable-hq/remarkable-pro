@@ -8,6 +8,7 @@ import {
   getBarLineChartProData,
   getBarLineChartProOptions,
 } from './BarLineChartPro.utils';
+import { getChartCardData } from '../../charts.other.loadData.utils';
 
 vi.mock('chart.js', () => ({
   Chart: { register: vi.fn() },
@@ -55,6 +56,10 @@ vi.mock('./BarLineChartPro.utils', () => ({
   getBarLineChartProData: vi.fn(() => ({ datasets: [], labels: [] })),
   getBarLineChartProOptions: vi.fn(() => ({})),
   createBarLineClickHandler: vi.fn(() => vi.fn()),
+}));
+
+vi.mock('../../charts.other.loadData.utils', () => ({
+  getChartCardData: vi.fn(() => ({ data: [], isLoading: false })),
 }));
 
 const makeMeasure = (name: string, inputs: Record<string, unknown> = {}): Measure =>
@@ -124,11 +129,10 @@ describe('BarLineChartPro', () => {
       );
     });
 
-    it('passes xAxisMaxItems as maxItems', () => {
+    it('passes xAxisMaxItems to getChartCardData as maxItems', () => {
       render(<BarLineChartPro {...defaultProps} xAxisMaxItems={20} />);
-      expect(vi.mocked(getBarLineChartProData)).toHaveBeenCalledWith(
+      expect(vi.mocked(getChartCardData)).toHaveBeenCalledWith(
         expect.objectContaining({ maxItems: 20 }),
-        expect.anything(),
       );
     });
   });

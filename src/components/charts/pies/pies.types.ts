@@ -11,6 +11,7 @@ export type DefaultPieChartProps = {
   maxLegendItems?: number;
   measure: Measure;
   results: DataResponse;
+  resultsOtherTotal?: DataResponse;
   showLegend?: boolean;
   showTooltips?: boolean;
   showValueLabels?: boolean;

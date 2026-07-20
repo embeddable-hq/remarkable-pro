@@ -261,6 +261,61 @@ describe('groupTailAsOther', () => {
     const result = groupTailAsOther(undefined as any, dimension, [measure], 3);
     expect(result).toEqual([]);
   });
+
+  describe('Other from full-dataset totals', () => {
+    const returnedTop5 = [
+      { category: 'US', value: 465235 },
+      { category: 'CA', value: 138807 },
+      { category: 'AU', value: 81337 },
+      { category: 'GB', value: 72056 },
+      { category: 'ES', value: 70956 },
+    ];
+
+    it('computes Other as grandTotal - sum(head) for additive measures', () => {
+      const result = groupTailAsOther(returnedTop5, dimension, [measure], 3, { value: 951515 });
+
+      expect(result).toHaveLength(3); // US, CA, Other
+      expect(result[0]?.value).toBe(465235); // US
+      expect(result[1]?.value).toBe(138807); // CA
+      // Other = 951515 - (465235 + 138807) = 347473  (NOT the returned tail 224349)
+      expect(result[2]?.value).toBe(347473);
+      expect(result[2]?.category).toBe('t(common.other)');
+    });
+
+    it('uses the grand total whenever provided — equals the tail sum when not truncated', () => {
+      // All 8 rows present (not truncated); grandTotal - sum(head) equals the tail.
+      const allRows = [
+        { category: 'US', value: 465235 },
+        { category: 'CA', value: 138807 },
+        { category: 'AU', value: 81337 },
+        { category: 'GB', value: 72056 },
+        { category: 'ES', value: 70956 },
+        { category: 'MX', value: 56960 },
+        { category: 'BR', value: 42886 },
+        { category: 'FR', value: 23278 },
+      ];
+      const withTotal = groupTailAsOther(allRows, dimension, [measure], 3, { value: 951515 });
+      const withoutTotal = groupTailAsOther(allRows, dimension, [measure], 3);
+      expect(withTotal[2]?.value).toBe(347473);
+      expect(withoutTotal[2]?.value).toBe(347473); // identical when all data is present
+    });
+
+    it('falls back to the tail when no total is provided (e.g. avg/min/max)', () => {
+      const avgMeasure = makeMeasure('avg_order', 'avg');
+      const data = [
+        { category: 'US', value: 465235, avg_order: 100 },
+        { category: 'CA', value: 138807, avg_order: 80 },
+        { category: 'AU', value: 81337, avg_order: 60 },
+        { category: 'GB', value: 72056, avg_order: 40 },
+      ];
+
+      // only the additive measure has a total
+      const result = groupTailAsOther(data, dimension, [measure, avgMeasure], 3, { value: 951515 });
+
+      expect(result[2]?.value).toBe(347473); // additive → from grand total
+      expect(result[2]?.avg_order).toBe(50); // avg → from returned tail (AU 60 + GB 40)/2
+    });
+  });
 });
 
 // -- createSimpleClickHandler / createGroupedClickHandler --------------------
