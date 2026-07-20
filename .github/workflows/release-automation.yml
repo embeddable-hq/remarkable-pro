@@ -21,7 +21,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ vars.BUILD_NODE_VERSION }}
 
       - name: Parse CHANGELOG.md
         id: parse
