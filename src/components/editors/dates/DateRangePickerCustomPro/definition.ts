@@ -30,6 +30,7 @@ const meta = {
       defaultValue: false,
       category: 'Component Settings',
     },
+    inputs.trackingId,
   ],
   events: [
     {
@@ -72,6 +73,7 @@ const preview = definePreview(Component, {
 const props = (inputs: Inputs<typeof meta>) => {
   return {
     ...inputs,
+    componentName: meta.name,
   };
 };
 

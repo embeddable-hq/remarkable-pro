@@ -42,6 +42,8 @@ export type LineChartComparisonDefaultProProps = {
   setGranularity?: (granularity: Granularity) => void;
   setComparisonDateRange?: (dateRange: TimeRange) => void;
   onLineClicked?: LineChartProOptionsClick;
+  componentName?: string;
+  trackingId?: string;
 } & ChartCardHeaderProps;
 
 const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps) => {
@@ -68,6 +70,8 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
     setGranularity,
     setComparisonDateRange,
     onLineClicked,
+    componentName,
+    trackingId,
   } = props;
 
   useEffect(() => {
@@ -120,6 +124,8 @@ const LineChartComparisonDefaultPro = (props: LineChartComparisonDefaultProProps
     measures,
     dimension: xAxis,
     granularity,
+    componentName,
+    trackingId,
     onClicked: onLineClicked,
   });
 

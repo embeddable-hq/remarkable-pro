@@ -16,6 +16,7 @@ export type BarChartDefaultProProps = BarChartBaseProps & {
   xAxisMaxItems?: number;
   yAxisRangeMin?: number;
   yAxisRangeMax?: number;
+  componentName?: string;
 };
 
 const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
@@ -35,6 +36,8 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     dimension,
     granularity,
     setGranularity,
+    componentName,
+    trackingId,
     onBarClicked,
   } = props;
 
@@ -61,10 +64,12 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
   const handleClick = createSimpleClickHandler({
     data,
     dimension,
+    measures,
     granularity,
+    componentName,
+    trackingId,
     onClicked: onBarClicked,
   });
-
   return (
     <ChartCard
       data={results}

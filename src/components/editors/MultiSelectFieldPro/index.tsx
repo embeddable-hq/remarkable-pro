@@ -7,6 +7,7 @@ import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCa
 import { resolveI18nProps } from '../../component.utils';
 import { i18n } from '../../../theme/i18n/i18n';
 import { MultiSelectField } from '@embeddable.com/remarkable-ui';
+import { dispatchEventUserInteraction } from '../../../utils/events.utils';
 
 export const MAX_OPTIONS = 200;
 
@@ -18,6 +19,8 @@ export type MultiSelectFieldProProps = {
   selectedValues?: string[];
   maxOptions?: number;
   clearable?: boolean;
+  componentName?: string;
+  trackingId?: string;
   setSearchValue?: (search: string) => void;
   onChange?: (newValues: string[]) => void;
 } & EditorCardHeaderProps;
@@ -33,6 +36,8 @@ const MultiSelectFieldPro = (props: MultiSelectFieldProProps) => {
     results,
     selectedValues,
     clearable,
+    componentName,
+    trackingId,
     setSearchValue,
     onChange,
   } = props;
@@ -68,7 +73,10 @@ const MultiSelectFieldPro = (props: MultiSelectFieldProProps) => {
         options={options}
         placeholder={placeholder}
         noOptionsMessage={showNoOptionsMessage ? i18n.t('common.noOptionsFound') : undefined}
-        onChange={(newValues) => onChange?.(newValues)}
+        onChange={(newValues) => {
+          dispatchEventUserInteraction({ componentName, trackingId, value: newValues });
+          onChange?.(newValues);
+        }}
         onSearch={setSearchValue}
         avoidCollisions={false}
       />

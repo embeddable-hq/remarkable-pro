@@ -7,6 +7,7 @@ import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCa
 import { resolveI18nProps } from '../../component.utils';
 import { i18n } from '../../../theme/i18n/i18n';
 import { SingleSelectField } from '@embeddable.com/remarkable-ui';
+import { dispatchEventUserInteraction } from '../../../utils/events.utils';
 
 export const MAX_OPTIONS = 200;
 
@@ -18,6 +19,8 @@ export type SingleSelectFieldProProps = {
   selectedValue?: string;
   maxOptions?: number;
   clearable?: boolean;
+  componentName?: string;
+  trackingId?: string;
   setSearchValue?: (search: string) => void;
   onChange?: (selectedValue: string | null) => void;
 } & EditorCardHeaderProps;
@@ -27,8 +30,16 @@ const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
   const themeFormatter = getThemeFormatter(theme);
 
   const { title, description, dimension, placeholder, tooltip } = resolveI18nProps(props);
-  const { optionalSecondDimension, results, selectedValue, clearable, setSearchValue, onChange } =
-    props;
+  const {
+    optionalSecondDimension,
+    results,
+    selectedValue,
+    clearable,
+    componentName,
+    trackingId,
+    setSearchValue,
+    onChange,
+  } = props;
 
   const options =
     results.data?.map((data) => {
@@ -63,7 +74,10 @@ const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
         options={options}
         placeholder={placeholder}
         noOptionsMessage={showNoOptionsMessage ? i18n.t('common.noOptionsFound') : undefined}
-        onChange={(newValue) => onChange?.(newValue as string | null)}
+        onChange={(newValue) => {
+          dispatchEventUserInteraction({ componentName, trackingId, value: newValue });
+          onChange?.(newValue as string | null);
+        }}
         onSearch={setSearchValue}
         avoidCollisions={false}
       />

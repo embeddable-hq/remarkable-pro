@@ -6,12 +6,15 @@ import { Theme } from '../../../theme/theme.types';
 import { useTheme } from '@embeddable.com/react';
 import { i18nSetup } from '../../../theme/i18n/i18n';
 import { DimensionAndMeasureSingleSelectField } from '../shared/DimensionAndMeasureSingleSelectField/DimensionAndMeasureSingleSelectField';
+import { dispatchEventUserInteraction } from '../../../utils/events.utils';
 
 export type MeasureSingleSelectFieldProProps = {
   selectedMeasure?: Measure;
   measureOptions: Measure[];
   placeholder?: string;
   clearable?: boolean;
+  componentName?: string;
+  trackingId?: string;
   onChange: (value: Measure | undefined) => void;
 } & ChartCardHeaderProps;
 
@@ -19,8 +22,13 @@ const MeasureSingleSelectFieldPro = (props: MeasureSingleSelectFieldProProps) =>
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { selectedMeasure, measureOptions, clearable, onChange } = props;
+  const { selectedMeasure, measureOptions, clearable, componentName, trackingId, onChange } = props;
   const { title, description, tooltip, placeholder } = resolveI18nProps(props);
+
+  const handleChange = (value: Measure | undefined) => {
+    dispatchEventUserInteraction({ componentName, trackingId, value });
+    onChange(value);
+  };
 
   return (
     <EditorCard title={title} description={description} tooltip={tooltip}>
@@ -29,7 +37,7 @@ const MeasureSingleSelectFieldPro = (props: MeasureSingleSelectFieldProProps) =>
         options={measureOptions}
         placeholder={placeholder}
         clearable={clearable}
-        onChange={onChange}
+        onChange={handleChange}
       />
     </EditorCard>
   );

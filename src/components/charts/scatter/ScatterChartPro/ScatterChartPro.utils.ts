@@ -2,6 +2,7 @@ import { ChartData, type ChartOptions, ScatterDataPoint } from 'chart.js';
 import { Context } from 'chartjs-plugin-datalabels';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 import { Theme } from '../../../../theme/theme.types';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getChartColors, getStyleNumber } from '@embeddable.com/remarkable-ui';
@@ -123,22 +124,34 @@ export const getPointClickData = (
   const pointField = getDimensionFieldName(pointDimension);
   const groupField = groupByDimension ? getDimensionFieldName(groupByDimension) : undefined;
 
-  const pointDimensionValue = rawValueToString(row[pointField]);
-  const groupByDimensionValue = groupField ? rawValueToString(row[groupField]) : null;
+  let pointDimensionValue: string | undefined = rawValueToString(row[pointField]);
+  let groupByDimensionValue: string | null | undefined = groupField
+    ? rawValueToString(row[groupField])
+    : null;
+
+  const pointDimensionTimeRange = getTimeRangeFromDimensionValue({
+    value: pointDimensionValue,
+    dimension: pointDimension,
+  });
+  const groupByDimensionTimeRange = getTimeRangeFromDimensionValue({
+    value: groupByDimensionValue ?? undefined,
+    dimension: groupByDimension,
+  });
+
+  if (pointDimensionTimeRange) {
+    pointDimensionValue = undefined;
+  }
+  if (groupByDimensionTimeRange) {
+    groupByDimensionValue = undefined;
+  }
 
   return {
     xMeasureValue: rawValueToString(row[xMeasure.name]),
     yMeasureValue: rawValueToString(row[yMeasure.name]),
     pointDimensionValue,
     groupByDimensionValue,
-    pointDimensionTimeRange: getTimeRangeFromDimensionValue({
-      value: pointDimensionValue,
-      dimension: pointDimension,
-    }),
-    groupByDimensionTimeRange: getTimeRangeFromDimensionValue({
-      value: groupByDimensionValue ?? undefined,
-      dimension: groupByDimension,
-    }),
+    pointDimensionTimeRange,
+    groupByDimensionTimeRange,
   };
 };
 
@@ -149,6 +162,8 @@ export const createScatterClickHandler = ({
   yMeasure,
   pointDimension,
   groupByDimension,
+  componentName,
+  trackingId,
   onPointClick,
 }: {
   datasets: ChartData<'scatter', ScatterPoint[]>['datasets'];
@@ -157,6 +172,8 @@ export const createScatterClickHandler = ({
   yMeasure: Measure;
   pointDimension: Dimension;
   groupByDimension?: Dimension;
+  componentName?: string;
+  trackingId?: string;
   onPointClick?: (payload: ScatterChartProOptionsClickArg) => void;
 }): ((args: ChartClickArgs) => void) => {
   return ({ elementAtEvent }) => {
@@ -171,7 +188,19 @@ export const createScatterClickHandler = ({
       pointDimension,
       groupByDimension,
     );
-    if (clickData) onPointClick?.(clickData);
+    if (!clickData) return;
+
+    dispatchEventUserInteraction({
+      componentName,
+      trackingId,
+      pointDimension,
+      groupByDimension,
+      xMeasure,
+      yMeasure,
+      ...clickData,
+    });
+
+    onPointClick?.(clickData);
   };
 };
 

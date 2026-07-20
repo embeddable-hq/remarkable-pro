@@ -2,6 +2,7 @@ import { BubbleDataPoint, ChartData, type ChartOptions } from 'chart.js';
 import { Context } from 'chartjs-plugin-datalabels';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 import { Theme } from '../../../../theme/theme.types';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getChartColors, getStyleNumber } from '@embeddable.com/remarkable-ui';
@@ -120,8 +121,26 @@ export const getBubblePointClickData = (
   const pointField = getDimensionFieldName(pointDimension);
   const groupField = groupByDimension ? getDimensionFieldName(groupByDimension) : undefined;
 
-  const pointDimensionValue = rawValueToString(row[pointField]);
-  const groupByDimensionValue = groupField ? rawValueToString(row[groupField]) : null;
+  let pointDimensionValue: string | undefined = rawValueToString(row[pointField]);
+  let groupByDimensionValue: string | null | undefined = groupField
+    ? rawValueToString(row[groupField])
+    : null;
+
+  const pointDimensionTimeRange = getTimeRangeFromDimensionValue({
+    value: pointDimensionValue,
+    dimension: pointDimension,
+  });
+  const groupByDimensionTimeRange = getTimeRangeFromDimensionValue({
+    value: groupByDimensionValue ?? undefined,
+    dimension: groupByDimension,
+  });
+
+  if (pointDimensionTimeRange) {
+    pointDimensionValue = undefined;
+  }
+  if (groupByDimensionTimeRange) {
+    groupByDimensionValue = undefined;
+  }
 
   return {
     xMeasureValue: rawValueToString(row[xMeasure.name]),
@@ -129,14 +148,8 @@ export const getBubblePointClickData = (
     sizeMeasureValue: rawValueToString(row[sizeMeasure.name]),
     pointDimensionValue,
     groupByDimensionValue,
-    pointDimensionTimeRange: getTimeRangeFromDimensionValue({
-      value: pointDimensionValue,
-      dimension: pointDimension,
-    }),
-    groupByDimensionTimeRange: getTimeRangeFromDimensionValue({
-      value: groupByDimensionValue ?? undefined,
-      dimension: groupByDimension,
-    }),
+    pointDimensionTimeRange,
+    groupByDimensionTimeRange,
   };
 };
 
@@ -148,6 +161,8 @@ export const createBubbleClickHandler = ({
   sizeMeasure,
   pointDimension,
   groupByDimension,
+  componentName,
+  trackingId,
   onPointClick,
 }: {
   datasets: ChartData<'bubble', BubblePoint[]>['datasets'];
@@ -157,6 +172,8 @@ export const createBubbleClickHandler = ({
   sizeMeasure: Measure;
   pointDimension: Dimension;
   groupByDimension?: Dimension;
+  componentName?: string;
+  trackingId?: string;
   onPointClick?: (payload: BubbleChartProOptionsClickArg) => void;
 }): ((args: ChartClickArgs) => void) => {
   return ({ elementAtEvent }) => {
@@ -172,7 +189,20 @@ export const createBubbleClickHandler = ({
       pointDimension,
       groupByDimension,
     );
-    if (clickData) onPointClick?.(clickData);
+    if (!clickData) return;
+
+    dispatchEventUserInteraction({
+      componentName,
+      trackingId,
+      pointDimension,
+      groupByDimension,
+      xMeasure,
+      yMeasure,
+      sizeMeasure,
+      ...clickData,
+    });
+
+    onPointClick?.(clickData);
   };
 };
 

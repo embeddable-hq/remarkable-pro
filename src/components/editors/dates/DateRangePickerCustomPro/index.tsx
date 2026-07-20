@@ -12,6 +12,7 @@ import {
   getTimeRangeLabel,
 } from '../dates.utils';
 import { IconCalendarFilled } from '@tabler/icons-react';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 
 export type DateRangePickerPresetsProps = {
   onChange: (newDateRange: TimeRange) => void;
@@ -19,6 +20,8 @@ export type DateRangePickerPresetsProps = {
   selectedValue?: TimeRange;
   clearable?: boolean;
   showTwoMonths?: boolean;
+  componentName?: string;
+  trackingId?: string;
 } & EditorCardHeaderProps;
 
 const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
@@ -32,10 +35,11 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   }
 
   const { description, placeholder, title, tooltip } = resolveI18nProps(props);
-  const { onChange, clearable, selectedValue, showTwoMonths } = props;
+  const { onChange, clearable, selectedValue, showTwoMonths, componentName, trackingId } = props;
 
   const handleChange = (newDateRange: DateRange | undefined) => {
     const timeRange: TimeRange = getTimeRangeFromDateRange(newDateRange);
+    dispatchEventUserInteraction({ componentName, trackingId, value: timeRange });
     onChange(timeRange);
   };
 

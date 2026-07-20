@@ -12,22 +12,46 @@ import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
 import { getChartColors, ChartClickArgs } from '@embeddable.com/remarkable-ui';
 import { PieChartClickArg } from './pies.types';
 import { getTimeRangeFromDimensionValue } from '../../utils/dimension.utils';
+import { dispatchEventUserInteraction } from '../../../utils/events.utils';
 import { i18n } from '../../../theme/i18n/i18n';
 
 export const createPieClickHandler = ({
   results,
   dimension,
+  measure,
+  componentName,
+  trackingId,
   onClicked,
 }: {
   results: DataResponse;
   dimension: Dimension;
+  measure: Measure;
+  componentName?: string;
+  trackingId?: string;
   onClicked?: (args: PieChartClickArg) => void;
 }): ((args: ChartClickArgs) => void) => {
   return ({ elementAtEvent }) => {
     const element = elementAtEvent[0];
     if (!element) return;
-    const dimensionValue = results.data?.[element.index]?.[dimension.name] as string | undefined;
+    let dimensionValue = results.data?.[element.index]?.[dimension.name] as string | undefined;
     const dimensionTimeRange = getTimeRangeFromDimensionValue({ value: dimensionValue, dimension });
+
+    if (dimensionTimeRange) {
+      dimensionValue = undefined;
+    }
+
+    const measureValue = results.data?.[element.index]?.[measure.name];
+
+    dispatchEventUserInteraction({
+      componentName,
+      trackingId,
+      dimension,
+      dimensionValue,
+      dimensionTimeRange,
+      measure,
+      measureValue,
+    });
+
     onClicked?.({ dimensionValue, dimensionTimeRange });
   };
 };

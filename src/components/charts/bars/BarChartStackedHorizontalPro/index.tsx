@@ -41,6 +41,8 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
     xAxisRangeMin,
     granularity,
     setGranularity,
+    componentName,
+    trackingId,
     onBarClicked,
     axisOrder,
     resultsAxisOrder,
@@ -90,8 +92,11 @@ const BarChartStackedHorizontalPro = (props: BarChartStackedHorizontalProProps) 
   const handleClick = createGroupedClickHandler({
     data,
     dimension: yAxis,
+    measure,
     groupBy,
     granularity,
+    componentName,
+    trackingId,
     onClicked: onBarClicked,
   });
 

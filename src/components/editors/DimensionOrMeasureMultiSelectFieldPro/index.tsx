@@ -7,12 +7,15 @@ import { i18nSetup, i18n } from '../../../theme/i18n/i18n';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 import { resolveI18nProps } from '../../component.utils';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
+import { dispatchEventUserInteraction } from '../../../utils/events.utils';
 
 export type DimensionMeasureMultiSelectFieldProProps = {
   selectedDimensionsAndMeasures?: DimensionOrMeasure[];
   dimensionAndMeasureOptions?: DimensionOrMeasure[];
   placeholder?: string;
   clearable?: boolean;
+  componentName?: string;
+  trackingId?: string;
   onChange: (value: DimensionOrMeasure[]) => void;
 } & EditorCardHeaderProps;
 
@@ -24,6 +27,8 @@ const DimensionMeasureMultiSelectFieldPro = (props: DimensionMeasureMultiSelectF
     selectedDimensionsAndMeasures = [],
     dimensionAndMeasureOptions = [],
     clearable,
+    componentName,
+    trackingId,
     onChange,
   } = props;
   const { title, description, tooltip, placeholder } = resolveI18nProps(props);
@@ -73,7 +78,11 @@ const DimensionMeasureMultiSelectFieldPro = (props: DimensionMeasureMultiSelectF
 
   const handleChange = (newValues: string[]) => {
     const selectedNamesSet = new Set(newValues);
-    onChange(dimensionAndMeasureOptions.filter((d) => selectedNamesSet.has(d.name)));
+    const newDimensionsAndMeasures = dimensionAndMeasureOptions.filter((d) =>
+      selectedNamesSet.has(d.name),
+    );
+    dispatchEventUserInteraction({ componentName, trackingId, value: newDimensionsAndMeasures });
+    onChange(newDimensionsAndMeasures);
   };
 
   return (

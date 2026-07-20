@@ -41,6 +41,8 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
     yAxisRangeMin,
     granularity,
     setGranularity,
+    componentName,
+    trackingId,
     onBarClicked,
     axisOrder,
     resultsAxisOrder,
@@ -90,8 +92,11 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
   const handleClick = createGroupedClickHandler({
     data,
     dimension: xAxis,
+    measure,
     groupBy,
     granularity,
+    componentName,
+    trackingId,
     onClicked: onBarClicked,
   });
 

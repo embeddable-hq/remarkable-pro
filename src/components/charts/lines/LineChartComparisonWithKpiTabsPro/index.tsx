@@ -48,6 +48,8 @@ const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabs
     onLineClicked,
     resultsKpis,
     resultsKpisComparison,
+    componentName,
+    trackingId,
   } = props;
 
   const [activeMeasureName, setActiveMeasureName] = useState(measures[0]?.name ?? '');
@@ -109,6 +111,8 @@ const LineChartComparisonWithKpiTabsPro = (props: LineChartComparisonWithKpiTabs
     data,
     measures: activeMeasure ? [activeMeasure] : [],
     dimension: xAxis,
+    componentName,
+    trackingId,
     onClicked: onLineClicked,
   });
 

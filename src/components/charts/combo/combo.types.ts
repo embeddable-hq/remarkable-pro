@@ -29,4 +29,6 @@ export type BarLineChartProProps = {
   setGranularity?: (granularity: Granularity) => void;
   onBarClicked?: (args: BarLineChartProClickArg) => void;
   onLineClicked?: (args: BarLineChartProClickArg) => void;
+  componentName?: string;
+  trackingId?: string;
 } & ChartCardHeaderProps;

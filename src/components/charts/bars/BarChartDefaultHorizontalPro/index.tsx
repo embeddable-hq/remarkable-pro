@@ -35,6 +35,8 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
     yAxisMaxItems,
     granularity,
     setGranularity,
+    componentName,
+    trackingId,
     onBarClicked,
   } = props;
 
@@ -61,7 +63,10 @@ const BarChartDefaultHorizontalPro = (props: BarChartDefaultHorizontalProProps) 
   const handleClick = createSimpleClickHandler({
     data,
     dimension,
+    measures,
     granularity,
+    componentName,
+    trackingId,
     onClicked: onBarClicked,
   });
 

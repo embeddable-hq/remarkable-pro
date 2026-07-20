@@ -13,11 +13,14 @@ import {
 } from './ComparisonPeriodSelectFieldPro.utils';
 import { useEffect, useMemo } from 'react';
 import { getTimeRangeFromPresets } from '../dates/dates.utils';
+import { dispatchEventUserInteraction } from '../../../utils/events.utils';
 
 export type DateComparisonSelectFieldPro = {
   placeholder?: string;
   primaryDateRange?: TimeRange;
   comparisonPeriod?: string;
+  componentName?: string;
+  trackingId?: string;
   onChange: (newComparisonPeriod?: string | null) => void;
 } & EditorCardHeaderProps;
 
@@ -26,7 +29,7 @@ const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
   i18nSetup(theme);
 
   const { description, placeholder, title, tooltip } = resolveI18nProps(props);
-  const { comparisonPeriod, onChange } = props;
+  const { comparisonPeriod, componentName, trackingId, onChange } = props;
 
   const comparisonPeriodOptions = theme.defaults.comparisonPeriodsOptions;
 
@@ -60,6 +63,11 @@ const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
     primaryDateRange,
   );
 
+  const handleChange = (newComparisonPeriod?: string | null) => {
+    dispatchEventUserInteraction({ componentName, trackingId, value: newComparisonPeriod });
+    onChange(newComparisonPeriod);
+  };
+
   return (
     <EditorCard title={title} description={description} tooltip={tooltip}>
       <SingleSelectField
@@ -67,7 +75,7 @@ const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
         clearable
         placeholder={placeholder}
         value={comparisonPeriodAvailable ? comparisonPeriod : undefined}
-        onChange={onChange}
+        onChange={handleChange}
         options={options}
         noOptionsMessage={i18n.t('common.noOptionsAvailable')}
         avoidCollisions={false}

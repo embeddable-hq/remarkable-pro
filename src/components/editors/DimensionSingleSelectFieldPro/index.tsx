@@ -6,12 +6,15 @@ import { Theme } from '../../../theme/theme.types';
 import { useTheme } from '@embeddable.com/react';
 import { i18nSetup } from '../../../theme/i18n/i18n';
 import { DimensionAndMeasureSingleSelectField } from '../shared/DimensionAndMeasureSingleSelectField/DimensionAndMeasureSingleSelectField';
+import { dispatchEventUserInteraction } from '../../../utils/events.utils';
 
 export type DimensionSingleSelectFieldProProps = {
   selectedDimension?: Dimension;
   dimensionOptions: Dimension[];
   placeholder?: string;
   clearable?: boolean;
+  componentName?: string;
+  trackingId?: string;
   onChange: (value: Dimension | undefined) => void;
 } & ChartCardHeaderProps;
 
@@ -19,8 +22,14 @@ const DimensionSingleSelectFieldPro = (props: DimensionSingleSelectFieldProProps
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { selectedDimension, dimensionOptions, clearable, onChange } = props;
+  const { selectedDimension, dimensionOptions, clearable, componentName, trackingId, onChange } =
+    props;
   const { title, description, tooltip, placeholder } = resolveI18nProps(props);
+
+  const handleChange = (value: Dimension | undefined) => {
+    dispatchEventUserInteraction({ componentName, trackingId, value });
+    onChange(value);
+  };
 
   return (
     <EditorCard title={title} description={description} tooltip={tooltip}>
@@ -29,7 +38,7 @@ const DimensionSingleSelectFieldPro = (props: DimensionSingleSelectFieldProProps
         options={dimensionOptions}
         placeholder={placeholder}
         clearable={clearable}
-        onChange={onChange}
+        onChange={handleChange}
       />
     </EditorCard>
   );

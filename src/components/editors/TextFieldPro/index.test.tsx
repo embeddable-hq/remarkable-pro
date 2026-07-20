@@ -130,7 +130,7 @@ describe('TextFieldPro definition config.props', () => {
   const { props } = textFieldPro.config;
 
   it('returns inputs without placeholder when not provided', () => {
-    expect(props({} as Parameters<typeof props>[0])).toEqual({});
+    expect(props({} as Parameters<typeof props>[0])).toEqual({ componentName: 'TextFieldPro' });
   });
 
   it('returns inputs with provided placeholder', () => {

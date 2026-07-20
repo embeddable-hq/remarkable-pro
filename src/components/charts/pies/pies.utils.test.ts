@@ -59,6 +59,7 @@ const makeTheme = (charts: Record<string, unknown> = {}) => ({ charts }) as any;
 
 describe('createPieClickHandler', () => {
   const dimension = makeDimension('category');
+  const measure = makeMeasure('value');
 
   const makeResults = (data: Record<string, unknown>[] | undefined) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -72,7 +73,12 @@ describe('createPieClickHandler', () => {
 
   it('does nothing when elementAtEvent is empty', () => {
     const onClicked = vi.fn();
-    const handler = createPieClickHandler({ results: makeResults([]), dimension, onClicked });
+    const handler = createPieClickHandler({
+      results: makeResults([]),
+      dimension,
+      measure,
+      onClicked,
+    });
 
     handler(makeClickArgs([]));
 
@@ -82,7 +88,7 @@ describe('createPieClickHandler', () => {
   it('calls onClicked with the dimensionValue from results.data at element.index', () => {
     const onClicked = vi.fn();
     const results = makeResults([{ category: 'Apple' }, { category: 'Banana' }]);
-    const handler = createPieClickHandler({ results, dimension, onClicked });
+    const handler = createPieClickHandler({ results, dimension, measure, onClicked });
 
     handler(makeClickArgs([makeElement(1)]));
 
@@ -92,7 +98,7 @@ describe('createPieClickHandler', () => {
   it('passes dimensionTimeRange as undefined for a non-time dimension', () => {
     const onClicked = vi.fn();
     const results = makeResults([{ category: 'Apple' }]);
-    const handler = createPieClickHandler({ results, dimension, onClicked });
+    const handler = createPieClickHandler({ results, dimension, measure, onClicked });
 
     handler(makeClickArgs([makeElement(0)]));
 
@@ -105,12 +111,17 @@ describe('createPieClickHandler', () => {
     const timeDimension = makeTimeDimension('date', 'month');
     const onClicked = vi.fn();
     const results = makeResults([{ date: '2024-01-15' }]);
-    const handler = createPieClickHandler({ results, dimension: timeDimension, onClicked });
+    const handler = createPieClickHandler({
+      results,
+      dimension: timeDimension,
+      measure,
+      onClicked,
+    });
 
     handler(makeClickArgs([makeElement(0)]));
 
     expect(onClicked).toHaveBeenCalledWith({
-      dimensionValue: '2024-01-15',
+      dimensionValue: undefined,
       dimensionTimeRange: {
         from: new Date('2024-01-01T00:00:00.000Z'),
         to: new Date('2024-01-31T23:59:59.999Z'),
@@ -121,7 +132,7 @@ describe('createPieClickHandler', () => {
 
   it('does not throw when onClicked is not provided', () => {
     const results = makeResults([{ category: 'Apple' }]);
-    const handler = createPieClickHandler({ results, dimension });
+    const handler = createPieClickHandler({ results, dimension, measure });
 
     expect(() => handler(makeClickArgs([makeElement(0)]))).not.toThrow();
   });
@@ -129,7 +140,7 @@ describe('createPieClickHandler', () => {
   it('sets dimensionValue to undefined when results.data is undefined', () => {
     const onClicked = vi.fn();
     const results = makeResults(undefined);
-    const handler = createPieClickHandler({ results, dimension, onClicked });
+    const handler = createPieClickHandler({ results, dimension, measure, onClicked });
 
     handler(makeClickArgs([makeElement(0)]));
 
