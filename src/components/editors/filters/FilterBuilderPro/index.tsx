@@ -24,7 +24,11 @@ import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../../utils/dimensionsAndMeasures.utils';
 import { resolveI18nProps } from '../../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../../shared/EditorCard/EditorCard';
-import { useFilterBuilderScroll } from '../filters.hooks';
+import {
+  FilterBuilderClauseGroup,
+  useAdoptDefaultFilters,
+  useFilterBuilderScroll,
+} from '../filters.hooks';
 
 export type FilterBuilderProProps = {
   embeddableState?: FilterBuilderState;
@@ -52,23 +56,26 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const [searchNew, setSearchNew] = useState('');
   const prevFilterValueRef = useRef<unknown>(undefined);
 
-  useEffect(() => {
-    if (!defaultFilters || !dimensionsAndMeasures?.length) {
-      return;
-    }
+  // Adopt defaultFilters on mount and whenever the host pushes a genuinely new
+  // value. An empty clause list resets to a single blank filter (the render
+  // fallback below turns `filters: []` into one empty row).
+  const adoptDefaultFilters = useCallback(
+    (clause: FilterBuilderClauseGroup) => {
+      setEmbeddableState?.((prev) => ({
+        ...prev,
+        filters: clauseToFilters(clause, dimensionsAndMeasures),
+        operator: clause.operator,
+      }));
+    },
+    [dimensionsAndMeasures, setEmbeddableState],
+  );
 
-    const newFilters = clauseToFilters(defaultFilters, dimensionsAndMeasures);
-
-    if (newFilters.length > 0) {
-      setEmbeddableState?.((prev) => {
-        if (prev?.filters?.length) {
-          return prev;
-        }
-
-        return { ...prev, filters: newFilters };
-      });
-    }
-  }, [defaultFilters, dimensionsAndMeasures, setEmbeddableState]);
+  useAdoptDefaultFilters({
+    defaultFilters,
+    dimensionsAndMeasures,
+    lastEmittedRef: prevFilterValueRef,
+    adopt: adoptDefaultFilters,
+  });
 
   const lastFilterId = embeddableState?.filters?.[embeddableState.filters.length - 1]?.id ?? 0;
 
@@ -205,7 +212,8 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
                 dimensionsAndMeasures={dimensionsAndMeasures}
                 results={
                   (props as Record<string, unknown>)[`filterResults${filter.id}`] as
-                    DataResponse | undefined
+                    | DataResponse
+                    | undefined
                 }
                 theme={theme}
                 onSelectDimensionOrMeasure={(value) => handleSelectDimensionOrMeasure(index, value)}

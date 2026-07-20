@@ -15,7 +15,11 @@ import {
   getSupportedDimensionsAndMeasures,
   hasMixedDimensionsAndMeasures,
 } from '../filters.utils';
-import { useFilterBuilderScroll } from '../filters.hooks';
+import {
+  FilterBuilderClauseGroup,
+  useAdoptDefaultFilters,
+  useFilterBuilderScroll,
+} from '../filters.hooks';
 import {
   clauseToItems,
   FilterBuilderGroupingState,
@@ -77,18 +81,26 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
   const items = storedItems.length ? storedItems : emptyItems;
   const operator = embeddableState?.operator ?? AND;
 
-  useEffect(() => {
-    if (!defaultFilters || !dimensionsAndMeasures?.length) return;
+  // Adopt defaultFilters on mount and whenever the host pushes a genuinely new
+  // value. An empty clause list resets to a single blank filter (getFilterNodes
+  // falls back to emptyItems when items is empty).
+  const adoptDefaultFilters = useCallback(
+    (clause: FilterBuilderClauseGroup) => {
+      setEmbeddableState?.((prev) =>
+        withItems(prev, clauseToItems(clause, dimensionsAndMeasures), {
+          operator: clause.operator,
+        }),
+      );
+    },
+    [dimensionsAndMeasures, setEmbeddableState],
+  );
 
-    const newItems = clauseToItems(defaultFilters, dimensionsAndMeasures);
-
-    if (newItems.length > 0) {
-      setEmbeddableState?.((prev) => {
-        if (getFilterNodes(prev).length) return prev;
-        return withItems(prev, newItems, { operator: defaultFilters.operator });
-      });
-    }
-  }, [defaultFilters, dimensionsAndMeasures, setEmbeddableState]);
+  useAdoptDefaultFilters({
+    defaultFilters,
+    dimensionsAndMeasures,
+    lastEmittedRef: prevFilterValueRef,
+    adopt: adoptDefaultFilters,
+  });
 
   const allFilters = items.flatMap((node) => (isFilterBuilderGroup(node) ? node.filters : [node]));
 
