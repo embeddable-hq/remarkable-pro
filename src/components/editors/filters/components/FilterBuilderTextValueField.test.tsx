@@ -1,15 +1,13 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import FilterBuilderTextValueField from './FilterBuilderTextValueField';
-import type { FilterBuilderFilter } from '../definition';
-
-vi.mock('../FilterBuilderPro.module.css', () => ({
-  default: { valueInput: 'valueInput' },
-}));
+import type { FilterBuilderFilter } from '../filters.utils';
 
 vi.mock('@embeddable.com/remarkable-ui', () => ({
   useDebounce: (fn: (...args: unknown[]) => void) => fn,
 }));
+
+const styles = { valueInput: 'valueInput' };
 
 const makeFilter = (overrides: Partial<FilterBuilderFilter> = {}): FilterBuilderFilter => ({
   id: 1,
@@ -30,13 +28,16 @@ describe('FilterBuilderTextValueField', () => {
   });
 
   it('renders a text input', () => {
-    render(<FilterBuilderTextValueField filter={makeFilter()} onSelectValue={vi.fn()} />);
+    render(
+      <FilterBuilderTextValueField styles={styles} filter={makeFilter()} onSelectValue={vi.fn()} />,
+    );
     expect(screen.getByRole('textbox')).toBeInTheDocument();
   });
 
   it('initialises the input with the filter value', () => {
     render(
       <FilterBuilderTextValueField
+        styles={styles}
         filter={makeFilter({ value: 'hello' })}
         onSelectValue={vi.fn()}
       />,
@@ -46,7 +47,11 @@ describe('FilterBuilderTextValueField', () => {
 
   it('renders an empty input when filter.value is null', () => {
     render(
-      <FilterBuilderTextValueField filter={makeFilter({ value: null })} onSelectValue={vi.fn()} />,
+      <FilterBuilderTextValueField
+        styles={styles}
+        filter={makeFilter({ value: null })}
+        onSelectValue={vi.fn()}
+      />,
     );
     expect(screen.getByRole('textbox')).toHaveValue('');
   });
@@ -55,6 +60,7 @@ describe('FilterBuilderTextValueField', () => {
     const onSelectValue = vi.fn();
     render(
       <FilterBuilderTextValueField
+        styles={styles}
         filter={makeFilter({ value: '' })}
         onSelectValue={onSelectValue}
       />,
@@ -69,6 +75,7 @@ describe('FilterBuilderTextValueField', () => {
     const onSelectValue = vi.fn();
     render(
       <FilterBuilderTextValueField
+        styles={styles}
         filter={makeFilter({ value: 'something' })}
         onSelectValue={onSelectValue}
       />,
@@ -83,6 +90,7 @@ describe('FilterBuilderTextValueField', () => {
     const onSelectValue = vi.fn();
     render(
       <FilterBuilderTextValueField
+        styles={styles}
         filter={makeFilter({ value: 'initial' })}
         onSelectValue={onSelectValue}
       />,
@@ -91,7 +99,9 @@ describe('FilterBuilderTextValueField', () => {
   });
 
   it('focuses the input after 100ms on mount', () => {
-    render(<FilterBuilderTextValueField filter={makeFilter()} onSelectValue={vi.fn()} />);
+    render(
+      <FilterBuilderTextValueField styles={styles} filter={makeFilter()} onSelectValue={vi.fn()} />,
+    );
     const input = screen.getByRole('textbox');
     const focusSpy = vi.spyOn(input, 'focus');
 
@@ -102,6 +112,7 @@ describe('FilterBuilderTextValueField', () => {
   it('focuses the input after 100ms when the operator changes', () => {
     const { rerender } = render(
       <FilterBuilderTextValueField
+        styles={styles}
         filter={makeFilter({ operator: 'is' })}
         onSelectValue={vi.fn()}
       />,
@@ -113,6 +124,7 @@ describe('FilterBuilderTextValueField', () => {
 
     rerender(
       <FilterBuilderTextValueField
+        styles={styles}
         filter={makeFilter({ operator: 'isNot' })}
         onSelectValue={vi.fn()}
       />,
@@ -124,6 +136,7 @@ describe('FilterBuilderTextValueField', () => {
   it('does not focus the input before the 100ms delay elapses', () => {
     const { rerender } = render(
       <FilterBuilderTextValueField
+        styles={styles}
         filter={makeFilter({ operator: 'is' })}
         onSelectValue={vi.fn()}
       />,
@@ -135,6 +148,7 @@ describe('FilterBuilderTextValueField', () => {
 
     rerender(
       <FilterBuilderTextValueField
+        styles={styles}
         filter={makeFilter({ operator: 'isNot' })}
         onSelectValue={vi.fn()}
       />,

@@ -1,7 +1,7 @@
 import { render, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
 import FilterBuilderItemNumberValueField from './FilterBuilderItemNumberValueField';
-import type { FilterBuilderFilter } from '../definition';
+import type { FilterBuilderFilter } from '../filters.utils';
 
 vi.mock('@embeddable.com/remarkable-ui', () => ({
   useDebounce: (fn: (...args: unknown[]) => void) => fn,
@@ -10,6 +10,8 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
 vi.mock('../../../../theme/i18n/i18n', () => ({
   i18n: { t: (key: string) => key },
 }));
+
+const styles = { valueInput: 'valueInput', operatorButton: 'operatorButton' };
 
 const makeFilter = (overrides: Partial<FilterBuilderFilter> = {}): FilterBuilderFilter => ({
   id: 1,
@@ -23,7 +25,11 @@ const makeFilter = (overrides: Partial<FilterBuilderFilter> = {}): FilterBuilder
 describe('FilterBuilderItemNumberValueField', () => {
   it('renders a single number input when operator is not "between"', () => {
     const { getAllByRole } = render(
-      <FilterBuilderItemNumberValueField filter={makeFilter()} onSelectValue={vi.fn()} />,
+      <FilterBuilderItemNumberValueField
+        styles={styles}
+        filter={makeFilter()}
+        onSelectValue={vi.fn()}
+      />,
     );
     expect(getAllByRole('spinbutton')).toHaveLength(1);
   });
@@ -31,6 +37,7 @@ describe('FilterBuilderItemNumberValueField', () => {
   it('renders two inputs and a disabled "and" button when operator is "between"', () => {
     const { getAllByRole, getByRole } = render(
       <FilterBuilderItemNumberValueField
+        styles={styles}
         filter={makeFilter({ operator: 'between' })}
         onSelectValue={vi.fn()}
       />,
@@ -42,6 +49,7 @@ describe('FilterBuilderItemNumberValueField', () => {
   it('initializes the single input with filter.value', () => {
     const { getByRole } = render(
       <FilterBuilderItemNumberValueField
+        styles={styles}
         filter={makeFilter({ value: 42 })}
         onSelectValue={vi.fn()}
       />,
@@ -52,7 +60,11 @@ describe('FilterBuilderItemNumberValueField', () => {
   it('calls onSelectValue with a number when the single input changes', () => {
     const onSelectValue = vi.fn();
     const { getByRole } = render(
-      <FilterBuilderItemNumberValueField filter={makeFilter()} onSelectValue={onSelectValue} />,
+      <FilterBuilderItemNumberValueField
+        styles={styles}
+        filter={makeFilter()}
+        onSelectValue={onSelectValue}
+      />,
     );
     fireEvent.change(getByRole('spinbutton'), { target: { value: '7' } });
     expect(onSelectValue).toHaveBeenCalledWith(7);
@@ -61,7 +73,11 @@ describe('FilterBuilderItemNumberValueField', () => {
   it('does not call onSelectValue when the single input is cleared', () => {
     const onSelectValue = vi.fn();
     const { getByRole } = render(
-      <FilterBuilderItemNumberValueField filter={makeFilter()} onSelectValue={onSelectValue} />,
+      <FilterBuilderItemNumberValueField
+        styles={styles}
+        filter={makeFilter()}
+        onSelectValue={onSelectValue}
+      />,
     );
     fireEvent.change(getByRole('spinbutton'), { target: { value: '' } });
     expect(onSelectValue).not.toHaveBeenCalled();
@@ -70,6 +86,7 @@ describe('FilterBuilderItemNumberValueField', () => {
   it('clears the single input to empty when cleared', () => {
     const { getByRole } = render(
       <FilterBuilderItemNumberValueField
+        styles={styles}
         filter={makeFilter({ value: 5 })}
         onSelectValue={vi.fn()}
       />,
@@ -82,6 +99,7 @@ describe('FilterBuilderItemNumberValueField', () => {
     const onSelectValue = vi.fn();
     const { getAllByRole } = render(
       <FilterBuilderItemNumberValueField
+        styles={styles}
         filter={makeFilter({ operator: 'between' })}
         onSelectValue={onSelectValue}
       />,
@@ -96,6 +114,7 @@ describe('FilterBuilderItemNumberValueField', () => {
     const onSelectValue = vi.fn();
     const { getAllByRole } = render(
       <FilterBuilderItemNumberValueField
+        styles={styles}
         filter={makeFilter({ operator: 'between' })}
         onSelectValue={onSelectValue}
       />,
@@ -109,6 +128,7 @@ describe('FilterBuilderItemNumberValueField', () => {
     const onSelectValue = vi.fn();
     render(
       <FilterBuilderItemNumberValueField
+        styles={styles}
         filter={makeFilter({ value: 99 })}
         onSelectValue={onSelectValue}
       />,

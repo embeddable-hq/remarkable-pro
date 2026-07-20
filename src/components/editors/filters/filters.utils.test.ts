@@ -3,15 +3,24 @@ import type { DimensionOrMeasure } from '@embeddable.com/core';
 import {
   clauseToFilter,
   clauseToFilters,
+  createEmptyFilter,
   filterBuilderAndOrOperator,
   filterToLoadDataFilters,
   filtersToClause,
+  getLastFilterKey,
+  getMultiSelectDisplayValue,
   getSupportedDimensionsAndMeasures,
+  hasMixedDimensionsAndMeasures,
   operatorNumber,
   operatorStringBoolean,
-} from './FilterBuilderPro.utils';
-import type { FilterBuilderClause } from './FilterBuilderPro.utils';
-import type { FilterBuilderFilter } from './definition';
+} from './filters.utils';
+import type { FilterBuilderClause, FilterBuilderFilter } from './filters.utils';
+
+vi.mock('../../../theme/i18n/i18n', () => ({
+  i18n: {
+    t: vi.fn((key: string, opts?: { count?: number }) => (opts ? `${key}:${opts.count}` : key)),
+  },
+}));
 
 type ClauseGroup = Extract<FilterBuilderClause, { clauses: FilterBuilderClause[] }>;
 
@@ -663,5 +672,103 @@ describe('clauseToFilters', () => {
       clauses: [{ operator: filterBuilderAndOrOperator.OR, clauses: [] }],
     };
     expect(clauseToFilters(clause, dims)).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getMultiSelectDisplayValue
+// ---------------------------------------------------------------------------
+
+describe('getMultiSelectDisplayValue', () => {
+  const getLabel = (v: string) => `label-${v}`;
+
+  it('localises the empty-selection state via i18n instead of a hardcoded string', () => {
+    expect(getMultiSelectDisplayValue([], getLabel)).toBe('editors.filterBuilder.noSelection');
+  });
+
+  it('localises the count label via i18n instead of a hardcoded string', () => {
+    expect(getMultiSelectDisplayValue(['a', 'b', 'c'], getLabel)).toBe(
+      'editors.filterBuilder.countSelected:3',
+    );
+  });
+
+  it('joins labels when 1 or 2 values are selected', () => {
+    expect(getMultiSelectDisplayValue(['a'], getLabel)).toBe('label-a');
+    expect(getMultiSelectDisplayValue(['a', 'b'], getLabel)).toBe('label-a, label-b');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// hasMixedDimensionsAndMeasures
+// ---------------------------------------------------------------------------
+
+describe('hasMixedDimensionsAndMeasures', () => {
+  const asMeasure = (f: FilterBuilderFilter): FilterBuilderFilter => ({
+    ...f,
+    dimensionOrMeasure: f.dimensionOrMeasure
+      ? ({ ...f.dimensionOrMeasure, __type__: 'measure' } as unknown as DimensionOrMeasure)
+      : null,
+  });
+
+  it('is true only when both a dimension and a measure are present', () => {
+    const dimensionFilter = makeFilter({ id: 1 });
+    const measureFilter = asMeasure(makeFilter({ id: 2 }));
+
+    expect(hasMixedDimensionsAndMeasures([dimensionFilter, measureFilter])).toBe(true);
+    expect(hasMixedDimensionsAndMeasures([dimensionFilter, makeFilter({ id: 3 })])).toBe(false);
+    expect(hasMixedDimensionsAndMeasures([measureFilter])).toBe(false);
+    expect(hasMixedDimensionsAndMeasures([makeFilter({ dimensionOrMeasure: null })])).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getLastFilterKey
+// ---------------------------------------------------------------------------
+
+describe('getLastFilterKey', () => {
+  it('derives a key from the last filter that changes when its value changes', () => {
+    const filters = [makeFilter({ id: 1 }), makeFilter({ id: 2, value: 'France' })];
+    const key = getLastFilterKey(filters);
+    expect(key).toContain('2');
+    expect(key).toContain('France');
+  });
+
+  it('produces a different key when the last filter changes', () => {
+    const before = getLastFilterKey([makeFilter({ id: 1, value: 'a' })]);
+    const after = getLastFilterKey([makeFilter({ id: 1, value: 'b' })]);
+    expect(before).not.toBe(after);
+  });
+
+  it('is stable (safe on undefined) for an empty list', () => {
+    expect(getLastFilterKey([])).toBe('undefined-undefined-undefined-undefined');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// createEmptyFilter
+// ---------------------------------------------------------------------------
+
+describe('createEmptyFilter', () => {
+  const dims = [makeDim(NativeDataType.string, 'country'), makeDim(NativeDataType.number, 'age')];
+
+  it('creates a blank filter with the given id and no member when name is omitted', () => {
+    const filter = createEmptyFilter(5, dims);
+    expect(filter).toEqual({
+      id: 5,
+      dimensionOrMeasure: null,
+      search: '',
+      operator: null,
+      value: null,
+    });
+  });
+
+  it('resolves the member by name when provided', () => {
+    const filter = createEmptyFilter(1, dims, 'age');
+    expect(filter.dimensionOrMeasure?.name).toBe('age');
+  });
+
+  it('leaves dimensionOrMeasure null when the name matches nothing', () => {
+    const filter = createEmptyFilter(1, dims, 'unknown_field');
+    expect(filter.dimensionOrMeasure).toBeNull();
   });
 });

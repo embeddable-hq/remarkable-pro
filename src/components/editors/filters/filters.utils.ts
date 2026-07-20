@@ -1,5 +1,50 @@
-import { DimensionOrMeasure, FilterOperator, NativeDataType } from '@embeddable.com/core';
-import { FilterBuilderFilter } from './definition';
+import {
+  DimensionOrMeasure,
+  FilterOperator,
+  isDimension,
+  isMeasure,
+  NativeDataType,
+} from '@embeddable.com/core';
+import { i18n } from '../../../theme/i18n/i18n';
+
+export type FilterBuilderFilter = {
+  id: number;
+  dimensionOrMeasure: DimensionOrMeasure | null;
+  search: string;
+  value: string | string[] | number | number[] | boolean | null;
+  operator: string | null;
+};
+
+/**
+ * Cube cannot combine a dimension filter (row-level WHERE) with a measure
+ * filter (aggregate HAVING) in the same logical operator. Used to decide when
+ * an OR must be forced back to AND.
+ */
+export const hasMixedDimensionsAndMeasures = (filters: FilterBuilderFilter[]): boolean =>
+  filters.some((f) => isDimension(f.dimensionOrMeasure ?? undefined)) &&
+  filters.some((f) => isMeasure(f.dimensionOrMeasure ?? undefined));
+
+/** Identity key for the last filter in a list — changes whenever its member,
+ * operator, or value changes, used to trigger scrolling to a newly added or
+ * edited filter. */
+export const getLastFilterKey = (filters: FilterBuilderFilter[]): string => {
+  const last = filters[filters.length - 1];
+  return `${last?.id}-${last?.dimensionOrMeasure?.name}-${last?.operator}-${JSON.stringify(last?.value)}`;
+};
+
+/** A fresh, unconfigured filter for the given id — optionally pre-selecting a
+ * member by name (looked up from the available dimensions/measures). */
+export const createEmptyFilter = (
+  id: number,
+  dimensionsAndMeasures: DimensionOrMeasure[],
+  name: string | null = null,
+): FilterBuilderFilter => ({
+  id,
+  dimensionOrMeasure: dimensionsAndMeasures.find((d) => d.name === name) ?? null,
+  search: '',
+  operator: null,
+  value: null,
+});
 
 export const operatorStringBoolean = {
   is: 'is',
@@ -39,16 +84,68 @@ export const filterBuilderAndOrOperator = {
 export type FilterBuilderAndOrOperator =
   (typeof filterBuilderAndOrOperator)[keyof typeof filterBuilderAndOrOperator];
 
-export const FILTER_BUILDER_PRO_SUPPORTED_TYPES: string[] = [
+export const FILTER_BUILDER_SUPPORTED_TYPES: string[] = [
   NativeDataType.string,
   NativeDataType.boolean,
   NativeDataType.number,
 ];
 
 export const getSupportedDimensionsAndMeasures = (dimensionsAndMeasures: DimensionOrMeasure[]) => {
-  return dimensionsAndMeasures.filter((d) =>
-    FILTER_BUILDER_PRO_SUPPORTED_TYPES.includes(d.nativeType),
-  );
+  return dimensionsAndMeasures.filter((d) => FILTER_BUILDER_SUPPORTED_TYPES.includes(d.nativeType));
+};
+
+export const getStringOperatorOptions = () => [
+  { value: operatorStringBoolean.is, label: i18n.t('editors.filterBuilder.is') },
+  { value: operatorStringBoolean.isNot, label: i18n.t('editors.filterBuilder.isNot') },
+  { value: operatorStringBoolean.isOneOf, label: i18n.t('editors.filterBuilder.isOneOf') },
+  { value: operatorStringBoolean.isNotOneOf, label: i18n.t('editors.filterBuilder.isNotOneOf') },
+  { value: operatorStringBoolean.contains, label: i18n.t('editors.filterBuilder.contains') },
+];
+
+export const getBooleanOperatorOptions = () => [
+  { value: operatorStringBoolean.is, label: i18n.t('editors.filterBuilder.is') },
+  { value: operatorStringBoolean.isNot, label: i18n.t('editors.filterBuilder.isNot') },
+  { value: operatorStringBoolean.isOneOf, label: i18n.t('editors.filterBuilder.isOneOf') },
+  { value: operatorStringBoolean.isNotOneOf, label: i18n.t('editors.filterBuilder.isNotOneOf') },
+];
+
+export const getNumberOperatorOptions = () => [
+  { value: operatorNumber.equals, label: i18n.t('editors.filterBuilder.equals') },
+  { value: operatorNumber.notEquals, label: i18n.t('editors.filterBuilder.doesNotEqual') },
+  { value: operatorNumber.gte, label: i18n.t('editors.filterBuilder.greaterThanOrEqualTo') },
+  { value: operatorNumber.lte, label: i18n.t('editors.filterBuilder.lessThanOrEqualTo') },
+  { value: operatorNumber.between, label: i18n.t('editors.filterBuilder.between') },
+];
+
+export const getOperatorOptions = (dimensionOrMeasure: DimensionOrMeasure) => {
+  if (dimensionOrMeasure.nativeType === NativeDataType.number) return getNumberOperatorOptions();
+  if (dimensionOrMeasure.nativeType === NativeDataType.boolean) return getBooleanOperatorOptions();
+  return getStringOperatorOptions();
+};
+
+export const normalizeSelectedValues = (value: unknown): string[] => {
+  if (Array.isArray(value)) return value as string[];
+  if (value === null || value === undefined) return [];
+  return [value as string];
+};
+
+export const sortOptionsWithSelectedFirst = <T extends { value: string }>(
+  rawOptions: T[],
+  selectedValues: string[],
+): T[] => [
+  ...rawOptions.filter((o) => selectedValues.includes(o.value)),
+  ...rawOptions.filter((o) => !selectedValues.includes(o.value)),
+];
+
+export const getMultiSelectDisplayValue = (
+  filterValue: string[],
+  getLabel: (value: string) => string,
+): string => {
+  if (filterValue.length === 0) return i18n.t('editors.filterBuilder.noSelection');
+  if (filterValue.length > 2) {
+    return i18n.t('editors.filterBuilder.countSelected', { count: filterValue.length });
+  }
+  return filterValue.map(getLabel).join(', ');
 };
 
 export type FilterBuilderClause =
@@ -91,7 +188,7 @@ export const filterToLoadDataFilters = (filter: FilterBuilderFilter): LoadDataFi
   return [{ operator: mappedOperator, property: dimensionOrMeasure, value }];
 };
 
-const filterToClause = (f: FilterBuilderFilter): FilterBuilderClause[] => {
+export const filterToClause = (f: FilterBuilderFilter): FilterBuilderClause[] => {
   if (
     f.operator === operatorNumber.between &&
     f.dimensionOrMeasure?.nativeType === NativeDataType.number

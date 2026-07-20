@@ -1,25 +1,30 @@
-import { DataResponse, DimensionOrMeasure, isDimension, isMeasure } from '@embeddable.com/core';
+import { DataResponse, DimensionOrMeasure } from '@embeddable.com/core';
 import { useTheme } from '@embeddable.com/react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Theme } from '../../../theme/theme.types';
+import { Theme } from '../../../../theme/theme.types';
 import FilterBuilderItem from './components/FilterBuilderItem';
-import { FilterBuilderFilter, FilterBuilderState } from './definition';
+import { FilterBuilderState } from './definition';
 import { ActionIcon, SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { IconPlus, IconChevronRight, IconChevronLeft } from '@tabler/icons-react';
 import styles from './FilterBuilderPro.module.css';
 import {
   filterBuilderAndOrOperator,
   FilterBuilderAndOrOperator,
+  FilterBuilderFilter,
   filtersToClause,
+  createEmptyFilter,
+  getLastFilterKey,
   getSupportedDimensionsAndMeasures,
+  hasMixedDimensionsAndMeasures,
   clauseToFilters,
   FilterBuilderClause,
-} from './FilterBuilderPro.utils';
+} from '../filters.utils';
 import { FilterBuilderProAndOrButton } from './components/FilterBuilderProAndOrButton';
-import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
-import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
-import { resolveI18nProps } from '../../component.utils';
-import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
+import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
+import { getDimensionAndMeasureOptions } from '../../utils/dimensionsAndMeasures.utils';
+import { resolveI18nProps } from '../../../component.utils';
+import { EditorCard, EditorCardHeaderProps } from '../../shared/EditorCard/EditorCard';
+import { useFilterBuilderScroll } from '../filters.hooks';
 
 export type FilterBuilderProProps = {
   embeddableState?: FilterBuilderState;
@@ -45,12 +50,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   } = props;
 
   const [searchNew, setSearchNew] = useState('');
-
-  const [canScrollRight, setCanScrollRight] = useState(false);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const prevFilterValueRef = useRef<unknown>(undefined);
-  const disableAutoScroll = useRef(true);
 
   useEffect(() => {
     if (!defaultFilters || !dimensionsAndMeasures?.length) {
@@ -68,61 +68,13 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
         return { ...prev, filters: newFilters };
       });
     }
-
-    // Auto-scroll reactivated after initial load or when defaultFilters change
-    setTimeout(() => {
-      disableAutoScroll.current = false;
-    }, 100);
   }, [defaultFilters, dimensionsAndMeasures, setEmbeddableState]);
 
-  const updateScrollState = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 1);
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
-  }, []);
-
-  const handleScrollRight = () => {
-    scrollRef.current?.scrollBy({ left: 200, behavior: 'smooth' });
-  };
-
-  const handleScrollLeft = () => {
-    scrollRef.current?.scrollBy({ left: -200, behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(updateScrollState);
-    ro.observe(el);
-    el.addEventListener('scroll', updateScrollState);
-    updateScrollState();
-    return () => {
-      ro.disconnect();
-      el.removeEventListener('scroll', updateScrollState);
-    };
-  }, [updateScrollState, embeddableState?.filters]);
-
   const lastFilterId = embeddableState?.filters?.[embeddableState.filters.length - 1]?.id ?? 0;
-  const lastFilter = embeddableState?.filters?.[embeddableState.filters.length - 1];
-  const lastFilterKey = `${lastFilter?.id}-${lastFilter?.dimensionOrMeasure?.name}-${lastFilter?.operator}-${JSON.stringify(lastFilter?.value)}`;
-
-  useEffect(() => {
-    if (disableAutoScroll.current) {
-      return;
-    }
-    setTimeout(() => {
-      scrollRef.current?.scrollTo({ left: scrollRef.current.scrollWidth, behavior: 'smooth' });
-    }, 100);
-  }, [lastFilterKey]);
 
   const newFilter = useCallback(
-    (dimensionOrMeasureValue: string | null = null): FilterBuilderFilter => {
-      const dimensionOrMeasure =
-        dimensionsAndMeasures.find((d) => d.name === dimensionOrMeasureValue) ?? null;
-
-      return { id: lastFilterId + 1, dimensionOrMeasure, search: '', operator: null, value: null };
-    },
+    (dimensionOrMeasureValue: string | null = null): FilterBuilderFilter =>
+      createEmptyFilter(lastFilterId + 1, dimensionsAndMeasures, dimensionOrMeasureValue),
     [dimensionsAndMeasures, lastFilterId],
   );
 
@@ -131,6 +83,12 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     [embeddableState?.filters, newFilter],
   );
   const operator = embeddableState?.operator ?? filterBuilderAndOrOperator.AND;
+
+  const { scrollRef, canScrollLeft, canScrollRight, scrollLeft, scrollRight, scrollToEnd } =
+    useFilterBuilderScroll({
+      itemsSignature: filters,
+      autoScrollKey: getLastFilterKey(filters),
+    });
 
   const handleOperatorChange = (value: FilterBuilderAndOrOperator) => {
     setEmbeddableState?.((prev) => ({ ...prev, operator: value }));
@@ -184,9 +142,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
 
   const handleAddFilter = (value: string | null) => {
     updateFilters((f) => [...f, newFilter(value)]);
-    setTimeout(() => {
-      scrollRef.current?.scrollTo({ left: scrollRef.current.scrollWidth, behavior: 'smooth' });
-    }, 0);
+    scrollToEnd();
   };
 
   const supportedDimensionsAndMeasures = getSupportedDimensionsAndMeasures(dimensionsAndMeasures);
@@ -199,13 +155,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
 
   const hasClearAll = filters.some((f) => f.dimensionOrMeasure && f.operator && f.value != null);
 
-  // OR cannot combine dimensions (row-level WHERE) with measures (aggregate HAVING)
-  // in Cube. This depends on which members are *selected*, not whether their values
-  // are filled in — a measure mid-edit (e.g. value cleared after an operator change)
-  // still makes the set mixed, so we must not look only at "complete" filters.
-  const hasMixedTypes =
-    filters.some((f) => isDimension(f.dimensionOrMeasure ?? undefined)) &&
-    filters.some((f) => isMeasure(f.dimensionOrMeasure ?? undefined));
+  const hasMixedTypes = hasMixedDimensionsAndMeasures(filters);
 
   const isMixedOrOperator = hasMixedTypes && operator === filterBuilderAndOrOperator.OR;
 
@@ -236,7 +186,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     <EditorCard title={title} description={description} tooltip={tooltip}>
       <div className={styles.container}>
         {canScrollLeft && (
-          <button className={styles.scrollLeftButton} onClick={handleScrollLeft}>
+          <button type="button" className={styles.scrollLeftButton} onClick={scrollLeft}>
             <IconChevronLeft />
           </button>
         )}
@@ -268,7 +218,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
           ))}
         </div>
         {canScrollRight && (
-          <button className={styles.scrollRightButton} onClick={handleScrollRight}>
+          <button type="button" className={styles.scrollRightButton} onClick={scrollRight}>
             <IconChevronRight />
           </button>
         )}
@@ -284,7 +234,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
           />
         )}
         {hasClearAll && (
-          <button className={styles.clearButton} onClick={handleClearAll}>
+          <button type="button" className={styles.clearButton} onClick={handleClearAll}>
             {i18n.t('editors.filterBuilder.clearAll')}
           </button>
         )}

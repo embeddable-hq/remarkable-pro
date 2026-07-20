@@ -1,12 +1,13 @@
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
-import { DimensionOrMeasure, FilterOperator, loadData, Value } from '@embeddable.com/core';
+import { FilterOperator, loadData, Value } from '@embeddable.com/core';
 import Component from '.';
-import { inputs } from '../../component.inputs.constants';
+import { inputs } from '../../../component.inputs.constants';
 import {
   FilterBuilderAndOrOperator,
   FilterBuilderClause,
+  FilterBuilderFilter,
   filterToLoadDataFilters,
-} from './FilterBuilderPro.utils';
+} from '../filters.utils';
 
 const meta = {
   name: 'FilterBuilderPro',
@@ -67,14 +68,6 @@ const meta = {
 } as const satisfies EmbeddedComponentMeta;
 
 const preview = definePreview(Component, {});
-
-export type FilterBuilderFilter = {
-  id: number;
-  dimensionOrMeasure: DimensionOrMeasure | null;
-  search: string;
-  value: string | string[] | number | number[] | boolean | null;
-  operator: string | null;
-};
 
 export type FilterBuilderState = {
   filters: FilterBuilderFilter[];

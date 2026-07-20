@@ -1,0 +1,306 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: hidden;
+  gap: var(--em-filter-gap--external, 0.75rem);
+  padding-right: var(--em-filter-gap--external, 0.75rem);
+  font-family: var(--em-filterbuilder-font-family, Inter);
+  font-weight: var(--em-filterbuilder-font-weight, 500);
+  font-size: var(--em-filterbuilder-font-size, 0.75rem);
+}
+
+.scroll {
+  display: flex;
+  align-items: center;
+  gap: var(--em-filter-gap--external, 0.75rem);
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: relative;
+}
+
+.scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  gap: var(--em-filter-gap--internal, 0.125rem);
+}
+
+.group {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--em-filter-gap--external, 0.75rem);
+  background: var(--em-filter-background--group, #ffffff);
+  border: var(--em-filter-border-width--group, 1px) solid
+    var(--em-filter-border-color--group, #ededf1);
+  border-radius: var(--em-filter-border-radius--group, 2rem);
+  padding: var(--em-filter-padding--group, 0.25rem);
+}
+
+.addButton {
+  box-sizing: border-box;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--em-filter-height, 2rem);
+  gap: var(--em-filter-gap--internal, 0.125rem);
+  border: var(--em-filter-border-width, 0) solid var(--em-filter-border-color, transparent);
+  background: var(--em-filter-background--filter, #ededf1);
+  padding: var(--em-filter-padding-y, 0) var(--em-filter-padding-x, 0.75rem);
+  border-radius: var(--em-filter-border-radius--group, 2rem);
+  color: var(--em-filter-color, #000000);
+}
+
+.addButton svg {
+  flex-shrink: 0;
+  width: var(--em-filter-icon-size, 1rem);
+  height: var(--em-filter-icon-size, 1rem);
+}
+
+.addButton:hover {
+  background: var(--em-filter-background--filter--hover, #e4e4ea);
+}
+
+.memberButton {
+  box-sizing: border-box;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--em-filter-height, 2rem);
+  border: var(--em-filter-border-width, 0) solid var(--em-filter-border-color, transparent);
+  background: var(--em-filter-background--filter, #ededf1);
+  color: var(--em-filter-color, #000000);
+  padding: var(--em-filter-padding-y, 0) var(--em-filter-padding-x, 0.75rem);
+  border-radius: var(--em-filter-border-radius, 0);
+  border-top-left-radius: var(--em-filter-border-radius--group, 2rem);
+  border-bottom-left-radius: var(--em-filter-border-radius--group, 2rem);
+}
+
+.memberButton:hover {
+  background: var(--em-filter-background--filter--hover, #e4e4ea);
+}
+
+.deleteButton,
+.createGroupButton {
+  box-sizing: border-box;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--em-filter-height, 2rem);
+  border: var(--em-filter-border-width, 0) solid var(--em-filter-border-color, transparent);
+  color: var(--em-filter-color--operator, #5c5c66);
+  padding: var(--em-filter-padding-y, 0) var(--em-filter-padding-x--operator, 0.25rem);
+  border-radius: var(--em-filter-border-radius, 0);
+}
+
+.deleteButton {
+  background: var(--em-filter-background--filter, #ededf1);
+}
+
+.deleteButton:hover {
+  background: var(--em-filter-background--filter--hover, #e4e4ea);
+}
+
+.createGroupButton {
+  background: var(--em-filter-background--operator, #f7f7f8);
+}
+
+.createGroupButton:hover {
+  background: var(--em-filter-background--operator--hover, #e4e4ea);
+}
+
+.deleteButton svg,
+.createGroupButton svg {
+  flex-shrink: 0;
+  width: var(--em-filter-icon-size, 1rem);
+  height: var(--em-filter-icon-size, 1rem);
+}
+
+.clearButton {
+  box-sizing: border-box;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  height: var(--em-filter-height, 2rem);
+  border: var(--em-filter-border-width, 0) solid var(--em-filter-border-color, transparent);
+  background: transparent;
+  padding: var(--em-filter-padding-y, 0) var(--em-filter-padding-x, 0.75rem);
+  border-radius: var(--em-filter-border-radius--group, 2rem);
+  color: var(--em-filter-color--operator, #5c5c66);
+}
+
+.clearButton:hover {
+  background: var(--em-filter-background--filter, #ededf1);
+}
+
+.scrollRightButton,
+.scrollLeftButton {
+  flex-shrink: 0;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--em-filter-height, 2rem);
+  border: var(--em-filter-border-width, 0) solid var(--em-filter-border-color, transparent);
+  background: var(--em-filter-background--chevron, #ffffff);
+  padding: var(--em-filter-padding-y, 0) var(--em-filter-padding-x, 0.75rem);
+  border-radius: var(--em-filter-border-radius--group, 2rem);
+  color: var(--em-filter-color, #000000);
+}
+
+.scrollRightButton {
+  margin-left: calc(-1 * var(--em-filter-gap--external, 0.75rem));
+}
+
+.scrollLeftButton {
+  margin-right: calc(-1 * var(--em-filter-gap--external, 0.75rem));
+}
+
+.scrollRightButton svg,
+.scrollLeftButton svg {
+  flex-shrink: 0;
+  width: var(--em-filter-icon-size, 1rem);
+  height: var(--em-filter-icon-size, 1rem);
+}
+
+.scrollRightButton:hover,
+.scrollLeftButton:hover {
+  background: var(--em-filter-background--filter--hover, #ededf1);
+}
+
+.andOrButton {
+  box-sizing: border-box;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  height: var(--em-filter-height, 2rem);
+  border: var(--em-filter-border-width, 0) solid var(--em-filter-border-color, transparent);
+  background: var(--em-filter-background--operator, #f7f7f8);
+  padding: var(--em-filter-padding-y, 0) var(--em-filter-padding-x, 0.75rem);
+  border-radius: var(--em-filter-border-radius--group, 2rem);
+  color: var(--em-filter-color--operator, #5c5c66);
+  margin-left: calc(var(--em-filter-gap--andor, 0.25rem) - var(--em-filter-gap--external, 0.75rem));
+  margin-right: calc(
+    var(--em-filter-gap--andor, 0.25rem) - var(--em-filter-gap--external, 0.75rem)
+  );
+}
+
+.andOrButtonInGroup {
+  color: var(--em-filter-color, #000000);
+}
+
+.andOrButton > span {
+  grid-area: 1 / 1;
+}
+
+.andOrButtonSizer {
+  visibility: hidden;
+}
+
+.andOrButton:hover {
+  background: var(--em-filter-background--operator--hover, #e4e4ea);
+}
+
+.andOrButton:disabled {
+  cursor: not-allowed;
+  opacity: var(--em-filter-opacity--disabled, 0.5);
+}
+
+.andOrButton:disabled:hover {
+  background: var(--em-filter-background--operator, #f7f7f8);
+}
+
+.roundedRight {
+  border-top-right-radius: var(--em-filter-border-radius--group, 2rem);
+  border-bottom-right-radius: var(--em-filter-border-radius--group, 2rem);
+}
+
+/* Value/operator segments (shared value editor, styled to the new design). */
+.operatorButton {
+  box-sizing: border-box;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: var(--em-filter-height, 2rem);
+  border: var(--em-filter-border-width, 0) solid var(--em-filter-border-color, transparent);
+  background: var(--em-filter-background--filter, #ededf1);
+  color: var(--em-filter-color, #000000);
+  padding: var(--em-filter-padding-y, 0) var(--em-filter-padding-x--operator, 0.25rem);
+  border-radius: var(--em-filter-border-radius, 0);
+}
+
+.operatorButton:hover {
+  background: var(--em-filter-background--filter--hover, #e4e4ea);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.valueButton {
+  box-sizing: border-box;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  height: var(--em-filter-height, 2rem);
+  gap: var(--em-filter-gap--internal, 0.125rem);
+  border: var(--em-filter-border-width, 0) solid var(--em-filter-border-color, transparent);
+  background: var(--em-filter-background--filter, #ededf1);
+  color: var(--em-filter-color, #000000);
+  padding: var(--em-filter-padding-y, 0) var(--em-filter-padding-x, 0.75rem);
+  border-radius: var(--em-filter-border-radius, 0);
+  min-width: 0;
+}
+
+.valueButton svg {
+  flex-shrink: 0;
+  width: var(--em-filter-icon-size, 1rem);
+  height: var(--em-filter-icon-size, 1rem);
+}
+
+.valueButton .loadingSpinner {
+  animation: spin 1s linear infinite;
+}
+
+.valueButton:hover {
+  background: var(--em-filter-background--filter--hover, #e4e4ea);
+}
+
+.valueButton.valueButtonEmpty {
+  display: block;
+}
+
+.valueInput {
+  box-sizing: border-box;
+  font: inherit;
+  height: var(--em-filter-height, 2rem);
+  border: var(--em-filter-border-width, 0) solid var(--em-filter-border-color, transparent);
+  padding: var(--em-filter-padding-y, 0) var(--em-filter-padding-x, 0.75rem);
+  border-radius: var(--em-filter-border-radius, 0);
+  color: var(--em-filter-color, #000000);
+  min-width: var(--em-filter-value-input-min-width, 2rem);
+  background: var(--em-filter-background--filter, #ededf1);
+  field-sizing: content;
+}

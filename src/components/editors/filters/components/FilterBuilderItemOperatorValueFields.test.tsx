@@ -3,16 +3,12 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { NativeDataType } from '@embeddable.com/core';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
 import FilterBuilderItemOperatorValueFields from './FilterBuilderItemOperatorValueFields';
-import { operatorNumber, operatorStringBoolean } from '../FilterBuilderPro.utils';
-import type { FilterBuilderFilter } from '../definition';
+import { operatorNumber, operatorStringBoolean } from '../filters.utils';
+import type { FilterBuilderFilter } from '../filters.utils';
 import type { FilterBuilderItemValueFieldProps } from './FilterBuilderItemValueField';
 
 vi.mock('../../../../theme/i18n/i18n', () => ({
   i18n: { t: vi.fn((key: string) => key) },
-}));
-
-vi.mock('../FilterBuilderPro.module.css', () => ({
-  default: { operatorButton: 'operatorButton' },
 }));
 
 const mockSingleSelectField = vi.fn();
@@ -61,12 +57,15 @@ const makeFilter = (overrides: Partial<FilterBuilderFilter> = {}): FilterBuilder
   ...overrides,
 });
 
+const styles = { operatorButton: 'operatorButton' };
+
 const defaultProps = {
   results: undefined,
   theme: {} as never,
   onSelectOperator: vi.fn(),
   onSelectValue: vi.fn(),
   onSearchValue: vi.fn(),
+  styles,
 };
 
 // ---------------------------------------------------------------------------

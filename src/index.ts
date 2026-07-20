@@ -224,9 +224,12 @@ export * from './components/editors/GranularitySelectFieldPro/definition';
 export * as TextFieldPro from './components/editors/TextFieldPro';
 export type { TextFieldProProps } from './components/editors/TextFieldPro';
 export * from './components/editors/TextFieldPro/definition';
-export type { FilterBuilderProProps } from './components/editors/FilterBuilderPro';
-export * as FilterBuilderPro from './components/editors/FilterBuilderPro';
-export * from './components/editors/FilterBuilderPro/definition';
+export type { FilterBuilderProProps } from './components/editors/filters/FilterBuilderPro';
+export * as FilterBuilderPro from './components/editors/filters/FilterBuilderPro';
+export * from './components/editors/filters/FilterBuilderPro/definition';
+export type { FilterBuilderWithGroupingProProps } from './components/editors/filters/FilterBuilderWithGroupingPro';
+export * as FilterBuilderWithGroupingPro from './components/editors/filters/FilterBuilderWithGroupingPro';
+export * from './components/editors/filters/FilterBuilderWithGroupingPro/definition';
 
 // Editors - Shared
 export * from './components/editors/shared/EditorCard/EditorCard';

@@ -1,14 +1,13 @@
 import { DataResponse, DimensionOrMeasure } from '@embeddable.com/core';
-import { FilterBuilderFilter } from '../definition';
 import { SingleSelectField } from '@embeddable.com/remarkable-ui';
-import { Theme } from '../../../../theme/theme.types';
-import { getDimensionAndMeasureOptions } from '../../utils/dimensionsAndMeasures.utils';
+import { Theme } from '../../../../../theme/theme.types';
+import { getDimensionAndMeasureOptions } from '../../../utils/dimensionsAndMeasures.utils';
 import { useState } from 'react';
-import { i18n } from '../../../../theme/i18n/i18n';
-import FilterBuilderItemOperatorValueFields from './FilterBuilderItemOperatorValueFields';
+import { i18n } from '../../../../../theme/i18n/i18n';
+import FilterBuilderItemOperatorValueFields from '../../components/FilterBuilderItemOperatorValueFields';
 import styles from '../FilterBuilderPro.module.css';
 import { IconPlus, IconX } from '@tabler/icons-react';
-import { getSupportedDimensionsAndMeasures } from '../FilterBuilderPro.utils';
+import { FilterBuilderFilter, getSupportedDimensionsAndMeasures } from '../../filters.utils';
 
 type FilterBuilderItemProps = {
   filter: FilterBuilderFilter;
@@ -55,11 +54,15 @@ const FilterBuilderItem = ({
 
   const getMemberTriggerComponent = () => {
     if (dimensionOrMeasure) {
-      return <button className={styles.memberButton}>{selectedLabel}</button>;
+      return (
+        <button type="button" className={styles.memberButton}>
+          {selectedLabel}
+        </button>
+      );
     }
 
     return (
-      <button className={styles.addButton}>
+      <button type="button" className={styles.addButton}>
         <IconPlus />
         <span>{i18n.t('editors.filterBuilder.addFilter')}</span>
       </button>
@@ -89,8 +92,9 @@ const FilterBuilderItem = ({
             onSelectOperator={onSelectOperator}
             onSelectValue={onSelectValue}
             onSearchValue={onSearchValue}
+            styles={styles}
           />
-          <button className={styles.deleteButton} onClick={onDelete}>
+          <button type="button" className={styles.deleteButton} onClick={onDelete}>
             <IconX />
           </button>
         </>

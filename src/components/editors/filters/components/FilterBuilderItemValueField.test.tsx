@@ -2,25 +2,23 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { NativeDataType } from '@embeddable.com/core';
 import FilterBuilderItemValueField from './FilterBuilderItemValueField';
-import { operatorStringBoolean } from '../FilterBuilderPro.utils';
+import { operatorStringBoolean } from '../filters.utils';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
-import type { FilterBuilderFilter } from '../definition';
+import type { FilterBuilderFilter } from '../filters.utils';
 import { Theme } from '../../../../theme/theme.types';
 
 // ---------------------------------------------------------------------------
 // Mocks
 // ---------------------------------------------------------------------------
 
-vi.mock('../FilterBuilderPro.module.css', () => ({
-  default: {
-    valueButton: 'valueButton',
-    valueButtonEmpty: 'valueButtonEmpty',
-    loadingSpinner: 'loadingSpinner',
-  },
-}));
-
 vi.mock('../../../../theme/i18n/i18n', () => ({
-  i18n: { t: vi.fn((key: string) => key) },
+  i18n: {
+    t: vi.fn((key: string, opts?: { count?: number }) => {
+      if (key === 'editors.filterBuilder.noSelection') return '...';
+      if (key === 'editors.filterBuilder.countSelected') return `${opts?.count} selected`;
+      return key;
+    }),
+  },
 }));
 
 vi.mock('@tabler/icons-react', () => ({
@@ -148,6 +146,12 @@ const makeResults = (values: string[] = [], isLoading = false) => ({
   isLoading,
 });
 
+const styles = {
+  valueButton: 'valueButton',
+  valueButtonEmpty: 'valueButtonEmpty',
+  loadingSpinner: 'loadingSpinner',
+};
+
 const defaultProps = {
   filter: makeFilter(),
   dimensionOrMeasure: makeDim(NativeDataType.string),
@@ -155,6 +159,7 @@ const defaultProps = {
   theme: {} as Theme,
   onSelectValue: vi.fn(),
   onSearchValue: vi.fn(),
+  styles,
 };
 
 // ---------------------------------------------------------------------------

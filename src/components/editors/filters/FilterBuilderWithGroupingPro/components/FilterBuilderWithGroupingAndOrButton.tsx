@@ -1,20 +1,20 @@
 import { FC } from 'react';
 import { Tooltip } from '@embeddable.com/remarkable-ui';
-import styles from '../FilterBuilderPro.module.css';
-import { i18n } from '../../../../theme/i18n/i18n';
-import { filterBuilderAndOrOperator, FilterBuilderAndOrOperator } from '../FilterBuilderPro.utils';
+import clsx from 'clsx';
+import styles from '../FilterBuilderWithGroupingPro.module.css';
+import { i18n } from '../../../../../theme/i18n/i18n';
+import { FilterBuilderAndOrOperator, filterBuilderAndOrOperator } from '../../filters.utils';
 
-type FilterBuilderProAndOrButtonProps = {
+type FilterBuilderWithGroupingAndOrButtonProps = {
   operator: FilterBuilderAndOrOperator;
   onChange: (value: FilterBuilderAndOrOperator) => void;
   disabled?: boolean;
+  inGroup?: boolean;
 };
 
-export const FilterBuilderProAndOrButton: FC<FilterBuilderProAndOrButtonProps> = ({
-  operator,
-  onChange,
-  disabled = false,
-}) => {
+export const FilterBuilderWithGroupingAndOrButton: FC<
+  FilterBuilderWithGroupingAndOrButtonProps
+> = ({ operator, onChange, disabled = false, inGroup = false }) => {
   const handleChange = () => {
     onChange(
       operator === filterBuilderAndOrOperator.AND
@@ -28,7 +28,12 @@ export const FilterBuilderProAndOrButton: FC<FilterBuilderProAndOrButtonProps> =
   const inactiveLabel = operator === filterBuilderAndOrOperator.AND ? orLabel : andLabel;
 
   const button = (
-    <button className={styles.andOrButton} onClick={handleChange} disabled={disabled}>
+    <button
+      type="button"
+      className={clsx(styles.andOrButton, inGroup && styles.andOrButtonInGroup)}
+      onClick={handleChange}
+      disabled={disabled}
+    >
       <span>{activeLabel}</span>
       <span className={styles.andOrButtonSizer} aria-hidden>
         {inactiveLabel}
