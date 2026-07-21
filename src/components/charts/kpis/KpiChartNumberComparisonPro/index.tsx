@@ -72,7 +72,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
 
   const themeFormatter = getThemeFormatter(theme);
   const valueFormatter = (valueToFormat: number) => themeFormatter.data(measure, valueToFormat);
-  const comparisonLabel = `vs ${getComparisonPeriodLabel(comparisonPeriod, theme).toLowerCase()}`;
+  const comparisonLabel = `vs ${getComparisonPeriodLabel(comparisonPeriod, theme)}`;
 
   const resultsCombined: DataResponse = {
     isLoading: Boolean(results.isLoading || resultsComparison?.isLoading),
