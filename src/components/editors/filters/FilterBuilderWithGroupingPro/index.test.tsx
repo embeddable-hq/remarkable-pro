@@ -519,7 +519,33 @@ describe('FilterBuilderWithGroupingPro', () => {
     expect(next.operator).toBe(filterBuilderAndOrOperator.OR);
   });
 
-  it('adopts a genuinely new defaultFilters even when state already has items', () => {
+  it('with syncDefaultFilters, adopts a genuinely new defaultFilters even when state already has items', () => {
+    const existing: FilterBuilderGroupingState = {
+      operator: filterBuilderAndOrOperator.AND,
+      items: [
+        makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), operator: 'is', value: 'UK' }),
+      ],
+    };
+    const defaultFilters: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [{ property: 'country', operator: 'equals' as never, value: 'AU' }],
+    };
+    render(
+      <FilterBuilderWithGroupingPro
+        {...defaultProps}
+        dimensionsAndMeasures={[makeDim('country')]}
+        defaultFilters={defaultFilters}
+        embeddableState={existing}
+        syncDefaultFilters
+      />,
+    );
+    expect(defaultProps.setEmbeddableState).toHaveBeenCalled();
+    const next = applyUpdater(defaultProps.setEmbeddableState, existing);
+    expect(itemsOf(next)).toHaveLength(1);
+    expect((itemsOf(next)[0] as FilterBuilderFilter).value).toBe('AU');
+  });
+
+  it('by default (seed-once), preserves existing items when state is non-empty', () => {
     const existing: FilterBuilderGroupingState = {
       operator: filterBuilderAndOrOperator.AND,
       items: [
@@ -538,10 +564,8 @@ describe('FilterBuilderWithGroupingPro', () => {
         embeddableState={existing}
       />,
     );
-    expect(defaultProps.setEmbeddableState).toHaveBeenCalled();
     const next = applyUpdater(defaultProps.setEmbeddableState, existing);
-    expect(itemsOf(next)).toHaveLength(1);
-    expect((itemsOf(next)[0] as FilterBuilderFilter).value).toBe('AU');
+    expect(itemsOf(next)).toEqual(existing.items);
   });
 
   it('ignores its own onChange echo coming back through the bound variable', () => {
@@ -574,7 +598,7 @@ describe('FilterBuilderWithGroupingPro', () => {
     expect(defaultProps.setEmbeddableState).not.toHaveBeenCalled();
   });
 
-  it('resets to an empty item list when given a well-formed empty clause', () => {
+  it('with syncDefaultFilters, resets to an empty item list when given a well-formed empty clause', () => {
     const existing: FilterBuilderGroupingState = {
       operator: filterBuilderAndOrOperator.AND,
       items: [
@@ -591,6 +615,7 @@ describe('FilterBuilderWithGroupingPro', () => {
         dimensionsAndMeasures={[makeDim('country')]}
         defaultFilters={emptyClause}
         embeddableState={existing}
+        syncDefaultFilters
       />,
     );
     expect(defaultProps.setEmbeddableState).toHaveBeenCalled();

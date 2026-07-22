@@ -288,9 +288,34 @@ describe('FilterBuilderPro', () => {
       expect(next.filters[0]!.value).toBe('France');
     });
 
-    it('adopts a genuinely new defaultFilters even when embeddableState already has filters', () => {
-      // Regression: the old seed-once behaviour bailed out whenever state was
-      // non-empty, so hosts could seed but never update/reset afterwards.
+    it('with syncDefaultFilters, adopts a genuinely new defaultFilters even when state already has filters', () => {
+      const existing: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
+        filters: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'UK',
+          }),
+        ],
+      };
+      render(
+        <FilterBuilderPro
+          {...defaultProps}
+          dimensionsAndMeasures={[makeDim('country')]}
+          defaultFilters={defaultFilterClause}
+          embeddableState={existing}
+          syncDefaultFilters
+        />,
+      );
+      expect(defaultProps.setEmbeddableState).toHaveBeenCalled();
+      const next = applyUpdater(defaultProps.setEmbeddableState, existing);
+      expect(next.filters).toHaveLength(1);
+      expect(next.filters[0]!.value).toBe('France');
+    });
+
+    it('by default (seed-once), preserves existing filters when state is non-empty', () => {
       const existing: FilterBuilderState = {
         operator: filterBuilderAndOrOperator.AND,
         filters: [
@@ -310,10 +335,10 @@ describe('FilterBuilderPro', () => {
           embeddableState={existing}
         />,
       );
-      expect(defaultProps.setEmbeddableState).toHaveBeenCalled();
+      // The adopt effect may still fire, but the updater must bail out and keep
+      // the existing filters untouched (backward-compatible seed-once).
       const next = applyUpdater(defaultProps.setEmbeddableState, existing);
-      expect(next.filters).toHaveLength(1);
-      expect(next.filters[0]!.value).toBe('France');
+      expect(next.filters).toEqual(existing.filters);
     });
 
     it('adopts a new defaultFilters value pushed after mount', () => {
@@ -383,7 +408,7 @@ describe('FilterBuilderPro', () => {
       expect(defaultProps.setEmbeddableState).not.toHaveBeenCalled();
     });
 
-    it('resets to an empty filter list when given a well-formed empty clause', () => {
+    it('with syncDefaultFilters, resets to an empty filter list when given a well-formed empty clause', () => {
       const existing: FilterBuilderState = {
         operator: filterBuilderAndOrOperator.AND,
         filters: [
@@ -405,6 +430,7 @@ describe('FilterBuilderPro', () => {
           dimensionsAndMeasures={[makeDim('country')]}
           defaultFilters={emptyClause}
           embeddableState={existing}
+          syncDefaultFilters
         />,
       );
       expect(defaultProps.setEmbeddableState).toHaveBeenCalled();

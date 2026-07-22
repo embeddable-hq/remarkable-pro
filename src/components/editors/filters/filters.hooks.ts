@@ -16,21 +16,17 @@ const isClauseGroup = (value: unknown): value is FilterBuilderClauseGroup =>
   Array.isArray((value as { clauses?: unknown }).clauses);
 
 /**
- * Adopts the bound `defaultFilters` value into internal state — on mount and,
- * unlike the old seed-once behaviour, whenever the host later pushes a genuinely
- * new value (switching between saved filter sets, or resetting).
+ * Calls `adopt` when the bound `defaultFilters` becomes a genuinely new value —
+ * on mount and whenever the host pushes a change afterwards. `defaultFilters` and
+ * the component's `onChange` share the same platform variable, so edits echo back
+ * in as a "new" value; we ignore anything matching what we last emitted
+ * (`lastEmittedRef`) or last adopted to avoid re-applying our own output.
  *
- * `defaultFilters` and the component's `onChange` are bound to the SAME platform
- * variable, so every internal edit echoes straight back in as a "new"
- * `defaultFilters`. To avoid clobbering the user's edits mid-session we ignore
- * any value that matches what we last emitted (`lastEmittedRef`, kept by the
- * onChange effect) or the value we last adopted.
- *
- * Only a well-formed clause container `{ operator, clauses: [...] }` counts as a
- * signal: `null` / `undefined` / `{}` / sentinel objects (e.g. `Value.noFilter()`)
- * are ignored so a missing binding never wipes state, while an explicit empty
- * `{ clauses: [] }` is honoured as a reset (the caller's `adopt` decides what an
- * empty clause list means — typically a single blank filter).
+ * Only a well-formed clause container `{ operator, clauses: [...] }` is treated as
+ * a signal; `null` / `undefined` / `{}` / sentinels (e.g. `Value.noFilter()`) are
+ * ignored so a missing binding never wipes state. The caller's `adopt` decides
+ * what to do with it — including whether to honour post-mount changes (see
+ * `syncDefaultFilters` in the builders) and what an empty `{ clauses: [] }` means.
  */
 export function useAdoptDefaultFilters(opts: {
   defaultFilters: FilterBuilderClause | undefined;

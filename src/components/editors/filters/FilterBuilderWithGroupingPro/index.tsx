@@ -51,6 +51,7 @@ export type FilterBuilderWithGroupingProProps = {
   dimensionsAndMeasures?: DimensionOrMeasure[];
   onChange?: (value: unknown) => void;
   defaultFilters?: FilterBuilderClause;
+  syncDefaultFilters?: boolean;
 } & EditorCardHeaderProps;
 
 const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) => {
@@ -64,10 +65,14 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
     embeddableState,
     onChange,
     defaultFilters,
+    syncDefaultFilters = false,
   } = props;
 
   const [searchNew, setSearchNew] = useState('');
   const prevFilterValueRef = useRef<unknown>(undefined);
+  // Bumped each time an adopted value is applied, so value inputs (which seed
+  // local state on mount) remount and re-read it. Only used when syncing.
+  const [adoptRevision, setAdoptRevision] = useState(0);
 
   const makeFilter = useCallback(
     (id: number, name: string | null = null): FilterBuilderFilter =>
@@ -81,18 +86,22 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
   const items = storedItems.length ? storedItems : emptyItems;
   const operator = embeddableState?.operator ?? AND;
 
-  // Adopt defaultFilters on mount and whenever the host pushes a genuinely new
-  // value. An empty clause list resets to a single blank filter (getFilterNodes
-  // falls back to emptyItems when items is empty).
   const adoptDefaultFilters = useCallback(
     (clause: FilterBuilderClauseGroup) => {
-      setEmbeddableState?.((prev) =>
-        withItems(prev, clauseToItems(clause, dimensionsAndMeasures), {
+      setEmbeddableState?.((prev) => {
+        // Seed-once (default, backward compatible): only apply while empty.
+        if (!syncDefaultFilters && getFilterNodes(prev).length) {
+          return prev;
+        }
+        return withItems(prev, clauseToItems(clause, dimensionsAndMeasures), {
           operator: clause.operator,
-        }),
-      );
+        });
+      });
+      if (syncDefaultFilters) {
+        setAdoptRevision((revision) => revision + 1);
+      }
     },
-    [dimensionsAndMeasures, setEmbeddableState],
+    [dimensionsAndMeasures, setEmbeddableState, syncDefaultFilters],
   );
 
   useAdoptDefaultFilters({
@@ -289,7 +298,7 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
         )}
         <div className={styles.scroll} ref={scrollRef}>
           {items.map((node, index) => (
-            <React.Fragment key={node.id}>
+            <React.Fragment key={syncDefaultFilters ? `${node.id}-${adoptRevision}` : node.id}>
               {index > 0 && (
                 <FilterBuilderWithGroupingAndOrButton
                   operator={operator}

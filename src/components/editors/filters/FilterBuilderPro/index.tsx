@@ -38,6 +38,7 @@ export type FilterBuilderProProps = {
   dimensionsAndMeasures?: DimensionOrMeasure[];
   onChange?: (value: unknown) => void;
   defaultFilters?: FilterBuilderClause;
+  syncDefaultFilters?: boolean;
 } & EditorCardHeaderProps;
 
 const FilterBuilderPro = (props: FilterBuilderProProps) => {
@@ -51,23 +52,34 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     embeddableState,
     onChange,
     defaultFilters,
+    syncDefaultFilters = false,
   } = props;
 
   const [searchNew, setSearchNew] = useState('');
   const prevFilterValueRef = useRef<unknown>(undefined);
+  // Bumped each time an adopted value is applied. Mixed into the filter row keys
+  // so the value inputs (which seed their own local state on mount) remount and
+  // re-read the adopted value. Only used when syncDefaultFilters is on.
+  const [adoptRevision, setAdoptRevision] = useState(0);
 
-  // Adopt defaultFilters on mount and whenever the host pushes a genuinely new
-  // value. An empty clause list resets to a single blank filter (the render
-  // fallback below turns `filters: []` into one empty row).
   const adoptDefaultFilters = useCallback(
     (clause: FilterBuilderClauseGroup) => {
-      setEmbeddableState?.((prev) => ({
-        ...prev,
-        filters: clauseToFilters(clause, dimensionsAndMeasures),
-        operator: clause.operator,
-      }));
+      setEmbeddableState?.((prev) => {
+        // Seed-once (default, backward compatible): only apply while empty.
+        if (!syncDefaultFilters && prev?.filters?.length) {
+          return prev;
+        }
+        return {
+          ...prev,
+          filters: clauseToFilters(clause, dimensionsAndMeasures),
+          operator: clause.operator,
+        };
+      });
+      if (syncDefaultFilters) {
+        setAdoptRevision((revision) => revision + 1);
+      }
     },
-    [dimensionsAndMeasures, setEmbeddableState],
+    [dimensionsAndMeasures, setEmbeddableState, syncDefaultFilters],
   );
 
   useAdoptDefaultFilters({
@@ -199,7 +211,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
         )}
         <div className={styles.scroll} ref={scrollRef}>
           {filters.map((filter, index) => (
-            <React.Fragment key={filter.id}>
+            <React.Fragment key={syncDefaultFilters ? `${filter.id}-${adoptRevision}` : filter.id}>
               {index > 0 && (
                 <FilterBuilderProAndOrButton
                   operator={operator}
@@ -212,8 +224,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
                 dimensionsAndMeasures={dimensionsAndMeasures}
                 results={
                   (props as Record<string, unknown>)[`filterResults${filter.id}`] as
-                    | DataResponse
-                    | undefined
+                    DataResponse | undefined
                 }
                 theme={theme}
                 onSelectDimensionOrMeasure={(value) => handleSelectDimensionOrMeasure(index, value)}
