@@ -518,4 +518,126 @@ describe('FilterBuilderWithGroupingPro', () => {
     });
     expect(next.operator).toBe(filterBuilderAndOrOperator.OR);
   });
+
+  it('with syncDefaultFilters, adopts a genuinely new defaultFilters even when state already has items', () => {
+    const existing: FilterBuilderGroupingState = {
+      operator: filterBuilderAndOrOperator.AND,
+      items: [
+        makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), operator: 'is', value: 'UK' }),
+      ],
+    };
+    const defaultFilters: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [{ property: 'country', operator: 'equals' as never, value: 'AU' }],
+    };
+    render(
+      <FilterBuilderWithGroupingPro
+        {...defaultProps}
+        dimensionsAndMeasures={[makeDim('country')]}
+        defaultFilters={defaultFilters}
+        embeddableState={existing}
+        syncDefaultFilters
+      />,
+    );
+    expect(defaultProps.setEmbeddableState).toHaveBeenCalled();
+    const next = applyUpdater(defaultProps.setEmbeddableState, existing);
+    expect(itemsOf(next)).toHaveLength(1);
+    expect((itemsOf(next)[0] as FilterBuilderFilter).value).toBe('AU');
+  });
+
+  it('by default (seed-once), preserves existing items when state is non-empty', () => {
+    const existing: FilterBuilderGroupingState = {
+      operator: filterBuilderAndOrOperator.AND,
+      items: [
+        makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), operator: 'is', value: 'UK' }),
+      ],
+    };
+    const defaultFilters: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [{ property: 'country', operator: 'equals' as never, value: 'AU' }],
+    };
+    render(
+      <FilterBuilderWithGroupingPro
+        {...defaultProps}
+        dimensionsAndMeasures={[makeDim('country')]}
+        defaultFilters={defaultFilters}
+        embeddableState={existing}
+      />,
+    );
+    const next = applyUpdater(defaultProps.setEmbeddableState, existing);
+    expect(itemsOf(next)).toEqual(existing.items);
+  });
+
+  it('ignores its own onChange echo coming back through the bound variable', () => {
+    const existing: FilterBuilderGroupingState = {
+      operator: filterBuilderAndOrOperator.AND,
+      items: [
+        makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), operator: 'is', value: 'UK' }),
+      ],
+    };
+    const { rerender } = render(
+      <FilterBuilderWithGroupingPro
+        {...defaultProps}
+        dimensionsAndMeasures={[makeDim('country')]}
+        embeddableState={existing}
+      />,
+    );
+    const echoed = defaultProps.onChange.mock.calls.at(-1)?.[0] as FilterBuilderClause;
+    expect(echoed).toBeTruthy();
+
+    defaultProps.setEmbeddableState.mockClear();
+
+    rerender(
+      <FilterBuilderWithGroupingPro
+        {...defaultProps}
+        dimensionsAndMeasures={[makeDim('country')]}
+        embeddableState={existing}
+        defaultFilters={echoed}
+      />,
+    );
+    expect(defaultProps.setEmbeddableState).not.toHaveBeenCalled();
+  });
+
+  it('with syncDefaultFilters, resets to an empty item list when given a well-formed empty clause', () => {
+    const existing: FilterBuilderGroupingState = {
+      operator: filterBuilderAndOrOperator.AND,
+      items: [
+        makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), operator: 'is', value: 'UK' }),
+      ],
+    };
+    const emptyClause: FilterBuilderClause = {
+      operator: filterBuilderAndOrOperator.AND,
+      clauses: [],
+    };
+    render(
+      <FilterBuilderWithGroupingPro
+        {...defaultProps}
+        dimensionsAndMeasures={[makeDim('country')]}
+        defaultFilters={emptyClause}
+        embeddableState={existing}
+        syncDefaultFilters
+      />,
+    );
+    expect(defaultProps.setEmbeddableState).toHaveBeenCalled();
+    const next = applyUpdater(defaultProps.setEmbeddableState, existing);
+    expect(itemsOf(next)).toHaveLength(0);
+  });
+
+  it('ignores a null defaultFilters and does not wipe existing items', () => {
+    const existing: FilterBuilderGroupingState = {
+      operator: filterBuilderAndOrOperator.AND,
+      items: [
+        makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), operator: 'is', value: 'UK' }),
+      ],
+    };
+    render(
+      <FilterBuilderWithGroupingPro
+        {...defaultProps}
+        dimensionsAndMeasures={[makeDim('country')]}
+        defaultFilters={null as unknown as FilterBuilderClause}
+        embeddableState={existing}
+      />,
+    );
+    expect(defaultProps.setEmbeddableState).not.toHaveBeenCalled();
+  });
 });

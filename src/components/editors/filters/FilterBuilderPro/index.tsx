@@ -24,7 +24,11 @@ import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../../utils/dimensionsAndMeasures.utils';
 import { resolveI18nProps } from '../../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../../shared/EditorCard/EditorCard';
-import { useFilterBuilderScroll } from '../filters.hooks';
+import {
+  FilterBuilderClauseGroup,
+  useAdoptDefaultFilters,
+  useFilterBuilderScroll,
+} from '../filters.hooks';
 
 export type FilterBuilderProProps = {
   embeddableState?: FilterBuilderState;
@@ -34,6 +38,7 @@ export type FilterBuilderProProps = {
   dimensionsAndMeasures?: DimensionOrMeasure[];
   onChange?: (value: unknown) => void;
   defaultFilters?: FilterBuilderClause;
+  syncDefaultFilters?: boolean;
 } & EditorCardHeaderProps;
 
 const FilterBuilderPro = (props: FilterBuilderProProps) => {
@@ -47,28 +52,42 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     embeddableState,
     onChange,
     defaultFilters,
+    syncDefaultFilters = false,
   } = props;
 
   const [searchNew, setSearchNew] = useState('');
   const prevFilterValueRef = useRef<unknown>(undefined);
+  // Bumped each time an adopted value is applied. Mixed into the filter row keys
+  // so the value inputs (which seed their own local state on mount) remount and
+  // re-read the adopted value. Only used when syncDefaultFilters is on.
+  const [adoptRevision, setAdoptRevision] = useState(0);
 
-  useEffect(() => {
-    if (!defaultFilters || !dimensionsAndMeasures?.length) {
-      return;
-    }
-
-    const newFilters = clauseToFilters(defaultFilters, dimensionsAndMeasures);
-
-    if (newFilters.length > 0) {
+  const adoptDefaultFilters = useCallback(
+    (clause: FilterBuilderClauseGroup) => {
       setEmbeddableState?.((prev) => {
-        if (prev?.filters?.length) {
+        // Seed-once (default, backward compatible): only apply while empty.
+        if (!syncDefaultFilters && prev?.filters?.length) {
           return prev;
         }
-
-        return { ...prev, filters: newFilters };
+        return {
+          ...prev,
+          filters: clauseToFilters(clause, dimensionsAndMeasures),
+          operator: clause.operator,
+        };
       });
-    }
-  }, [defaultFilters, dimensionsAndMeasures, setEmbeddableState]);
+      if (syncDefaultFilters) {
+        setAdoptRevision((revision) => revision + 1);
+      }
+    },
+    [dimensionsAndMeasures, setEmbeddableState, syncDefaultFilters],
+  );
+
+  useAdoptDefaultFilters({
+    defaultFilters,
+    dimensionsAndMeasures,
+    lastEmittedRef: prevFilterValueRef,
+    adopt: adoptDefaultFilters,
+  });
 
   const lastFilterId = embeddableState?.filters?.[embeddableState.filters.length - 1]?.id ?? 0;
 
@@ -192,7 +211,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
         )}
         <div className={styles.scroll} ref={scrollRef}>
           {filters.map((filter, index) => (
-            <React.Fragment key={filter.id}>
+            <React.Fragment key={syncDefaultFilters ? `${filter.id}-${adoptRevision}` : filter.id}>
               {index > 0 && (
                 <FilterBuilderProAndOrButton
                   operator={operator}

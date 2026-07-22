@@ -135,4 +135,57 @@ describe('FilterBuilderItemNumberValueField', () => {
     );
     expect(onSelectValue).toHaveBeenCalledWith(99);
   });
+
+  // Root cause of the "stale filter value" bug: the input seeds its local state
+  // from filter.value on mount only, so an externally-adopted change on the SAME
+  // instance is not reflected. This is why updating embeddableState (what
+  // useAdoptDefaultFilters does) was not sufficient on its own.
+  it('does not reflect an external filter.value change on the same instance', () => {
+    const { rerender, getByRole } = render(
+      <FilterBuilderItemNumberValueField
+        styles={styles}
+        filter={makeFilter({ value: 67 })}
+        onSelectValue={vi.fn()}
+      />,
+    );
+    expect(getByRole('spinbutton')).toHaveValue(67);
+
+    rerender(
+      <FilterBuilderItemNumberValueField
+        styles={styles}
+        filter={makeFilter({ value: 100 })}
+        onSelectValue={vi.fn()}
+      />,
+    );
+    expect(getByRole('spinbutton')).toHaveValue(67);
+  });
+
+  // The fix mechanism: FilterBuilderPro mixes an adopt revision into the filter
+  // row key when syncDefaultFilters is on, so an adopted change remounts the field
+  // and it re-seeds from the new filter.value.
+  it('reflects the new value when its key changes (remount)', () => {
+    const { rerender, getByRole } = render(
+      <div>
+        <FilterBuilderItemNumberValueField
+          key="rev-0"
+          styles={styles}
+          filter={makeFilter({ value: 67 })}
+          onSelectValue={vi.fn()}
+        />
+      </div>,
+    );
+    expect(getByRole('spinbutton')).toHaveValue(67);
+
+    rerender(
+      <div>
+        <FilterBuilderItemNumberValueField
+          key="rev-1"
+          styles={styles}
+          filter={makeFilter({ value: 100 })}
+          onSelectValue={vi.fn()}
+        />
+      </div>,
+    );
+    expect(getByRole('spinbutton')).toHaveValue(100);
+  });
 });

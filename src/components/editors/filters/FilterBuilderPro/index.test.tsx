@@ -288,7 +288,34 @@ describe('FilterBuilderPro', () => {
       expect(next.filters[0]!.value).toBe('France');
     });
 
-    it('preserves existing filters when embeddableState already has filters', () => {
+    it('with syncDefaultFilters, adopts a genuinely new defaultFilters even when state already has filters', () => {
+      const existing: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
+        filters: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'UK',
+          }),
+        ],
+      };
+      render(
+        <FilterBuilderPro
+          {...defaultProps}
+          dimensionsAndMeasures={[makeDim('country')]}
+          defaultFilters={defaultFilterClause}
+          embeddableState={existing}
+          syncDefaultFilters
+        />,
+      );
+      expect(defaultProps.setEmbeddableState).toHaveBeenCalled();
+      const next = applyUpdater(defaultProps.setEmbeddableState, existing);
+      expect(next.filters).toHaveLength(1);
+      expect(next.filters[0]!.value).toBe('France');
+    });
+
+    it('by default (seed-once), preserves existing filters when state is non-empty', () => {
       const existing: FilterBuilderState = {
         operator: filterBuilderAndOrOperator.AND,
         filters: [
@@ -308,16 +335,91 @@ describe('FilterBuilderPro', () => {
           embeddableState={existing}
         />,
       );
-      const seedCall = defaultProps.setEmbeddableState.mock.calls.find(
-        (call) => typeof call[0] === 'function',
-      );
-      if (seedCall) {
-        const result = (seedCall[0] as (s: FilterBuilderState) => FilterBuilderState)(existing);
-        expect(result.filters).toEqual(existing.filters);
-      }
+      // The adopt effect may still fire, but the updater must bail out and keep
+      // the existing filters untouched (backward-compatible seed-once).
+      const next = applyUpdater(defaultProps.setEmbeddableState, existing);
+      expect(next.filters).toEqual(existing.filters);
     });
 
-    it('does not seed filters when defaultFilters has no matching clauses', () => {
+    it('adopts a new defaultFilters value pushed after mount', () => {
+      const { rerender } = render(
+        <FilterBuilderPro
+          {...defaultProps}
+          dimensionsAndMeasures={[makeDim('country')]}
+          defaultFilters={defaultFilterClause}
+        />,
+      );
+
+      const nextClause: FilterBuilderClause = {
+        operator: filterBuilderAndOrOperator.AND,
+        clauses: [{ property: 'country', operator: 'equals' as never, value: 'Spain' }],
+      };
+      defaultProps.setEmbeddableState.mockClear();
+
+      rerender(
+        <FilterBuilderPro
+          {...defaultProps}
+          dimensionsAndMeasures={[makeDim('country')]}
+          defaultFilters={nextClause}
+        />,
+      );
+
+      expect(defaultProps.setEmbeddableState).toHaveBeenCalled();
+      const next = applyUpdater(defaultProps.setEmbeddableState, emptyFilterState());
+      expect(next.filters[0]!.value).toBe('Spain');
+    });
+
+    it('ignores its own onChange echo coming back through the bound variable', () => {
+      const existing: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
+        filters: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'UK',
+          }),
+        ],
+      };
+      // First mount without defaultFilters so the component emits its current
+      // clause; that emitted value is what the platform feeds back as defaultFilters.
+      const { rerender } = render(
+        <FilterBuilderPro
+          {...defaultProps}
+          dimensionsAndMeasures={[makeDim('country')]}
+          embeddableState={existing}
+        />,
+      );
+      const echoed = defaultProps.onChange.mock.calls.at(-1)?.[0] as FilterBuilderClause;
+      expect(echoed).toBeTruthy();
+
+      defaultProps.setEmbeddableState.mockClear();
+
+      rerender(
+        <FilterBuilderPro
+          {...defaultProps}
+          dimensionsAndMeasures={[makeDim('country')]}
+          embeddableState={existing}
+          defaultFilters={echoed}
+        />,
+      );
+
+      // The echo must not trigger a re-adoption that would reset ids/search.
+      expect(defaultProps.setEmbeddableState).not.toHaveBeenCalled();
+    });
+
+    it('with syncDefaultFilters, resets to an empty filter list when given a well-formed empty clause', () => {
+      const existing: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
+        filters: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'UK',
+          }),
+        ],
+      };
       const emptyClause: FilterBuilderClause = {
         operator: filterBuilderAndOrOperator.AND,
         clauses: [],
@@ -327,16 +429,36 @@ describe('FilterBuilderPro', () => {
           {...defaultProps}
           dimensionsAndMeasures={[makeDim('country')]}
           defaultFilters={emptyClause}
+          embeddableState={existing}
+          syncDefaultFilters
         />,
       );
-      const seedCall = defaultProps.setEmbeddableState.mock.calls.find((call) => {
-        if (typeof call[0] !== 'function') return false;
-        const result = (call[0] as (s: FilterBuilderState) => FilterBuilderState)(
-          emptyFilterState(),
-        );
-        return Array.isArray(result.filters) && result.filters.length > 0;
-      });
-      expect(seedCall).toBeUndefined();
+      expect(defaultProps.setEmbeddableState).toHaveBeenCalled();
+      const next = applyUpdater(defaultProps.setEmbeddableState, existing);
+      expect(next.filters).toHaveLength(0);
+    });
+
+    it('ignores a null defaultFilters and does not wipe existing filters', () => {
+      const existing: FilterBuilderState = {
+        operator: filterBuilderAndOrOperator.AND,
+        filters: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'UK',
+          }),
+        ],
+      };
+      render(
+        <FilterBuilderPro
+          {...defaultProps}
+          dimensionsAndMeasures={[makeDim('country')]}
+          defaultFilters={null as unknown as FilterBuilderClause}
+          embeddableState={existing}
+        />,
+      );
+      expect(defaultProps.setEmbeddableState).not.toHaveBeenCalled();
     });
   });
 
