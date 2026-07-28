@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TextField, useDebounce } from '@embeddable.com/remarkable-ui';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 import { resolveI18nProps } from '../../component.utils';
@@ -22,9 +22,12 @@ const TextFieldPro = (props: TextFieldProProps) => {
   const { value = '', componentName, trackingId, onChange } = props;
 
   const [currentValue, setCurrentValue] = useState(value);
+  const hasUserInteracted = useRef(false);
 
   const debouncedUpdateState = useDebounce((newValue: string) => {
-    dispatchEventUserInteraction({ componentName, trackingId, value: newValue });
+    if (hasUserInteracted.current) {
+      dispatchEventUserInteraction({ componentName, trackingId, value: newValue });
+    }
     onChange?.(newValue);
   });
 
@@ -32,14 +35,14 @@ const TextFieldPro = (props: TextFieldProProps) => {
     debouncedUpdateState(currentValue);
   }, [currentValue, debouncedUpdateState]);
 
+  const handleChange = (newValue: string) => {
+    hasUserInteracted.current = true;
+    setCurrentValue(newValue);
+  };
+
   return (
     <EditorCard title={title} description={description} tooltip={tooltip}>
-      <TextField
-        value={currentValue}
-        placeholder={placeholder}
-        onChange={setCurrentValue}
-        clearable
-      />
+      <TextField value={currentValue} placeholder={placeholder} onChange={handleChange} clearable />
     </EditorCard>
   );
 };

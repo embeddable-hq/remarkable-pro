@@ -25,8 +25,10 @@ const MeasureSingleSelectFieldPro = (props: MeasureSingleSelectFieldProProps) =>
   const { selectedMeasure, measureOptions, clearable, componentName, trackingId, onChange } = props;
   const { title, description, tooltip, placeholder } = resolveI18nProps(props);
 
-  const handleChange = (value: Measure | undefined) => {
-    dispatchEventUserInteraction({ componentName, trackingId, value });
+  const handleChange = (value: Measure | undefined, isUserAction?: boolean) => {
+    if (isUserAction) {
+      dispatchEventUserInteraction({ componentName, trackingId, value });
+    }
     onChange(value);
   };
 

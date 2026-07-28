@@ -13,6 +13,7 @@ import { getChartColors, ChartClickArgs } from '@embeddable.com/remarkable-ui';
 import { PieChartClickArg } from './pies.types';
 import { getTimeRangeFromDimensionValue } from '../../utils/dimension.utils';
 import { dispatchEventUserInteraction } from '../../../utils/events.utils';
+import { DimensionValueOrTimeRange } from '../charts.types';
 import { i18n } from '../../../theme/i18n/i18n';
 
 export const createPieClickHandler = ({
@@ -36,8 +37,10 @@ export const createPieClickHandler = ({
     let dimensionValue = results.data?.[element.index]?.[dimension.name] as string | undefined;
     const dimensionTimeRange = getTimeRangeFromDimensionValue({ value: dimensionValue, dimension });
 
+    let dimensionValueOrTimeRange: DimensionValueOrTimeRange = dimensionValue;
     if (dimensionTimeRange) {
       dimensionValue = undefined;
+      dimensionValueOrTimeRange = dimensionTimeRange;
     }
 
     const measureValue = results.data?.[element.index]?.[measure.name];
@@ -46,8 +49,7 @@ export const createPieClickHandler = ({
       componentName,
       trackingId,
       dimension,
-      dimensionValue,
-      dimensionTimeRange,
+      dimensionValue: dimensionValueOrTimeRange,
       measure,
       measureValue,
     });

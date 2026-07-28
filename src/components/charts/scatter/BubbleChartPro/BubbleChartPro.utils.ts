@@ -8,6 +8,7 @@ import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getChartColors, getStyleNumber } from '@embeddable.com/remarkable-ui';
 import type { ChartClickArgs, BubbleDatasetExtended } from '@embeddable.com/remarkable-ui';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
+import { DimensionValueOrTimeRange } from '../../charts.types';
 import type { BubbleChartProOptionsClickArg, BubblePoint } from './BubbleChartPro.types';
 import { getDimensionFieldName } from '../../../../utils/data.utils';
 import {
@@ -191,6 +192,17 @@ export const createBubbleClickHandler = ({
     );
     if (!clickData) return;
 
+    let pointDimensionValueOrTimeRange: DimensionValueOrTimeRange =
+      clickData.pointDimensionValue ?? undefined;
+    if (clickData.pointDimensionTimeRange) {
+      pointDimensionValueOrTimeRange = clickData.pointDimensionTimeRange;
+    }
+    let groupByDimensionValueOrTimeRange: DimensionValueOrTimeRange =
+      clickData.groupByDimensionValue ?? undefined;
+    if (clickData.groupByDimensionTimeRange) {
+      groupByDimensionValueOrTimeRange = clickData.groupByDimensionTimeRange;
+    }
+
     dispatchEventUserInteraction({
       componentName,
       trackingId,
@@ -199,7 +211,11 @@ export const createBubbleClickHandler = ({
       xMeasure,
       yMeasure,
       sizeMeasure,
-      ...clickData,
+      xMeasureValue: clickData.xMeasureValue,
+      yMeasureValue: clickData.yMeasureValue,
+      sizeMeasureValue: clickData.sizeMeasureValue,
+      pointDimensionValue: pointDimensionValueOrTimeRange,
+      groupByDimensionValue: groupByDimensionValueOrTimeRange,
     });
 
     onPointClick?.(clickData);

@@ -16,6 +16,7 @@ import { isColorValid, setColorAlpha } from '../../../../utils/color.utils';
 import { getDimensionWithoutTruncation } from '../../charts.utils';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
+import { DimensionValueOrTimeRange } from '../../charts.types';
 import { LineChartProOptionsClick } from '../lines.types';
 
 const AXIS_ID_MAIN = 'mainAxis';
@@ -410,8 +411,10 @@ export const createComparisonClickHandler = ({
       dimension,
     });
 
+    let dimensionValueOrTimeRange: DimensionValueOrTimeRange = dimensionValue;
     if (dimensionTimeRange) {
       dimensionValue = undefined;
+      dimensionValueOrTimeRange = dimensionTimeRange;
     }
 
     const rawMeasureValue = data.datasets[element.datasetIndex]?.data?.[element.index];
@@ -429,8 +432,7 @@ export const createComparisonClickHandler = ({
       componentName,
       trackingId,
       dimension,
-      dimensionValue,
-      dimensionTimeRange,
+      dimensionValue: dimensionValueOrTimeRange,
       measures,
       measureValues,
       measure,

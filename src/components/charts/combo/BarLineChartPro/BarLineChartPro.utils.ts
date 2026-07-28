@@ -15,6 +15,7 @@ import {
 import { getBarChartProOptions } from '../../bars/bars.utils';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
+import { DimensionValueOrTimeRange } from '../../charts.types';
 import { BarLineChartProClickArg } from '../combo.types';
 
 export const getBarLineChartProData = (
@@ -274,8 +275,10 @@ export const createBarLineClickHandler = ({
       stateGranularity: granularity,
       dimension,
     });
+    let dimensionValueOrTimeRange: DimensionValueOrTimeRange = dimensionValue;
     if (dimensionTimeRange) {
       dimensionValue = undefined;
+      dimensionValueOrTimeRange = dimensionTimeRange;
     }
 
     const buildMeasureValues = (measuresList: Measure[], offset: number) =>
@@ -293,8 +296,7 @@ export const createBarLineClickHandler = ({
       componentName,
       trackingId,
       dimension,
-      dimensionValue,
-      dimensionTimeRange,
+      dimensionValue: dimensionValueOrTimeRange,
       barMeasures,
       lineMeasures,
       barMeasureValues,

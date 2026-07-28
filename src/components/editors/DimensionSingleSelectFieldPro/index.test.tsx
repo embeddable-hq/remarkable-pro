@@ -24,9 +24,14 @@ vi.mock(
   () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     DimensionAndMeasureSingleSelectField: ({ onChange }: Record<string, any>) => (
-      <button data-testid="field" onClick={() => onChange({ name: 'revenue' })}>
-        field
-      </button>
+      <>
+        <button data-testid="field" onClick={() => onChange({ name: 'revenue' }, true)}>
+          field
+        </button>
+        <button data-testid="field-auto" onClick={() => onChange({ name: 'revenue' })}>
+          field-auto
+        </button>
+      </>
     ),
   }),
 );
@@ -57,5 +62,25 @@ describe('DimensionSingleSelectFieldPro', () => {
       trackingId: 'track-1',
       value: { name: 'revenue' },
     });
+  });
+
+  it('does not dispatch a user interaction event for a non-user-initiated change (e.g. auto-select)', () => {
+    const onChange = vi.fn();
+    const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+    dispatchSpy.mockClear();
+
+    render(
+      <DimensionSingleSelectFieldPro
+        dimensionOptions={[dimensionOption]}
+        onChange={onChange}
+        componentName="DimensionSingleSelectFieldPro"
+        trackingId="track-1"
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId('field-auto'));
+
+    expect(onChange).toHaveBeenCalledWith({ name: 'revenue' });
+    expect(dispatchSpy).not.toHaveBeenCalled();
   });
 });

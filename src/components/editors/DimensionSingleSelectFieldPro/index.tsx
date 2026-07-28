@@ -26,8 +26,10 @@ const DimensionSingleSelectFieldPro = (props: DimensionSingleSelectFieldProProps
     props;
   const { title, description, tooltip, placeholder } = resolveI18nProps(props);
 
-  const handleChange = (value: Dimension | undefined) => {
-    dispatchEventUserInteraction({ componentName, trackingId, value });
+  const handleChange = (value: Dimension | undefined, isUserAction?: boolean) => {
+    if (isUserAction) {
+      dispatchEventUserInteraction({ componentName, trackingId, value });
+    }
     onChange(value);
   };
 

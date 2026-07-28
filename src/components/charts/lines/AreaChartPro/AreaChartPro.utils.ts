@@ -9,6 +9,7 @@ import {
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 import { setColorAlpha } from '../../../../utils/color.utils';
+import { DimensionValueOrTimeRange } from '../../charts.types';
 import { AreaChartProAreaClickArg, AreaChartProPointClickArg } from '../lines.types';
 import { ChartClickArgs } from '@embeddable.com/remarkable-ui';
 
@@ -76,7 +77,7 @@ const handlePointClick = ({
   granularity: Granularity | undefined;
   componentName: string | undefined;
   trackingId: string | undefined;
-  onPointClicked: (arg: AreaChartProPointClickArg) => void;
+  onPointClicked?: (arg: AreaChartProPointClickArg) => void;
 }): boolean => {
   if (!elementAtEvent.length) return false;
 
@@ -93,38 +94,40 @@ const handlePointClick = ({
     dimension,
   });
 
+  let dimensionValueOrTimeRange: DimensionValueOrTimeRange = dimensionValue;
   if (dimensionTimeRange) {
     dimensionValue = undefined;
+    dimensionValueOrTimeRange = dimensionTimeRange;
   }
 
   const measureValue = (data?.datasets?.[clicked.datasetIndex] as { data?: unknown[] })?.data?.[
     clicked.index
   ] as number | undefined;
 
-  let dimensionGroupByValue = (data?.datasets?.[clicked.datasetIndex] as { rawLabel?: string })
+  const dimensionGroupByValue = (data?.datasets?.[clicked.datasetIndex] as { rawLabel?: string })
     ?.rawLabel;
   const dimensionGroupByTimeRange = getTimeRangeFromDimensionValue({
     value: dimensionGroupByValue,
     dimension: groupBy,
   });
 
+  let dimensionGroupByValueOrTimeRange: DimensionValueOrTimeRange = dimensionGroupByValue;
   if (dimensionGroupByTimeRange) {
-    dimensionGroupByValue = undefined;
+    dimensionGroupByValueOrTimeRange = dimensionGroupByTimeRange;
   }
 
   dispatchEventUserInteraction({
     componentName,
     trackingId,
     dimension,
-    dimensionValue,
-    dimensionTimeRange,
+    dimensionValue: dimensionValueOrTimeRange,
     dimensionGroupBy: groupBy,
-    dimensionGroupByValue,
+    dimensionGroupByValue: dimensionGroupByValueOrTimeRange,
     measure,
     measureValue,
   });
 
-  onPointClicked({
+  onPointClicked?.({
     dimensionValue,
     dimensionTimeRange,
     measureValue,
@@ -149,7 +152,7 @@ const handleAreaClick = ({
   groupBy: Dimension;
   componentName: string | undefined;
   trackingId: string | undefined;
-  onAreaClicked: (arg: AreaChartProAreaClickArg) => void;
+  onAreaClicked?: (arg: AreaChartProAreaClickArg) => void;
 }): void => {
   const chartBottom = chart.chartArea?.bottom ?? Infinity;
 
@@ -165,19 +168,20 @@ const handleAreaClick = ({
       dimension: groupBy,
     });
 
+    let groupingDimensionValueOrTimeRange: DimensionValueOrTimeRange = groupingDimensionValue;
     if (groupingDimensionTimeRange) {
       groupingDimensionValue = undefined;
+      groupingDimensionValueOrTimeRange = groupingDimensionTimeRange;
     }
 
     dispatchEventUserInteraction({
       componentName,
       trackingId,
       dimension: groupBy,
-      groupingDimensionValue,
-      groupingDimensionTimeRange,
+      dimensionValue: groupingDimensionValueOrTimeRange,
     });
 
-    onAreaClicked({
+    onAreaClicked?.({
       groupingDimensionValue,
       groupingDimensionTimeRange,
     });
@@ -215,7 +219,6 @@ export const createAreaClickHandler =
     const clickY = event.nativeEvent.offsetY;
 
     if (
-      onPointClicked &&
       handlePointClick({
         chart,
         elementAtEvent,
@@ -231,17 +234,16 @@ export const createAreaClickHandler =
       })
     )
       return;
-    if (onAreaClicked)
-      handleAreaClick({
-        chart,
-        clickX,
-        clickY,
-        data,
-        groupBy,
-        componentName,
-        trackingId,
-        onAreaClicked,
-      });
+    handleAreaClick({
+      chart,
+      clickX,
+      clickY,
+      data,
+      groupBy,
+      componentName,
+      trackingId,
+      onAreaClicked,
+    });
   };
 
 export const getAreaChartProOptions = (

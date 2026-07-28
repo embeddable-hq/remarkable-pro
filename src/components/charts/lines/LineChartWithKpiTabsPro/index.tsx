@@ -78,7 +78,7 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
   const handleClick = createSimpleClickHandler({
     data,
     dimension: xAxis,
-    measures,
+    measures: activeMeasure ? [activeMeasure] : [],
     granularity,
     componentName,
     trackingId,

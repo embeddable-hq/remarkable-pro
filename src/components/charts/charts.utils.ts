@@ -3,7 +3,7 @@ import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/c
 import { getTimeRangeFromDimensionValue } from '../utils/dimension.utils';
 import { dispatchEventUserInteraction } from '../../utils/events.utils';
 import { i18n } from '../../theme/i18n/i18n';
-import { GroupedClickArg, SimpleClickArg } from './charts.types';
+import { DimensionValueOrTimeRange, GroupedClickArg, SimpleClickArg } from './charts.types';
 import { ChartData } from 'chart.js';
 
 export const getDimensionWithoutTruncation = (dimension: Dimension): Dimension => ({
@@ -86,8 +86,10 @@ export const createSimpleClickHandler = ({
       stateGranularity: granularity,
       dimension,
     });
+    let dimensionValueOrTimeRange: DimensionValueOrTimeRange = dimensionValue;
     if (dimensionTimeRange) {
       dimensionValue = undefined;
+      dimensionValueOrTimeRange = dimensionTimeRange;
     }
     const measureValues = (measures ?? []).reduce<Record<string, unknown>>(
       (acc, measure, index) => {
@@ -100,8 +102,7 @@ export const createSimpleClickHandler = ({
       componentName,
       trackingId,
       dimension,
-      dimensionValue,
-      dimensionTimeRange,
+      dimensionValue: dimensionValueOrTimeRange,
       measures,
       measureValues,
     });
@@ -145,8 +146,10 @@ export const createGroupedClickHandler = ({
       dimension,
     });
 
+    let dimensionValueOrTimeRange: DimensionValueOrTimeRange = dimensionValue;
     if (dimensionTimeRange) {
       dimensionValue = undefined;
+      dimensionValueOrTimeRange = dimensionTimeRange;
     }
 
     const groupingDimensionTimeRange = getTimeRangeFromDimensionValue({
@@ -154,16 +157,20 @@ export const createGroupedClickHandler = ({
       dimension: groupBy,
     });
 
+    let dimensionGroupByValueOrTimeRange: DimensionValueOrTimeRange = groupingDimensionValue;
+    if (groupingDimensionTimeRange) {
+      dimensionGroupByValueOrTimeRange = groupingDimensionTimeRange;
+    }
+
     const measureValue = data?.datasets?.[element.datasetIndex]?.data?.[element.index];
 
     dispatchEventUserInteraction({
       componentName,
       trackingId,
       dimension,
-      dimensionValue,
-      dimensionTimeRange,
+      dimensionValue: dimensionValueOrTimeRange,
       dimensionGroupBy: groupBy,
-      dimensionGroupByValue: groupingDimensionValue,
+      dimensionGroupByValue: dimensionGroupByValueOrTimeRange,
       measure,
       measureValue,
     });

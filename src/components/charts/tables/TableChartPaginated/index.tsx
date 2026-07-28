@@ -18,6 +18,7 @@ import {
 } from '@embeddable.com/core';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
+import { DimensionValueOrTimeRange } from '../../charts.types';
 import {
   getStyleNumber,
   getTableTotalPages,
@@ -137,8 +138,10 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
         })
       : undefined;
 
+    let dimensionValueOrTimeRange: DimensionValueOrTimeRange = dimensionValue ?? undefined;
     if (dimensionTimeRange) {
       dimensionValue = undefined;
+      dimensionValueOrTimeRange = dimensionTimeRange;
     }
 
     const measures = dimensionsAndMeasures.filter(isMeasure);
@@ -157,8 +160,7 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
       componentName,
       trackingId,
       dimensionClick: clickDimension,
-      dimensionClickValue: dimensionValue,
-      dimensionTimeRange,
+      dimensionClickValue: dimensionValueOrTimeRange,
       dimensions,
       dimensionValues,
       measures,

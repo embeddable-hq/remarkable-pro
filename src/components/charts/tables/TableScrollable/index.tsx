@@ -19,6 +19,7 @@ import {
 } from '@embeddable.com/core';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
+import { DimensionValueOrTimeRange } from '../../charts.types';
 import { TableScrollable, TableScrollableHandle, TableSort } from '@embeddable.com/remarkable-ui';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getTableHeaders, getTableRows } from '../tables.utils';
@@ -154,8 +155,10 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
         })
       : undefined;
 
+    let dimensionValueOrTimeRange: DimensionValueOrTimeRange = dimensionValue ?? undefined;
     if (dimensionTimeRange) {
       dimensionValue = undefined;
+      dimensionValueOrTimeRange = dimensionTimeRange;
     }
 
     const measures = dimensionsAndMeasures.filter(isMeasure);
@@ -174,8 +177,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
       componentName,
       trackingId,
       dimension: clickDimension,
-      dimensionValue,
-      dimensionTimeRange,
+      dimensionValue: dimensionValueOrTimeRange,
       dimensions,
       dimensionValues,
       measures,

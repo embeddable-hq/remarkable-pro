@@ -19,6 +19,7 @@ import { useGetTableSortedResults } from '../tables.hooks';
 import { useCallback } from 'react';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
+import { DimensionValueOrTimeRange } from '../../charts.types';
 import { HeatMapCellClickArg, HeatMapProOptionsClickArg } from './HeatMapPro.types';
 
 export type HeatMapProProps = {
@@ -149,11 +150,15 @@ const HeatMapPro = (props: HeatMapProProps) => {
           row[columnDimension.name] === rawColumnDimensionValue,
       )?.[measure.name];
 
+      let rowDimensionValueOrTimeRange: DimensionValueOrTimeRange = rowDimensionValue;
       if (rowDimensionTimeRange) {
         rowDimensionValue = undefined;
+        rowDimensionValueOrTimeRange = rowDimensionTimeRange;
       }
+      let columnDimensionValueOrTimeRange: DimensionValueOrTimeRange = columnDimensionValue;
       if (columnDimensionTimeRange) {
         columnDimensionValue = undefined;
+        columnDimensionValueOrTimeRange = columnDimensionTimeRange;
       }
 
       dispatchEventUserInteraction({
@@ -161,10 +166,8 @@ const HeatMapPro = (props: HeatMapProProps) => {
         trackingId,
         rowDimension,
         columnDimension,
-        rowDimensionValue,
-        rowDimensionTimeRange,
-        columnDimensionValue,
-        columnDimensionTimeRange,
+        rowDimensionValue: rowDimensionValueOrTimeRange,
+        columnDimensionValue: columnDimensionValueOrTimeRange,
         measure,
         measureValue,
       });

@@ -12,6 +12,7 @@ import type {
   ScatterDatasetExtended,
 } from '@embeddable.com/remarkable-ui';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
+import { DimensionValueOrTimeRange } from '../../charts.types';
 import type { ScatterChartProOptionsClickArg } from './ScatterChartPro.types';
 import { getDimensionFieldName } from '../../../../utils/data.utils';
 import {
@@ -190,6 +191,17 @@ export const createScatterClickHandler = ({
     );
     if (!clickData) return;
 
+    let pointDimensionValueOrTimeRange: DimensionValueOrTimeRange =
+      clickData.pointDimensionValue ?? undefined;
+    if (clickData.pointDimensionTimeRange) {
+      pointDimensionValueOrTimeRange = clickData.pointDimensionTimeRange;
+    }
+    let groupByDimensionValueOrTimeRange: DimensionValueOrTimeRange =
+      clickData.groupByDimensionValue ?? undefined;
+    if (clickData.groupByDimensionTimeRange) {
+      groupByDimensionValueOrTimeRange = clickData.groupByDimensionTimeRange;
+    }
+
     dispatchEventUserInteraction({
       componentName,
       trackingId,
@@ -197,7 +209,10 @@ export const createScatterClickHandler = ({
       groupByDimension,
       xMeasure,
       yMeasure,
-      ...clickData,
+      xMeasureValue: clickData.xMeasureValue,
+      yMeasureValue: clickData.yMeasureValue,
+      pointDimensionValue: pointDimensionValueOrTimeRange,
+      groupByDimensionValue: groupByDimensionValueOrTimeRange,
     });
 
     onPointClick?.(clickData);
