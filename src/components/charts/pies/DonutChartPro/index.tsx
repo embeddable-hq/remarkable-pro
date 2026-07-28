@@ -20,6 +20,8 @@ const DonutChartPro = (props: DonutChartProProps) => {
     showLegend,
     showTooltips,
     showValueLabels,
+    componentName,
+    trackingId,
     onSegmentClick,
   } = props;
 
@@ -33,7 +35,14 @@ const DonutChartPro = (props: DonutChartProProps) => {
     theme.charts.donutChartPro?.options ?? {},
   );
 
-  const handleClick = createPieClickHandler({ results, dimension, onClicked: onSegmentClick });
+  const handleClick = createPieClickHandler({
+    results,
+    dimension,
+    measure,
+    componentName,
+    trackingId,
+    onClicked: onSegmentClick,
+  });
 
   return (
     <ChartCard

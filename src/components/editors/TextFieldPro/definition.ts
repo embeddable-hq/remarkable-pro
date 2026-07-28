@@ -21,6 +21,7 @@ const meta = {
       label: 'Value',
       category: 'Pre-configured Variables',
     },
+    inputs.trackingId,
   ],
   events: [
     {
@@ -53,6 +54,7 @@ const preview = definePreview(Component, {
 
 const props = (inputs: Inputs<typeof meta>) => ({
   ...inputs,
+  componentName: meta.name,
 });
 
 const events = {

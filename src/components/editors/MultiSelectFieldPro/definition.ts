@@ -42,6 +42,7 @@ const meta = {
       description: 'Send a different dimension to embeddable when the user clicks. Must be unique.',
     },
     inputs.clearable,
+    inputs.trackingId,
   ],
   events: [
     {
@@ -104,6 +105,7 @@ const props = (
   [state, setState]: [MultiSelectDropdownState, (state: MultiSelectDropdownState) => void],
 ) => ({
   ...inputs,
+  componentName: meta.name,
   setSearchValue: (searchValue: string) => setState({ searchValue }),
   results: loadDataResults(inputs, state),
 });

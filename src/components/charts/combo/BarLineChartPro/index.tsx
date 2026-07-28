@@ -38,6 +38,8 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
     dimension,
     granularity,
     setGranularity,
+    componentName,
+    trackingId,
     onBarClicked,
     onLineClicked,
   } = props;
@@ -80,8 +82,11 @@ const BarLineChartPro = (props: BarLineChartProProps) => {
   const handleClick = createBarLineClickHandler({
     data,
     dimension,
-    granularity,
+    lineMeasures,
     barMeasures: measures,
+    granularity,
+    componentName,
+    trackingId,
     onBarClicked,
     onLineClicked,
   });

@@ -76,6 +76,7 @@ const meta = {
     },
     inputs.maxResults,
     inputs.menuOptions,
+    inputs.trackingId,
   ],
   events: [
     {
@@ -167,6 +168,7 @@ const props = (
     granularity: state?.granularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
     results: loadDataResults(inputs, dimensionWithGranularity, clientContext),
+    componentName: meta.name,
   };
 };
 

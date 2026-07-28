@@ -18,6 +18,8 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { useGetTableSortedResults } from '../tables.hooks';
 import { useCallback } from 'react';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
+import { DimensionValueOrTimeRange } from '../../charts.types';
 import { HeatMapCellClickArg, HeatMapProOptionsClickArg } from './HeatMapPro.types';
 
 export type HeatMapProProps = {
@@ -36,6 +38,8 @@ export type HeatMapProProps = {
   rowDimension: Dimension;
   showValues?: boolean;
   onCellClicked?: (args: HeatMapProOptionsClickArg) => void;
+  componentName?: string;
+  trackingId?: string;
 } & ChartCardHeaderProps;
 
 export const getHeatMeasure = (
@@ -85,27 +89,10 @@ const HeatMapPro = (props: HeatMapProProps) => {
     showValues,
     minThreshold,
     maxThreshold,
+    componentName,
+    trackingId,
     onCellClicked,
   } = props;
-
-  const handleCellClick = useCallback(
-    ({ rowDimensionValue, columnDimensionValue }: HeatMapCellClickArg) => {
-      if (!onCellClicked) return;
-      onCellClicked({
-        rowDimensionValue,
-        rowDimensionTimeRange: getTimeRangeFromDimensionValue({
-          value: rowDimensionValue,
-          dimension: rowDimension,
-        }),
-        columnDimensionValue,
-        columnDimensionTimeRange: getTimeRangeFromDimensionValue({
-          value: columnDimensionValue,
-          dimension: columnDimension,
-        }),
-      });
-    },
-    [onCellClicked, rowDimension, columnDimension],
-  );
 
   const columnOrder = Array.from(
     new Set((props.results.data ?? []).filter(Boolean).map((d) => d[columnDimension.name])),
@@ -139,6 +126,62 @@ const HeatMapPro = (props: HeatMapProProps) => {
   const pivotMeasures = getHeatMeasure({ measure }, theme);
   const pivotRowDimension = getHeatDimension({ dimension: rowDimension }, theme);
   const pivotColumnDimension = getHeatDimension({ dimension: columnDimension }, theme);
+
+  const handleCellClick = useCallback(
+    ({
+      rowDimensionValue: rawRowDimensionValue,
+      columnDimensionValue: rawColumnDimensionValue,
+    }: HeatMapCellClickArg) => {
+      let rowDimensionValue: string | undefined = rawRowDimensionValue;
+      let columnDimensionValue: string | undefined = rawColumnDimensionValue;
+
+      const rowDimensionTimeRange = getTimeRangeFromDimensionValue({
+        value: rowDimensionValue,
+        dimension: rowDimension,
+      });
+      const columnDimensionTimeRange = getTimeRangeFromDimensionValue({
+        value: columnDimensionValue,
+        dimension: columnDimension,
+      });
+
+      const measureValue = results.find(
+        (row) =>
+          row[rowDimension.name] === rawRowDimensionValue &&
+          row[columnDimension.name] === rawColumnDimensionValue,
+      )?.[measure.name];
+
+      let rowDimensionValueOrTimeRange: DimensionValueOrTimeRange = rowDimensionValue;
+      if (rowDimensionTimeRange) {
+        rowDimensionValue = undefined;
+        rowDimensionValueOrTimeRange = rowDimensionTimeRange;
+      }
+      let columnDimensionValueOrTimeRange: DimensionValueOrTimeRange = columnDimensionValue;
+      if (columnDimensionTimeRange) {
+        columnDimensionValue = undefined;
+        columnDimensionValueOrTimeRange = columnDimensionTimeRange;
+      }
+
+      dispatchEventUserInteraction({
+        componentName,
+        trackingId,
+        rowDimension,
+        columnDimension,
+        rowDimensionValue: rowDimensionValueOrTimeRange,
+        columnDimensionValue: columnDimensionValueOrTimeRange,
+        measure,
+        measureValue,
+      });
+
+      if (!onCellClicked) return;
+      onCellClicked({
+        rowDimensionValue,
+        rowDimensionTimeRange,
+        columnDimensionValue,
+        columnDimensionTimeRange,
+      });
+    },
+    [onCellClicked, rowDimension, columnDimension, measure, results, componentName, trackingId],
+  );
 
   return (
     <ChartCard

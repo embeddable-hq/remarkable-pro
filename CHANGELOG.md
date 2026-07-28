@@ -1,5 +1,17 @@
 # @embeddable/remarkable-ui
 
+## 0.3.22
+
+### Patch Changes
+
+- 4fd4f70: Introduce embeddable-user-interaction event
+
+## 0.3.21
+
+### Patch Changes
+
+- 1468e1c: remove lowercase transformation in KPI comparison label
+
 ## 0.3.20
 
 ### Patch Changes

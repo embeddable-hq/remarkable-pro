@@ -20,6 +20,7 @@ import {
   FilterBuilderClause,
 } from '../filters.utils';
 import { FilterBuilderProAndOrButton } from './components/FilterBuilderProAndOrButton';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../../utils/dimensionsAndMeasures.utils';
 import { resolveI18nProps } from '../../../component.utils';
@@ -39,6 +40,8 @@ export type FilterBuilderProProps = {
   onChange?: (value: unknown) => void;
   defaultFilters?: FilterBuilderClause;
   syncDefaultFilters?: boolean;
+  componentName?: string;
+  trackingId?: string;
 } & EditorCardHeaderProps;
 
 const FilterBuilderPro = (props: FilterBuilderProProps) => {
@@ -53,6 +56,8 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     onChange,
     defaultFilters,
     syncDefaultFilters = false,
+    componentName,
+    trackingId,
   } = props;
 
   const [searchNew, setSearchNew] = useState('');
@@ -61,6 +66,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   // so the value inputs (which seed their own local state on mount) remount and
   // re-read the adopted value. Only used when syncDefaultFilters is on.
   const [adoptRevision, setAdoptRevision] = useState(0);
+  const hasUserInteracted = useRef(false);
 
   const adoptDefaultFilters = useCallback(
     (clause: FilterBuilderClauseGroup) => {
@@ -110,11 +116,13 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     });
 
   const handleOperatorChange = (value: FilterBuilderAndOrOperator) => {
+    hasUserInteracted.current = true;
     setEmbeddableState?.((prev) => ({ ...prev, operator: value }));
   };
 
   const updateFilters = useCallback(
     (updater: (filters: FilterBuilderFilter[]) => FilterBuilderFilter[]) => {
+      hasUserInteracted.current = true;
       setEmbeddableState?.((prev) => ({
         ...prev,
         filters: updater([...(prev?.filters ?? [])]),
@@ -190,10 +198,14 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     const serialized = JSON.stringify(filterValue);
     if (serialized === JSON.stringify(prevFilterValueRef.current)) return;
     prevFilterValueRef.current = filterValue;
+    if (hasUserInteracted.current) {
+      dispatchEventUserInteraction({ componentName, trackingId, value: filterValue });
+    }
     onChange?.(filterValue);
-  }, [filters, operator, onChange, isMixedOrOperator]);
+  }, [filters, operator, onChange, isMixedOrOperator, componentName, trackingId]);
 
   const handleClearAll = () => {
+    hasUserInteracted.current = true;
     setEmbeddableState?.((prev: FilterBuilderState) => ({
       ...prev,
       filters: [newFilter()],

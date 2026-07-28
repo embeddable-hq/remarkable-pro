@@ -52,6 +52,7 @@ const meta = {
     inputs.title,
     inputs.description,
     inputs.tooltip,
+    inputs.trackingId,
   ],
   events: [
     {
@@ -124,6 +125,7 @@ const props = (
     embeddableState: state,
     setEmbeddableState: setState,
     dimensionsAndMeasures: inputs.dimensionsAndMeasures ?? [],
+    componentName: meta.name,
     ...filterResults,
   };
 };

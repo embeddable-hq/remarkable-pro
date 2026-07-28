@@ -33,6 +33,8 @@ export type LineChartProProps = {
   granularity?: Granularity;
   setGranularity?: (granularity: Granularity) => void;
   onLineClicked?: LineChartProOptionsClick;
+  componentName?: string;
+  trackingId?: string;
 } & ChartCardHeaderProps;
 
 const LineChartPro = (props: LineChartProProps) => {
@@ -54,6 +56,8 @@ const LineChartPro = (props: LineChartProProps) => {
     yAxisRangeMin,
     setGranularity,
     onLineClicked,
+    componentName,
+    trackingId,
   } = props;
 
   const results = useFillGaps({
@@ -77,7 +81,10 @@ const LineChartPro = (props: LineChartProProps) => {
   const handleClick = createSimpleClickHandler({
     data,
     dimension: xAxis,
+    measures,
     granularity,
+    componentName,
+    trackingId,
     onClicked: onLineClicked,
   });
 

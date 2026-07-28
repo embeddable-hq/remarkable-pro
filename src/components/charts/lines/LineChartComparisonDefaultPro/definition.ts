@@ -106,6 +106,7 @@ const meta = {
     },
     inputs.maxResults,
     inputs.menuOptions,
+    inputs.trackingId,
   ],
   events: [
     {
@@ -263,6 +264,7 @@ const props = (
       state,
       clientContext,
     ),
+    componentName: meta.name,
   };
 };
 
