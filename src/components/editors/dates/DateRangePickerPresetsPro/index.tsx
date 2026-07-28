@@ -27,6 +27,7 @@ import {
   getTimeRangeFromPresets,
   getTimeRangeLabel,
 } from '../dates.utils';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 
 export type DateRangePickerPresetsProps = {
   onChange: (newDateRange: TimeRange) => void;
@@ -36,13 +37,23 @@ export type DateRangePickerPresetsProps = {
   clearable?: boolean;
   showCustomRangeOptions?: boolean;
   showTwoMonths?: boolean;
+  componentName?: string;
+  trackingId?: string;
 } & EditorCardHeaderProps;
 
 const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
   const { dayjsLocaleReady } = useLoadDayjsLocale();
-  const { onChange, clearable, selectedValue, showCustomRangeOptions, showTwoMonths } = props;
+  const {
+    onChange,
+    clearable,
+    selectedValue,
+    showCustomRangeOptions,
+    showTwoMonths,
+    componentName,
+    trackingId,
+  } = props;
   const onlyDateRangePicker = !showCustomRangeOptions;
   const [showDateRangePicker, setShowDateRangePicker] = useState(onlyDateRangePicker);
 
@@ -84,17 +95,21 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
       theme.clientContext.timezone,
     );
 
+    dispatchEventUserInteraction({ componentName, trackingId, value: newTimeRange });
     onChange(newTimeRange);
     setDateRange(undefined);
   };
 
   const handleDateRangeChange = (newDateRange: DateRange | undefined) => {
-    onChange(getTimeRangeFromDateRange(newDateRange));
+    const newTimeRange = getTimeRangeFromDateRange(newDateRange);
+    dispatchEventUserInteraction({ componentName, trackingId, value: newTimeRange });
+    onChange(newTimeRange);
     setIsOpen(false);
   };
 
   const handleClear = () => {
     setDateRange(undefined);
+    dispatchEventUserInteraction({ componentName, trackingId, value: undefined });
     onChange(undefined);
   };
 

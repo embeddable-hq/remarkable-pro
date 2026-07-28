@@ -67,6 +67,7 @@ const meta = {
     inputs.yAxisRangeMax,
     inputs.maxResults,
     inputs.menuOptions,
+    inputs.trackingId,
   ],
   events: [
     {
@@ -149,6 +150,7 @@ const props = (
   ...inputs,
   pointColor: inputs.pointColor as string | undefined,
   results: loadDataResults(inputs, clientContext),
+  componentName: meta.name,
 });
 
 export const bubbleChartPro = {

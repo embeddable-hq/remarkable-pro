@@ -282,6 +282,7 @@ describe('createAreaClickHandler', () => {
   const defaultHandlerProps = {
     data: chartData as never,
     dimension: makeDimension(),
+    measure: makeMeasure(),
     groupBy: makeDimension({ name: 'category' }),
   };
 
@@ -319,6 +320,29 @@ describe('createAreaClickHandler', () => {
       handler(makeArgs(100, 250) as never);
       expect(onAreaClicked).toHaveBeenCalledWith(
         expect.objectContaining({ groupingDimensionValue: 'Group B' }),
+      );
+    });
+
+    it('nulls out groupingDimensionValue when the grouping resolves to a time range', () => {
+      const onAreaClicked = vi.fn();
+      const range = {
+        from: new Date('2024-02-01'),
+        to: new Date('2024-02-29'),
+        relativeTimeString: undefined,
+      };
+      vi.mocked(getTimeRangeFromDimensionValue).mockReturnValue(range);
+      mockChartInstance = makeChartInstance({
+        0: [{ x: 100, y: 300 }],
+        1: [{ x: 100, y: 200 }],
+      });
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onAreaClicked });
+      handler(makeArgs(100, 250) as never);
+      expect(onAreaClicked).toHaveBeenCalledWith(
+        expect.objectContaining({
+          groupingDimensionValue: undefined,
+          groupingDimensionTimeRange: range,
+        }),
       );
     });
 
@@ -472,7 +496,9 @@ describe('createAreaClickHandler', () => {
       vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onPointClicked });
       handler(makeArgs(100, 50, [{ index: 0, datasetIndex: 0 }]) as never);
-      expect(getTimeRangeFromDimensionValue).toHaveBeenCalledTimes(1);
+      expect(getTimeRangeFromDimensionValue).toHaveBeenCalledWith(
+        expect.objectContaining({ dimension: defaultHandlerProps.dimension }),
+      );
     });
 
     it('falls through to onAreaClicked when no point element is under the cursor', () => {
@@ -495,6 +521,23 @@ describe('createAreaClickHandler', () => {
       const handler = createAreaClickHandler({ ...defaultHandlerProps, onPointClicked });
       handler(makeArgs(100, 50, [{ index: 5, datasetIndex: 0 }]) as never);
       expect(onPointClicked).not.toHaveBeenCalled();
+    });
+
+    it('nulls out dimensionValue when the x dimension resolves to a time range', () => {
+      const onPointClicked = vi.fn();
+      const range = {
+        from: new Date('2024-01-01'),
+        to: new Date('2024-01-31'),
+        relativeTimeString: undefined,
+      };
+      vi.mocked(getTimeRangeFromDimensionValue).mockReturnValue(range);
+      mockChartInstance = makeChartInstance({ 0: [{ x: 100, y: 50 }] });
+      vi.spyOn(Chart, 'getChart').mockReturnValue(mockChartInstance as never);
+      const handler = createAreaClickHandler({ ...defaultHandlerProps, onPointClicked });
+      handler(makeArgs(100, 50, [{ index: 0, datasetIndex: 0 }]) as never);
+      expect(onPointClicked).toHaveBeenCalledWith(
+        expect.objectContaining({ dimensionValue: undefined, dimensionTimeRange: range }),
+      );
     });
   });
 

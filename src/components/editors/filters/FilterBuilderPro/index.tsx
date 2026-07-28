@@ -20,6 +20,7 @@ import {
   FilterBuilderClause,
 } from '../filters.utils';
 import { FilterBuilderProAndOrButton } from './components/FilterBuilderProAndOrButton';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../../utils/dimensionsAndMeasures.utils';
 import { resolveI18nProps } from '../../../component.utils';
@@ -34,6 +35,8 @@ export type FilterBuilderProProps = {
   dimensionsAndMeasures?: DimensionOrMeasure[];
   onChange?: (value: unknown) => void;
   defaultFilters?: FilterBuilderClause;
+  componentName?: string;
+  trackingId?: string;
 } & EditorCardHeaderProps;
 
 const FilterBuilderPro = (props: FilterBuilderProProps) => {
@@ -47,10 +50,13 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     embeddableState,
     onChange,
     defaultFilters,
+    componentName,
+    trackingId,
   } = props;
 
   const [searchNew, setSearchNew] = useState('');
   const prevFilterValueRef = useRef<unknown>(undefined);
+  const hasUserInteracted = useRef(false);
 
   useEffect(() => {
     if (!defaultFilters || !dimensionsAndMeasures?.length) {
@@ -91,11 +97,13 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     });
 
   const handleOperatorChange = (value: FilterBuilderAndOrOperator) => {
+    hasUserInteracted.current = true;
     setEmbeddableState?.((prev) => ({ ...prev, operator: value }));
   };
 
   const updateFilters = useCallback(
     (updater: (filters: FilterBuilderFilter[]) => FilterBuilderFilter[]) => {
+      hasUserInteracted.current = true;
       setEmbeddableState?.((prev) => ({
         ...prev,
         filters: updater([...(prev?.filters ?? [])]),
@@ -171,10 +179,14 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     const serialized = JSON.stringify(filterValue);
     if (serialized === JSON.stringify(prevFilterValueRef.current)) return;
     prevFilterValueRef.current = filterValue;
+    if (hasUserInteracted.current) {
+      dispatchEventUserInteraction({ componentName, trackingId, value: filterValue });
+    }
     onChange?.(filterValue);
-  }, [filters, operator, onChange, isMixedOrOperator]);
+  }, [filters, operator, onChange, isMixedOrOperator, componentName, trackingId]);
 
   const handleClearAll = () => {
+    hasUserInteracted.current = true;
     setEmbeddableState?.((prev: FilterBuilderState) => ({
       ...prev,
       filters: [newFilter()],

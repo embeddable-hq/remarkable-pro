@@ -1,8 +1,9 @@
 import { ChartClickArgs } from '@embeddable.com/remarkable-ui';
 import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/core';
 import { getTimeRangeFromDimensionValue } from '../utils/dimension.utils';
+import { dispatchEventUserInteraction } from '../../utils/events.utils';
 import { i18n } from '../../theme/i18n/i18n';
-import { GroupedClickArg, SimpleClickArg } from './charts.types';
+import { DimensionValueOrTimeRange, GroupedClickArg, SimpleClickArg } from './charts.types';
 import { ChartData } from 'chart.js';
 
 export const getDimensionWithoutTruncation = (dimension: Dimension): Dimension => ({
@@ -61,55 +62,117 @@ export const getDatalabelPercentage = (
 export const createSimpleClickHandler = ({
   data,
   dimension,
+  measures,
   granularity,
+  componentName,
+  trackingId,
   onClicked,
 }: {
   data: ChartData;
   dimension: Dimension;
+  measures?: Measure[];
   granularity?: Granularity;
+  componentName?: string;
+  trackingId?: string;
   onClicked?: (args: SimpleClickArg) => void;
 }): ((args: ChartClickArgs) => void) => {
   return ({ elementAtEvent }) => {
     const element = elementAtEvent[0];
     if (!element) return;
-    const dimensionValue = data?.labels?.[element.index] as string | undefined;
+
+    let dimensionValue = data?.labels?.[element.index] as string | undefined;
     const dimensionTimeRange = getTimeRangeFromDimensionValue({
       value: dimensionValue,
       stateGranularity: granularity,
       dimension,
     });
-    onClicked?.({ dimensionValue, dimensionTimeRange });
+    let dimensionValueOrTimeRange: DimensionValueOrTimeRange = dimensionValue;
+    if (dimensionTimeRange) {
+      dimensionValue = undefined;
+      dimensionValueOrTimeRange = dimensionTimeRange;
+    }
+    const measureValues = (measures ?? []).reduce<Record<string, unknown>>(
+      (acc, measure, index) => {
+        acc[measure.name] = data?.datasets?.[index]?.data?.[element.index];
+        return acc;
+      },
+      {},
+    );
+    dispatchEventUserInteraction({
+      componentName,
+      trackingId,
+      dimension,
+      dimensionValue: dimensionValueOrTimeRange,
+      measures,
+      measureValues,
+    });
+    onClicked?.({ dimensionValue, dimensionTimeRange, measureValues });
   };
 };
 
 export const createGroupedClickHandler = ({
   data,
   dimension,
+  measure,
   groupBy,
   granularity,
+  componentName,
+  trackingId,
   onClicked,
 }: {
   data: ChartData;
   dimension: Dimension;
+  measure?: Measure;
   groupBy: Dimension;
   granularity?: Granularity;
+  componentName?: string;
+  trackingId?: string;
   onClicked?: (args: GroupedClickArg) => void;
 }): ((args: ChartClickArgs) => void) => {
   return ({ elementAtEvent }) => {
     const element = elementAtEvent[0];
+
     if (!element) return;
-    const dimensionValue = data?.labels?.[element.index] as string | undefined;
+
+    let dimensionValue = data?.labels?.[element.index] as string | undefined;
+
     const groupingDimensionValue = (
       data?.datasets?.[element.datasetIndex] as { rawLabel?: string } | undefined
     )?.rawLabel;
+
     const dimensionTimeRange = getTimeRangeFromDimensionValue({
       value: dimensionValue,
       stateGranularity: granularity,
       dimension,
     });
+
+    let dimensionValueOrTimeRange: DimensionValueOrTimeRange = dimensionValue;
+    if (dimensionTimeRange) {
+      dimensionValue = undefined;
+      dimensionValueOrTimeRange = dimensionTimeRange;
+    }
+
     const groupingDimensionTimeRange = getTimeRangeFromDimensionValue({
       value: groupingDimensionValue,
       dimension: groupBy,
+    });
+
+    let dimensionGroupByValueOrTimeRange: DimensionValueOrTimeRange = groupingDimensionValue;
+    if (groupingDimensionTimeRange) {
+      dimensionGroupByValueOrTimeRange = groupingDimensionTimeRange;
+    }
+
+    const measureValue = data?.datasets?.[element.datasetIndex]?.data?.[element.index];
+
+    dispatchEventUserInteraction({
+      componentName,
+      trackingId,
+      dimension,
+      dimensionValue: dimensionValueOrTimeRange,
+      dimensionGroupBy: groupBy,
+      dimensionGroupByValue: dimensionGroupByValueOrTimeRange,
+      measure,
+      measureValue,
     });
     onClicked?.({
       dimensionValue,

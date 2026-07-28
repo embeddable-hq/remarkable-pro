@@ -114,6 +114,7 @@ const props = (
     granularity: state?.granularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
     results: loadDataResults(inputs, xAxisWithGranularity, clientContext),
+    componentName: meta.name,
   };
 };
 

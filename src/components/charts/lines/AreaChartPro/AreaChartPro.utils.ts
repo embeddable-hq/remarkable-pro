@@ -7,7 +7,9 @@ import {
   getLineChartGroupedProOptions,
 } from '../LineChartGroupedPro/LineChartGroupedPro.utils';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 import { setColorAlpha } from '../../../../utils/color.utils';
+import { DimensionValueOrTimeRange } from '../../charts.types';
 import { AreaChartProAreaClickArg, AreaChartProPointClickArg } from '../lines.types';
 import { ChartClickArgs } from '@embeddable.com/remarkable-ui';
 
@@ -52,15 +54,31 @@ const interpolateLineY = (chart: Chart, datasetIndex: number, clickX: number): n
   return last?.x === clickX ? last.y : null;
 };
 
-const handlePointClick = (
-  chart: Chart,
-  elementAtEvent: ChartClickArgs['elementAtEvent'],
-  clickY: number,
-  data: ChartData<'line'>,
-  dimension: Dimension,
-  granularity: Granularity | undefined,
-  onPointClicked: (arg: AreaChartProPointClickArg) => void,
-): boolean => {
+const handlePointClick = ({
+  chart,
+  elementAtEvent,
+  clickY,
+  data,
+  dimension,
+  measure,
+  groupBy,
+  granularity,
+  componentName,
+  trackingId,
+  onPointClicked,
+}: {
+  chart: Chart;
+  elementAtEvent: ChartClickArgs['elementAtEvent'];
+  clickY: number;
+  data: ChartData<'line'>;
+  dimension: Dimension;
+  measure: Measure;
+  groupBy: Dimension;
+  granularity: Granularity | undefined;
+  componentName: string | undefined;
+  trackingId: string | undefined;
+  onPointClicked?: (arg: AreaChartProPointClickArg) => void;
+}): boolean => {
   if (!elementAtEvent.length) return false;
 
   const clicked = elementAtEvent[0]!;
@@ -69,31 +87,73 @@ const handlePointClick = (
 
   if (Math.abs(clickY - pointY) > 8) return false;
 
-  const dimensionValue = data?.labels?.[clicked.index] as string | undefined;
+  let dimensionValue = data?.labels?.[clicked.index] as string | undefined;
+  const dimensionTimeRange = getTimeRangeFromDimensionValue({
+    value: dimensionValue,
+    stateGranularity: granularity,
+    dimension,
+  });
+
+  let dimensionValueOrTimeRange: DimensionValueOrTimeRange = dimensionValue;
+  if (dimensionTimeRange) {
+    dimensionValue = undefined;
+    dimensionValueOrTimeRange = dimensionTimeRange;
+  }
+
   const measureValue = (data?.datasets?.[clicked.datasetIndex] as { data?: unknown[] })?.data?.[
     clicked.index
   ] as number | undefined;
 
-  onPointClicked({
+  const dimensionGroupByValue = (data?.datasets?.[clicked.datasetIndex] as { rawLabel?: string })
+    ?.rawLabel;
+  const dimensionGroupByTimeRange = getTimeRangeFromDimensionValue({
+    value: dimensionGroupByValue,
+    dimension: groupBy,
+  });
+
+  let dimensionGroupByValueOrTimeRange: DimensionValueOrTimeRange = dimensionGroupByValue;
+  if (dimensionGroupByTimeRange) {
+    dimensionGroupByValueOrTimeRange = dimensionGroupByTimeRange;
+  }
+
+  dispatchEventUserInteraction({
+    componentName,
+    trackingId,
+    dimension,
+    dimensionValue: dimensionValueOrTimeRange,
+    dimensionGroupBy: groupBy,
+    dimensionGroupByValue: dimensionGroupByValueOrTimeRange,
+    measure,
+    measureValue,
+  });
+
+  onPointClicked?.({
     dimensionValue,
-    dimensionTimeRange: getTimeRangeFromDimensionValue({
-      value: dimensionValue,
-      stateGranularity: granularity,
-      dimension,
-    }),
+    dimensionTimeRange,
     measureValue,
   });
   return true;
 };
 
-const handleAreaClick = (
-  chart: Chart,
-  clickX: number,
-  clickY: number,
-  data: ChartData<'line'>,
-  groupBy: Dimension,
-  onAreaClicked: (arg: AreaChartProAreaClickArg) => void,
-): void => {
+const handleAreaClick = ({
+  chart,
+  clickX,
+  clickY,
+  data,
+  groupBy,
+  componentName,
+  trackingId,
+  onAreaClicked,
+}: {
+  chart: Chart;
+  clickX: number;
+  clickY: number;
+  data: ChartData<'line'>;
+  groupBy: Dimension;
+  componentName: string | undefined;
+  trackingId: string | undefined;
+  onAreaClicked?: (arg: AreaChartProAreaClickArg) => void;
+}): void => {
   const chartBottom = chart.chartArea?.bottom ?? Infinity;
 
   for (let i = chart.data.datasets.length - 1; i >= 0; i--) {
@@ -102,13 +162,28 @@ const handleAreaClick = (
     if (lineY == null || baseY == null) continue;
     if (clickY < Math.min(lineY, baseY) || clickY > Math.max(lineY, baseY)) continue;
 
-    const groupingDimensionValue = (data?.datasets?.[i] as { rawLabel?: string })?.rawLabel;
-    onAreaClicked({
+    let groupingDimensionValue = (data?.datasets?.[i] as { rawLabel?: string })?.rawLabel;
+    const groupingDimensionTimeRange = getTimeRangeFromDimensionValue({
+      value: groupingDimensionValue,
+      dimension: groupBy,
+    });
+
+    let groupingDimensionValueOrTimeRange: DimensionValueOrTimeRange = groupingDimensionValue;
+    if (groupingDimensionTimeRange) {
+      groupingDimensionValue = undefined;
+      groupingDimensionValueOrTimeRange = groupingDimensionTimeRange;
+    }
+
+    dispatchEventUserInteraction({
+      componentName,
+      trackingId,
+      dimension: groupBy,
+      dimensionValue: groupingDimensionValueOrTimeRange,
+    });
+
+    onAreaClicked?.({
       groupingDimensionValue,
-      groupingDimensionTimeRange: getTimeRangeFromDimensionValue({
-        value: groupingDimensionValue,
-        dimension: groupBy,
-      }),
+      groupingDimensionTimeRange,
     });
     return;
   }
@@ -118,15 +193,21 @@ export const createAreaClickHandler =
   ({
     data,
     dimension,
+    measure,
     groupBy,
     granularity,
+    componentName,
+    trackingId,
     onPointClicked,
     onAreaClicked,
   }: {
     data: ChartData<'line'>;
     dimension: Dimension;
+    measure: Measure;
     groupBy: Dimension;
     granularity?: Granularity;
+    componentName?: string;
+    trackingId?: string;
     onPointClicked?: (arg: AreaChartProPointClickArg) => void;
     onAreaClicked?: (arg: AreaChartProAreaClickArg) => void;
   }) =>
@@ -138,11 +219,31 @@ export const createAreaClickHandler =
     const clickY = event.nativeEvent.offsetY;
 
     if (
-      onPointClicked &&
-      handlePointClick(chart, elementAtEvent, clickY, data, dimension, granularity, onPointClicked)
+      handlePointClick({
+        chart,
+        elementAtEvent,
+        clickY,
+        data,
+        dimension,
+        measure,
+        groupBy,
+        granularity,
+        componentName,
+        trackingId,
+        onPointClicked,
+      })
     )
       return;
-    if (onAreaClicked) handleAreaClick(chart, clickX, clickY, data, groupBy, onAreaClicked);
+    handleAreaClick({
+      chart,
+      clickX,
+      clickY,
+      data,
+      groupBy,
+      componentName,
+      trackingId,
+      onAreaClicked,
+    });
   };
 
 export const getAreaChartProOptions = (

@@ -176,6 +176,7 @@ const props = (
       state,
       clientContext,
     ),
+    componentName: meta.name,
   };
 };
 

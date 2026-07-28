@@ -34,6 +34,7 @@ const meta = {
     inputs.showTooltips,
     inputs.showValueLabels,
     inputs.menuOptions,
+    inputs.trackingId,
   ],
   events: [
     {
@@ -104,6 +105,7 @@ const props = (inputs: Inputs<typeof meta>) => ({
   ...inputs,
   results: loadDataResults(inputs),
   resultsInnerLabel: loadDataResultsInnerLabel(inputs),
+  componentName: meta.name,
 });
 
 export const donutLabelChartPro = {

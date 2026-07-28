@@ -41,6 +41,8 @@ export type BubbleChartProProps = {
   bubbleRadiusMin?: number;
   bubbleRadiusMax?: number;
   onPointClick?: (payload: BubbleChartProOptionsClickArg) => void;
+  componentName?: string;
+  trackingId?: string;
 } & ChartCardHeaderProps;
 
 const BubbleChartPro = (props: BubbleChartProProps) => {
@@ -68,6 +70,8 @@ const BubbleChartPro = (props: BubbleChartProProps) => {
     bubbleRadiusMin,
     bubbleRadiusMax,
     onPointClick,
+    componentName,
+    trackingId,
   } = props;
 
   const resolvedI18nProps = resolveI18nProps(props);
@@ -98,6 +102,8 @@ const BubbleChartPro = (props: BubbleChartProProps) => {
     pointDimension,
     groupByDimension,
     onPointClick,
+    componentName,
+    trackingId,
   });
 
   const chartOptions = mergician(

@@ -63,6 +63,7 @@ const meta = {
     inputs.yAxisRangeMax,
     inputs.maxResults,
     inputs.menuOptions,
+    inputs.trackingId,
   ],
   events: [
     {
@@ -135,6 +136,7 @@ const props = (
     xAxis: xAxisWithGranularity,
     setGranularity: (granularity: Granularity) => setState({ granularity }),
     results: loadDataResults(inputs, xAxisWithGranularity, clientContext),
+    componentName: meta.name,
   };
 };
 

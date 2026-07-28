@@ -41,6 +41,7 @@ const meta = {
     inputs.yAxisRangeMin,
     inputs.yAxisRangeMax,
     inputs.menuOptions,
+    inputs.trackingId,
   ],
   events: [
     {
@@ -145,6 +146,7 @@ const props = (
       axisOrder: cachedAxisOrder,
       timezone,
     }),
+    componentName: meta.name,
   };
 };
 
