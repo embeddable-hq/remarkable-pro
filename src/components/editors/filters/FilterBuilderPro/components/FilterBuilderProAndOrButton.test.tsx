@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { FilterBuilderProAndOrButton } from './FilterBuilderProAndOrButton';
-import { filterBuilderAndOrOperator } from '../FilterBuilderPro.utils';
+import { filterBuilderAndOrOperator } from '../../filters.utils';
 
 vi.mock('../FilterBuilderPro.module.css', () => ({
   default: {
@@ -10,12 +10,12 @@ vi.mock('../FilterBuilderPro.module.css', () => ({
   },
 }));
 
-vi.mock('../../../../theme/i18n/i18n', () => ({
+vi.mock('../../../../../theme/i18n/i18n', () => ({
   i18n: { t: vi.fn((key: string) => key) },
 }));
 
 vi.mock('@embeddable.com/remarkable-ui', async () => {
-  const { TooltipMock } = await import('../test-utils');
+  const { TooltipMock } = await import('../../test-utils');
   return { Tooltip: TooltipMock };
 });
 

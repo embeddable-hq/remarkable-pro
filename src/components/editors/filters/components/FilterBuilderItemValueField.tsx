@@ -1,19 +1,19 @@
 import { DataResponse, DimensionOrMeasure, NativeDataType } from '@embeddable.com/core';
-import { FilterBuilderFilter } from '../definition';
 import { MultiSelectField, SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../../theme/theme.types';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { i18n } from '../../../../theme/i18n/i18n';
 import FilterBuilderItemNumberValueField from './FilterBuilderItemNumberValueField';
 import FilterBuilderTextValueField from './FilterBuilderTextValueField';
-import styles from '../FilterBuilderPro.module.css';
 import { IconLoader2, IconX } from '@tabler/icons-react';
-import { operatorStringBoolean } from '../FilterBuilderPro.utils';
 import {
+  FilterBuilderFilter,
   normalizeSelectedValues,
+  operatorStringBoolean,
   sortOptionsWithSelectedFirst,
   getMultiSelectDisplayValue,
-} from './FilterBuilderItemValueField.utils';
+} from '../filters.utils';
+import { CssModuleClasses } from '../../../../types/css-modules';
 import clsx from 'clsx';
 import { useRef } from 'react';
 
@@ -21,21 +21,21 @@ type ValueTriggerButtonProps = {
   hasValue: boolean;
   isLoading: boolean | undefined;
   displayValue: string;
-  showClearIcon: boolean;
-  onClear: () => void;
+  onClear?: () => void;
+  styles: CssModuleClasses;
 };
 
 const ValueTriggerButton = ({
   hasValue,
   isLoading,
   displayValue,
-  showClearIcon,
   onClear,
+  styles,
   ...props
 }: ValueTriggerButtonProps) => (
   <button className={clsx(styles.valueButton, !hasValue && styles.valueButtonEmpty)} {...props}>
     {isLoading ? <IconLoader2 className={styles.loadingSpinner} /> : displayValue}
-    {showClearIcon && <IconX onClick={onClear} />}
+    {onClear && <IconX onClick={onClear} />}
   </button>
 );
 
@@ -46,6 +46,8 @@ export type FilterBuilderItemValueFieldProps = {
   theme: Theme;
   onSelectValue: (value: string | string[] | number | number[] | null) => void;
   onSearchValue: (value: string) => void;
+  styles: CssModuleClasses;
+  showClear?: boolean;
 };
 
 const FilterBuilderItemValueField = ({
@@ -55,6 +57,8 @@ const FilterBuilderItemValueField = ({
   theme,
   onSelectValue,
   onSearchValue,
+  styles,
+  showClear = true,
 }: FilterBuilderItemValueFieldProps) => {
   const themeFormatter = getThemeFormatter(theme);
   const labelCache = useRef<Record<string, string>>({});
@@ -84,7 +88,13 @@ const FilterBuilderItemValueField = ({
   const isNumberField = dimensionOrMeasure.nativeType === NativeDataType.number;
 
   if (isNumberField) {
-    return <FilterBuilderItemNumberValueField filter={filter} onSelectValue={onSelectValue} />;
+    return (
+      <FilterBuilderItemNumberValueField
+        filter={filter}
+        onSelectValue={onSelectValue}
+        styles={styles}
+      />
+    );
   }
 
   const isTextField =
@@ -92,7 +102,9 @@ const FilterBuilderItemValueField = ({
     filter.operator === operatorStringBoolean.contains;
 
   if (isTextField) {
-    return <FilterBuilderTextValueField filter={filter} onSelectValue={onSelectValue} />;
+    return (
+      <FilterBuilderTextValueField filter={filter} onSelectValue={onSelectValue} styles={styles} />
+    );
   }
 
   const isMultiSelectField =
@@ -100,7 +112,7 @@ const FilterBuilderItemValueField = ({
     filter.operator === operatorStringBoolean.isNotOneOf;
 
   const hasValue = filter.value != null;
-  const showClearIcon = !isLoading && hasValue;
+  const canClear = showClear && !isLoading && hasValue;
 
   if (isMultiSelectField) {
     const filterValue = (filter.value as string[]) ?? [];
@@ -114,8 +126,8 @@ const FilterBuilderItemValueField = ({
             hasValue={hasValue}
             isLoading={isLoading}
             displayValue={displayValue}
-            showClearIcon={showClearIcon}
-            onClear={() => onSelectValue(null)}
+            onClear={canClear ? () => onSelectValue(null) : undefined}
+            styles={styles}
           />
         }
         isSearchable
@@ -144,8 +156,8 @@ const FilterBuilderItemValueField = ({
             hasValue={hasValue}
             isLoading={isLoading}
             displayValue={displayValue}
-            showClearIcon={showClearIcon}
-            onClear={() => onSelectValue(null)}
+            onClear={canClear ? () => onSelectValue(null) : undefined}
+            styles={styles}
           />
         }
         searchable

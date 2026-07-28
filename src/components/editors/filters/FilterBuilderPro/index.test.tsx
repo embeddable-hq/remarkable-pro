@@ -2,8 +2,12 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import FilterBuilderPro from './index';
 import type { DimensionOrMeasure } from '@embeddable.com/core';
-import type { FilterBuilderFilter, FilterBuilderState } from './definition';
-import { filterBuilderAndOrOperator, FilterBuilderClause } from './FilterBuilderPro.utils';
+import type { FilterBuilderState } from './definition';
+import {
+  filterBuilderAndOrOperator,
+  FilterBuilderClause,
+  FilterBuilderFilter,
+} from '../filters.utils';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -19,7 +23,7 @@ vi.mock('./FilterBuilderPro.module.css', () => ({
   },
 }));
 
-vi.mock('../../../theme/i18n/i18n', () => ({
+vi.mock('../../../../theme/i18n/i18n', () => ({
   i18nSetup: vi.fn(),
   i18n: { t: vi.fn((key: string) => key) },
 }));
@@ -35,7 +39,7 @@ vi.mock('@tabler/icons-react', () => ({
 }));
 
 vi.mock('@embeddable.com/remarkable-ui', async () => {
-  const { TooltipMock } = await import('./test-utils');
+  const { TooltipMock } = await import('../test-utils');
   return {
     SingleSelectField: ({
       triggerComponent,
@@ -107,7 +111,7 @@ vi.mock('./components/FilterBuilderItem', () => ({
   ),
 }));
 
-vi.mock('../shared/EditorCard/EditorCard', () => ({
+vi.mock('../../shared/EditorCard/EditorCard', () => ({
   EditorCard: ({ children, title }: { children: React.ReactNode; title?: string }) => (
     <div data-testid="editor-card" data-title={title}>
       {children}
@@ -115,11 +119,11 @@ vi.mock('../shared/EditorCard/EditorCard', () => ({
   ),
 }));
 
-vi.mock('../utils/dimensionsAndMeasures.utils', () => ({
+vi.mock('../../utils/dimensionsAndMeasures.utils', () => ({
   getDimensionAndMeasureOptions: vi.fn(() => [{ value: 'country', label: 'Country' }]),
 }));
 
-vi.mock('../../component.utils', () => ({
+vi.mock('../../../component.utils', () => ({
   resolveI18nProps: vi.fn((props) => props),
 }));
 
@@ -672,6 +676,43 @@ describe('FilterBuilderPro', () => {
 
       fireEvent.click(screen.getByTestId('icon-chevron-left').closest('button')!);
       expect(Element.prototype.scrollBy).toHaveBeenCalledWith({ left: -200, behavior: 'smooth' });
+    });
+
+    it('auto-scrolls to the end when a filter changes after mount, even without defaultFilters (regression)', () => {
+      // Previously, the auto-scroll guard only cleared inside the defaultFilters
+      // effect, so without defaultFilters it never cleared and scroll-to-end
+      // never fired after the initial mount.
+      vi.useFakeTimers();
+      const dims = [makeDim('country')];
+
+      const { rerender } = render(
+        <FilterBuilderPro {...defaultProps} dimensionsAndMeasures={dims} />,
+      );
+
+      act(() => vi.advanceTimersByTime(100));
+
+      rerender(
+        <FilterBuilderPro
+          {...defaultProps}
+          dimensionsAndMeasures={dims}
+          embeddableState={{
+            operator: filterBuilderAndOrOperator.AND,
+            filters: [
+              makeFilter({
+                id: 1,
+                dimensionOrMeasure: makeDim('country'),
+                operator: 'is',
+                value: 'France',
+              }),
+            ],
+          }}
+        />,
+      );
+
+      act(() => vi.advanceTimersByTime(100));
+
+      expect(Element.prototype.scrollTo).toHaveBeenCalled();
+      vi.useRealTimers();
     });
 
     it('auto-scrolls to the end when a filter changes after initialisation', () => {
