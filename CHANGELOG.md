@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.22
+
+### Patch Changes
+
+- 4fd4f70: Introduce embeddable-user-interaction event
+
 ## 0.3.21
 
 ### Patch Changes
