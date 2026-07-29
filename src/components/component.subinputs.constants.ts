@@ -177,6 +177,16 @@ const ignoreEmptyDate = {
   defaultValue: false,
 } as const;
 
+const connectGaps = {
+  type: 'boolean',
+  name: 'connectGaps',
+  label: 'Connect gaps',
+  description:
+    'When enabled, empty dates are connected by treating missing values as 0 instead of leaving a gap in the line.',
+  supportedTypes: ['time'],
+  defaultValue: false,
+} as const;
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const dimensionMeasureSubInputs: any[] = [
   prefix,
@@ -246,6 +256,7 @@ export const subInputs = {
   showGranularityDropdown,
   showValueAsPercentage,
   ignoreEmptyDate,
+  connectGaps,
   columnAggregation,
   rowAggregation,
 };

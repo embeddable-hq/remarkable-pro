@@ -33,7 +33,7 @@ export const getLineChartProData = (
       return item[props.dimension.name];
     }),
     datasets: props.measures.map((measure, index) => {
-      const zeroFill = Boolean(measure.inputs?.['connectGaps']);
+      const zeroFill = Boolean(props.dimension.inputs?.['connectGaps']);
       const values = groupedData.map((item) => item[measure.name] ?? (zeroFill ? 0 : null));
 
       const lineColor = measure.inputs?.['lineColor'];

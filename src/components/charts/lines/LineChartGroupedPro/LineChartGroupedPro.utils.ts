@@ -56,7 +56,7 @@ export const getLineChartGroupedProData = (
         const record = data.find(
           (d) => d[groupDimension.name] === groupByItem && d[dimension.name] === axisItem,
         );
-        return record?.[measure.name] ?? (measure.inputs?.['connectGaps'] ? 0 : null);
+        return record?.[measure.name] ?? (dimension.inputs?.['connectGaps'] ? 0 : null);
       }),
     } as ChartData<'line'>['datasets'][number];
 

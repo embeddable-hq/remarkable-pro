@@ -35,7 +35,7 @@ const getLineChartComparisonDataset = (
   const { data, measure, dimension, index, isPreviousPeriod, hasMinMaxYAxisRange, labels } = props;
   const datasetLabels = data?.map((item) => item[dimension.name]);
 
-  const zeroFill = Boolean(measure.inputs?.['connectGaps']);
+  const zeroFill = Boolean(dimension.inputs?.['connectGaps']);
 
   const processedData = labels
     ? labels.map((label) => {

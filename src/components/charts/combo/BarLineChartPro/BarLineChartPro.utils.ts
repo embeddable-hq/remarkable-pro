@@ -64,7 +64,7 @@ export const getBarLineChartProData = (
   const lineDatasets = lineMeasures.map((measure, index) => {
     const colorIndex = barMeasures.length + index;
     const lineColor = measure.inputs?.['lineColor'];
-    const zeroFill = Boolean(measure.inputs?.['connectGaps']);
+    const zeroFill = Boolean(dimension.inputs?.['connectGaps']);
 
     const backgroundColor = isColorValid(lineColor)
       ? lineColor

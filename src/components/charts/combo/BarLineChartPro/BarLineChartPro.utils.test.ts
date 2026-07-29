@@ -206,9 +206,9 @@ describe('getBarLineChartProData', () => {
     const result = getBarLineChartProData(
       {
         data,
-        dimension: makeDimension(),
+        dimension: makeDimension({ inputs: { connectGaps: false } }),
         barMeasures: [],
-        lineMeasures: [makeMeasure({ name: 'avg', inputs: { connectGaps: false } })],
+        lineMeasures: [makeMeasure({ name: 'avg' })],
         showSecondaryAxis: false,
       },
       makeTheme(),
@@ -224,9 +224,9 @@ describe('getBarLineChartProData', () => {
     const result = getBarLineChartProData(
       {
         data,
-        dimension: makeDimension(),
+        dimension: makeDimension({ inputs: { connectGaps: true } }),
         barMeasures: [],
-        lineMeasures: [makeMeasure({ name: 'avg', inputs: { connectGaps: true } })],
+        lineMeasures: [makeMeasure({ name: 'avg' })],
         showSecondaryAxis: false,
       },
       makeTheme(),

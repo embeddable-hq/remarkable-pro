@@ -10,6 +10,7 @@ import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/re
 import Component from './index';
 import { LineChartGroupedProOptionsClickArg } from '../lines.types';
 import { inputs } from '../../../component.inputs.constants';
+import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
@@ -33,16 +34,14 @@ const meta = {
           label: 'Fill under line',
           category: 'Component Settings',
         },
-        {
-          ...inputs.boolean,
-          name: 'connectGaps',
-          label: 'Connect gaps',
-          defaultValue: true,
-          category: 'Component Settings',
-        },
       ],
     },
-    { ...inputs.dimensionWithGranularitySelectField, name: 'xAxis', label: 'X-axis' },
+    {
+      ...inputs.dimensionWithGranularitySelectField,
+      name: 'xAxis',
+      label: 'X-axis',
+      inputs: [...inputs.dimensionWithGranularitySelectField.inputs, subInputs.connectGaps],
+    },
     inputs.groupBy,
     inputs.title,
     inputs.description,

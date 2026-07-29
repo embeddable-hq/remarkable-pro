@@ -98,8 +98,8 @@ describe('getLineChartProData', () => {
     const result = getLineChartProData(
       {
         data: [{ date: 'Jan', revenue: 100 }, { date: 'Feb' }],
-        dimension: makeDimension({ name: 'date' }),
-        measures: [makeMeasure({ name: 'revenue', inputs: { connectGaps: false } })],
+        dimension: makeDimension({ name: 'date', inputs: { connectGaps: false } }),
+        measures: [makeMeasure({ name: 'revenue' })],
         hasMinMaxYAxisRange: false,
       },
       makeTheme(),
@@ -112,8 +112,8 @@ describe('getLineChartProData', () => {
     const result = getLineChartProData(
       {
         data: [{ date: 'Jan', revenue: 100 }, { date: 'Feb' }],
-        dimension: makeDimension({ name: 'date' }),
-        measures: [makeMeasure({ name: 'revenue', inputs: { connectGaps: true } })],
+        dimension: makeDimension({ name: 'date', inputs: { connectGaps: true } }),
+        measures: [makeMeasure({ name: 'revenue' })],
         hasMinMaxYAxisRange: false,
       },
       makeTheme(),

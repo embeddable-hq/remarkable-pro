@@ -55,15 +55,14 @@ const meta = {
           label: 'Compared line dashed',
           defaultValue: true,
         },
-        {
-          ...subInputs.boolean,
-          name: 'connectGaps',
-          label: 'Connect gaps',
-          defaultValue: true,
-        },
       ],
     },
-    { ...inputs.dimensionWithGranularitySelectField, label: 'X-axis', name: 'xAxis' },
+    {
+      ...inputs.dimensionWithGranularitySelectField,
+      label: 'X-axis',
+      name: 'xAxis',
+      inputs: [...inputs.dimensionWithGranularitySelectField.inputs, subInputs.connectGaps],
+    },
     {
       ...inputs.timeRange,
       name: 'primaryDateRange',
