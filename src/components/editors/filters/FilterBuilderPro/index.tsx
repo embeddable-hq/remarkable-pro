@@ -62,10 +62,6 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
 
   const [searchNew, setSearchNew] = useState('');
   const prevFilterValueRef = useRef<unknown>(undefined);
-  // Bumped each time an adopted value is applied. Mixed into the filter row keys
-  // so the value inputs (which seed their own local state on mount) remount and
-  // re-read the adopted value. Only used when syncDefaultFilters is on.
-  const [adoptRevision, setAdoptRevision] = useState(0);
   const hasUserInteracted = useRef(false);
 
   const adoptDefaultFilters = useCallback(
@@ -81,9 +77,6 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
           operator: clause.operator,
         };
       });
-      if (syncDefaultFilters) {
-        setAdoptRevision((revision) => revision + 1);
-      }
     },
     [dimensionsAndMeasures, setEmbeddableState, syncDefaultFilters],
   );
@@ -223,7 +216,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
         )}
         <div className={styles.scroll} ref={scrollRef}>
           {filters.map((filter, index) => (
-            <React.Fragment key={syncDefaultFilters ? `${filter.id}-${adoptRevision}` : filter.id}>
+            <React.Fragment key={filter.id}>
               {index > 0 && (
                 <FilterBuilderProAndOrButton
                   operator={operator}

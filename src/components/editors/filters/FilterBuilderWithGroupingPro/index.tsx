@@ -70,9 +70,6 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
 
   const [searchNew, setSearchNew] = useState('');
   const prevFilterValueRef = useRef<unknown>(undefined);
-  // Bumped each time an adopted value is applied, so value inputs (which seed
-  // local state on mount) remount and re-read it. Only used when syncing.
-  const [adoptRevision, setAdoptRevision] = useState(0);
 
   const makeFilter = useCallback(
     (id: number, name: string | null = null): FilterBuilderFilter =>
@@ -97,9 +94,6 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
           operator: clause.operator,
         });
       });
-      if (syncDefaultFilters) {
-        setAdoptRevision((revision) => revision + 1);
-      }
     },
     [dimensionsAndMeasures, setEmbeddableState, syncDefaultFilters],
   );
@@ -298,7 +292,7 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
         )}
         <div className={styles.scroll} ref={scrollRef}>
           {items.map((node, index) => (
-            <React.Fragment key={syncDefaultFilters ? `${node.id}-${adoptRevision}` : node.id}>
+            <React.Fragment key={node.id}>
               {index > 0 && (
                 <FilterBuilderWithGroupingAndOrButton
                   operator={operator}

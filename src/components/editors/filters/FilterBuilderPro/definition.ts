@@ -7,6 +7,7 @@ import {
   FilterBuilderClause,
   FilterBuilderFilter,
   filterToLoadDataFilters,
+  syncDefaultFiltersInput,
 } from '../filters.utils';
 
 const meta = {
@@ -40,15 +41,7 @@ const meta = {
       category: 'Component Settings',
       description: "Each filter's available options update based on the other active filters.",
     },
-    {
-      ...inputs.boolean,
-      name: 'syncDefaultFilters',
-      label: 'Track default filters',
-      defaultValue: false,
-      category: 'Component Settings',
-      description:
-        'When on, the filter tracks changes to its bound Default filters after load — so the host can update or reset it at runtime. When off (default), Default filters only seeds the initial value.',
-    },
+    syncDefaultFiltersInput,
     inputs.title,
     inputs.description,
     inputs.tooltip,
