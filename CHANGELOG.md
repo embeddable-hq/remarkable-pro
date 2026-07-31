@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.24
+
+### Patch Changes
+
+- 4e7df09: FilterBuilderWithGroupingPro now dispatches `embeddable-user-interaction` events on user-driven edits (top-level and group-level), matching FilterBuilderPro. Adds `trackingId` input and `componentName` for consistency with other trackable components.
+
 ## 0.3.23
 
 ### Patch Changes
