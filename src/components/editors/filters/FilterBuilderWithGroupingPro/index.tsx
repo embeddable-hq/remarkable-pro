@@ -34,6 +34,7 @@ import {
 import FilterBuilderWithGroupingItem from './components/FilterBuilderWithGroupingItem';
 import FilterBuilderWithGroupingGroup from './components/FilterBuilderWithGroupingGroup';
 import { FilterBuilderWithGroupingAndOrButton } from './components/FilterBuilderWithGroupingAndOrButton';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../../utils/dimensionsAndMeasures.utils';
 import { resolveI18nProps } from '../../../component.utils';
@@ -52,6 +53,8 @@ export type FilterBuilderWithGroupingProProps = {
   onChange?: (value: unknown) => void;
   defaultFilters?: FilterBuilderClause;
   syncDefaultFilters?: boolean;
+  componentName?: string;
+  trackingId?: string;
 } & EditorCardHeaderProps;
 
 const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) => {
@@ -66,10 +69,13 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
     onChange,
     defaultFilters,
     syncDefaultFilters = false,
+    componentName,
+    trackingId,
   } = props;
 
   const [searchNew, setSearchNew] = useState('');
   const prevFilterValueRef = useRef<unknown>(undefined);
+  const hasUserInteracted = useRef(false);
 
   const makeFilter = useCallback(
     (id: number, name: string | null = null): FilterBuilderFilter =>
@@ -114,11 +120,13 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
     });
 
   const handleOperatorChange = (value: FilterBuilderAndOrOperator) => {
+    hasUserInteracted.current = true;
     setEmbeddableState?.((prev) => ({ ...prev, operator: value }));
   };
 
   const updateItems = useCallback(
     (updater: (items: FilterBuilderNode[]) => FilterBuilderNode[]) => {
+      hasUserInteracted.current = true;
       setEmbeddableState?.((prev) => {
         const stored = getFilterNodes(prev);
         const base = stored.length ? stored : [makeFilter(1)];
@@ -241,6 +249,7 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
   };
 
   const handleClearAll = () => {
+    hasUserInteracted.current = true;
     setEmbeddableState?.((prev) => withItems(prev, [makeFilter(1)], { operator: AND }));
   };
 
@@ -255,6 +264,7 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
   const topDisabled = hasMixedDimensionsAndMeasures(allFilters);
 
   const sanitized = sanitizeMixedTypeOperators(items, operator);
+  const sanitizedClauseKey = JSON.stringify(itemsToClause(sanitized.operator, sanitized.items));
 
   useEffect(() => {
     if (!sanitized.changed) return;
@@ -270,9 +280,12 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
     const serialized = JSON.stringify(filterValue);
     if (serialized === JSON.stringify(prevFilterValueRef.current)) return;
     prevFilterValueRef.current = filterValue;
+    if (hasUserInteracted.current) {
+      dispatchEventUserInteraction({ componentName, trackingId, value: filterValue });
+    }
     onChange?.(filterValue);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(itemsToClause(sanitized.operator, sanitized.items)), onChange]);
+  }, [sanitizedClauseKey, onChange, componentName, trackingId]);
 
   const getResults = (id: number) =>
     (props as Record<string, unknown>)[`filterResults${id}`] as DataResponse | undefined;

@@ -640,4 +640,190 @@ describe('FilterBuilderWithGroupingPro', () => {
     );
     expect(defaultProps.setEmbeddableState).not.toHaveBeenCalled();
   });
+
+  describe('user-interaction tracking', () => {
+    const lastUserInteractionEvent = (spy: ReturnType<typeof vi.spyOn>) =>
+      (spy.mock.calls as unknown[][])
+        .map((call) => call[0] as CustomEvent)
+        .filter((event) => event.type === 'embeddable-user-interaction')
+        .at(-1);
+
+    it('dispatches a user-interaction event with componentName/trackingId/value on a top-level edit', () => {
+      const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+      // Start from a filter that already has a dimension + operator, so completing
+      // it with a value produces a clause that actually differs from the last
+      // emitted one — the onChange effect (and thus the dispatch) is gated on that.
+      const embeddableState: FilterBuilderGroupingState = {
+        operator: filterBuilderAndOrOperator.AND,
+        items: [makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), operator: 'is' })],
+      };
+      const { rerender } = render(
+        <FilterBuilderWithGroupingPro
+          {...defaultProps}
+          componentName="FilterBuilderWithGroupingPro"
+          trackingId="track-1"
+          embeddableState={embeddableState}
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId('select-val-1'));
+      const next = applyUpdater(defaultProps.setEmbeddableState, embeddableState);
+      rerender(
+        <FilterBuilderWithGroupingPro
+          {...defaultProps}
+          componentName="FilterBuilderWithGroupingPro"
+          trackingId="track-1"
+          embeddableState={next}
+        />,
+      );
+
+      const event = lastUserInteractionEvent(dispatchSpy);
+      expect(event).toBeTruthy();
+      expect(event!.detail).toMatchObject({
+        componentName: 'FilterBuilderWithGroupingPro',
+        trackingId: 'track-1',
+      });
+    });
+
+    it('dispatches a user-interaction event on a group-level edit', () => {
+      const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+      const groupState: FilterBuilderGroupingState = {
+        operator: filterBuilderAndOrOperator.AND,
+        items: [
+          {
+            id: 5,
+            operator: 'and',
+            filters: [
+              makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), operator: 'is' }),
+              makeFilter({ id: 2, dimensionOrMeasure: makeDim('country'), operator: 'is' }),
+            ],
+          },
+        ],
+      };
+      const { rerender } = render(
+        <FilterBuilderWithGroupingPro
+          {...defaultProps}
+          componentName="FilterBuilderWithGroupingPro"
+          trackingId="track-2"
+          embeddableState={groupState}
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId('group-selval-5'));
+      const next = applyUpdater(defaultProps.setEmbeddableState, groupState);
+      rerender(
+        <FilterBuilderWithGroupingPro
+          {...defaultProps}
+          componentName="FilterBuilderWithGroupingPro"
+          trackingId="track-2"
+          embeddableState={next}
+        />,
+      );
+
+      const event = lastUserInteractionEvent(dispatchSpy);
+      expect(event).toBeTruthy();
+      expect(event!.detail).toMatchObject({ componentName: 'FilterBuilderWithGroupingPro' });
+    });
+
+    it('does not dispatch on initial mount, even when a complete filter is seeded', () => {
+      const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+      const embeddableState: FilterBuilderGroupingState = {
+        operator: filterBuilderAndOrOperator.AND,
+        items: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'AU',
+          }),
+        ],
+      };
+      render(
+        <FilterBuilderWithGroupingPro
+          {...defaultProps}
+          componentName="FilterBuilderWithGroupingPro"
+          trackingId="track-3"
+          embeddableState={embeddableState}
+        />,
+      );
+
+      // onChange still fires on mount (existing behaviour) — only the tracking
+      // dispatch is gated on a real user interaction.
+      expect(defaultProps.onChange).toHaveBeenCalled();
+      expect(lastUserInteractionEvent(dispatchSpy)).toBeUndefined();
+    });
+
+    it('does not dispatch when the host pushes a new defaultFilters with syncDefaultFilters on', () => {
+      const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+      const existing: FilterBuilderGroupingState = {
+        operator: filterBuilderAndOrOperator.AND,
+        items: [
+          makeFilter({
+            id: 1,
+            dimensionOrMeasure: makeDim('country'),
+            operator: 'is',
+            value: 'UK',
+          }),
+        ],
+      };
+      const defaultFilters: FilterBuilderClause = {
+        operator: filterBuilderAndOrOperator.AND,
+        clauses: [{ property: 'country', operator: 'equals' as never, value: 'AU' }],
+      };
+      const { rerender } = render(
+        <FilterBuilderWithGroupingPro
+          {...defaultProps}
+          componentName="FilterBuilderWithGroupingPro"
+          trackingId="track-4"
+          dimensionsAndMeasures={[makeDim('country')]}
+          embeddableState={existing}
+          syncDefaultFilters
+        />,
+      );
+
+      const adopted = applyUpdater(defaultProps.setEmbeddableState, existing);
+      rerender(
+        <FilterBuilderWithGroupingPro
+          {...defaultProps}
+          componentName="FilterBuilderWithGroupingPro"
+          trackingId="track-4"
+          dimensionsAndMeasures={[makeDim('country')]}
+          embeddableState={adopted}
+          defaultFilters={defaultFilters}
+          syncDefaultFilters
+        />,
+      );
+
+      expect(lastUserInteractionEvent(dispatchSpy)).toBeUndefined();
+    });
+
+    it('dispatches even when trackingId is not provided', () => {
+      const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+      const embeddableState: FilterBuilderGroupingState = {
+        operator: filterBuilderAndOrOperator.AND,
+        items: [makeFilter({ id: 1, dimensionOrMeasure: makeDim('country'), operator: 'is' })],
+      };
+      const { rerender } = render(
+        <FilterBuilderWithGroupingPro
+          {...defaultProps}
+          componentName="FilterBuilderWithGroupingPro"
+          embeddableState={embeddableState}
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId('select-val-1'));
+      const next = applyUpdater(defaultProps.setEmbeddableState, embeddableState);
+      rerender(
+        <FilterBuilderWithGroupingPro
+          {...defaultProps}
+          componentName="FilterBuilderWithGroupingPro"
+          embeddableState={next}
+        />,
+      );
+
+      const event = lastUserInteractionEvent(dispatchSpy);
+      expect(event).toBeTruthy();
+      expect(event!.detail.trackingId).toBeUndefined();
+    });
+  });
 });
