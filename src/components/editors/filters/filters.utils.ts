@@ -6,6 +6,18 @@ import {
   NativeDataType,
 } from '@embeddable.com/core';
 import { i18n } from '../../../theme/i18n/i18n';
+import { inputs } from '../../component.inputs.constants';
+
+/** Shared "Track default filters" input, used by both filter-builder metas. */
+export const syncDefaultFiltersInput = {
+  ...inputs.boolean,
+  name: 'syncDefaultFilters',
+  label: 'Track default filters',
+  defaultValue: false,
+  category: 'Component Settings',
+  description:
+    'When on, the filter tracks changes to its bound Default filters after load — so the host can update or reset it at runtime. When off (default), Default filters only seeds the initial value.',
+} as const;
 
 export type FilterBuilderFilter = {
   id: number;

@@ -25,7 +25,11 @@ import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { getDimensionAndMeasureOptions } from '../../utils/dimensionsAndMeasures.utils';
 import { resolveI18nProps } from '../../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../../shared/EditorCard/EditorCard';
-import { useFilterBuilderScroll } from '../filters.hooks';
+import {
+  FilterBuilderClauseGroup,
+  useAdoptDefaultFilters,
+  useFilterBuilderScroll,
+} from '../filters.hooks';
 
 export type FilterBuilderProProps = {
   embeddableState?: FilterBuilderState;
@@ -35,6 +39,7 @@ export type FilterBuilderProProps = {
   dimensionsAndMeasures?: DimensionOrMeasure[];
   onChange?: (value: unknown) => void;
   defaultFilters?: FilterBuilderClause;
+  syncDefaultFilters?: boolean;
   componentName?: string;
   trackingId?: string;
 } & EditorCardHeaderProps;
@@ -50,6 +55,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
     embeddableState,
     onChange,
     defaultFilters,
+    syncDefaultFilters = false,
     componentName,
     trackingId,
   } = props;
@@ -58,23 +64,29 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
   const prevFilterValueRef = useRef<unknown>(undefined);
   const hasUserInteracted = useRef(false);
 
-  useEffect(() => {
-    if (!defaultFilters || !dimensionsAndMeasures?.length) {
-      return;
-    }
-
-    const newFilters = clauseToFilters(defaultFilters, dimensionsAndMeasures);
-
-    if (newFilters.length > 0) {
+  const adoptDefaultFilters = useCallback(
+    (clause: FilterBuilderClauseGroup) => {
       setEmbeddableState?.((prev) => {
-        if (prev?.filters?.length) {
+        // Seed-once (default, backward compatible): only apply while empty.
+        if (!syncDefaultFilters && prev?.filters?.length) {
           return prev;
         }
-
-        return { ...prev, filters: newFilters };
+        return {
+          ...prev,
+          filters: clauseToFilters(clause, dimensionsAndMeasures),
+          operator: clause.operator,
+        };
       });
-    }
-  }, [defaultFilters, dimensionsAndMeasures, setEmbeddableState]);
+    },
+    [dimensionsAndMeasures, setEmbeddableState, syncDefaultFilters],
+  );
+
+  useAdoptDefaultFilters({
+    defaultFilters,
+    dimensionsAndMeasures,
+    lastEmittedRef: prevFilterValueRef,
+    adopt: adoptDefaultFilters,
+  });
 
   const lastFilterId = embeddableState?.filters?.[embeddableState.filters.length - 1]?.id ?? 0;
 

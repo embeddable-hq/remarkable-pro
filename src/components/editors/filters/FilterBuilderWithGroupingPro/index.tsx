@@ -15,7 +15,11 @@ import {
   getSupportedDimensionsAndMeasures,
   hasMixedDimensionsAndMeasures,
 } from '../filters.utils';
-import { useFilterBuilderScroll } from '../filters.hooks';
+import {
+  FilterBuilderClauseGroup,
+  useAdoptDefaultFilters,
+  useFilterBuilderScroll,
+} from '../filters.hooks';
 import {
   clauseToItems,
   FilterBuilderGroupingState,
@@ -47,6 +51,7 @@ export type FilterBuilderWithGroupingProProps = {
   dimensionsAndMeasures?: DimensionOrMeasure[];
   onChange?: (value: unknown) => void;
   defaultFilters?: FilterBuilderClause;
+  syncDefaultFilters?: boolean;
 } & EditorCardHeaderProps;
 
 const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) => {
@@ -60,6 +65,7 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
     embeddableState,
     onChange,
     defaultFilters,
+    syncDefaultFilters = false,
   } = props;
 
   const [searchNew, setSearchNew] = useState('');
@@ -77,18 +83,27 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
   const items = storedItems.length ? storedItems : emptyItems;
   const operator = embeddableState?.operator ?? AND;
 
-  useEffect(() => {
-    if (!defaultFilters || !dimensionsAndMeasures?.length) return;
-
-    const newItems = clauseToItems(defaultFilters, dimensionsAndMeasures);
-
-    if (newItems.length > 0) {
+  const adoptDefaultFilters = useCallback(
+    (clause: FilterBuilderClauseGroup) => {
       setEmbeddableState?.((prev) => {
-        if (getFilterNodes(prev).length) return prev;
-        return withItems(prev, newItems, { operator: defaultFilters.operator });
+        // Seed-once (default, backward compatible): only apply while empty.
+        if (!syncDefaultFilters && getFilterNodes(prev).length) {
+          return prev;
+        }
+        return withItems(prev, clauseToItems(clause, dimensionsAndMeasures), {
+          operator: clause.operator,
+        });
       });
-    }
-  }, [defaultFilters, dimensionsAndMeasures, setEmbeddableState]);
+    },
+    [dimensionsAndMeasures, setEmbeddableState, syncDefaultFilters],
+  );
+
+  useAdoptDefaultFilters({
+    defaultFilters,
+    dimensionsAndMeasures,
+    lastEmittedRef: prevFilterValueRef,
+    adopt: adoptDefaultFilters,
+  });
 
   const allFilters = items.flatMap((node) => (isFilterBuilderGroup(node) ? node.filters : [node]));
 

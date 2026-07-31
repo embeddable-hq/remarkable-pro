@@ -2,7 +2,11 @@ import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/re
 import { FilterOperator, loadData, Value } from '@embeddable.com/core';
 import Component from '.';
 import { inputs } from '../../../component.inputs.constants';
-import { FilterBuilderClause, filterToLoadDataFilters } from '../filters.utils';
+import {
+  FilterBuilderClause,
+  filterToLoadDataFilters,
+  syncDefaultFiltersInput,
+} from '../filters.utils';
 import { FilterBuilderGroupingState, getAllFilters } from './FilterBuilderWithGroupingPro.utils';
 
 export type { FilterBuilderGroupingState };
@@ -38,6 +42,7 @@ const meta = {
       category: 'Component Settings',
       description: "Each filter's available options update based on the other active filters.",
     },
+    syncDefaultFiltersInput,
     inputs.title,
     inputs.description,
     inputs.tooltip,

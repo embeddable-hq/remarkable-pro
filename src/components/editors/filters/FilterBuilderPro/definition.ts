@@ -7,6 +7,7 @@ import {
   FilterBuilderClause,
   FilterBuilderFilter,
   filterToLoadDataFilters,
+  syncDefaultFiltersInput,
 } from '../filters.utils';
 
 const meta = {
@@ -40,6 +41,7 @@ const meta = {
       category: 'Component Settings',
       description: "Each filter's available options update based on the other active filters.",
     },
+    syncDefaultFiltersInput,
     inputs.title,
     inputs.description,
     inputs.tooltip,

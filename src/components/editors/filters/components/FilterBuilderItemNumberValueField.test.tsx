@@ -135,4 +135,46 @@ describe('FilterBuilderItemNumberValueField', () => {
     );
     expect(onSelectValue).toHaveBeenCalledWith(99);
   });
+
+  // The fix: the field adopts a host-driven change to filter.value on the SAME
+  // instance (no remount), so an updated/reset defaultFilters is reflected.
+  it('reflects an external filter.value change on the same instance', () => {
+    const { rerender, getByRole } = render(
+      <FilterBuilderItemNumberValueField
+        styles={styles}
+        filter={makeFilter({ value: 67 })}
+        onSelectValue={vi.fn()}
+      />,
+    );
+    expect(getByRole('spinbutton')).toHaveValue(67);
+
+    rerender(
+      <FilterBuilderItemNumberValueField
+        styles={styles}
+        filter={makeFilter({ value: 100 })}
+        onSelectValue={vi.fn()}
+      />,
+    );
+    expect(getByRole('spinbutton')).toHaveValue(100);
+  });
+
+  it('reflects an external reset to null on the same instance', () => {
+    const { rerender, getByRole } = render(
+      <FilterBuilderItemNumberValueField
+        styles={styles}
+        filter={makeFilter({ value: 100 })}
+        onSelectValue={vi.fn()}
+      />,
+    );
+    expect(getByRole('spinbutton')).toHaveValue(100);
+
+    rerender(
+      <FilterBuilderItemNumberValueField
+        styles={styles}
+        filter={makeFilter({ value: null })}
+        onSelectValue={vi.fn()}
+      />,
+    );
+    expect(getByRole('spinbutton')).toHaveValue(null);
+  });
 });

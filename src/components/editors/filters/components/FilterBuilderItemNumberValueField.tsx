@@ -27,8 +27,14 @@ const FilterBuilderItemNumberValueField = ({
     Array.isArray(filter.value) ? ((filter.value as number[])[1] ?? null) : null,
   );
   const firstInputRef = useRef<HTMLInputElement>(null);
+  // Tracks the value we last emitted, so the external-sync effect below can tell
+  // a genuine host-driven change apart from the echo of our own debounced emit.
+  const lastEmittedRef = useRef<number | number[] | null>(
+    (filter?.value as number | number[]) ?? null,
+  );
 
   const debouncedSelectValue = useDebounce((value: number | number[] | null) => {
+    lastEmittedRef.current = value;
     onSelectValue(value);
   });
 
@@ -43,6 +49,21 @@ const FilterBuilderItemNumberValueField = ({
       debouncedSelectValue(value);
     }
   }, [value, debouncedSelectValue]);
+
+  // Adopt host-driven changes to filter.value (e.g. an updated/reset defaultFilters)
+  // into local state, ignoring the echo of our own emit so typing isn't disrupted.
+  useEffect(() => {
+    const incoming = (filter?.value ?? null) as number | number[] | null;
+    if (JSON.stringify(incoming) === JSON.stringify(lastEmittedRef.current)) return;
+    lastEmittedRef.current = incoming;
+    if (Array.isArray(incoming)) {
+      setMin(incoming[0] ?? null);
+      setMax(incoming[1] ?? null);
+    } else {
+      setValue(incoming);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(filter?.value ?? null)]);
 
   useEffect(() => {
     if (filter.value) return;
