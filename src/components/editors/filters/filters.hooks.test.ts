@@ -90,6 +90,44 @@ describe('useAdoptDefaultFilters', () => {
     rerender({ defaultFilters: { ...(emitted as object) } as FilterBuilderClause });
     expect(adopt).toHaveBeenCalledTimes(1);
   });
+
+  it('clears adoption history even while dimensionsAndMeasures is empty, so a later re-push re-adopts', () => {
+    const adopt = vi.fn();
+    const lastEmittedRef = { current: undefined as unknown };
+    const initialProps: { defaultFilters?: FilterBuilderClause; dims: DimensionOrMeasure[] } = {
+      defaultFilters: group,
+      dims: dimensionsAndMeasures,
+    };
+    const { rerender } = renderHook(
+      ({
+        defaultFilters,
+        dims,
+      }: {
+        defaultFilters?: FilterBuilderClause;
+        dims: DimensionOrMeasure[];
+      }) =>
+        useAdoptDefaultFilters({
+          defaultFilters,
+          dimensionsAndMeasures: dims,
+          lastEmittedRef,
+          adopt,
+        }),
+      { initialProps },
+    );
+    expect(adopt).toHaveBeenCalledTimes(1);
+
+    // Filter cleared and dimensions go away in the same beat (e.g. the host
+    // swaps datasets). The invalid-default branch must still run and reset
+    // lastAdoptedRef, even though the dimensions guard would otherwise
+    // short-circuit first.
+    rerender({ defaultFilters: undefined, dims: [] });
+    expect(adopt).toHaveBeenCalledTimes(1);
+
+    // Dimensions come back and the host re-pushes the same group — it must
+    // be re-adopted, not dropped as "already applied".
+    rerender({ defaultFilters: group, dims: dimensionsAndMeasures });
+    expect(adopt).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('useFilterBuilderScroll', () => {

@@ -38,15 +38,18 @@ export function useAdoptDefaultFilters(opts: {
   const lastAdoptedRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!dimensionsAndMeasures?.length) return;
     if (!isClauseGroup(defaultFilters)) {
       // Clearing the last filter emits `null`, which echoes back here as a
       // non-group value (e.g. `Value.noFilter()`). It still supersedes whatever
       // we last adopted — forget it, so the host re-pushing the previously
       // adopted clause group is seen as a genuine change and re-applied (RUI-306).
+      // Must run even while dimensionsAndMeasures is still empty, otherwise a
+      // group cleared before dimensions load leaves lastAdoptedRef stale and a
+      // later re-push of that same group is wrongly seen as already-applied.
       lastAdoptedRef.current = null;
       return;
     }
+    if (!dimensionsAndMeasures?.length) return;
 
     const serialized = JSON.stringify(defaultFilters);
 
