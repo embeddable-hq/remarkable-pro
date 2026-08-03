@@ -74,4 +74,4 @@ Please follow our code style and add tests for new features.
 
 ## 📄 License
 
-MIT — see the `LICENSE` file for details.
+MIT — see the `LICENSE` file for details .
