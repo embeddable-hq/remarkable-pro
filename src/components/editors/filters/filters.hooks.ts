@@ -39,7 +39,14 @@ export function useAdoptDefaultFilters(opts: {
 
   useEffect(() => {
     if (!dimensionsAndMeasures?.length) return;
-    if (!isClauseGroup(defaultFilters)) return;
+    if (!isClauseGroup(defaultFilters)) {
+      // Clearing the last filter emits `null`, which echoes back here as a
+      // non-group value (e.g. `Value.noFilter()`). It still supersedes whatever
+      // we last adopted — forget it, so the host re-pushing the previously
+      // adopted clause group is seen as a genuine change and re-applied (RUI-306).
+      lastAdoptedRef.current = null;
+      return;
+    }
 
     const serialized = JSON.stringify(defaultFilters);
 

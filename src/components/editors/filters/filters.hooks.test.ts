@@ -1,5 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
-import { useFilterBuilderScroll } from './filters.hooks';
+import { DimensionOrMeasure } from '@embeddable.com/core';
+import { FilterBuilderClause } from './filters.utils';
+import { useAdoptDefaultFilters, useFilterBuilderScroll } from './filters.hooks';
 
 const simulateScrollState = (
   el: HTMLDivElement,
@@ -33,6 +35,62 @@ const attachScrollRef = (result: {
   result.current.scrollRef.current = el;
   return el;
 };
+
+describe('useAdoptDefaultFilters', () => {
+  const dimensionsAndMeasures = [{ name: 'theme' }] as unknown as DimensionOrMeasure[];
+  const group = {
+    operator: 'and',
+    clauses: [{ property: { name: 'theme' }, operator: 'equals', value: 'X' }],
+  } as unknown as FilterBuilderClause;
+
+  const setup = () => {
+    const adopt = vi.fn();
+    const lastEmittedRef = { current: undefined as unknown };
+    const initialProps: { defaultFilters?: FilterBuilderClause } = { defaultFilters: group };
+    const hook = renderHook(
+      ({ defaultFilters }: { defaultFilters?: FilterBuilderClause }) =>
+        useAdoptDefaultFilters({ defaultFilters, dimensionsAndMeasures, lastEmittedRef, adopt }),
+      { initialProps },
+    );
+    return { adopt, lastEmittedRef, ...hook };
+  };
+
+  it('adopts defaultFilters on mount and ignores a re-push of the same value', () => {
+    const { adopt, rerender } = setup();
+    expect(adopt).toHaveBeenCalledTimes(1);
+
+    rerender({ defaultFilters: { ...(group as object) } as FilterBuilderClause });
+    expect(adopt).toHaveBeenCalledTimes(1);
+  });
+
+  it('re-adopts a previously adopted value after the filters were cleared (RUI-306)', () => {
+    const { adopt, lastEmittedRef, rerender } = setup();
+    expect(adopt).toHaveBeenCalledTimes(1);
+
+    // User deletes the filter in the UI: the builder emits `null`, which
+    // echoes back through the shared variable as a non-group value.
+    lastEmittedRef.current = null;
+    rerender({ defaultFilters: undefined });
+    expect(adopt).toHaveBeenCalledTimes(1);
+
+    // Host pushes the original value again — it must be re-applied, not
+    // dropped as "already adopted".
+    rerender({ defaultFilters: group });
+    expect(adopt).toHaveBeenCalledTimes(2);
+  });
+
+  it('still records its own group echo without re-applying it', () => {
+    const { adopt, lastEmittedRef, rerender } = setup();
+
+    const emitted = {
+      operator: 'and',
+      clauses: [{ property: { name: 'theme' }, operator: 'equals', value: 'Y' }],
+    } as unknown as FilterBuilderClause;
+    lastEmittedRef.current = emitted;
+    rerender({ defaultFilters: { ...(emitted as object) } as FilterBuilderClause });
+    expect(adopt).toHaveBeenCalledTimes(1);
+  });
+});
 
 describe('useFilterBuilderScroll', () => {
   it('starts with scroll buttons hidden', () => {
