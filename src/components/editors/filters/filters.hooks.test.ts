@@ -63,7 +63,7 @@ describe('useAdoptDefaultFilters', () => {
     expect(adopt).toHaveBeenCalledTimes(1);
   });
 
-  it('re-adopts a previously adopted value after the filters were cleared (RUI-306)', () => {
+  it('re-adopts a previously adopted value after the filters were cleared', () => {
     const { adopt, lastEmittedRef, rerender } = setup();
     expect(adopt).toHaveBeenCalledTimes(1);
 
