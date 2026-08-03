@@ -1,4 +1,4 @@
-import { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { DimensionOrMeasure } from '@embeddable.com/core';
 import { FilterBuilderClause } from './filters.utils';
 
@@ -31,7 +31,7 @@ const isClauseGroup = (value: unknown): value is FilterBuilderClauseGroup =>
 export function useAdoptDefaultFilters(opts: {
   defaultFilters: FilterBuilderClause | undefined;
   dimensionsAndMeasures: DimensionOrMeasure[];
-  lastEmittedRef: MutableRefObject<unknown>;
+  lastEmittedRef: RefObject<unknown>;
   adopt: (clause: FilterBuilderClauseGroup) => void;
 }): void {
   const { defaultFilters, dimensionsAndMeasures, lastEmittedRef, adopt } = opts;
@@ -39,13 +39,10 @@ export function useAdoptDefaultFilters(opts: {
 
   useEffect(() => {
     if (!isClauseGroup(defaultFilters)) {
-      // Clearing the last filter emits `null`, which echoes back here as a
-      // non-group value (e.g. `Value.noFilter()`). It still supersedes whatever
-      // we last adopted — forget it, so the host re-pushing the previously
-      // adopted clause group is seen as a genuine change and re-applied (RUI-306).
-      // Must run even while dimensionsAndMeasures is still empty, otherwise a
-      // group cleared before dimensions load leaves lastAdoptedRef stale and a
-      // later re-push of that same group is wrongly seen as already-applied.
+      // A cleared filter echoes back as a non-group value (e.g. `Value.noFilter()`).
+      // Forget what we adopted so a later re-push of that group is treated as new,
+      // not "already applied". Runs before the dimensions guard so a clear that
+      // races with dimensions loading isn't missed.
       lastAdoptedRef.current = null;
       return;
     }
