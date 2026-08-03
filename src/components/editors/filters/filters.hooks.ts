@@ -1,4 +1,4 @@
-import { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { DimensionOrMeasure } from '@embeddable.com/core';
 import { FilterBuilderClause } from './filters.utils';
 
@@ -31,15 +31,22 @@ const isClauseGroup = (value: unknown): value is FilterBuilderClauseGroup =>
 export function useAdoptDefaultFilters(opts: {
   defaultFilters: FilterBuilderClause | undefined;
   dimensionsAndMeasures: DimensionOrMeasure[];
-  lastEmittedRef: MutableRefObject<unknown>;
+  lastEmittedRef: RefObject<unknown>;
   adopt: (clause: FilterBuilderClauseGroup) => void;
 }): void {
   const { defaultFilters, dimensionsAndMeasures, lastEmittedRef, adopt } = opts;
   const lastAdoptedRef = useRef<string | null>(null);
 
   useEffect(() => {
+    if (!isClauseGroup(defaultFilters)) {
+      // A cleared filter echoes back as a non-group value (e.g. `Value.noFilter()`).
+      // Forget what we adopted so a later re-push of that group is treated as new,
+      // not "already applied". Runs before the dimensions guard so a clear that
+      // races with dimensions loading isn't missed.
+      lastAdoptedRef.current = null;
+      return;
+    }
     if (!dimensionsAndMeasures?.length) return;
-    if (!isClauseGroup(defaultFilters)) return;
 
     const serialized = JSON.stringify(defaultFilters);
 

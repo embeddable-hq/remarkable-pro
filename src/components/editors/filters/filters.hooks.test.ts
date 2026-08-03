@@ -1,5 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
-import { useFilterBuilderScroll } from './filters.hooks';
+import { DimensionOrMeasure } from '@embeddable.com/core';
+import { FilterBuilderClause } from './filters.utils';
+import { useAdoptDefaultFilters, useFilterBuilderScroll } from './filters.hooks';
 
 const simulateScrollState = (
   el: HTMLDivElement,
@@ -33,6 +35,100 @@ const attachScrollRef = (result: {
   result.current.scrollRef.current = el;
   return el;
 };
+
+describe('useAdoptDefaultFilters', () => {
+  const dimensionsAndMeasures = [{ name: 'theme' }] as unknown as DimensionOrMeasure[];
+  const group = {
+    operator: 'and',
+    clauses: [{ property: { name: 'theme' }, operator: 'equals', value: 'X' }],
+  } as unknown as FilterBuilderClause;
+
+  const setup = () => {
+    const adopt = vi.fn();
+    const lastEmittedRef = { current: undefined as unknown };
+    const initialProps: { defaultFilters?: FilterBuilderClause } = { defaultFilters: group };
+    const hook = renderHook(
+      ({ defaultFilters }: { defaultFilters?: FilterBuilderClause }) =>
+        useAdoptDefaultFilters({ defaultFilters, dimensionsAndMeasures, lastEmittedRef, adopt }),
+      { initialProps },
+    );
+    return { adopt, lastEmittedRef, ...hook };
+  };
+
+  it('adopts defaultFilters on mount and ignores a re-push of the same value', () => {
+    const { adopt, rerender } = setup();
+    expect(adopt).toHaveBeenCalledTimes(1);
+
+    rerender({ defaultFilters: { ...(group as object) } as FilterBuilderClause });
+    expect(adopt).toHaveBeenCalledTimes(1);
+  });
+
+  it('re-adopts a previously adopted value after the filters were cleared', () => {
+    const { adopt, lastEmittedRef, rerender } = setup();
+    expect(adopt).toHaveBeenCalledTimes(1);
+
+    // User deletes the filter in the UI: the builder emits `null`, which
+    // echoes back through the shared variable as a non-group value.
+    lastEmittedRef.current = null;
+    rerender({ defaultFilters: undefined });
+    expect(adopt).toHaveBeenCalledTimes(1);
+
+    // Host pushes the original value again — it must be re-applied, not
+    // dropped as "already adopted".
+    rerender({ defaultFilters: group });
+    expect(adopt).toHaveBeenCalledTimes(2);
+  });
+
+  it('still records its own group echo without re-applying it', () => {
+    const { adopt, lastEmittedRef, rerender } = setup();
+
+    const emitted = {
+      operator: 'and',
+      clauses: [{ property: { name: 'theme' }, operator: 'equals', value: 'Y' }],
+    } as unknown as FilterBuilderClause;
+    lastEmittedRef.current = emitted;
+    rerender({ defaultFilters: { ...(emitted as object) } as FilterBuilderClause });
+    expect(adopt).toHaveBeenCalledTimes(1);
+  });
+
+  it('clears adoption history even while dimensionsAndMeasures is empty, so a later re-push re-adopts', () => {
+    const adopt = vi.fn();
+    const lastEmittedRef = { current: undefined as unknown };
+    const initialProps: { defaultFilters?: FilterBuilderClause; dims: DimensionOrMeasure[] } = {
+      defaultFilters: group,
+      dims: dimensionsAndMeasures,
+    };
+    const { rerender } = renderHook(
+      ({
+        defaultFilters,
+        dims,
+      }: {
+        defaultFilters?: FilterBuilderClause;
+        dims: DimensionOrMeasure[];
+      }) =>
+        useAdoptDefaultFilters({
+          defaultFilters,
+          dimensionsAndMeasures: dims,
+          lastEmittedRef,
+          adopt,
+        }),
+      { initialProps },
+    );
+    expect(adopt).toHaveBeenCalledTimes(1);
+
+    // Filter cleared and dimensions go away in the same beat (e.g. the host
+    // swaps datasets). The invalid-default branch must still run and reset
+    // lastAdoptedRef, even though the dimensions guard would otherwise
+    // short-circuit first.
+    rerender({ defaultFilters: undefined, dims: [] });
+    expect(adopt).toHaveBeenCalledTimes(1);
+
+    // Dimensions come back and the host re-pushes the same group — it must
+    // be re-adopted, not dropped as "already applied".
+    rerender({ defaultFilters: group, dims: dimensionsAndMeasures });
+    expect(adopt).toHaveBeenCalledTimes(2);
+  });
+});
 
 describe('useFilterBuilderScroll', () => {
   it('starts with scroll buttons hidden', () => {
