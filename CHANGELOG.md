@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.26
+
+### Patch Changes
+
+- 944c858: Receive overlay css variables
+
 ## 0.3.25
 
 ### Patch Changes
