@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.3.27
+
+### Patch Changes
+
+- 67eb200: Sync presets and date range selection
+
 ## 0.3.26
 
 ### Patch Changes
