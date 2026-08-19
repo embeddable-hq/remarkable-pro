@@ -1,4 +1,6 @@
 import { Resource } from 'i18next';
+// Side-effect import: augments Chart.js's ChartTypeRegistry with the 'funnel' chart type.
+import type {} from 'chartjs-chart-funnel';
 import { ThemeFormatter } from './formatter/formatter.types';
 import { ThemeStyles } from './styles/styles.types';
 import { ThemeFonts } from './fonts/fonts.types';
@@ -48,6 +50,7 @@ export type ThemeCharts = {
   areaChartPro?: { options: Partial<ChartOptions<'line'>> };
   scatterChartPro?: { options: Partial<ChartOptions<'scatter'>> };
   bubbleChartPro?: { options: Partial<ChartOptions<'bubble'>> };
+  funnelChartPro?: { options: Partial<ChartOptions<'funnel'>> };
 };
 
 export type ThemeDefaults = {

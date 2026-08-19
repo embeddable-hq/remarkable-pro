@@ -142,6 +142,13 @@ export * from './components/charts/pies/DonutChartPro/definition';
 export * from './components/charts/pies/PieChartPro/definition';
 export * from './components/charts/pies/DonutLabelChartPro/definition';
 
+// Charts - Funnel
+export * as FunnelChartPro from './components/charts/funnel/FunnelChartPro';
+export type { FunnelChartProProps } from './components/charts/funnel/FunnelChartPro';
+export * from './components/charts/funnel/funnel.types';
+export * from './components/charts/funnel/funnel.utils';
+export * from './components/charts/funnel/FunnelChartPro/definition';
+
 // Charts - Tables
 export * as HeatMapPro from './components/charts/tables/HeatMapPro';
 export type { HeatMapProProps } from './components/charts/tables/HeatMapPro';
