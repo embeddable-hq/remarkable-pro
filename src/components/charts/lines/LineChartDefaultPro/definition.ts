@@ -61,6 +61,7 @@ const meta = {
     inputs.reverseXAxis,
     inputs.yAxisRangeMin,
     inputs.yAxisRangeMax,
+    inputs.xAxisMaxItems,
     inputs.maxResults,
     inputs.menuOptions,
     inputs.trackingId,

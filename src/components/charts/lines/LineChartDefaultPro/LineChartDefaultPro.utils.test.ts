@@ -2,14 +2,17 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Dimension, Measure } from '@embeddable.com/core';
 import { getLineChartProData, getLineChartProOptions } from './LineChartDefaultPro.utils';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
-import { getDimensionWithoutTruncation } from '../../charts.utils';
+import { getDimensionWithoutTruncation, groupTailAsOther } from '../../charts.utils';
 
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
 vi.mock('@embeddable.com/remarkable-ui', () => ({
   getChartColors: vi.fn(() => []),
   getStyleNumber: vi.fn(() => 5),
 }));
-vi.mock('../../charts.utils', () => ({ getDimensionWithoutTruncation: vi.fn((d) => d) }));
+vi.mock('../../charts.utils', () => ({
+  getDimensionWithoutTruncation: vi.fn((d) => d),
+  groupTailAsOther: vi.fn((data) => data),
+}));
 vi.mock('../../../../theme/styles/styles.utils', () => ({
   getDimensionMeasureColor: vi.fn(() => '#000'),
 }));
@@ -120,6 +123,42 @@ describe('getLineChartProData', () => {
     );
 
     expect(result?.datasets?.[0]?.data).toEqual([100, 0]);
+  });
+
+  describe('maxItems', () => {
+    it('calls groupTailAsOther with maxItems when provided', () => {
+      const data = [
+        { date: 'Jan', revenue: 100 },
+        { date: 'Feb', revenue: 200 },
+        { date: 'Mar', revenue: 300 },
+      ];
+      const dimension = makeDimension({ name: 'date' });
+      const measures = [makeMeasure({ name: 'revenue' })];
+      vi.mocked(groupTailAsOther).mockReturnValue(data);
+
+      getLineChartProData(
+        { data, dimension, measures, hasMinMaxYAxisRange: false, maxItems: 2 },
+        makeTheme(),
+      );
+
+      expect(vi.mocked(groupTailAsOther)).toHaveBeenCalledWith(data, dimension, measures, 2);
+    });
+
+    it('calls groupTailAsOther with undefined when maxItems is not set', () => {
+      const data = [{ date: 'Jan', revenue: 100 }];
+      const dimension = makeDimension({ name: 'date' });
+      const measures = [makeMeasure({ name: 'revenue' })];
+      vi.mocked(groupTailAsOther).mockReturnValue(data);
+
+      getLineChartProData({ data, dimension, measures, hasMinMaxYAxisRange: false }, makeTheme());
+
+      expect(vi.mocked(groupTailAsOther)).toHaveBeenCalledWith(
+        data,
+        dimension,
+        measures,
+        undefined,
+      );
+    });
   });
 });
 

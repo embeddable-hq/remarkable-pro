@@ -30,6 +30,7 @@ export type LineChartProProps = {
   yAxisLabel?: string;
   yAxisRangeMax?: number;
   yAxisRangeMin?: number;
+  xAxisMaxItems?: number;
   granularity?: Granularity;
   setGranularity?: (granularity: Granularity) => void;
   onLineClicked?: LineChartProOptionsClick;
@@ -54,6 +55,7 @@ const LineChartPro = (props: LineChartProProps) => {
     showValueLabels,
     yAxisRangeMax,
     yAxisRangeMin,
+    xAxisMaxItems,
     setGranularity,
     onLineClicked,
     componentName,
@@ -71,6 +73,7 @@ const LineChartPro = (props: LineChartProProps) => {
       dimension: xAxis,
       measures,
       hasMinMaxYAxisRange: Boolean(yAxisRangeMin != null || yAxisRangeMax != null),
+      maxItems: xAxisMaxItems,
     },
     theme,
   );
