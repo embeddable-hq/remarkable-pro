@@ -26,6 +26,11 @@ const toClientTzInstant = (date: Date | undefined, tz?: string) => {
   return tz ? dayjs.tz(dayjs.utc(date).format('YYYY-MM-DDTHH:mm:ss.SSS'), tz) : dayjs.utc(date);
 };
 
+// Sub-day buckets come back from the backend as real UTC instants, so dateBounds needs the
+// same real-instant treatment to line up. Day-and-coarser buckets come back in the same
+// pseudo-UTC wall-clock convention dateBounds already uses, so they must NOT be shifted.
+const SUB_DAY_GRANULARITIES = new Set(['second', 'minute', 'hour']);
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DataRecord = { [key: string]: any };
 
@@ -78,11 +83,16 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
     });
 
     const clientTimezone = theme.clientContext.timezone;
-    const explicitFrom = toClientTzInstant(
-      externalDateBounds?.from ?? dateBounds?.from,
-      clientTimezone,
-    );
-    const explicitTo = toClientTzInstant(externalDateBounds?.to ?? dateBounds?.to, clientTimezone);
+    const isSubDayGranularity = SUB_DAY_GRANULARITIES.has(granularity);
+    const toBoundary = (date: Date | undefined) =>
+      date == null
+        ? undefined
+        : isSubDayGranularity
+          ? toClientTzInstant(date, clientTimezone)
+          : dayjs.utc(date);
+
+    const explicitFrom = toBoundary(externalDateBounds?.from ?? dateBounds?.from);
+    const explicitTo = toBoundary(externalDateBounds?.to ?? dateBounds?.to);
 
     // Determine the full date range even if data is empty
     const from = explicitFrom ?? dayjs.utc(sortedResults[0]?.[dimensionName]);
