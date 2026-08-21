@@ -66,6 +66,7 @@ const meta = {
       ...inputs.menuOptions,
       defaultValue: [ExportOptionTypeOptions.csv, ExportOptionTypeOptions.xlsx],
     },
+    inputs.trackingId,
   ],
   events: [
     {
@@ -187,6 +188,7 @@ const props = (
     setState,
     results: loadDataResults(inputs, mergedState.page, orderBy, dimensionsAndMeasuresToLoad),
     allResults: loadDataAllResults(inputs, orderBy, mergedState),
+    componentName: meta.name,
   };
 };
 

@@ -26,6 +26,7 @@ const meta = {
     inputs.showTooltips,
     inputs.showValueLabels,
     inputs.menuOptions,
+    inputs.trackingId,
   ],
   events: [
     {
@@ -75,6 +76,7 @@ const events = {
 const props = (inputs: Inputs<typeof meta>) => ({
   ...inputs,
   results: loadDataResults(inputs),
+  componentName: meta.name,
 });
 
 export const pieChartPro = {

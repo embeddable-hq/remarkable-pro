@@ -35,6 +35,8 @@ export type LineChartGroupedProProp = {
   granularity?: Granularity;
   setGranularity?: (granularity: Granularity) => void;
   onLineClicked?: (arg: LineChartGroupedProOptionsClickArg) => void;
+  componentName?: string;
+  trackingId?: string;
 } & ChartCardHeaderProps;
 
 const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
@@ -57,6 +59,8 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
     granularity,
     setGranularity,
     onLineClicked,
+    componentName,
+    trackingId,
   } = props;
 
   const results = useFillGaps({
@@ -84,8 +88,11 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
   const handleClick = createGroupedClickHandler({
     data,
     dimension: xAxis,
+    measure,
     groupBy,
     granularity,
+    componentName,
+    trackingId,
     onClicked: onLineClicked,
   });
 

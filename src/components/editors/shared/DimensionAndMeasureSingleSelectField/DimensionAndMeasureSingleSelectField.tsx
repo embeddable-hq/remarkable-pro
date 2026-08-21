@@ -10,7 +10,7 @@ export type DimensionAndMeasureSingleSelectFieldProps<T> = {
   options: T[];
   placeholder?: string;
   clearable?: boolean;
-  onChange: (value: T | undefined) => void;
+  onChange: (value: T | undefined, isUserAction?: boolean) => void;
 };
 
 export const DimensionAndMeasureSingleSelectField = <T extends Dimension | Measure>(
@@ -24,7 +24,7 @@ export const DimensionAndMeasureSingleSelectField = <T extends Dimension | Measu
 
   const handleChange = (newValue: string | null) => {
     const newSelection = options.find((option) => option.name === newValue);
-    onChange(newSelection);
+    onChange(newSelection, true);
   };
 
   // Auto-select first dimensionOrMeasure when is not clearable and there is no selection

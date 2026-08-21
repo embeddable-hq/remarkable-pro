@@ -40,6 +40,8 @@ const AreaChartPro = (props: AreaChartProProps) => {
     setGranularity,
     onPointClicked,
     onAreaClicked,
+    componentName,
+    trackingId,
   } = props;
 
   const results = useFillGaps({
@@ -61,8 +63,11 @@ const AreaChartPro = (props: AreaChartProProps) => {
   const handleClick = createAreaClickHandler({
     data,
     dimension: xAxis,
+    measure,
     groupBy,
     granularity,
+    componentName,
+    trackingId,
     onPointClicked,
     onAreaClicked,
   });

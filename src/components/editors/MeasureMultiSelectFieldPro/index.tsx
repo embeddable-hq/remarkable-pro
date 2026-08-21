@@ -7,12 +7,15 @@ import { i18nSetup, i18n } from '../../../theme/i18n/i18n';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 import { resolveI18nProps } from '../../component.utils';
 import { getDimensionAndMeasureOptions } from '../utils/dimensionsAndMeasures.utils';
+import { dispatchEventUserInteraction } from '../../../utils/events.utils';
 
 export type MeasureMultiSelectFieldProProps = {
   selectedMeasures?: Measure[];
   measureOptions?: Measure[];
   placeholder?: string;
   clearable?: boolean;
+  componentName?: string;
+  trackingId?: string;
   onChange: (value: Measure[]) => void;
 } & EditorCardHeaderProps;
 
@@ -20,7 +23,14 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
   const theme = useTheme() as Theme;
   i18nSetup(theme);
 
-  const { selectedMeasures = [], measureOptions = [], clearable, onChange } = props;
+  const {
+    selectedMeasures = [],
+    measureOptions = [],
+    clearable,
+    componentName,
+    trackingId,
+    onChange,
+  } = props;
   const { title, description, tooltip, placeholder } = resolveI18nProps(props);
 
   const [searchValue, setSearchValue] = useState('');
@@ -67,7 +77,9 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
 
   const handleChange = (newValues: string[]) => {
     const selectedNamesSet = new Set(newValues);
-    onChange(measureOptions.filter((m) => selectedNamesSet.has(m.name)));
+    const newMeasures = measureOptions.filter((m) => selectedNamesSet.has(m.name));
+    dispatchEventUserInteraction({ componentName, trackingId, value: newMeasures });
+    onChange(newMeasures);
   };
 
   return (

@@ -2,6 +2,7 @@ import { Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
 import { PivotTableProps } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
+import { PivotAggregationTypeOptions } from '../../../types/PivotAggregation.type.emb';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -41,14 +42,38 @@ export const getPivotDimension = (
   };
 };
 
-export const getPivotColumnTotalsFor = (
+const measureKeysFor = (
   measures: Measure[],
-): PivotTableProps<any>['columnTotalsFor'] | undefined => {
-  return measures.filter((m) => m.inputs?.showColumnTotal).map((m) => m.name);
-};
+  field: 'columnAggregation' | 'rowAggregation',
+  type: string,
+): string[] =>
+  measures
+    .filter((m) => (m.inputs?.[field] as string[] | undefined)?.includes(type))
+    .map((m) => m.name);
 
-export const getPivotRowTotalsFor = (
+export const getPivotAggregationsFor = (
   measures: Measure[],
-): PivotTableProps<any>['rowTotalsFor'] | undefined => {
-  return measures.filter((m) => m.inputs?.showRowTotal).map((m) => m.name);
-};
+): Pick<
+  PivotTableProps<any>,
+  | 'columnSumFor'
+  | 'columnMinFor'
+  | 'columnMaxFor'
+  | 'columnAverageFor'
+  | 'rowSumFor'
+  | 'rowMinFor'
+  | 'rowMaxFor'
+  | 'rowAverageFor'
+> => ({
+  columnSumFor: measureKeysFor(measures, 'columnAggregation', PivotAggregationTypeOptions.sum),
+  columnMinFor: measureKeysFor(measures, 'columnAggregation', PivotAggregationTypeOptions.min),
+  columnMaxFor: measureKeysFor(measures, 'columnAggregation', PivotAggregationTypeOptions.max),
+  columnAverageFor: measureKeysFor(
+    measures,
+    'columnAggregation',
+    PivotAggregationTypeOptions.average,
+  ),
+  rowSumFor: measureKeysFor(measures, 'rowAggregation', PivotAggregationTypeOptions.sum),
+  rowMinFor: measureKeysFor(measures, 'rowAggregation', PivotAggregationTypeOptions.min),
+  rowMaxFor: measureKeysFor(measures, 'rowAggregation', PivotAggregationTypeOptions.max),
+  rowAverageFor: measureKeysFor(measures, 'rowAggregation', PivotAggregationTypeOptions.average),
+});

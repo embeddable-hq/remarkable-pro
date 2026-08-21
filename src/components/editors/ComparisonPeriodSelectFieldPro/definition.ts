@@ -29,6 +29,7 @@ const meta = {
       label: 'Selected comparison period',
       category: 'Pre-configured variables',
     },
+    inputs.trackingId,
   ],
   events: [
     {
@@ -58,7 +59,10 @@ const preview = definePreview(Component, {
   onChange: () => null,
 });
 
-const props = (inputs: Inputs<typeof meta>) => inputs;
+const props = (inputs: Inputs<typeof meta>) => ({
+  ...inputs,
+  componentName: meta.name,
+});
 
 const events = {
   onChange: (value: unknown) => {

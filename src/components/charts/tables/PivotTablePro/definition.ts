@@ -20,16 +20,8 @@ const meta = {
       label: 'Measures to display',
       inputs: [
         ...inputs.measures.inputs,
-        {
-          ...subInputs.boolean,
-          name: 'showColumnTotal',
-          label: 'Show column total',
-        },
-        {
-          ...subInputs.boolean,
-          name: 'showRowTotal',
-          label: 'Show row total',
-        },
+        subInputs.columnAggregation,
+        subInputs.rowAggregation,
         {
           ...subInputs.boolean,
           name: 'showAsPercentage',
@@ -85,7 +77,9 @@ export type PivotTableProState = {
 };
 
 const previewConfig = {
-  measures: [{ ...previewData.measure, inputs: { showRowTotal: true, showColumnTotal: true } }],
+  measures: [
+    { ...previewData.measure, inputs: { rowAggregation: ['sum'], columnAggregation: ['sum'] } },
+  ],
   rowDimension: previewData.dimension,
   columnDimension: previewData.dimensionGroup,
   results: previewData.results1Measure2Dimensions,

@@ -3,6 +3,7 @@ import { Granularity } from '../theme/defaults/defaults.GranularityOptions.const
 import AlignType from './types/Align.type.emb';
 import DisplayFormatType from './types/DisplayFormat.type.emb';
 import TableCellStyleType from './types/TableCellStyle.type.emb';
+import PivotAggregationType from './types/PivotAggregation.type.emb';
 
 /* -------------------- */
 /* ----- Generics ----- */
@@ -143,6 +144,20 @@ const showValueAsPercentage = {
   defaultValue: false,
 } as const;
 
+const columnAggregation = {
+  name: 'columnAggregation',
+  type: PivotAggregationType,
+  label: 'Show column calculation',
+  array: true,
+} as const;
+
+const rowAggregation = {
+  name: 'rowAggregation',
+  type: PivotAggregationType,
+  label: 'Show row calculation',
+  array: true,
+} as const;
+
 const showGranularityDropdown = {
   type: 'boolean',
   name: 'showGranularityDropdown',
@@ -231,4 +246,6 @@ export const subInputs = {
   showGranularityDropdown,
   showValueAsPercentage,
   ignoreEmptyDate,
+  columnAggregation,
+  rowAggregation,
 };

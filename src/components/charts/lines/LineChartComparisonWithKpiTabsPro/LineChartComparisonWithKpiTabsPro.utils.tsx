@@ -22,11 +22,9 @@ export const getComparisonKpiTabsItems = ({
     const kpiValue = resultsKpis?.data?.[0]?.[measure.name];
     const kpiComparisonValue = resultsKpisComparison?.data?.[0]?.[measure.name];
     const displayChangeAsPercentage = measure.inputs?.['displayChangeAsPercentage'] as
-      | boolean
-      | undefined;
+      boolean | undefined;
     const percentageDecimalPlaces = measure.inputs?.['percentageDecimalPlaces'] as
-      | number
-      | undefined;
+      number | undefined;
     return {
       id: measure.name,
       label: themeFormatter.dimensionOrMeasureTitle(measure),

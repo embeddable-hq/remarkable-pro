@@ -60,6 +60,7 @@ const meta = {
     },
     { ...inputs.sortDirection, label: 'Default sort direction', category: 'Component Settings' },
     inputs.menuOptions,
+    inputs.trackingId,
   ],
   events: [
     {
@@ -215,6 +216,7 @@ const props = (
       : undefined,
     totalResults: loadDataTotalResults(inputs, dimensionsAndMeasuresToLoad),
     allResults: mergedState.isLoadingDownloadData ? loadDataAllResults(inputs, orderBy) : undefined,
+    componentName: meta.name,
   };
 };
 

@@ -8,14 +8,9 @@ import {
 } from '../../shared/ChartCard/ChartCard';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { PivotTable } from '@embeddable.com/remarkable-ui';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import {
-  getPivotColumnTotalsFor,
-  getPivotDimension,
-  getPivotMeasures,
-  getPivotRowTotalsFor,
-} from './PivotPro.utils';
+import { getPivotAggregationsFor, getPivotDimension, getPivotMeasures } from './PivotPro.utils';
 import { useGetTableSortedResults } from '../tables.hooks';
 import { sortArrayByProp } from '../../../../utils/array.utils';
 
@@ -83,14 +78,31 @@ const PivotTablePro = (props: PivotTableProProps) => {
 
   const cardContentRef = useRef<HTMLDivElement>(null);
 
-  const pivotMeasures = getPivotMeasures({ measures, displayNullAs }, theme);
-  const pivotRowDimension = getPivotDimension({ dimension: rowDimension }, theme);
-  const pivotSubRowDimension = subRowDimension
-    ? getPivotDimension({ dimension: subRowDimension }, theme)
-    : undefined;
-  const pivotColumnDimension = getPivotDimension({ dimension: columnDimension }, theme);
-  const pivotColumnTotalsFor = getPivotColumnTotalsFor(measures);
-  const pivotRowTotalsFor = getPivotRowTotalsFor(measures);
+  const pivotMeasures = useMemo(
+    () => getPivotMeasures({ measures, displayNullAs }, theme),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [measures, displayNullAs, theme],
+  );
+  const pivotRowDimension = useMemo(
+    () => getPivotDimension({ dimension: rowDimension }, theme),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rowDimension, theme],
+  );
+  const pivotSubRowDimension = useMemo(
+    () => (subRowDimension ? getPivotDimension({ dimension: subRowDimension }, theme) : undefined),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [subRowDimension, theme],
+  );
+  const pivotColumnDimension = useMemo(
+    () => getPivotDimension({ dimension: columnDimension }, theme),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [columnDimension, theme],
+  );
+  const pivotAggregations = useMemo(
+    () => getPivotAggregationsFor(measures),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [measures],
+  );
 
   const [loadingRows, setLoadingRows] = useState(new Set<string>());
   const [subRowsByRow, setSubRowsByRow] = useState(new Map<string, any[]>());
@@ -103,6 +115,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
   useEffect(() => {
     // No results or no expandedRowKeys, nothing to load
     if (!resultsSubRows || !resultsSubRows?.data || expandedRowKeys.length === 0) {
+      setSubRowsByRow(new Map());
       return;
     }
 
@@ -146,13 +159,15 @@ const PivotTablePro = (props: PivotTableProProps) => {
       <PivotTable
         firstColumnWidth={firstColumnWidth}
         columnWidth={columnWidth}
-        totalLabel={i18n.t('charts.pivotTable.total')}
         data={results}
         measures={pivotMeasures}
         rowDimension={pivotRowDimension}
         columnDimension={pivotColumnDimension}
-        columnTotalsFor={pivotColumnTotalsFor}
-        rowTotalsFor={pivotRowTotalsFor}
+        {...pivotAggregations}
+        sumLabel={i18n.t('charts.pivotTable.sum')}
+        minLabel={i18n.t('charts.pivotTable.min')}
+        maxLabel={i18n.t('charts.pivotTable.max')}
+        averageLabel={i18n.t('charts.pivotTable.average')}
         expandableRows={Boolean(subRowDimension)}
         subRowsByRow={subRowsByRow}
         loadingRows={loadingRows}

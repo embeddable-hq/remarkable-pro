@@ -1,5 +1,101 @@
 # @embeddable/remarkable-ui
 
+## 0.3.27
+
+### Patch Changes
+
+- 67eb200: Sync presets and date range selection
+
+## 0.3.26
+
+### Patch Changes
+
+- 944c858: Receive overlay css variables
+
+## 0.3.25
+
+### Patch Changes
+
+- fecb78f: FilterBuilderPro and FilterBuilderWithGroupingPro: fix `syncDefaultFilters` not re-applying a previously adopted `defaultFilters` value after the filter list was cleared. Deleting the last filter emits `null`, which was leaving stale adoption state behind — so pushing the same clause back in from the host was silently ignored. The host can now revert to or re-push a filter set after it's been cleared, and it will be re-applied as expected.
+
+## 0.3.24
+
+### Patch Changes
+
+- 4e7df09: FilterBuilderWithGroupingPro now dispatches `embeddable-user-interaction` events on user-driven edits (top-level and group-level), matching FilterBuilderPro. Adds `trackingId` input and `componentName` for consistency with other trackable components.
+
+## 0.3.23
+
+### Patch Changes
+
+- bd87b52: FilterBuilderPro and FilterBuilderWithGroupingPro get a new opt-in **Track default filters** (`syncDefaultFilters`) setting. When enabled, the filter tracks host-driven changes to its bound `defaultFilters` after mount — so the host can update or reset it at runtime (e.g. switching between or reverting to saved filter sets) without remounting the embed. The component's own onChange echo and null/undefined values are ignored so in-progress edits are preserved, and a well-formed empty clause resets the filters. When disabled (the default), behaviour is unchanged: `defaultFilters` only seeds the initial value.
+
+## 0.3.22
+
+### Patch Changes
+
+- 4fd4f70: Introduce embeddable-user-interaction event
+
+## 0.3.21
+
+### Patch Changes
+
+- 1468e1c: remove lowercase transformation in KPI comparison label
+
+## 0.3.20
+
+### Patch Changes
+
+- 7c4bd9b: Introduice FilterBuilder with grouping component
+
+## 0.3.19
+
+### Patch Changes
+
+- 19896fe: Disable shadow for editor card
+
+## 0.3.18
+
+### Patch Changes
+
+- 82b6ec6: Increase Remarkable Ui
+
+## 0.3.17
+
+### Patch Changes
+
+- 6c3f976: Add "can be cleared" field to the Single and Multi select field component
+
+## 0.3.16
+
+### Patch Changes
+
+- 8f1bb3c: Fallback string value when the i18n is not initialized
+
+## 0.3.15
+
+### Patch Changes
+
+- 2bfc752: Pivot table: renamed the "Show row/column aggregation" inputs to "Show row/column calculation", and the Sum/Min/Max/Average total labels shown in the rendered table are now translatable via the theme i18n (`charts.pivotTable.sum|min|max|average`).
+
+## 0.3.14
+
+### Patch Changes
+
+- 043fb0d: Discard border style on the EditorCard
+
+## 0.3.13
+
+### Patch Changes
+
+- adad13e: Increase Remarkable-Ui version
+
+## 0.3.12
+
+### Patch Changes
+
+- e153b5b: Include Timezone on the kpi chart
+
 ## 0.3.11
 
 ### Patch Changes

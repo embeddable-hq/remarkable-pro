@@ -17,4 +17,6 @@ export type DefaultPieChartProps = {
   showValueLabelsAsPercentage?: boolean;
 
   onSegmentClick?: (args: PieChartClickArg) => void;
+  componentName?: string;
+  trackingId?: string;
 } & ChartCardHeaderProps;

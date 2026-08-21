@@ -29,6 +29,8 @@ export type BarChartStackedBaseProps = {
   granularity?: Granularity;
   setGranularity?: (granularity: Granularity) => void;
   onBarClicked?: (args: BarChartStackedProOptionsClickArg) => void;
+  componentName?: string;
+  trackingId?: string;
 } & ChartCardHeaderProps;
 
 export type BarChartBaseProps = {
@@ -44,4 +46,6 @@ export type BarChartBaseProps = {
   granularity?: Granularity;
   setGranularity?: (granularity: Granularity) => void;
   onBarClicked?: (args: BarChartProOptionsClickArg) => void;
+  componentName?: string;
+  trackingId?: string;
 } & ChartCardHeaderProps;

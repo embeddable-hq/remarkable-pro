@@ -27,6 +27,7 @@ import {
   getTimeRangeFromPresets,
   getTimeRangeLabel,
 } from '../dates.utils';
+import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 
 export type DateRangePickerPresetsProps = {
   onChange: (newDateRange: TimeRange) => void;
@@ -36,38 +37,47 @@ export type DateRangePickerPresetsProps = {
   clearable?: boolean;
   showCustomRangeOptions?: boolean;
   showTwoMonths?: boolean;
+  componentName?: string;
+  trackingId?: string;
 } & EditorCardHeaderProps;
 
 const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const theme: Theme = useTheme() as Theme;
   i18nSetup(theme);
   const { dayjsLocaleReady } = useLoadDayjsLocale();
-  const { onChange, clearable, selectedValue, showCustomRangeOptions, showTwoMonths } = props;
+  const {
+    onChange,
+    clearable,
+    selectedValue,
+    showCustomRangeOptions,
+    showTwoMonths,
+    componentName,
+    trackingId,
+  } = props;
   const onlyDateRangePicker = !showCustomRangeOptions;
   const [showDateRangePicker, setShowDateRangePicker] = useState(onlyDateRangePicker);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(
-    getDateRangeFromTimeRange(selectedValue),
-  );
 
   const dateRangeOptions = theme.defaults.dateRangesOptions;
+  const timezone = theme.clientContext.timezone;
+
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(
+    getDateRangeFromTimeRange(selectedValue, dateRangeOptions, timezone),
+  );
 
   useEffect(() => {
     if (!dayjsLocaleReady) {
       return;
     }
     // Step 1: Convert relativeTimeString to actual time range (from/to)
-    const newTimeRange = getTimeRangeFromPresets(
-      selectedValue,
-      dateRangeOptions,
-      theme.clientContext.timezone,
-    );
+    const newTimeRange = getTimeRangeFromPresets(selectedValue, dateRangeOptions, timezone);
 
     if (!shallowEqual(newTimeRange, selectedValue)) {
       onChange(newTimeRange);
+      setDateRange({ from: newTimeRange?.from, to: newTimeRange?.to });
     }
-  }, [selectedValue, dayjsLocaleReady, onChange, dateRangeOptions, theme.clientContext.timezone]);
+  }, [selectedValue, dayjsLocaleReady, onChange, dateRangeOptions, timezone]);
 
   if (!dayjsLocaleReady) {
     return null;
@@ -75,26 +85,30 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
 
   const { description, placeholder, title, tooltip } = resolveI18nProps(props);
 
-  const options = getDateRangeSelectFieldProOptions(dateRangeOptions, theme.clientContext.timezone);
+  const options = getDateRangeSelectFieldProOptions(dateRangeOptions, timezone);
 
   const handleOptionChange = (newValue: string | undefined) => {
     const newTimeRange = getTimeRangeFromPresets(
       { relativeTimeString: newValue } as TimeRange,
       dateRangeOptions,
-      theme.clientContext.timezone,
+      timezone,
     );
 
+    dispatchEventUserInteraction({ componentName, trackingId, value: newTimeRange });
     onChange(newTimeRange);
-    setDateRange(undefined);
+    setDateRange({ from: newTimeRange?.from, to: newTimeRange?.to });
   };
 
   const handleDateRangeChange = (newDateRange: DateRange | undefined) => {
-    onChange(getTimeRangeFromDateRange(newDateRange));
+    const newTimeRange = getTimeRangeFromDateRange(newDateRange);
+    dispatchEventUserInteraction({ componentName, trackingId, value: newTimeRange });
+    onChange(newTimeRange);
     setIsOpen(false);
   };
 
   const handleClear = () => {
     setDateRange(undefined);
+    dispatchEventUserInteraction({ componentName, trackingId, value: undefined });
     onChange(undefined);
   };
 
@@ -118,7 +132,6 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const locale = theme.i18n.language ?? theme.formatter.locale;
   const isSubmitDisabled = isSameDateRange(dateRange, selectedValue);
   const numberOfMonths = showTwoMonths ? 2 : 1;
-
   return (
     <EditorCard title={title} description={description} tooltip={tooltip}>
       <Dropdown

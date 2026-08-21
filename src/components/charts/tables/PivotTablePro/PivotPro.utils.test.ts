@@ -1,9 +1,4 @@
-import {
-  getPivotMeasures,
-  getPivotDimension,
-  getPivotColumnTotalsFor,
-  getPivotRowTotalsFor,
-} from './PivotPro.utils';
+import { getPivotMeasures, getPivotDimension, getPivotAggregationsFor } from './PivotPro.utils';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
@@ -168,44 +163,54 @@ describe('getPivotDimension', () => {
 
 // ---------------------------------------------------------------------------
 
-describe('getPivotColumnTotalsFor', () => {
-  it('returns names of measures with showColumnTotal set', () => {
+describe('getPivotAggregationsFor', () => {
+  it('maps columnAggregation selections to column props', () => {
     const measures = [
-      measure({ name: 'a', inputs: { showColumnTotal: true } }),
-      measure({ name: 'b', inputs: { showColumnTotal: false } }),
-      measure({ name: 'c', inputs: { showColumnTotal: true } }),
+      measure({ name: 'a', inputs: { columnAggregation: ['sum', 'min'] } }),
+      measure({ name: 'b', inputs: { columnAggregation: ['max'] } }),
+      measure({ name: 'c', inputs: { columnAggregation: ['average', 'sum'] } }),
     ];
 
-    expect(getPivotColumnTotalsFor(measures)).toEqual(['a', 'c']);
+    const result = getPivotAggregationsFor(measures);
+
+    expect(result.columnSumFor).toEqual(['a', 'c']);
+    expect(result.columnMinFor).toEqual(['a']);
+    expect(result.columnMaxFor).toEqual(['b']);
+    expect(result.columnAverageFor).toEqual(['c']);
   });
 
-  it('returns empty array when no measures have showColumnTotal', () => {
-    expect(getPivotColumnTotalsFor([measure({ name: 'a' })])).toEqual([]);
-  });
-
-  it('returns empty array for empty measures list', () => {
-    expect(getPivotColumnTotalsFor([])).toEqual([]);
-  });
-});
-
-// ---------------------------------------------------------------------------
-
-describe('getPivotRowTotalsFor', () => {
-  it('returns names of measures with showRowTotal set', () => {
+  it('maps rowAggregation selections to row props', () => {
     const measures = [
-      measure({ name: 'x', inputs: { showRowTotal: true } }),
-      measure({ name: 'y', inputs: { showRowTotal: false } }),
-      measure({ name: 'z', inputs: { showRowTotal: true } }),
+      measure({ name: 'x', inputs: { rowAggregation: ['sum', 'average'] } }),
+      measure({ name: 'y', inputs: { rowAggregation: ['min'] } }),
+      measure({ name: 'z', inputs: { rowAggregation: ['max', 'sum'] } }),
     ];
 
-    expect(getPivotRowTotalsFor(measures)).toEqual(['x', 'z']);
+    const result = getPivotAggregationsFor(measures);
+
+    expect(result.rowSumFor).toEqual(['x', 'z']);
+    expect(result.rowMinFor).toEqual(['y']);
+    expect(result.rowMaxFor).toEqual(['z']);
+    expect(result.rowAverageFor).toEqual(['x']);
   });
 
-  it('returns empty array when no measures have showRowTotal', () => {
-    expect(getPivotRowTotalsFor([measure({ name: 'x' })])).toEqual([]);
+  it('returns empty arrays when no measures have aggregation inputs', () => {
+    const result = getPivotAggregationsFor([measure({ name: 'a' })]);
+
+    expect(result.columnSumFor).toEqual([]);
+    expect(result.columnMinFor).toEqual([]);
+    expect(result.columnMaxFor).toEqual([]);
+    expect(result.columnAverageFor).toEqual([]);
+    expect(result.rowSumFor).toEqual([]);
+    expect(result.rowMinFor).toEqual([]);
+    expect(result.rowMaxFor).toEqual([]);
+    expect(result.rowAverageFor).toEqual([]);
   });
 
-  it('returns empty array for empty measures list', () => {
-    expect(getPivotRowTotalsFor([])).toEqual([]);
+  it('returns empty arrays for empty measures list', () => {
+    const result = getPivotAggregationsFor([]);
+
+    expect(result.columnSumFor).toEqual([]);
+    expect(result.rowSumFor).toEqual([]);
   });
 });

@@ -135,7 +135,7 @@ describe('DimensionAndMeasureSingleSelectField', () => {
       />,
     );
     fireEvent.click(getByTestId('option-country'));
-    expect(onChange).toHaveBeenCalledWith(country);
+    expect(onChange).toHaveBeenCalledWith(country, true);
   });
 
   it('calls onChange with undefined when the selected value does not match any option', () => {
@@ -151,7 +151,7 @@ describe('DimensionAndMeasureSingleSelectField', () => {
       />,
     );
     fireEvent.click(getByTestId('option-unknown'));
-    expect(onChange).toHaveBeenCalledWith(undefined);
+    expect(onChange).toHaveBeenCalledWith(undefined, true);
   });
 
   it('passes updated searchValue to getDimensionAndMeasureOptions when search changes', () => {

@@ -31,6 +31,7 @@ const meta = {
       },
     },
     { ...inputs.clearable, defaultValue: false },
+    inputs.trackingId,
   ],
   events: [
     {
@@ -68,6 +69,7 @@ const props = (inputs: Inputs<typeof meta>) => {
     ...inputs,
     measureOptions: inputs.measureOptions ?? [],
     selectedMeasures: inputs.selectedMeasures ?? [],
+    componentName: meta.name,
   };
 };
 
