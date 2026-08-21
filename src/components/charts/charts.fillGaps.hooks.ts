@@ -2,6 +2,7 @@ import { DataResponse, Dimension, TimeRange } from '@embeddable.com/core';
 import dayjs, { QUnitType } from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek.js';
 import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore.js';
 import { Theme } from '../../theme/theme.types';
 import { useTheme } from '@embeddable.com/react';
@@ -10,9 +11,20 @@ import quarterOfYear from 'dayjs/plugin/quarterOfYear.js';
 import { defaultGranularitySelectFieldOptions } from '../../theme/defaults/defaults.GranularityOptions.constants';
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 dayjs.extend(isoWeek);
 dayjs.extend(isSameOrBefore);
 dayjs.extend(quarterOfYear);
+
+// dateBounds/externalDateBounds store the picked calendar date encoded as if it were
+// UTC (e.g. Aug 17 -> "2026-08-17T00:00:00.000Z"), with the real timezone meant to be
+// applied wherever the range is consumed (see defaults.DateRanges.constants.ts). Reinterpret
+// those UTC-anchored digits as wall-clock time in the client's timezone so the resulting
+// instant lines up with the real, already timezone-bucketed data returned for the chart.
+const toClientTzInstant = (date: Date | undefined, tz?: string) => {
+  if (!date) return undefined;
+  return tz ? dayjs.tz(dayjs.utc(date).format('YYYY-MM-DDTHH:mm:ss.SSS'), tz) : dayjs.utc(date);
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DataRecord = { [key: string]: any };
@@ -65,17 +77,24 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
       return dayjs.utc(aVal).diff(dayjs.utc(bVal));
     });
 
-    // Determine the full date range even if data is empty
-    const from = dayjs.utc(
-      externalDateBounds?.from ?? dateBounds?.from ?? sortedResults[0]?.[dimensionName],
+    const clientTimezone = theme.clientContext.timezone;
+    const explicitFrom = toClientTzInstant(
+      externalDateBounds?.from ?? dateBounds?.from,
+      clientTimezone,
     );
+    const explicitTo = toClientTzInstant(externalDateBounds?.to ?? dateBounds?.to, clientTimezone);
 
-    const to = dayjs.utc(
-      externalDateBounds?.to ??
-        dateBounds?.to ??
+    // Determine the full date range even if data is empty
+    const from = explicitFrom ?? dayjs.utc(sortedResults[0]?.[dimensionName]);
+
+    const to =
+      explicitTo ??
+      dayjs.utc(
         sortedResults[sortedResults.length - 1]?.[dimensionName] ??
-        [...sortedResults].reverse().find((item) => item?.[dimensionName] != null)?.[dimensionName],
-    );
+          [...sortedResults].reverse().find((item) => item?.[dimensionName] != null)?.[
+            dimensionName
+          ],
+      );
 
     // If we *still* don’t have valid date bounds, bail out safely
     if (!from.isValid() || !to.isValid()) {
