@@ -15,6 +15,7 @@ export const groupTailAsOther = (
   dimension: Dimension,
   measures: Measure[],
   maxItems?: number,
+  serverOtherAggregate?: Record<string, unknown>,
 ) => {
   if (!maxItems || data.length <= maxItems) return data;
 
@@ -24,6 +25,15 @@ export const groupTailAsOther = (
   const aggregatedRow: Record<string, unknown> = {
     [dimension.name]: i18n.t('common.other'),
   };
+
+  if (serverOtherAggregate) {
+    for (const measure of measures) {
+      aggregatedRow[measure.name] = Number.parseFloat(
+        String(serverOtherAggregate[measure.name] ?? '0'),
+      );
+    }
+    return [...head, aggregatedRow];
+  }
 
   for (const measure of measures) {
     const vals = tail.map((row) => Number.parseFloat(row[measure.name] ?? '0'));

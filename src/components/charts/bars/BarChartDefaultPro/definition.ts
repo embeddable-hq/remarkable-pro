@@ -15,6 +15,12 @@ import { subInputs } from '../../../component.subinputs.constants';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
 import { BarChartProOptionsClickArg } from '../bars.types';
+import {
+  getCachedOtherBucketState,
+  getOtherBucketAggregateArgs,
+  getOtherBucketCacheKey,
+  OtherBucketHeadInfo,
+} from '../../charts.otherBucket.utils';
 
 const meta = {
   name: 'BarChartDefaultPro',
@@ -70,6 +76,9 @@ const meta = {
 
 export type BarChartDefaultProState = {
   granularity?: Granularity;
+  otherBucketActive?: boolean;
+  otherBucketHeadValues?: string[];
+  otherBucketCacheKey?: string;
 };
 
 const previewConfig = {
@@ -89,6 +98,7 @@ const loadDataResultsArgs = (
   limit: inputs.maxResults,
   from: inputs.dataset,
   select: [...inputs.measures, dimension ?? inputs.dimension],
+  orderBy: inputs.measures[0] ? [{ property: inputs.measures[0], direction: 'desc' }] : undefined,
   timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
@@ -114,13 +124,37 @@ const props = (
     inputs.dimension,
     state?.granularity,
   );
+  const timezone = getClientContextTimezone(clientContext?.timezone);
+  const primaryRequest = loadDataResultsArgs(inputs, dimensionWithGranularity, clientContext);
+  const otherBucketCacheKey = getOtherBucketCacheKey(primaryRequest, inputs.xAxisMaxItems);
+  const cachedOtherBucket = getCachedOtherBucketState(otherBucketCacheKey, state);
 
   return {
     ...inputs,
     dimension: dimensionWithGranularity,
     granularity: state?.granularity,
-    setGranularity: (granularity: Granularity) => setState({ granularity }),
-    results: loadDataResults(inputs, dimensionWithGranularity, clientContext),
+    setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
+    otherBucketActive: cachedOtherBucket.active,
+    otherBucketHeadValues: cachedOtherBucket.headValues,
+    otherBucketCacheKey,
+    setOtherBucketState: (info: OtherBucketHeadInfo, cacheKey: string) =>
+      setState({
+        ...state,
+        otherBucketActive: info.active,
+        otherBucketHeadValues: info.headValues,
+        otherBucketCacheKey: cacheKey,
+      }),
+    results: loadData(primaryRequest),
+    resultsOtherBucket: loadData(
+      getOtherBucketAggregateArgs({
+        dataset: inputs.dataset,
+        dimension: dimensionWithGranularity,
+        measures: inputs.measures,
+        active: cachedOtherBucket.active,
+        headValues: cachedOtherBucket.headValues,
+        timezone,
+      }),
+    ),
   };
 };
 

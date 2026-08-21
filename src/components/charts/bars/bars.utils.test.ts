@@ -360,7 +360,35 @@ describe('getBarChartProData', () => {
 
     getBarChartProData({ data, dimension, measures, maxItems: 5 }, makeTheme());
 
-    expect(vi.mocked(groupTailAsOther)).toHaveBeenCalledWith(data, dimension, measures, 5);
+    expect(vi.mocked(groupTailAsOther)).toHaveBeenCalledWith(
+      data,
+      dimension,
+      measures,
+      5,
+      undefined,
+    );
+  });
+
+  it('passes otherBucketAggregate through to groupTailAsOther', () => {
+    const dimension = makeDimension({ name: 'product' });
+    const measures = [makeMeasure({ name: 'revenue' })];
+    const data = [{ product: 'Widget', revenue: '100' }];
+    const otherBucketAggregate = { revenue: 999 };
+
+    vi.mocked(groupTailAsOther).mockReturnValue(data);
+
+    getBarChartProData(
+      { data, dimension, measures, maxItems: 5, otherBucketAggregate },
+      makeTheme(),
+    );
+
+    expect(vi.mocked(groupTailAsOther)).toHaveBeenCalledWith(
+      data,
+      dimension,
+      measures,
+      5,
+      otherBucketAggregate,
+    );
   });
 
   it('assigns background and border colors per measure', () => {

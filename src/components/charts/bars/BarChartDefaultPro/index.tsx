@@ -1,4 +1,5 @@
 import { useTheme } from '@embeddable.com/react';
+import { DataResponse } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { ChartCard, asChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
@@ -10,12 +11,19 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
 import { BarChartBaseProps } from '../bars.types';
 import { createSimpleClickHandler } from '../../charts.utils';
+import { useUpdateOtherBucketState } from '../../charts.otherBucket.hooks';
+import { OtherBucketHeadInfo } from '../../charts.otherBucket.utils';
 
 export type BarChartDefaultProProps = BarChartBaseProps & {
   reverseXAxis?: boolean;
   xAxisMaxItems?: number;
   yAxisRangeMin?: number;
   yAxisRangeMax?: number;
+  maxResults?: number;
+  otherBucketActive?: boolean;
+  otherBucketCacheKey?: string;
+  setOtherBucketState?: (info: OtherBucketHeadInfo, cacheKey: string) => void;
+  resultsOtherBucket?: DataResponse;
 };
 
 const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
@@ -27,6 +35,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     yAxisRangeMin,
     xAxisMaxItems,
     yAxisRangeMax,
+    maxResults,
     showLegend,
     showTooltips,
     showLogarithmicScale,
@@ -36,18 +45,36 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     granularity,
     setGranularity,
     onBarClicked,
+    otherBucketActive,
+    otherBucketCacheKey,
+    setOtherBucketState,
+    resultsOtherBucket,
   } = props;
 
   const resolvedI18nProps = resolveI18nProps(props);
   const { tooltip, description, title, xAxisLabel, yAxisLabel } = resolvedI18nProps;
+
+  useUpdateOtherBucketState({
+    results: props.results,
+    dimension,
+    maxItems: xAxisMaxItems,
+    maxResults,
+    cacheKey: otherBucketCacheKey,
+    setOtherBucketState,
+  });
 
   const results = useFillGaps({
     results: props.results,
     dimension,
   });
 
+  const otherBucketAggregate =
+    otherBucketActive && !resultsOtherBucket?.isLoading
+      ? (resultsOtherBucket?.data?.[0] as Record<string, unknown> | undefined)
+      : undefined;
+
   const data = getBarChartProData(
-    { data: results.data, dimension, measures, maxItems: xAxisMaxItems },
+    { data: results.data, dimension, measures, maxItems: xAxisMaxItems, otherBucketAggregate },
     theme,
   );
 
@@ -69,7 +96,7 @@ const BarChartDefaultPro = (props: BarChartDefaultProProps) => {
     <ChartCard
       data={results}
       dimensionsAndMeasures={[dimension, ...measures]}
-      errorMessage={results.error}
+      errorMessage={results.error || resultsOtherBucket?.error}
       {...asChartCardHeaderProps(props)}
     >
       {setGranularity && (

@@ -261,6 +261,55 @@ describe('groupTailAsOther', () => {
     const result = groupTailAsOther(undefined as any, dimension, [measure], 3);
     expect(result).toEqual([]);
   });
+
+  it('uses serverOtherAggregate values verbatim instead of client-side aggType math when provided', () => {
+    const avgMeasure = makeMeasure('score', 'avg');
+    const data = [
+      { category: 'A', score: 80 },
+      { category: 'B', score: 60 },
+      { category: 'C', score: 40 },
+    ];
+
+    const result = groupTailAsOther(data, dimension, [avgMeasure], 2, { score: 999 });
+
+    // would be 50 via client-side avg math; serverOtherAggregate wins
+    expect(result[1]?.score).toBe(999);
+  });
+
+  it('parses string values from serverOtherAggregate', () => {
+    const data = [
+      { category: 'A', value: 10 },
+      { category: 'B', value: 20 },
+      { category: 'C', value: 30 },
+    ];
+
+    const result = groupTailAsOther(data, dimension, [measure], 2, { value: '123' });
+
+    expect(result[1]?.value).toBe(123);
+  });
+
+  it('defaults missing measures in serverOtherAggregate to 0', () => {
+    const data = [
+      { category: 'A', value: 10 },
+      { category: 'B', value: 20 },
+      { category: 'C', value: 30 },
+    ];
+
+    const result = groupTailAsOther(data, dimension, [measure], 2, {});
+
+    expect(result[1]?.value).toBe(0);
+  });
+
+  it('ignores serverOtherAggregate when bucketing does not apply (data within maxItems)', () => {
+    const data = [
+      { category: 'A', value: 1 },
+      { category: 'B', value: 2 },
+    ];
+
+    const result = groupTailAsOther(data, dimension, [measure], 3, { value: 999 });
+
+    expect(result).toBe(data);
+  });
 });
 
 // -- createSimpleClickHandler / createGroupedClickHandler --------------------

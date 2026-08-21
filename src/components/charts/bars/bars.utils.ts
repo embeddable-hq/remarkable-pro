@@ -79,6 +79,7 @@ export const getBarChartProData = (
     dimension: Dimension;
     measures: Measure[];
     maxItems?: number;
+    otherBucketAggregate?: Record<string, unknown>;
   },
   theme: Theme = remarkableTheme,
 ): ChartData<'bar'> => {
@@ -90,7 +91,13 @@ export const getBarChartProData = (
   }
 
   const themeFormatter = getThemeFormatter(theme);
-  const groupedData = groupTailAsOther(props.data, props.dimension, props.measures, props.maxItems);
+  const groupedData = groupTailAsOther(
+    props.data,
+    props.dimension,
+    props.measures,
+    props.maxItems,
+    props.otherBucketAggregate,
+  );
   const chartColors = getChartColors();
 
   return {

@@ -4,6 +4,9 @@ import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import BarChartDefaultPro from './index';
 import type { BarChartDefaultProProps } from './index';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
+import { useUpdateOtherBucketState } from '../../charts.otherBucket.hooks';
+import { getBarChartProData } from '../bars.utils';
+import { ChartCard } from '../../shared/ChartCard/ChartCard';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
@@ -54,6 +57,10 @@ vi.mock('../../charts.utils', () => ({
   createSimpleClickHandler: vi.fn(() => vi.fn()),
 }));
 
+vi.mock('../../charts.otherBucket.hooks', () => ({
+  useUpdateOtherBucketState: vi.fn(),
+}));
+
 vi.mock('../../shared/ChartGranularitySelectField/ChartGranularitySelectField', () => ({
   ChartGranularitySelectField: () => <div data-testid="granularity-select" />,
 }));
@@ -96,5 +103,105 @@ describe('BarChartDefaultPro', () => {
   it('renders granularity selector when setGranularity is provided', () => {
     render(<BarChartDefaultPro {...defaultProps} setGranularity={vi.fn()} />);
     expect(screen.getByTestId('granularity-select')).toBeInTheDocument();
+  });
+
+  it('wires up useUpdateOtherBucketState with the primary results and otherBucket props', () => {
+    const setOtherBucketState = vi.fn();
+    render(
+      <BarChartDefaultPro
+        {...defaultProps}
+        xAxisMaxItems={5}
+        maxResults={1000}
+        otherBucketCacheKey="key-1"
+        setOtherBucketState={setOtherBucketState}
+      />,
+    );
+
+    expect(useUpdateOtherBucketState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        results: emptyResults,
+        dimension,
+        maxItems: 5,
+        maxResults: 1000,
+        cacheKey: 'key-1',
+        setOtherBucketState,
+      }),
+    );
+  });
+
+  it('passes otherBucketAggregate to getBarChartProData when active and resolved', () => {
+    const otherBucketRow = { revenue: 999 };
+    const resultsOtherBucket = {
+      data: [otherBucketRow],
+      isLoading: false,
+    } as unknown as DataResponse;
+
+    render(
+      <BarChartDefaultPro
+        {...defaultProps}
+        otherBucketActive
+        resultsOtherBucket={resultsOtherBucket}
+      />,
+    );
+
+    expect(getBarChartProData).toHaveBeenCalledWith(
+      expect.objectContaining({ otherBucketAggregate: otherBucketRow }),
+      expect.anything(),
+    );
+  });
+
+  it('does not pass a stale otherBucketAggregate while resultsOtherBucket is loading', () => {
+    const resultsOtherBucket = {
+      data: [{ revenue: 999 }],
+      isLoading: true,
+    } as unknown as DataResponse;
+
+    render(
+      <BarChartDefaultPro
+        {...defaultProps}
+        otherBucketActive
+        resultsOtherBucket={resultsOtherBucket}
+      />,
+    );
+
+    expect(getBarChartProData).toHaveBeenCalledWith(
+      expect.objectContaining({ otherBucketAggregate: undefined }),
+      expect.anything(),
+    );
+  });
+
+  it('does not pass otherBucketAggregate when otherBucketActive is false', () => {
+    const resultsOtherBucket = {
+      data: [{ revenue: 999 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+
+    render(
+      <BarChartDefaultPro
+        {...defaultProps}
+        otherBucketActive={false}
+        resultsOtherBucket={resultsOtherBucket}
+      />,
+    );
+
+    expect(getBarChartProData).toHaveBeenCalledWith(
+      expect.objectContaining({ otherBucketAggregate: undefined }),
+      expect.anything(),
+    );
+  });
+
+  it('surfaces resultsOtherBucket errors via ChartCard errorMessage', () => {
+    const resultsOtherBucket = {
+      data: undefined,
+      isLoading: false,
+      error: 'other bucket failed',
+    } as unknown as DataResponse;
+
+    render(<BarChartDefaultPro {...defaultProps} resultsOtherBucket={resultsOtherBucket} />);
+
+    expect(vi.mocked(ChartCard)).toHaveBeenCalledWith(
+      expect.objectContaining({ errorMessage: 'other bucket failed' }),
+      undefined,
+    );
   });
 });
