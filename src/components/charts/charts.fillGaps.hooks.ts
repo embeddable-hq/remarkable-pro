@@ -94,8 +94,11 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
     const explicitFrom = toBoundary(externalDateBounds?.from ?? dateBounds?.from);
     const explicitTo = toBoundary(externalDateBounds?.to ?? dateBounds?.to);
 
-    // Determine the full date range even if data is empty
-    const from = explicitFrom ?? dayjs.utc(sortedResults[0]?.[dimensionName]);
+    // Determine the full date range even if data is empty. dayjs.utc(undefined) silently
+    // defaults to "now" (unlike dayjs.utc(null), which is correctly Invalid), so normalize
+    // a missing dimension value to null before handing it to dayjs to avoid fabricating
+    // a bogus current-date bucket when every row is missing the dimension value.
+    const from = explicitFrom ?? dayjs.utc(sortedResults[0]?.[dimensionName] ?? null);
 
     const to =
       explicitTo ??
@@ -103,7 +106,8 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
         sortedResults[sortedResults.length - 1]?.[dimensionName] ??
           [...sortedResults].reverse().find((item) => item?.[dimensionName] != null)?.[
             dimensionName
-          ],
+          ] ??
+          null,
       );
 
     // If we *still* don’t have valid date bounds, bail out safely

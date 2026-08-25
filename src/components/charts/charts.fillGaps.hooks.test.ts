@@ -114,6 +114,17 @@ describe('useFillGaps', () => {
 
       expect(result.current.data).toEqual([]);
     });
+
+    it('returns empty data (not a fabricated current-date bucket) when the dimension value is undefined', () => {
+      // dayjs.utc(undefined) silently defaults to "now", unlike dayjs.utc(null); this
+      // guards against every row being missing the dimension key entirely.
+      const results = makeResults([{ value: 1 }, { value: 2 }]);
+      const dimension = makeDimension();
+
+      const { result } = renderHook(() => useFillGaps({ results, dimension }));
+
+      expect(result.current.data).toEqual([]);
+    });
   });
 
   describe('core gap-filling (day granularity, no dateBounds)', () => {
