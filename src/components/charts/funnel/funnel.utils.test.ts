@@ -173,6 +173,24 @@ describe('getFunnelChartProData', () => {
     expect(result.labels).toEqual(['t(Near Misses)', 't(Recordable)', 't(Unordered)']);
   });
 
+  it('sorts stages with a nonnumeric order value last', () => {
+    const orderDimension = makeDimension('order');
+    const data: DataResponse['data'] = [
+      { stage: 'Nonnumeric', count: '1', order: 'not-a-number' },
+      { stage: 'Near Misses', count: '33', order: '1' },
+      { stage: 'Recordable', count: '14', order: '3' },
+    ];
+
+    const result = getFunnelChartProData({
+      data,
+      stageDimension,
+      countMeasure,
+      orderDimension,
+    });
+
+    expect(result.labels).toEqual(['t(Near Misses)', 't(Recordable)', 't(Nonnumeric)']);
+  });
+
   it('uses the formatted value as the label when it differs from the raw stage name', () => {
     vi.mocked(getThemeFormatter).mockReturnValueOnce({
       data: vi.fn(() => 'Formatted Label'),

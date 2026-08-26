@@ -35,7 +35,8 @@ const aggregateFunnelStages = (
     const count = Number(row[countMeasure.name] ?? 0);
     stageMap.set(stageName, (stageMap.get(stageName) ?? 0) + count);
     if (orderDimension && !orderMap.has(stageName)) {
-      orderMap.set(stageName, Number(row[orderDimension.name] ?? Infinity));
+      const order = Number(row[orderDimension.name]);
+      orderMap.set(stageName, Number.isFinite(order) ? order : Infinity);
     }
   }
 
