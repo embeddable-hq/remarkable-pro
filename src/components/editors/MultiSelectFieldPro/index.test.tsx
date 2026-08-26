@@ -258,4 +258,101 @@ describe('MultiSelectFieldPro', () => {
       expect(onChange).toHaveBeenCalledWith(['US']);
     });
   });
+
+  describe('select all option', () => {
+    it('shows select all when enabled and fewer options than maxOptions are loaded', () => {
+      const { getByTestId } = render(
+        <MultiSelectFieldPro
+          dimension={country}
+          results={resultsWith([{ country: 'US' }, { country: 'UK' }])}
+          maxOptions={3}
+          showSelectAll
+          onChange={vi.fn()}
+        />,
+      );
+      expect(getByTestId('multi-select')).toHaveAttribute('data-show-select-all', 'true');
+    });
+
+    it('hides select all when the showSelectAll input is disabled', () => {
+      const { getByTestId } = render(
+        <MultiSelectFieldPro
+          dimension={country}
+          results={resultsWith([{ country: 'US' }, { country: 'UK' }])}
+          maxOptions={3}
+          showSelectAll={false}
+          onChange={vi.fn()}
+        />,
+      );
+      expect(getByTestId('multi-select')).toHaveAttribute('data-show-select-all', 'false');
+    });
+
+    it('hides select all when showSelectAll is not provided', () => {
+      const { getByTestId } = render(
+        <MultiSelectFieldPro
+          dimension={country}
+          results={resultsWith([{ country: 'US' }, { country: 'UK' }])}
+          maxOptions={3}
+          onChange={vi.fn()}
+        />,
+      );
+      expect(getByTestId('multi-select')).toHaveAttribute('data-show-select-all', 'false');
+    });
+
+    it('hides select all when the option count equals maxOptions', () => {
+      const { getByTestId } = render(
+        <MultiSelectFieldPro
+          dimension={country}
+          results={resultsWith([{ country: 'US' }, { country: 'UK' }])}
+          maxOptions={2}
+          showSelectAll
+          onChange={vi.fn()}
+        />,
+      );
+      expect(getByTestId('multi-select')).toHaveAttribute('data-show-select-all', 'false');
+    });
+
+    it('hides select all when maxOptions is undefined', () => {
+      const { getByTestId } = render(
+        <MultiSelectFieldPro
+          dimension={country}
+          results={resultsWith([{ country: 'US' }])}
+          showSelectAll
+          onChange={vi.fn()}
+        />,
+      );
+      expect(getByTestId('multi-select')).toHaveAttribute('data-show-select-all', 'false');
+    });
+
+    it('hides select all when there are no options', () => {
+      const { getByTestId } = render(
+        <MultiSelectFieldPro
+          dimension={country}
+          results={resultsWith([])}
+          maxOptions={3}
+          showSelectAll
+          onChange={vi.fn()}
+        />,
+      );
+      expect(getByTestId('multi-select')).toHaveAttribute('data-show-select-all', 'false');
+    });
+
+    it('passes translated select all and deselect all labels', () => {
+      const { getByTestId } = render(
+        <MultiSelectFieldPro
+          dimension={country}
+          results={resultsWith([{ country: 'US' }])}
+          maxOptions={3}
+          onChange={vi.fn()}
+        />,
+      );
+      expect(getByTestId('multi-select')).toHaveAttribute(
+        'data-select-all-label',
+        'common.selectAll',
+      );
+      expect(getByTestId('multi-select')).toHaveAttribute(
+        'data-deselect-all-label',
+        'common.deselectAll',
+      );
+    });
+  });
 });
