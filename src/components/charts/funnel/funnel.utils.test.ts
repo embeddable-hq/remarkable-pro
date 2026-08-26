@@ -1,4 +1,5 @@
 import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { FUNNEL_PALETTES, getFunnelChartProData } from './funnel.utils';
 
 vi.mock('../../../utils/color.utils', () => ({
@@ -107,5 +108,80 @@ describe('getFunnelChartProData', () => {
     });
 
     expect(result.datasets[0]?.backgroundColor).toEqual(['#111111->#222222@0']);
+  });
+
+  it('falls back to the amber palette when colorScheme is not recognized', () => {
+    const data: DataResponse['data'] = [{ stage: 'A', count: '1' }];
+
+    const result = getFunnelChartProData({
+      data,
+      stageDimension,
+      countMeasure,
+      colorScheme: 'not-a-real-scheme',
+    });
+
+    const { start, end } = FUNNEL_PALETTES.amber!;
+    expect(result.datasets[0]?.backgroundColor).toEqual([`${start}->${end}@0`]);
+  });
+
+  it('treats missing data as an empty result', () => {
+    const result = getFunnelChartProData({
+      data: undefined as unknown as DataResponse['data'],
+      stageDimension,
+      countMeasure,
+    });
+
+    expect(result).toEqual({ labels: [], datasets: [{ data: [] }] });
+  });
+
+  it('ignores rows with a missing or empty stage value', () => {
+    const data: DataResponse['data'] = [
+      { stage: '', count: '10' },
+      { count: '5' },
+      { stage: 'Recordable', count: '14' },
+    ];
+
+    const result = getFunnelChartProData({ data, stageDimension, countMeasure });
+
+    expect(result.labels).toEqual(['t(Recordable)']);
+    expect(result.datasets[0]?.data).toEqual([14]);
+  });
+
+  it('defaults a missing count value to 0', () => {
+    const data: DataResponse['data'] = [{ stage: 'Recordable' }];
+
+    const result = getFunnelChartProData({ data, stageDimension, countMeasure });
+
+    expect(result.datasets[0]?.data).toEqual([0]);
+  });
+
+  it('sorts stages missing an order value last', () => {
+    const orderDimension = makeDimension('order');
+    const data: DataResponse['data'] = [
+      { stage: 'Unordered', count: '1' },
+      { stage: 'Near Misses', count: '33', order: '1' },
+      { stage: 'Recordable', count: '14', order: '3' },
+    ];
+
+    const result = getFunnelChartProData({
+      data,
+      stageDimension,
+      countMeasure,
+      orderDimension,
+    });
+
+    expect(result.labels).toEqual(['t(Near Misses)', 't(Recordable)', 't(Unordered)']);
+  });
+
+  it('uses the formatted value as the label when it differs from the raw stage name', () => {
+    vi.mocked(getThemeFormatter).mockReturnValueOnce({
+      data: vi.fn(() => 'Formatted Label'),
+    } as unknown as ReturnType<typeof getThemeFormatter>);
+
+    const data: DataResponse['data'] = [{ stage: 'Recordable', count: '14' }];
+
+    const result = getFunnelChartProData({ data, stageDimension, countMeasure });
+
+    expect(result.labels).toEqual(['Formatted Label']);
   });
 });
