@@ -19,7 +19,7 @@ import { resolveI18nProps } from '../../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../../shared/EditorCard/EditorCard';
 import { IconCalendarFilled, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './DateRangePickerPresetsPro.module.css';
 import {
   getDateRangeFromTimeRange,
@@ -66,6 +66,9 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
     getDateRangeFromTimeRange(selectedValue, dateRangeOptions, timezone),
   );
 
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
   useEffect(() => {
     if (!dayjsLocaleReady) {
       return;
@@ -74,11 +77,12 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
     const newTimeRange = getTimeRangeFromPresets(selectedValue, dateRangeOptions, timezone);
 
     if (!shallowEqual(newTimeRange, selectedValue)) {
-      onChange(newTimeRange);
+      onChangeRef.current(newTimeRange);
     }
 
     setDateRange({ from: newTimeRange?.from, to: newTimeRange?.to });
-  }, [selectedValue, dayjsLocaleReady, onChange, dateRangeOptions, timezone]);
+    // onChange is read via ref so the draft isn't reset just because the parent passed a new callback identity
+  }, [selectedValue, dayjsLocaleReady, dateRangeOptions, timezone]);
 
   if (!dayjsLocaleReady) {
     return null;
