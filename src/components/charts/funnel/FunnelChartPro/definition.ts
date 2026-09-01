@@ -1,4 +1,4 @@
-import { DataResponse, Dimension, LoadDataRequest, Measure, loadData } from '@embeddable.com/core';
+import { DataResponse, LoadDataRequest, loadData } from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
@@ -72,9 +72,9 @@ const preview = definePreview(Component, previewConfig);
 const loadDataResultsArgs = (inputs: Inputs<typeof meta>): LoadDataRequest => ({
   from: inputs.dataset,
   select: [
-    inputs.stageDimension as unknown as Dimension,
-    inputs.countMeasure as unknown as Measure,
-    ...(inputs.orderDimension ? [inputs.orderDimension as unknown as Dimension] : []),
+    inputs.stageDimension,
+    inputs.countMeasure,
+    ...(inputs.orderDimension ? [inputs.orderDimension] : []),
   ],
 });
 
