@@ -109,7 +109,20 @@ describe('getFunnelChartProData', () => {
     expect(result.datasets[0]?.backgroundColor).toEqual(['#111111->#222222@0']);
   });
 
-  it('ignores a partial startColor/endColor override and falls back to the theme default', () => {
+  it('derives startColor from endColor when only endColor is set', () => {
+    const data: DataResponse['data'] = [{ stage: 'A', count: '1' }];
+
+    const result = getFunnelChartProData({
+      data,
+      stageDimension,
+      countMeasure,
+      endColor: '#222222',
+    });
+
+    expect(result.datasets[0]?.backgroundColor).toEqual(['#222222+2.2->#222222@0']);
+  });
+
+  it('derives endColor from startColor when only startColor is set', () => {
     const data: DataResponse['data'] = [{ stage: 'A', count: '1' }];
 
     const result = getFunnelChartProData({
@@ -119,8 +132,7 @@ describe('getFunnelChartProData', () => {
       startColor: '#111111',
     });
 
-    const { start, end } = getDefaultFunnelPalette();
-    expect(result.datasets[0]?.backgroundColor).toEqual([`${start}->${end}@0`]);
+    expect(result.datasets[0]?.backgroundColor).toEqual(['#111111->#111111+-2.2@0']);
   });
 
   it('treats missing data as an empty result', () => {

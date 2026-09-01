@@ -11,7 +11,6 @@ import {
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
-import { subInputs } from '../../../component.subinputs.constants';
 
 const meta = {
   name: 'FunnelChartPro',
@@ -43,17 +42,16 @@ const meta = {
         'Optional numeric dimension that defines stage order (ascending). When set, overrides the default descending-by-count order, e.g. severity_order INTEGER.',
     },
     {
-      ...subInputs.color,
+      ...inputs.color,
       name: 'startColor',
       label: 'Start color (lowest stage)',
-      category: 'Component Settings',
-      description: 'Both Start and End color must be set to override the theme default gradient.',
+      description: 'Overrides the theme default gradient. The other end auto-derives if unset.',
     },
     {
-      ...subInputs.color,
+      ...inputs.color,
       name: 'endColor',
       label: 'End color (highest stage)',
-      category: 'Component Settings',
+      description: 'Overrides the theme default gradient. The other end auto-derives if unset.',
     },
     inputs.title,
     inputs.description,
