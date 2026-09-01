@@ -200,6 +200,20 @@ describe('getTimeRangeFromDateRange', () => {
     expect(result?.from).toEqual(new Date('2026-09-01T00:00:00.000Z'));
     expect(result?.to).toEqual(new Date('2026-09-05T23:59:59.999Z'));
   });
+
+  it('treats a single click (range not completed, `to` undefined) as a single-day pick instead of defaulting to "now"', () => {
+    // react-day-picker leaves `to` undefined until a 2nd click completes the range.
+    // Naively resolving that missing value with dayjs would silently substitute
+    // "right now", which can land on a different day than `from` in the target
+    // timezone and produce a bogus multi-day span.
+    const dateRange: DateRange = {
+      from: new Date('2026-09-01T00:00:00.000Z'),
+      to: undefined,
+    };
+    const result = getTimeRangeFromDateRange(dateRange, 'Australia/Sydney');
+    expect(result?.from).toEqual(new Date('2026-09-01T00:00:00.000Z'));
+    expect(result?.to).toEqual(new Date('2026-09-01T23:59:59.999Z'));
+  });
 });
 
 // ---------------------------------------------------------------------------
