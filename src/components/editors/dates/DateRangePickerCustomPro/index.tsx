@@ -38,7 +38,10 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const { onChange, clearable, selectedValue, showTwoMonths, componentName, trackingId } = props;
 
   const handleChange = (newDateRange: DateRange | undefined) => {
-    const timeRange: TimeRange = getTimeRangeFromDateRange(newDateRange);
+    const timeRange: TimeRange = getTimeRangeFromDateRange(
+      newDateRange,
+      theme.clientContext.timezone,
+    );
     dispatchEventUserInteraction({ componentName, trackingId, value: timeRange });
     onChange(timeRange);
   };
