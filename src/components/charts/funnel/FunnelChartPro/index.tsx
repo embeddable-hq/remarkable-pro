@@ -21,7 +21,7 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
     results,
     showLegend,
     showTooltips,
-    showPercentage,
+    displayPercentages,
   } = props;
 
   const data = getFunnelChartProData(
@@ -63,7 +63,7 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
         options={options}
         showLegend={showLegend}
         showTooltips={showTooltips}
-        showPercentage={showPercentage}
+        showPercentage={displayPercentages}
       />
     </ChartCard>
   );

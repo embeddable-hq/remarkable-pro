@@ -12,5 +12,5 @@ export type DefaultFunnelChartProps = {
   results: DataResponse;
   showLegend?: boolean;
   showTooltips?: boolean;
-  showPercentage?: boolean;
+  displayPercentages?: boolean;
 } & ChartCardHeaderProps;

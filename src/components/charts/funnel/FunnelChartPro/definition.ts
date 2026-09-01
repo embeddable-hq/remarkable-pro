@@ -59,12 +59,8 @@ const meta = {
     inputs.showLegend,
     inputs.showTooltips,
     {
-      ...inputs.boolean,
-      name: 'showPercentage',
-      label: 'Show percentage',
+      ...inputs.displayPercentages,
       description: 'Show percentage of total instead of the raw count on each stage.',
-      defaultValue: false,
-      category: 'Component Settings',
     },
     inputs.menuOptions,
   ],
@@ -73,7 +69,7 @@ const meta = {
 const previewConfig = {
   stageDimension: mockDimension('severity', 'string', { title: 'Severity Level' }),
   countMeasure: mockMeasure('count', 'number', { title: 'Count' }),
-  showPercentage: false,
+  displayPercentages: false,
   showLegend: true,
   results: mockDataResponse(
     ['severity', 'count'],

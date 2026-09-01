@@ -93,8 +93,8 @@ describe('FunnelChartPro', () => {
     expect(screen.getByTestId('funnel-chart')).toBeInTheDocument();
   });
 
-  it('passes showPercentage through to FunnelChart', () => {
-    render(<FunnelChartPro {...defaultProps} showPercentage={true} />);
+  it('passes displayPercentages through to FunnelChart', () => {
+    render(<FunnelChartPro {...defaultProps} displayPercentages={true} />);
     expect(screen.getByTestId('funnel-chart')).toHaveAttribute('data-show-percentage', 'true');
   });
 
