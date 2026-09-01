@@ -92,7 +92,7 @@ export const getTimeRangeFromDateRange = (
   dateRange: DateRange | undefined,
   timezone?: string,
 ): TimeRange => {
-  if (!dateRange?.from) {
+  if (!dateRange) {
     return dateRange;
   }
 
