@@ -1,16 +1,8 @@
-import {
-  DataResponse,
-  Dimension,
-  LoadDataRequest,
-  Measure,
-  loadData,
-  mockDataResponse,
-  mockDimension,
-  mockMeasure,
-} from '@embeddable.com/core';
+import { DataResponse, Dimension, LoadDataRequest, Measure, loadData } from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
+import { previewData } from '../../../preview.data.constants';
 
 const meta = {
   name: 'FunnelChartPro',
@@ -67,19 +59,11 @@ const meta = {
 } as const satisfies EmbeddedComponentMeta;
 
 const previewConfig = {
-  stageDimension: mockDimension('severity', 'string', { title: 'Severity Level' }),
-  countMeasure: mockMeasure('count', 'number', { title: 'Count' }),
+  stageDimension: previewData.dimension,
+  countMeasure: previewData.measure,
   displayPercentages: false,
   showLegend: true,
-  results: mockDataResponse(
-    ['severity', 'count'],
-    [
-      ['Near Misses', '33'],
-      ['Injury/Illness', '30'],
-      ['Recordable', '14'],
-      ['DART', '5'],
-    ],
-  ),
+  results: previewData.results1Measure1Dimension,
   hideMenu: true,
 };
 
