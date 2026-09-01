@@ -155,7 +155,6 @@ describe('getTimeRangeFromDateRange', () => {
   });
 
   it('falls back to UTC day boundaries when no timezone is provided', () => {
-    // 02:00 UTC on 1 Mar — with no timezone this should stay on the UTC calendar day
     const dateRange: DateRange = {
       from: new Date('2024-03-01T02:00:00.000Z'),
       to: new Date('2024-03-01T02:00:00.000Z'),
@@ -166,8 +165,7 @@ describe('getTimeRangeFromDateRange', () => {
   });
 
   it('anchors from/to using clientContext.timezone rather than UTC', () => {
-    // 02:00 UTC on 1 Mar is still 29 Feb (18:00) in America/Los_Angeles (UTC-8) —
-    // the resolved day boundaries should follow the local calendar day, not the UTC one
+    // 02:00 UTC on 1 Mar is 29 Feb locally in America/Los_Angeles (UTC-8)
     const dateRange: DateRange = {
       from: new Date('2024-03-01T02:00:00.000Z'),
       to: new Date('2024-03-01T02:00:00.000Z'),
@@ -178,10 +176,7 @@ describe('getTimeRangeFromDateRange', () => {
   });
 
   it('does not tip `to` into the next day when the calendar widget has already forced it to 23:59:59.999 UTC and timezone is ahead of UTC', () => {
-    // Mirrors what react-day-picker + remarkable-ui's endOfDayUTC actually hand us for a
-    // single-day pick of "1 Sep" with a UTC browser: from = day start, to = that SAME UTC
-    // day forced to 23:59:59.999. Naively re-projecting `to` through a timezone ahead of
-    // UTC (e.g. Europe/London, BST +1) would push 23:59:59.999 UTC into "2 Sep" local time.
+    // Naive re-projection through Europe/London (BST +1) would push this into "2 Sep".
     const dateRange: DateRange = {
       from: new Date('2026-09-01T00:00:00.000Z'),
       to: new Date('2026-09-01T23:59:59.999Z'),
@@ -202,10 +197,6 @@ describe('getTimeRangeFromDateRange', () => {
   });
 
   it('treats a single click (range not completed, `to` undefined) as a single-day pick instead of defaulting to "now"', () => {
-    // react-day-picker leaves `to` undefined until a 2nd click completes the range.
-    // Naively resolving that missing value with dayjs would silently substitute
-    // "right now", which can land on a different day than `from` in the target
-    // timezone and produce a bogus multi-day span.
     const dateRange: DateRange = {
       from: new Date('2026-09-01T00:00:00.000Z'),
       to: undefined,

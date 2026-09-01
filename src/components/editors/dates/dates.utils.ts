@@ -81,10 +81,7 @@ export const getDateRangeFromTimeRange = (
   return finalTimeRange;
 };
 
-// Resolves the calendar day a Date instant falls on in the given timezone
-// (falling back to UTC when no timezone is provided), as a YYYY-MM-DD string.
-// Mirrors the convention in defaults.DateRanges.constants.ts so that
-// manually-picked ranges line up with the timezone-aware preset ranges.
+// Matches defaults.DateRanges.constants.ts so manual picks line up with preset ranges.
 const getLocalDateString = (date: Date | undefined, tz?: string): string =>
   tz ? dayjs.tz(date, tz).format('YYYY-MM-DD') : dayjs.utc(date).format('YYYY-MM-DD');
 
@@ -96,16 +93,11 @@ export const getTimeRangeFromDateRange = (
     return dateRange;
   }
 
-  // A single click (range not completed with a 2nd click) leaves `to` undefined.
-  // Treat that as a single-day pick — matching `from` — instead of letting dayjs
-  // silently resolve the missing value to "now".
+  // Single click leaves `to` undefined; treat it as a single-day pick instead of "now".
   const to = dateRange.to ?? dateRange.from;
 
-  // The calendar widget (remarkable-ui's DateRangePicker) already forces `to` to
-  // 23:59:59.999 UTC of its own UTC calendar day before we see it. Re-projecting that
-  // near-midnight instant straight into `timezone` could tip it into the next day
-  // whenever the timezone is ahead of UTC. Normalise it back to that day's UTC
-  // start first, so it resolves the same way `from` does.
+  // `to` arrives pre-forced to 23:59:59.999 UTC; re-derive its day start so it
+  // resolves through `timezone` the same way `from` does, instead of tipping over.
   const toDayStart = dayjs.utc(to).startOf('day').toDate();
 
   return {
