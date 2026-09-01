@@ -1,11 +1,16 @@
 import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { FUNNEL_PALETTES, getFunnelChartProData } from './funnel.utils';
+import { getDefaultFunnelPalette, getFunnelChartProData } from './funnel.utils';
 
 vi.mock('../../../utils/color.utils', () => ({
   getColorGradient: vi.fn((start: string, end: string, steps: number) =>
     Array.from({ length: steps }, (_, i) => `${start}->${end}@${i}`),
   ),
+  brightenColor: vi.fn((value: string, amount: number) => `${value}+${amount}`),
+}));
+
+vi.mock('@embeddable.com/remarkable-ui', () => ({
+  getChartColors: vi.fn(() => ['#336699', '#112233', '#445566', '#778899', '#99aabb']),
 }));
 
 vi.mock('../../../theme/formatter/formatter.utils', () => ({
@@ -75,34 +80,28 @@ describe('getFunnelChartProData', () => {
     expect(result.datasets[0]?.data).toEqual([33, 14, 5]);
   });
 
-  it('builds the background gradient from the resolved palette', () => {
+  it('builds the background gradient from the theme-derived default palette', () => {
     const data: DataResponse['data'] = [
       { stage: 'A', count: '1' },
       { stage: 'B', count: '2' },
     ];
 
-    const result = getFunnelChartProData({
-      data,
-      stageDimension,
-      countMeasure,
-      colorScheme: 'blue',
-    });
+    const result = getFunnelChartProData({ data, stageDimension, countMeasure });
 
-    const { start, end } = FUNNEL_PALETTES.blue!;
+    const { start, end } = getDefaultFunnelPalette();
     expect(result.datasets[0]?.backgroundColor).toEqual([
       `${start}->${end}@0`,
       `${start}->${end}@1`,
     ]);
   });
 
-  it('prefers startColor/endColor over colorScheme when both are set', () => {
+  it('prefers startColor/endColor over the theme default when both are set', () => {
     const data: DataResponse['data'] = [{ stage: 'A', count: '1' }];
 
     const result = getFunnelChartProData({
       data,
       stageDimension,
       countMeasure,
-      colorScheme: 'blue',
       startColor: '#111111',
       endColor: '#222222',
     });
@@ -110,17 +109,17 @@ describe('getFunnelChartProData', () => {
     expect(result.datasets[0]?.backgroundColor).toEqual(['#111111->#222222@0']);
   });
 
-  it('falls back to the amber palette when colorScheme is not recognized', () => {
+  it('ignores a partial startColor/endColor override and falls back to the theme default', () => {
     const data: DataResponse['data'] = [{ stage: 'A', count: '1' }];
 
     const result = getFunnelChartProData({
       data,
       stageDimension,
       countMeasure,
-      colorScheme: 'not-a-real-scheme',
+      startColor: '#111111',
     });
 
-    const { start, end } = FUNNEL_PALETTES.amber!;
+    const { start, end } = getDefaultFunnelPalette();
     expect(result.datasets[0]?.backgroundColor).toEqual([`${start}->${end}@0`]);
   });
 
@@ -201,5 +200,14 @@ describe('getFunnelChartProData', () => {
     const result = getFunnelChartProData({ data, stageDimension, countMeasure });
 
     expect(result.labels).toEqual(['Formatted Label']);
+  });
+});
+
+describe('getDefaultFunnelPalette', () => {
+  it('uses the first theme chart color as the end color and a brightened variant as the start color', () => {
+    const { start, end } = getDefaultFunnelPalette();
+
+    expect(end).toBe('#336699');
+    expect(start).toBe('#336699+2.2');
   });
 });

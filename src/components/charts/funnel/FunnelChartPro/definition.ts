@@ -12,9 +12,6 @@ import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/re
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { subInputs } from '../../../component.subinputs.constants';
-import FunnelColorSchemeType, {
-  FunnelColorSchemeOptions,
-} from '../../../types/FunnelColorScheme.type.emb';
 
 const meta = {
   name: 'FunnelChartPro',
@@ -46,18 +43,11 @@ const meta = {
         'Optional numeric dimension that defines stage order (ascending). When set, overrides the default descending-by-count order, e.g. severity_order INTEGER.',
     },
     {
-      name: 'colorScheme',
-      type: FunnelColorSchemeType,
-      label: 'Color scheme',
-      defaultValue: FunnelColorSchemeOptions.amber,
-      category: 'Component Settings',
-    },
-    {
       ...subInputs.color,
       name: 'startColor',
       label: 'Start color (lowest stage)',
       category: 'Component Settings',
-      description: 'Both Start and End color must be set to override the Color scheme.',
+      description: 'Both Start and End color must be set to override the theme default gradient.',
     },
     {
       ...subInputs.color,
@@ -85,7 +75,6 @@ const meta = {
 const previewConfig = {
   stageDimension: mockDimension('severity', 'string', { title: 'Severity Level' }),
   countMeasure: mockMeasure('count', 'number', { title: 'Count' }),
-  colorScheme: FunnelColorSchemeOptions.amber,
   showPercentage: false,
   showLegend: true,
   results: mockDataResponse(
@@ -116,7 +105,6 @@ const loadDataResults = (inputs: Inputs<typeof meta>): DataResponse =>
 
 const props = (inputs: Inputs<typeof meta>) => ({
   ...inputs,
-  colorScheme: inputs.colorScheme as string | undefined,
   startColor: inputs.startColor as string | undefined,
   endColor: inputs.endColor as string | undefined,
   results: loadDataResults(inputs),

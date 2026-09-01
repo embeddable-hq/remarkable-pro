@@ -7,7 +7,6 @@ export type DefaultFunnelChartProps = {
   stageDimension: Dimension;
   countMeasure: Measure;
   orderDimension?: Dimension;
-  colorScheme?: string;
   startColor?: string;
   endColor?: string;
   results: DataResponse;

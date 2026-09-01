@@ -6,16 +6,14 @@ import { Theme } from '../../../theme/theme.types';
 import { remarkableTheme } from '../../../theme/theme.constants';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { getDimensionWithoutTruncation } from '../charts.utils';
-import { getColorGradient } from '../../../utils/color.utils';
+import { brightenColor, getColorGradient } from '../../../utils/color.utils';
 import { i18n } from '../../../theme/i18n/i18n';
+import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { FunnelPalette } from './funnel.types';
 
-export const FUNNEL_PALETTES: Record<string, FunnelPalette> = {
-  amber: { start: '#FBC02D', end: '#6A1A9A' },
-  orange: { start: '#FFB300', end: '#BF360C' },
-  blue: { start: '#64B5F6', end: '#0D47A1' },
-  'green-red': { start: '#66BB6A', end: '#B71C1C' },
-  red: { start: '#FFCDD2', end: '#B71C1C' },
+export const getDefaultFunnelPalette = (): FunnelPalette => {
+  const end = getChartColors()[0] ?? '#FBC02D';
+  return { start: brightenColor(end, 2.2), end };
 };
 
 type FunnelStage = { name: string; count: number };
@@ -56,7 +54,6 @@ export const getFunnelChartProData = (
     stageDimension: Dimension;
     countMeasure: Measure;
     orderDimension?: Dimension;
-    colorScheme?: string;
     startColor?: string;
     endColor?: string;
   },
@@ -76,7 +73,7 @@ export const getFunnelChartProData = (
   const palette: FunnelPalette =
     props.startColor && props.endColor
       ? { start: props.startColor, end: props.endColor }
-      : (FUNNEL_PALETTES[props.colorScheme ?? 'amber'] ?? FUNNEL_PALETTES.amber)!;
+      : getDefaultFunnelPalette();
 
   const backgroundColor = getColorGradient(palette.start, palette.end, stages.length);
   const themeFormatter = getThemeFormatter(theme);

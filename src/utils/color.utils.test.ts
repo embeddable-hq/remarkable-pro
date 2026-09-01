@@ -1,4 +1,4 @@
-import { getColorGradient, isColorValid, setColorAlpha } from './color.utils';
+import { brightenColor, getColorGradient, isColorValid, setColorAlpha } from './color.utils';
 
 describe('isColorValid', () => {
   it('returns true for a valid hex color', () => {
@@ -64,5 +64,17 @@ describe('getColorGradient', () => {
     const colors = getColorGradient('#FBC02D', '#6A1A9A', 4);
     expect(colors).toHaveLength(4);
     colors.forEach((color) => expect(isColorValid(color)).toBe(true));
+  });
+});
+
+describe('brightenColor', () => {
+  it('returns a lighter color for a positive amount', () => {
+    const brightened = brightenColor('#336699', 2.2);
+    expect(isColorValid(brightened)).toBe(true);
+    expect(brightened.toLowerCase()).not.toBe('#336699');
+  });
+
+  it('returns the same color for an amount of 0', () => {
+    expect(brightenColor('#336699', 0).toLowerCase()).toBe('#336699');
   });
 });
