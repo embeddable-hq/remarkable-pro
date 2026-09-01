@@ -176,6 +176,30 @@ describe('getTimeRangeFromDateRange', () => {
     expect(result?.from).toEqual(new Date('2024-02-29T00:00:00.000Z'));
     expect(result?.to).toEqual(new Date('2024-02-29T23:59:59.999Z'));
   });
+
+  it('does not tip `to` into the next day when the calendar widget has already forced it to 23:59:59.999 UTC and timezone is ahead of UTC', () => {
+    // Mirrors what react-day-picker + remarkable-ui's endOfDayUTC actually hand us for a
+    // single-day pick of "1 Sep" with a UTC browser: from = day start, to = that SAME UTC
+    // day forced to 23:59:59.999. Naively re-projecting `to` through a timezone ahead of
+    // UTC (e.g. Europe/London, BST +1) would push 23:59:59.999 UTC into "2 Sep" local time.
+    const dateRange: DateRange = {
+      from: new Date('2026-09-01T00:00:00.000Z'),
+      to: new Date('2026-09-01T23:59:59.999Z'),
+    };
+    const result = getTimeRangeFromDateRange(dateRange, 'Europe/London');
+    expect(result?.from).toEqual(new Date('2026-09-01T00:00:00.000Z'));
+    expect(result?.to).toEqual(new Date('2026-09-01T23:59:59.999Z'));
+  });
+
+  it('resolves a genuine multi-day range correctly under a timezone ahead of UTC', () => {
+    const dateRange: DateRange = {
+      from: new Date('2026-09-01T00:00:00.000Z'),
+      to: new Date('2026-09-05T23:59:59.999Z'),
+    };
+    const result = getTimeRangeFromDateRange(dateRange, 'Europe/London');
+    expect(result?.from).toEqual(new Date('2026-09-01T00:00:00.000Z'));
+    expect(result?.to).toEqual(new Date('2026-09-05T23:59:59.999Z'));
+  });
 });
 
 // ---------------------------------------------------------------------------
