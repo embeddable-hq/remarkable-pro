@@ -6,6 +6,8 @@ export const de: ResourceLanguage = {
       other: 'Andere',
       noOptionsFound: 'Keine Optionen gefunden',
       noOptionsAvailable: 'Keine Optionen verfügbar',
+      selectAll: 'Alle auswählen',
+      deselectAll: 'Alle abwählen',
       compared: 'Verglichen',
       loading: 'Laden...',
     },

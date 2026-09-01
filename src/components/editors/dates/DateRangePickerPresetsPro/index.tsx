@@ -19,7 +19,7 @@ import { resolveI18nProps } from '../../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../../shared/EditorCard/EditorCard';
 import { IconCalendarFilled, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './DateRangePickerPresetsPro.module.css';
 import {
   getDateRangeFromTimeRange,
@@ -66,6 +66,9 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
     getDateRangeFromTimeRange(selectedValue, dateRangeOptions, timezone),
   );
 
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
   useEffect(() => {
     if (!dayjsLocaleReady) {
       return;
@@ -74,10 +77,12 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
     const newTimeRange = getTimeRangeFromPresets(selectedValue, dateRangeOptions, timezone);
 
     if (!shallowEqual(newTimeRange, selectedValue)) {
-      onChange(newTimeRange);
-      setDateRange({ from: newTimeRange?.from, to: newTimeRange?.to });
+      onChangeRef.current(newTimeRange);
     }
-  }, [selectedValue, dayjsLocaleReady, onChange, dateRangeOptions, timezone]);
+
+    setDateRange({ from: newTimeRange?.from, to: newTimeRange?.to });
+    // onChange is read via ref so the draft isn't reset just because the parent passed a new callback identity
+  }, [selectedValue, dayjsLocaleReady, dateRangeOptions, timezone]);
 
   if (!dayjsLocaleReady) {
     return null;
@@ -104,6 +109,14 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
     dispatchEventUserInteraction({ componentName, trackingId, value: newTimeRange });
     onChange(newTimeRange);
     setIsOpen(false);
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      // Discard unapplied edits: revert the draft grid to the applied value
+      setDateRange(getDateRangeFromTimeRange(selectedValue, dateRangeOptions, timezone));
+    }
+    setIsOpen(open);
   };
 
   const handleClear = () => {
@@ -136,7 +149,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
     <EditorCard title={title} description={description} tooltip={tooltip}>
       <Dropdown
         open={isOpen}
-        onOpenChange={setIsOpen}
+        onOpenChange={handleOpenChange}
         avoidCollisions={false}
         triggerComponent={
           <SelectFieldTrigger

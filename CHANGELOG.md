@@ -1,5 +1,17 @@
 # @embeddable/remarkable-ui
 
+## 0.4.1
+
+### Patch Changes
+
+- cdd3b78: Fix DateRangePickerPresetsPro not syncing when `selectedValue` changes to a custom `{from, to}` range, and discard unapplied date range edits when the picker closes without pressing Apply
+
+## 0.4.0
+
+### Minor Changes
+
+- 94c0897: MultiSelectFieldPro: add an opt-in select all / deselect all option, controlled by a new 'Display "select / deselect all"' input (off by default). Even when enabled it only appears when the loaded values are fewer than the maximum options limit, so the full list is known to be complete
+
 ## 0.3.27
 
 ### Patch Changes
