@@ -83,8 +83,6 @@ const loadDataResults = (inputs: Inputs<typeof meta>): DataResponse =>
 
 const props = (inputs: Inputs<typeof meta>) => ({
   ...inputs,
-  startColor: inputs.startColor as string | undefined,
-  endColor: inputs.endColor as string | undefined,
   results: loadDataResults(inputs),
 });
 
