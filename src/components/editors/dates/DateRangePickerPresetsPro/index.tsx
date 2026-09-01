@@ -105,7 +105,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   };
 
   const handleDateRangeChange = (newDateRange: DateRange | undefined) => {
-    const newTimeRange = getTimeRangeFromDateRange(newDateRange);
+    const newTimeRange = getTimeRangeFromDateRange(newDateRange, timezone);
     dispatchEventUserInteraction({ componentName, trackingId, value: newTimeRange });
     onChange(newTimeRange);
     setIsOpen(false);
