@@ -5,6 +5,9 @@ export const MultiSelectFieldMock = ({
   isClearable,
   placeholder,
   noOptionsMessage,
+  showSelectAll,
+  selectAllLabel,
+  deselectAllLabel,
   options,
 }: {
   values: string[];
@@ -13,6 +16,9 @@ export const MultiSelectFieldMock = ({
   isClearable?: boolean;
   placeholder?: string;
   noOptionsMessage?: string;
+  showSelectAll?: boolean;
+  selectAllLabel?: string;
+  deselectAllLabel?: string;
   options: { value: string; label: string }[];
 }) => (
   <div
@@ -21,6 +27,9 @@ export const MultiSelectFieldMock = ({
     data-clearable={String(isClearable ?? false)}
     data-placeholder={placeholder ?? ''}
     data-no-options-message={noOptionsMessage ?? ''}
+    data-show-select-all={String(showSelectAll ?? false)}
+    data-select-all-label={selectAllLabel ?? ''}
+    data-deselect-all-label={deselectAllLabel ?? ''}
   >
     {options.map((o) => (
       <button
