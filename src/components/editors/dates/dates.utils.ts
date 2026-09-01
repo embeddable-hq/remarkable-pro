@@ -96,9 +96,16 @@ export const getTimeRangeFromDateRange = (
     return dateRange;
   }
 
+  // The calendar widget (remarkable-ui's DateRangePicker) already forces `to` to
+  // 23:59:59.999 UTC of its own UTC calendar day before we see it. Re-projecting that
+  // near-midnight instant straight into `timezone` could tip it into the next day
+  // whenever the timezone is ahead of UTC. Normalise it back to that day's UTC
+  // start first, so it resolves the same way `from` does.
+  const toDayStart = dateRange.to ? dayjs.utc(dateRange.to).startOf('day').toDate() : dateRange.to;
+
   return {
     relativeTimeString: undefined,
     from: dayjs.utc(getLocalDateString(dateRange.from, timezone)).startOf('day').toDate(),
-    to: dayjs.utc(getLocalDateString(dateRange.to, timezone)).endOf('day').toDate(),
+    to: dayjs.utc(getLocalDateString(toDayStart, timezone)).endOf('day').toDate(),
   };
 };
