@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.4.2
+
+### Patch Changes
+
+- 36459a7: fix DateRange picker computing UTC day boundaries instead of clientContext.timezone
+
 ## 0.4.1
 
 ### Patch Changes
