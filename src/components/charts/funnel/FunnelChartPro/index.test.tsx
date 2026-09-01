@@ -43,15 +43,15 @@ vi.mock('../../shared/ChartCard/ChartCard', () => ({
 vi.mock('@embeddable.com/remarkable-ui', () => ({
   FunnelChart: ({
     showPercentage,
-    legendPosition,
+    options,
   }: {
     showPercentage?: boolean;
-    legendPosition?: string;
+    options?: { plugins?: { legend?: { position?: string } } };
   }) => (
     <div
       data-testid="funnel-chart"
       data-show-percentage={String(Boolean(showPercentage))}
-      data-legend-position={legendPosition}
+      data-legend-position={options?.plugins?.legend?.position}
     />
   ),
 }));
@@ -103,23 +103,20 @@ describe('FunnelChartPro', () => {
     expect(screen.getByTestId('funnel-chart')).toHaveAttribute('data-legend-position', 'bottom');
   });
 
-  it('passes legendPosition through when the theme sets it to right', () => {
-    vi.mocked(useTheme).mockReturnValue({
-      charts: { funnelChartPro: {}, legendPosition: 'right' },
-    } as never);
+  it.each(['top', 'right', 'bottom', 'left'])(
+    'passes legendPosition through when the theme sets it to %s',
+    (legendPosition) => {
+      vi.mocked(useTheme).mockReturnValue({
+        charts: { funnelChartPro: {}, legendPosition },
+      } as never);
 
-    render(<FunnelChartPro {...defaultProps} />);
-    expect(screen.getByTestId('funnel-chart')).toHaveAttribute('data-legend-position', 'right');
-  });
-
-  it('falls back to bottom when the theme legendPosition is not supported by the funnel chart', () => {
-    vi.mocked(useTheme).mockReturnValue({
-      charts: { funnelChartPro: {}, legendPosition: 'top' },
-    } as never);
-
-    render(<FunnelChartPro {...defaultProps} />);
-    expect(screen.getByTestId('funnel-chart')).toHaveAttribute('data-legend-position', 'bottom');
-  });
+      render(<FunnelChartPro {...defaultProps} />);
+      expect(screen.getByTestId('funnel-chart')).toHaveAttribute(
+        'data-legend-position',
+        legendPosition,
+      );
+    },
+  );
 
   it('includes orderDimension in dimensionsAndMeasures when provided', () => {
     render(<FunnelChartPro {...defaultProps} orderDimension={orderDimension} />);

@@ -38,8 +38,16 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
     theme,
   );
 
-  const options = theme.charts.funnelChartPro?.options ?? {};
-  const legendPosition = theme.charts.legendPosition === 'right' ? 'right' : 'bottom';
+  const options = {
+    ...theme.charts.funnelChartPro?.options,
+    plugins: {
+      ...theme.charts.funnelChartPro?.options?.plugins,
+      legend: {
+        ...theme.charts.funnelChartPro?.options?.plugins?.legend,
+        position: theme.charts.legendPosition ?? 'bottom',
+      },
+    },
+  };
 
   return (
     <ChartCard
@@ -58,7 +66,6 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
         showLegend={showLegend}
         showTooltips={showTooltips}
         showPercentage={showPercentage}
-        legendPosition={legendPosition}
       />
     </ChartCard>
   );
