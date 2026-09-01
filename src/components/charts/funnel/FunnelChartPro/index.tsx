@@ -1,12 +1,26 @@
 import { useTheme } from '@embeddable.com/react';
 import { FunnelChart } from '@embeddable.com/remarkable-ui';
+import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { Theme } from '../../../../theme/theme.types';
 import { getFunnelChartProData } from '../funnel.utils';
-import { DefaultFunnelChartProps } from '../funnel.types';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
-import { ChartCard, asChartCardHeaderProps } from '../../shared/ChartCard/ChartCard';
+import {
+  ChartCard,
+  ChartCardHeaderProps,
+  asChartCardHeaderProps,
+} from '../../shared/ChartCard/ChartCard';
 
-export type FunnelChartProProps = DefaultFunnelChartProps;
+export type FunnelChartProProps = {
+  stageDimension: Dimension;
+  countMeasure: Measure;
+  orderDimension?: Dimension;
+  startColor?: string;
+  endColor?: string;
+  results: DataResponse;
+  showLegend?: boolean;
+  showTooltips?: boolean;
+  displayPercentages?: boolean;
+} & ChartCardHeaderProps;
 
 const FunnelChartPro = (props: FunnelChartProProps) => {
   const theme = useTheme() as Theme;
