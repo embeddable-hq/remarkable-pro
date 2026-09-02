@@ -2,9 +2,11 @@ import { TimeRange } from '@embeddable.com/core';
 import { DateRange } from '@embeddable.com/remarkable-ui';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
 import { DateRangeOption } from '../../../theme/defaults/defaults.DateRanges.constants';
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const getTimeRangeFromPresets = (
   receivedTimeRange: TimeRange,
@@ -79,14 +81,28 @@ export const getDateRangeFromTimeRange = (
   return finalTimeRange;
 };
 
-export const getTimeRangeFromDateRange = (dateRange: DateRange | undefined): TimeRange => {
+// Matches defaults.DateRanges.constants.ts so manual picks line up with preset ranges.
+const getLocalDateString = (date: Date | undefined, tz?: string): string =>
+  tz ? dayjs.tz(date, tz).format('YYYY-MM-DD') : dayjs.utc(date).format('YYYY-MM-DD');
+
+export const getTimeRangeFromDateRange = (
+  dateRange: DateRange | undefined,
+  timezone?: string,
+): TimeRange => {
   if (!dateRange) {
     return dateRange;
   }
 
+  // Single click leaves `to` undefined; treat it as a single-day pick instead of "now".
+  const to = dateRange.to ?? dateRange.from;
+
+  // `to` arrives pre-forced to 23:59:59.999 UTC; re-derive its day start so it
+  // resolves through `timezone` the same way `from` does, instead of tipping over.
+  const toDayStart = dayjs.utc(to).startOf('day').toDate();
+
   return {
     relativeTimeString: undefined,
-    from: dayjs.utc(dateRange.from).toDate(),
-    to: dayjs.utc(dateRange.to).toDate(),
+    from: dayjs.utc(getLocalDateString(dateRange.from, timezone)).startOf('day').toDate(),
+    to: dayjs.utc(getLocalDateString(toDayStart, timezone)).endOf('day').toDate(),
   };
 };

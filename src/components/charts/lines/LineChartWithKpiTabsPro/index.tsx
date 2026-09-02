@@ -36,6 +36,7 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
     showValueLabels,
     yAxisRangeMax,
     yAxisRangeMin,
+    xAxisMaxItems,
     granularity,
     setGranularity,
     onLineClicked,
@@ -64,6 +65,7 @@ const LineChartWithKpiTabsPro = (props: LineChartWithKpiTabsProProps) => {
       dimension: xAxis,
       measures: activeMeasure ? [activeMeasure] : [],
       hasMinMaxYAxisRange: Boolean(yAxisRangeMin != null || yAxisRangeMax != null),
+      maxItems: xAxisMaxItems,
     },
     theme,
   );
