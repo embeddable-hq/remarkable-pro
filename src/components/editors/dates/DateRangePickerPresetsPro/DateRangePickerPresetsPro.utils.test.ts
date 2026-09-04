@@ -39,16 +39,22 @@ describe('getDateRangeSelectFieldProOptions', () => {
     });
   });
 
-  it('calls getTimeRangeLabel with the result of getRange and option.dateFormat', () => {
+  it('calls getTimeRangeLabel with the result of getRange, option.dateFormat, and the timezone', () => {
     const returned = range(new Date('2024-01-01'), new Date('2024-01-31'));
     const opt = makeOption('last_7_days', 'key|Last 7 days');
     vi.mocked(opt.getRange).mockReturnValue(returned);
     vi.mocked(resolveI18nString).mockReturnValue('Last 7 days');
     vi.mocked(getTimeRangeLabel).mockReturnValue('Jan 2024');
 
-    getDateRangeSelectFieldProOptions([opt]);
+    getDateRangeSelectFieldProOptions([opt], 'Australia/Sydney');
 
-    expect(getTimeRangeLabel).toHaveBeenCalledWith(returned, 'MMM YYYY');
+    expect(opt.getRange).toHaveBeenCalledWith('Australia/Sydney');
+    expect(getTimeRangeLabel).toHaveBeenCalledWith(
+      returned,
+      'MMM YYYY',
+      undefined,
+      'Australia/Sydney',
+    );
   });
 
   it('calls resolveI18nString with option.label', () => {

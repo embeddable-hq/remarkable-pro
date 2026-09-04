@@ -165,25 +165,28 @@ describe('getTimeRangeFromDateRange', () => {
   });
 
   it('anchors from/to using clientContext.timezone rather than UTC', () => {
-    // 02:00 UTC on 1 Mar is 29 Feb locally in America/Los_Angeles (UTC-8)
+    // 02:00 UTC on 1 Mar is 29 Feb locally in America/Los_Angeles (UTC-8),
+    // so the emitted range must be 29 Feb's midnight-to-midnight in that
+    // zone (08:00-1 Mar 07:59:59.999 UTC), not UTC midnight-to-midnight.
     const dateRange: DateRange = {
       from: new Date('2024-03-01T02:00:00.000Z'),
       to: new Date('2024-03-01T02:00:00.000Z'),
     };
     const result = getTimeRangeFromDateRange(dateRange, 'America/Los_Angeles');
-    expect(result?.from).toEqual(new Date('2024-02-29T00:00:00.000Z'));
-    expect(result?.to).toEqual(new Date('2024-02-29T23:59:59.999Z'));
+    expect(result?.from).toEqual(new Date('2024-02-29T08:00:00.000Z'));
+    expect(result?.to).toEqual(new Date('2024-03-01T07:59:59.999Z'));
   });
 
   it('does not tip `to` into the next day when the calendar widget has already forced it to 23:59:59.999 UTC and timezone is ahead of UTC', () => {
-    // Naive re-projection through Europe/London (BST +1) would push this into "2 Sep".
+    // Naive re-projection through Europe/London (BST +1) must keep this on "1 Sep"
+    // locally, i.e. 31 Aug 23:00 UTC to 1 Sep 22:59:59.999 UTC, not "2 Sep".
     const dateRange: DateRange = {
       from: new Date('2026-09-01T00:00:00.000Z'),
       to: new Date('2026-09-01T23:59:59.999Z'),
     };
     const result = getTimeRangeFromDateRange(dateRange, 'Europe/London');
-    expect(result?.from).toEqual(new Date('2026-09-01T00:00:00.000Z'));
-    expect(result?.to).toEqual(new Date('2026-09-01T23:59:59.999Z'));
+    expect(result?.from).toEqual(new Date('2026-08-31T23:00:00.000Z'));
+    expect(result?.to).toEqual(new Date('2026-09-01T22:59:59.999Z'));
   });
 
   it('resolves a genuine multi-day range correctly under a timezone ahead of UTC', () => {
@@ -192,8 +195,8 @@ describe('getTimeRangeFromDateRange', () => {
       to: new Date('2026-09-05T23:59:59.999Z'),
     };
     const result = getTimeRangeFromDateRange(dateRange, 'Europe/London');
-    expect(result?.from).toEqual(new Date('2026-09-01T00:00:00.000Z'));
-    expect(result?.to).toEqual(new Date('2026-09-05T23:59:59.999Z'));
+    expect(result?.from).toEqual(new Date('2026-08-31T23:00:00.000Z'));
+    expect(result?.to).toEqual(new Date('2026-09-05T22:59:59.999Z'));
   });
 
   it('treats a single click (range not completed, `to` undefined) as a single-day pick instead of defaulting to "now"', () => {
@@ -202,8 +205,8 @@ describe('getTimeRangeFromDateRange', () => {
       to: undefined,
     };
     const result = getTimeRangeFromDateRange(dateRange, 'Australia/Sydney');
-    expect(result?.from).toEqual(new Date('2026-09-01T00:00:00.000Z'));
-    expect(result?.to).toEqual(new Date('2026-09-01T23:59:59.999Z'));
+    expect(result?.from).toEqual(new Date('2026-08-31T14:00:00.000Z'));
+    expect(result?.to).toEqual(new Date('2026-09-01T13:59:59.999Z'));
   });
 });
 
@@ -276,5 +279,23 @@ describe('getTimeRangeLabel', () => {
     const opt = makeOption('jan', jan);
     // unresolved → dateRange undefined → ''
     expect(getTimeRangeLabel(input, 'DD MMM', [opt])).toBe('');
+  });
+
+  it('formats from/to in UTC when no timezone is given, even if that spans two UTC days', () => {
+    // Midnight-to-midnight 15 Jun in Australia/Sydney (AEST, UTC+10) is
+    // 14 Jun 14:00 UTC to 15 Jun 13:59:59.999 UTC — two different UTC days.
+    const sydneyDay = range(
+      new Date('2024-06-14T14:00:00.000Z'),
+      new Date('2024-06-15T13:59:59.999Z'),
+    );
+    expect(getTimeRangeLabel(sydneyDay, 'DD MMM')).toBe('14 Jun - 15 Jun');
+  });
+
+  it('formats from/to in the given timezone rather than UTC', () => {
+    const sydneyDay = range(
+      new Date('2024-06-14T14:00:00.000Z'),
+      new Date('2024-06-15T13:59:59.999Z'),
+    );
+    expect(getTimeRangeLabel(sydneyDay, 'DD MMM', undefined, 'Australia/Sydney')).toBe('15 Jun');
   });
 });
