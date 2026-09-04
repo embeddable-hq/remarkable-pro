@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.5.0
+
+### Minor Changes
+
+- df437dd: Fix timezone in date component
+
 ## 0.4.2
 
 ### Patch Changes
