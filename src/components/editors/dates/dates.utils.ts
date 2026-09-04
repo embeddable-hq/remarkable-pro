@@ -81,9 +81,11 @@ export const getDateRangeFromTimeRange = (
   return finalTimeRange;
 };
 
-// Matches defaults.DateRanges.constants.ts so manual picks line up with preset ranges.
-const getLocalDateString = (date: Date | undefined, tz?: string): string =>
-  tz ? dayjs.tz(date, tz).format('YYYY-MM-DD') : dayjs.utc(date).format('YYYY-MM-DD');
+// Anchors `date` to the start of its calendar day in `tz` (or in UTC when no
+// timezone is given). Matches defaults.DateRanges.constants.ts so manual
+// picks line up with preset ranges.
+const startOfDayIn = (date: Date | undefined, tz?: string) =>
+  tz ? dayjs(date).tz(tz).startOf('day') : dayjs.utc(date).startOf('day');
 
 export const getTimeRangeFromDateRange = (
   dateRange: DateRange | undefined,
@@ -102,7 +104,7 @@ export const getTimeRangeFromDateRange = (
 
   return {
     relativeTimeString: undefined,
-    from: dayjs.utc(getLocalDateString(dateRange.from, timezone)).startOf('day').toDate(),
-    to: dayjs.utc(getLocalDateString(toDayStart, timezone)).endOf('day').toDate(),
+    from: startOfDayIn(dateRange.from, timezone).toDate(),
+    to: startOfDayIn(toDayStart, timezone).endOf('day').toDate(),
   };
 };
