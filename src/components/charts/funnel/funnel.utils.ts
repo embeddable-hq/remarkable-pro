@@ -10,7 +10,8 @@ import { remarkableTheme } from '../../../theme/theme.constants';
 import { Theme } from '../../../theme/theme.types';
 import { brightenColor, getColorGradient } from '../../../utils/color.utils';
 import { getDimensionWithoutTruncation } from '../charts.utils';
-import { FunnelPalette } from './funnel.types';
+
+export type FunnelPalette = { start: string; end: string };
 
 const PALETTE_BRIGHTEN_AMOUNT = 2.2;
 

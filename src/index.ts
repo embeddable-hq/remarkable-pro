@@ -145,7 +145,6 @@ export * from './components/charts/pies/DonutLabelChartPro/definition';
 // Charts - Funnel
 export * as FunnelChartPro from './components/charts/funnel/FunnelChartPro';
 export type { FunnelChartProProps } from './components/charts/funnel/FunnelChartPro';
-export * from './components/charts/funnel/funnel.types';
 export * from './components/charts/funnel/funnel.utils';
 export * from './components/charts/funnel/FunnelChartPro/definition';
 
