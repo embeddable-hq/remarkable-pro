@@ -280,4 +280,22 @@ describe('getTimeRangeLabel', () => {
     // unresolved → dateRange undefined → ''
     expect(getTimeRangeLabel(input, 'DD MMM', [opt])).toBe('');
   });
+
+  it('formats from/to in UTC when no timezone is given, even if that spans two UTC days', () => {
+    // Midnight-to-midnight 15 Jun in Australia/Sydney (AEST, UTC+10) is
+    // 14 Jun 14:00 UTC to 15 Jun 13:59:59.999 UTC — two different UTC days.
+    const sydneyDay = range(
+      new Date('2024-06-14T14:00:00.000Z'),
+      new Date('2024-06-15T13:59:59.999Z'),
+    );
+    expect(getTimeRangeLabel(sydneyDay, 'DD MMM')).toBe('14 Jun - 15 Jun');
+  });
+
+  it('formats from/to in the given timezone rather than UTC', () => {
+    const sydneyDay = range(
+      new Date('2024-06-14T14:00:00.000Z'),
+      new Date('2024-06-15T13:59:59.999Z'),
+    );
+    expect(getTimeRangeLabel(sydneyDay, 'DD MMM', undefined, 'Australia/Sydney')).toBe('15 Jun');
+  });
 });
