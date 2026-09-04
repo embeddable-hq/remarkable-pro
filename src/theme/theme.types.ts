@@ -1,6 +1,4 @@
 import { Resource } from 'i18next';
-// Type-only: pulls in chartjs-chart-funnel's module augmentation so 'funnel' is a valid Chart.js chart type.
-import type {} from 'chartjs-chart-funnel';
 import { ThemeFormatter } from './formatter/formatter.types';
 import { ThemeStyles } from './styles/styles.types';
 import { ThemeFonts } from './fonts/fonts.types';
