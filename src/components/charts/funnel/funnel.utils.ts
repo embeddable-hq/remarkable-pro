@@ -1,7 +1,7 @@
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { styles } from '@embeddable.com/remarkable-ui/styles';
-import { ChartData } from 'chart.js';
+import { ChartData, ChartOptions } from 'chart.js';
 // Type-only: pulls in chartjs-chart-funnel's module augmentation so 'funnel' is a valid Chart.js chart type.
 import type {} from 'chartjs-chart-funnel';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
@@ -74,6 +74,16 @@ const aggregateFunnelStages = (
 
   return names.map((name) => ({ name, count: stageMap.get(name) ?? 0 }));
 };
+
+export const getFunnelChartProOptions = (
+  theme: Theme = remarkableTheme,
+): Partial<ChartOptions<'funnel'>> => ({
+  plugins: {
+    legend: {
+      position: theme.charts.legendPosition ?? 'bottom',
+    },
+  },
+});
 
 export const getFunnelChartProData = (
   props: {

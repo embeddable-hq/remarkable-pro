@@ -58,6 +58,7 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
 
 vi.mock('../funnel.utils', () => ({
   getFunnelChartProData: vi.fn(() => ({ labels: [], datasets: [{ data: [] }] })),
+  getFunnelChartProOptions: vi.fn(() => ({})),
 }));
 
 const emptyResults: DataResponse = { data: [], isLoading: false } as unknown as DataResponse;
@@ -98,25 +99,14 @@ describe('FunnelChartPro', () => {
     expect(screen.getByTestId('funnel-chart')).toHaveAttribute('data-show-percentage', 'true');
   });
 
-  it('defaults legendPosition to bottom when the theme does not specify one', () => {
+  it('merges theme.charts.funnelChartPro.options over getFunnelChartProOptions', () => {
+    vi.mocked(useTheme).mockReturnValue({
+      charts: { funnelChartPro: { options: { plugins: { legend: { position: 'right' } } } } },
+    } as never);
+
     render(<FunnelChartPro {...defaultProps} />);
-    expect(screen.getByTestId('funnel-chart')).toHaveAttribute('data-legend-position', 'bottom');
+    expect(screen.getByTestId('funnel-chart')).toHaveAttribute('data-legend-position', 'right');
   });
-
-  it.each(['top', 'right', 'bottom', 'left'])(
-    'passes legendPosition through when the theme sets it to %s',
-    (legendPosition) => {
-      vi.mocked(useTheme).mockReturnValue({
-        charts: { funnelChartPro: {}, legendPosition },
-      } as never);
-
-      render(<FunnelChartPro {...defaultProps} />);
-      expect(screen.getByTestId('funnel-chart')).toHaveAttribute(
-        'data-legend-position',
-        legendPosition,
-      );
-    },
-  );
 
   it('includes orderDimension in dimensionsAndMeasures when provided', () => {
     render(<FunnelChartPro {...defaultProps} orderDimension={orderDimension} />);

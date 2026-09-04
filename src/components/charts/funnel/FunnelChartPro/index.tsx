@@ -1,8 +1,9 @@
 import { useTheme } from '@embeddable.com/react';
 import { FunnelChart } from '@embeddable.com/remarkable-ui';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { mergician } from 'mergician';
 import { Theme } from '../../../../theme/theme.types';
-import { getFunnelChartProData } from '../funnel.utils';
+import { getFunnelChartProData, getFunnelChartProOptions } from '../funnel.utils';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import {
   ChartCard,
@@ -50,16 +51,10 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
     theme,
   );
 
-  const options = {
-    ...theme.charts.funnelChartPro?.options,
-    plugins: {
-      ...theme.charts.funnelChartPro?.options?.plugins,
-      legend: {
-        ...theme.charts.funnelChartPro?.options?.plugins?.legend,
-        position: theme.charts.legendPosition ?? 'bottom',
-      },
-    },
-  };
+  const options = mergician(
+    getFunnelChartProOptions(theme),
+    theme.charts.funnelChartPro?.options ?? {},
+  );
 
   return (
     <ChartCard

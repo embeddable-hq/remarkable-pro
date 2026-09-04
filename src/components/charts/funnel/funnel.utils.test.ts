@@ -1,7 +1,11 @@
 import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { getDefaultFunnelPalette, getFunnelChartProData } from './funnel.utils';
+import {
+  getDefaultFunnelPalette,
+  getFunnelChartProData,
+  getFunnelChartProOptions,
+} from './funnel.utils';
 
 vi.mock('../../../utils/color.utils', () => ({
   getColorGradient: vi.fn((start: string, end: string, steps: number) =>
@@ -285,5 +289,17 @@ describe('getDefaultFunnelPalette', () => {
     const { end } = getDefaultFunnelPalette();
 
     expect(end).toBe('#ff5400');
+  });
+});
+
+describe('getFunnelChartProOptions', () => {
+  it('uses legendPosition from theme', () => {
+    const options = getFunnelChartProOptions({ charts: { legendPosition: 'right' } } as never);
+    expect(options.plugins?.legend?.position).toBe('right');
+  });
+
+  it('defaults legendPosition to "bottom" when theme does not specify one', () => {
+    const options = getFunnelChartProOptions({ charts: {} } as never);
+    expect(options.plugins?.legend?.position).toBe('bottom');
   });
 });
