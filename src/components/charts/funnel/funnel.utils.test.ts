@@ -1,4 +1,5 @@
 import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { getDefaultFunnelPalette, getFunnelChartProData } from './funnel.utils';
 
@@ -221,5 +222,21 @@ describe('getDefaultFunnelPalette', () => {
 
     expect(end).toBe('#336699');
     expect(start).toBe('#336699+2.2');
+  });
+
+  it('falls back to the last theme chart color when the first one does not resolve', () => {
+    vi.mocked(getChartColors).mockReturnValueOnce(['', '#112233', '#445566', '#778899', '#99aabb']);
+
+    const { end } = getDefaultFunnelPalette();
+
+    expect(end).toBe('#99aabb');
+  });
+
+  it('falls back to the design system default when no theme chart color resolves', () => {
+    vi.mocked(getChartColors).mockReturnValueOnce(['', '']);
+
+    const { end } = getDefaultFunnelPalette();
+
+    expect(end).toBe('#ff5400');
   });
 });
