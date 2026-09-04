@@ -1,15 +1,15 @@
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import { getChartColors } from '@embeddable.com/remarkable-ui';
+import { styles } from '@embeddable.com/remarkable-ui/styles';
 import { ChartData } from 'chart.js';
 // Type-only: pulls in chartjs-chart-funnel's module augmentation so 'funnel' is a valid Chart.js chart type.
 import type {} from 'chartjs-chart-funnel';
-import { Theme } from '../../../theme/theme.types';
-import { remarkableTheme } from '../../../theme/theme.constants';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { getDimensionWithoutTruncation } from '../charts.utils';
-import { brightenColor, getColorGradient } from '../../../utils/color.utils';
 import { i18n } from '../../../theme/i18n/i18n';
-import { getChartColors } from '@embeddable.com/remarkable-ui';
-import { styles } from '@embeddable.com/remarkable-ui/styles';
+import { remarkableTheme } from '../../../theme/theme.constants';
+import { Theme } from '../../../theme/theme.types';
+import { brightenColor, getColorGradient } from '../../../utils/color.utils';
+import { getDimensionWithoutTruncation } from '../charts.utils';
 import { FunnelPalette } from './funnel.types';
 
 const PALETTE_BRIGHTEN_AMOUNT = 2.2;
@@ -27,6 +27,19 @@ const resolveFunnelPalette = (startColor?: string, endColor?: string): FunnelPal
   if (startColor)
     return { start: startColor, end: brightenColor(startColor, -PALETTE_BRIGHTEN_AMOUNT) };
   return getDefaultFunnelPalette();
+};
+
+const getStageColorOverride = (
+  stageDimension: Dimension,
+  theme: Theme,
+  stageName: string,
+): string | undefined => {
+  const value = `${stageDimension.name}.${stageName}`;
+  return (
+    stageDimension.inputs?.color ??
+    theme.charts.backgroundColorMap?.dimensionValue?.[value] ??
+    theme.charts.borderColorMap?.dimensionValue?.[value]
+  );
 };
 
 type FunnelStage = { name: string; count: number };
@@ -84,8 +97,13 @@ export const getFunnelChartProData = (
   }
 
   const palette = resolveFunnelPalette(props.startColor, props.endColor);
+  const gradientColors = getColorGradient(palette.start, palette.end, stages.length);
 
-  const backgroundColor = getColorGradient(palette.start, palette.end, stages.length);
+  const backgroundColor = stages.map(
+    (stage, index) =>
+      getStageColorOverride(props.stageDimension, theme, stage.name) ?? gradientColors[index] ?? '',
+  );
+
   const themeFormatter = getThemeFormatter(theme);
   const dimensionWithoutTruncation = getDimensionWithoutTruncation(props.stageDimension);
 

@@ -203,6 +203,53 @@ describe('getFunnelChartProData', () => {
     expect(result.labels).toEqual(['t(Near Misses)', 't(Recordable)', 't(Nonnumeric)']);
   });
 
+  it('overrides a single stage color via theme.charts.backgroundColorMap', () => {
+    const data: DataResponse['data'] = [
+      { stage: 'A', count: '1' },
+      { stage: 'B', count: '2' },
+    ];
+    const theme = {
+      charts: { backgroundColorMap: { dimensionValue: { 'stage.B': '#ff0000' } } },
+    } as never;
+
+    const result = getFunnelChartProData({ data, stageDimension, countMeasure }, theme);
+
+    // Stages sort descending by count (no orderDimension), so 'B' (count 2) is index 0.
+    expect(result.labels).toEqual(['t(B)', 't(A)']);
+    const { start, end } = getDefaultFunnelPalette();
+    expect(result.datasets[0]?.backgroundColor).toEqual(['#ff0000', `${start}->${end}@1`]);
+  });
+
+  it('falls back to theme.charts.borderColorMap when backgroundColorMap has no entry for the stage', () => {
+    const data: DataResponse['data'] = [{ stage: 'A', count: '1' }];
+    const theme = {
+      charts: { borderColorMap: { dimensionValue: { 'stage.A': '#00ff00' } } },
+    } as never;
+
+    const result = getFunnelChartProData({ data, stageDimension, countMeasure }, theme);
+
+    expect(result.datasets[0]?.backgroundColor).toEqual(['#00ff00']);
+  });
+
+  it('overrides every stage color when the stage dimension has a fixed input color', () => {
+    const data: DataResponse['data'] = [
+      { stage: 'A', count: '1' },
+      { stage: 'B', count: '2' },
+    ];
+    const coloredStageDimension = {
+      ...stageDimension,
+      inputs: { color: '#123456' },
+    } as unknown as Dimension;
+
+    const result = getFunnelChartProData({
+      data,
+      stageDimension: coloredStageDimension,
+      countMeasure,
+    });
+
+    expect(result.datasets[0]?.backgroundColor).toEqual(['#123456', '#123456']);
+  });
+
   it('uses the formatted value as the label when it differs from the raw stage name', () => {
     vi.mocked(getThemeFormatter).mockReturnValueOnce({
       data: vi.fn(() => 'Formatted Label'),
