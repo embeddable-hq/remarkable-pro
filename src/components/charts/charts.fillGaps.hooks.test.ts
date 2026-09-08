@@ -1,9 +1,9 @@
 import { renderHook } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
 import timezone from 'dayjs/plugin/timezone.js';
-import type { Dimension, DataResponse } from '@embeddable.com/core';
+import type { Dimension, DataResponse, TimeRange } from '@embeddable.com/core';
 import { useFillGaps } from './charts.fillGaps.hooks';
 import { defaultDateRangeOptions } from '../../theme/defaults/defaults.DateRanges.constants';
 import { getTimeRangeFromDateRange } from '../editors/dates/dates.utils';
@@ -51,6 +51,10 @@ const makeResults = (data: Record<string, unknown>[]): DataResponse => ({
 });
 
 describe('useFillGaps', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('fills gaps correctly in UTC with no dateBounds (baseline, no regression)', () => {
     mockUseTheme.mockReturnValue(makeTheme('UTC'));
 
@@ -72,6 +76,11 @@ describe('useFillGaps', () => {
 
   it('respects a day-precision preset dateBounds in a non-UTC timezone (PR #271 case, unchanged)', () => {
     mockUseTheme.mockReturnValue(makeTheme('America/Los_Angeles'));
+
+    // "Today" reads the real clock internally -- pin it so this test is
+    // deterministic instead of depending on when it happens to run.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-08T18:00:00.000Z')); // 11:00 America/Los_Angeles, safely mid-day
 
     const todayOption = defaultDateRangeOptions.find((opt) => opt.value === 'Today')!;
     const { from, to } = todayOption.getRange('America/Los_Angeles')!;
@@ -98,7 +107,7 @@ describe('useFillGaps', () => {
     expect(keys[23]).toBe(lastKey);
   });
 
-  it('treats a manually-picked absolute range from the custom picker as already-safe (no double-conversion)', () => {
+  it('correctly converts a manually-picked absolute range from the custom picker', () => {
     mockUseTheme.mockReturnValue(makeTheme('America/Los_Angeles'));
 
     const pickedRange = getTimeRangeFromDateRange(
@@ -121,6 +130,30 @@ describe('useFillGaps', () => {
 
     const keys = result.current.data?.map((r) => r['daily_listens.listened_date']) ?? [];
     // 24 hourly buckets spanning the picked local day, anchored exactly at pickedRange.from
+    expect(keys.length).toBe(24);
+    expect(keys[0]).toBe(firstKey);
+  });
+
+  it('converts a host-app-supplied dateBounds that happens to land on a UTC day boundary', () => {
+    mockUseTheme.mockReturnValue(makeTheme('America/Los_Angeles'));
+
+    // Simulates a caller outside our own components building its own range as
+    // startOf('day')/endOf('day') in UTC -- landing exactly on 00:00:00.000Z /
+    // 23:59:59.999Z is systematic for that pattern, not a coincidence, and must
+    // still be converted like any other genuine instant.
+    const dimension = makeDimension({
+      dateBounds: {
+        from: new Date('2026-06-15T00:00:00.000Z'),
+        to: new Date('2026-06-15T23:59:59.999Z'),
+      },
+    });
+
+    const firstKey = localKey(new Date('2026-06-15T00:00:00.000Z'), 'America/Los_Angeles');
+    const results = makeResults([{ 'daily_listens.listened_date': firstKey, value: 1 }]);
+
+    const { result } = renderHook(() => useFillGaps({ results, dimension }));
+
+    const keys = result.current.data?.map((r) => r['daily_listens.listened_date']) ?? [];
     expect(keys.length).toBe(24);
     expect(keys[0]).toBe(firstKey);
   });
@@ -225,5 +258,45 @@ describe('useFillGaps', () => {
     expect(keys.length).toBe(24);
     expect(keys[0]).toBe('2026-01-01T00:00:00.000');
     expect(keys[23]).toBe('2026-01-01T23:00:00.000');
+  });
+
+  it('honors externalDateBounds (the LineChartComparison* path) and recomputes when it changes', () => {
+    mockUseTheme.mockReturnValue(makeTheme('UTC'));
+
+    // No dimension.inputs.dateBounds -- externalDateBounds is the only bound source,
+    // exactly like LineChartComparisonWithKpiTabsPro/LineChartComparisonDefaultPro,
+    // which pass primaryDateRange/comparisonDateRange this way.
+    const dimension = makeDimension({ granularity: 'day' });
+    const results = makeResults([
+      { 'daily_listens.listened_date': '2026-09-01T00:00:00.000', value: 1 },
+      { 'daily_listens.listened_date': '2026-10-01T00:00:00.000', value: 2 },
+    ]);
+
+    const { result, rerender } = renderHook(
+      (externalDateBounds: TimeRange) => useFillGaps({ results, dimension, externalDateBounds }),
+      {
+        initialProps: {
+          from: new Date('2026-09-01T00:00:00.000Z'),
+          to: new Date('2026-09-01T23:59:59.999Z'),
+          relativeTimeString: undefined,
+        },
+      },
+    );
+
+    expect(result.current.data).toEqual([
+      { 'daily_listens.listened_date': '2026-09-01T00:00:00.000', value: 1 },
+    ]);
+
+    // Same dimension/results/theme -- only externalDateBounds changes. If it were
+    // missing from the useMemo dependency array, this would still show September.
+    rerender({
+      from: new Date('2026-10-01T00:00:00.000Z'),
+      to: new Date('2026-10-01T23:59:59.999Z'),
+      relativeTimeString: undefined,
+    });
+
+    expect(result.current.data).toEqual([
+      { 'daily_listens.listened_date': '2026-10-01T00:00:00.000', value: 2 },
+    ]);
   });
 });
