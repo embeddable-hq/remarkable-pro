@@ -65,35 +65,35 @@ describe('useFillGaps', () => {
     const todayOption = defaultDateRangeOptions.find((opt) => opt.value === 'Today')!;
     const { from, to } = todayOption.getRange('America/Los_Angeles')!;
 
+    // Compute every expected/seed key once, up front, and reuse the saved strings below
+    // rather than re-deriving them after renderHook -- see PR discussion for why.
+    const firstKey = isoKey(from as Date);
+    const thirdHourKey = isoKey(
+      dayjs
+        .utc(from as Date)
+        .add(3, 'hour')
+        .toDate(),
+    );
+    const lastKey = isoKey(
+      dayjs
+        .utc(from as Date)
+        .add(23, 'hour')
+        .toDate(),
+    );
+
     const dimension = makeDimension({
       granularity: 'hour',
       dateBounds: { from, to, relativeTimeString: 'Today' },
     });
 
-    const results = makeResults([
-      {
-        'daily_listens.listened_date': isoKey(
-          dayjs
-            .utc(from as Date)
-            .add(3, 'hour')
-            .toDate(),
-        ),
-      },
-    ]);
+    const results = makeResults([{ 'daily_listens.listened_date': thirdHourKey }]);
 
     const { result } = renderHook(() => useFillGaps({ results, dimension }));
 
     const keys = result.current.data?.map((r) => r['daily_listens.listened_date']) ?? [];
     expect(keys.length).toBe(24);
-    expect(keys[0]).toBe(isoKey(from as Date));
-    expect(keys[23]).toBe(
-      isoKey(
-        dayjs
-          .utc(from as Date)
-          .add(23, 'hour')
-          .toDate(),
-      ),
-    );
+    expect(keys[0]).toBe(firstKey);
+    expect(keys[23]).toBe(lastKey);
   });
 
   it('treats a manually-picked absolute range from the custom picker as already-safe (no double-conversion)', () => {
@@ -104,21 +104,23 @@ describe('useFillGaps', () => {
       'America/Los_Angeles',
     )!;
 
+    // Compute the expected/seed key once, up front, and reuse the saved string below
+    // rather than re-deriving it after renderHook -- see PR discussion for why.
+    const firstKey = isoKey(pickedRange.from as Date);
+
     const dimension = makeDimension({
       granularity: 'hour',
       dateBounds: pickedRange,
     });
 
-    const results = makeResults([
-      { 'daily_listens.listened_date': isoKey(pickedRange.from as Date), value: 1 },
-    ]);
+    const results = makeResults([{ 'daily_listens.listened_date': firstKey, value: 1 }]);
 
     const { result } = renderHook(() => useFillGaps({ results, dimension }));
 
     const keys = result.current.data?.map((r) => r['daily_listens.listened_date']) ?? [];
     // 24 hourly buckets spanning the picked local day, anchored exactly at pickedRange.from
     expect(keys.length).toBe(24);
-    expect(keys[0]).toBe(isoKey(pickedRange.from as Date));
+    expect(keys[0]).toBe(firstKey);
   });
 
   it('correctly fills an hour-granularity chart bound to a live/rolling range (regression for the reported bug)', () => {
