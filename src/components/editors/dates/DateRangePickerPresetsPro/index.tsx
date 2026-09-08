@@ -134,7 +134,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
     }
 
     if (selectedValue?.from && selectedValue?.to) {
-      return getTimeRangeLabel(selectedValue, 'MMM DD');
+      return getTimeRangeLabel(selectedValue, 'MMM DD', dateRangeOptions, timezone);
     }
 
     return '';

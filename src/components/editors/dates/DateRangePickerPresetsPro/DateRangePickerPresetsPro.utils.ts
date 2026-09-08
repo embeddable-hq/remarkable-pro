@@ -9,7 +9,12 @@ export const getDateRangeSelectFieldProOptions = (
 ): SelectListOptionProps[] => {
   return dateRangeSelectFieldProOptions.map((option) => {
     return {
-      rightLabel: getTimeRangeLabel(option.getRange(timezone), option.dateFormat),
+      rightLabel: getTimeRangeLabel(
+        option.getRange(timezone),
+        option.dateFormat,
+        undefined,
+        timezone,
+      ),
       value: option.value,
       label: resolveI18nString(option.label),
     };

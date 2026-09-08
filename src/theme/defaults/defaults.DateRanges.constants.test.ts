@@ -177,28 +177,28 @@ describe('defaultDateRangeOptions', () => {
       vi.useRealTimers();
     });
 
-    it('Today anchors to local date (Feb 16, not Feb 15)', () => {
+    it('Today anchors to local date (Feb 16, not Feb 15), in Auckland midnight-to-midnight', () => {
       const { from, to } = getOption('Today').getRange(
         'Pacific/Auckland',
       ) as TimeRangeDeserializedValue;
-      expect(from).toEqual(new Date('2024-02-16T00:00:00.000Z'));
-      expect(to).toEqual(new Date('2024-02-16T23:59:59.999Z'));
+      expect(from).toEqual(new Date('2024-02-15T11:00:00.000Z')); // Feb 16 00:00 NZDT (UTC+13)
+      expect(to).toEqual(new Date('2024-02-16T10:59:59.999Z')); // Feb 16 23:59:59.999 NZDT
     });
 
     it('Yesterday is Feb 15, not Feb 14', () => {
       const { from, to } = getOption('Yesterday').getRange(
         'Pacific/Auckland',
       ) as TimeRangeDeserializedValue;
-      expect(from).toEqual(new Date('2024-02-15T00:00:00.000Z'));
-      expect(to).toEqual(new Date('2024-02-15T23:59:59.999Z'));
+      expect(from).toEqual(new Date('2024-02-14T11:00:00.000Z')); // Feb 15 00:00 NZDT
+      expect(to).toEqual(new Date('2024-02-15T10:59:59.999Z')); // Feb 15 23:59:59.999 NZDT
     });
 
     it('Week to date ends on local today (Mon Feb 12 – Fri Feb 16)', () => {
       const { from, to } = getOption('Week to date').getRange(
         'Pacific/Auckland',
       ) as TimeRangeDeserializedValue;
-      expect(from).toEqual(new Date('2024-02-12T00:00:00.000Z'));
-      expect(to).toEqual(new Date('2024-02-16T23:59:59.999Z'));
+      expect(from).toEqual(new Date('2024-02-11T11:00:00.000Z')); // Feb 12 00:00 NZDT
+      expect(to).toEqual(new Date('2024-02-16T10:59:59.999Z')); // Feb 16 23:59:59.999 NZDT
     });
   });
 
@@ -220,24 +220,24 @@ describe('defaultDateRangeOptions', () => {
       const { from, to } = getOption('Today').getRange(
         'Atlantic/Cape_Verde',
       ) as TimeRangeDeserializedValue;
-      expect(from).toEqual(new Date('2024-02-29T00:00:00.000Z'));
-      expect(to).toEqual(new Date('2024-02-29T23:59:59.999Z'));
+      expect(from).toEqual(new Date('2024-02-29T01:00:00.000Z')); // Feb 29 00:00 UTC-1
+      expect(to).toEqual(new Date('2024-03-01T00:59:59.999Z')); // Feb 29 23:59:59.999 UTC-1
     });
 
     it('This month is February (leap year), not March', () => {
       const { from, to } = getOption('This month').getRange(
         'Atlantic/Cape_Verde',
       ) as TimeRangeDeserializedValue;
-      expect(from).toEqual(new Date('2024-02-01T00:00:00.000Z'));
-      expect(to).toEqual(new Date('2024-02-29T23:59:59.999Z'));
+      expect(from).toEqual(new Date('2024-02-01T01:00:00.000Z')); // Feb 1 00:00 UTC-1
+      expect(to).toEqual(new Date('2024-03-01T00:59:59.999Z')); // Feb 29 23:59:59.999 UTC-1
     });
 
     it('Last month is January, not February', () => {
       const { from, to } = getOption('Last month').getRange(
         'Atlantic/Cape_Verde',
       ) as TimeRangeDeserializedValue;
-      expect(from).toEqual(new Date('2024-01-01T00:00:00.000Z'));
-      expect(to).toEqual(new Date('2024-01-31T23:59:59.999Z'));
+      expect(from).toEqual(new Date('2024-01-01T01:00:00.000Z')); // Jan 1 00:00 UTC-1
+      expect(to).toEqual(new Date('2024-02-01T00:59:59.999Z')); // Jan 31 23:59:59.999 UTC-1
     });
   });
 });

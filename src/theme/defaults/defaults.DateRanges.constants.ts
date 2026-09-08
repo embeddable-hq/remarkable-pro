@@ -12,10 +12,7 @@ dayjs.extend(quarterOfYear);
 
 const makeTimeRange = (from: Date, to: Date): TimeRange => ({ from, to, relativeTimeString: '' });
 
-const getLocalDateString = (date: Date, tz?: string): string =>
-  tz ? dayjs.tz(date, tz).format('YYYY-MM-DD') : dayjs.utc(date).format('YYYY-MM-DD');
-
-const getNow = (tz?: string) => dayjs.utc(getLocalDateString(new Date(), tz));
+const getNow = (tz?: string) => (tz ? dayjs().tz(tz) : dayjs.utc());
 
 const getDayBounds = (offset = 0, tz?: string): TimeRange => {
   const d = getNow(tz).add(offset, 'day');
