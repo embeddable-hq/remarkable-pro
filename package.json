@@ -81,6 +81,7 @@
     "@embeddable.com/sdk-react": "^4.3.13",
     "@embeddable.com/sdk-utils": "^0.9.1",
     "@eslint/css": "^0.13.0",
+    "@eslint/js": "^9.31.0",
     "@testing-library/react": "^16.3.2",
     "@types/chroma-js": "^3.1.1",
     "@types/react": "^19.1.9",

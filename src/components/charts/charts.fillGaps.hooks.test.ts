@@ -154,4 +154,72 @@ describe('useFillGaps', () => {
     expect(rows.length).toBe(25);
     expect(nullRows.length).toBe(0);
   });
+
+  it('converts a live dateBounds provided as ISO strings with a "Z" offset (customer-reported regression)', () => {
+    mockUseTheme.mockReturnValue(makeTheme('America/Los_Angeles'));
+
+    // No relativeTimeString, so dateBoundsTmp is used as-is -- and here it arrives
+    // as plain strings rather than Date instances, exactly as reported.
+    const dimension = makeDimension({
+      dateBounds: {
+        from: '2026-09-04T13:55:09.000Z',
+        to: '2026-09-04T14:56:09.999Z',
+      },
+    });
+
+    const results = makeResults([
+      { 'daily_listens.listened_date': '2026-09-04T06:00:00.000', value: 1 },
+      { 'daily_listens.listened_date': '2026-09-04T07:00:00.000', value: 2 },
+    ]);
+
+    const { result } = renderHook(() => useFillGaps({ results, dimension }));
+
+    expect(result.current.data).toEqual(results.data);
+  });
+
+  it('converts a live dateBounds string with an explicit +/-HH:MM offset', () => {
+    mockUseTheme.mockReturnValue(makeTheme('America/Los_Angeles'));
+
+    // Same real instants as the "Z" test above, just spelled with an explicit
+    // numeric offset instead of "Z".
+    const dimension = makeDimension({
+      dateBounds: {
+        from: '2026-09-04T06:55:09.000-07:00',
+        to: '2026-09-04T07:56:09.999-07:00',
+      },
+    });
+
+    const results = makeResults([
+      { 'daily_listens.listened_date': '2026-09-04T06:00:00.000', value: 1 },
+      { 'daily_listens.listened_date': '2026-09-04T07:00:00.000', value: 2 },
+    ]);
+
+    const { result } = renderHook(() => useFillGaps({ results, dimension }));
+
+    expect(result.current.data).toEqual(results.data);
+  });
+
+  it('leaves a naive, offset-less string dateBounds unconverted (no regression)', () => {
+    mockUseTheme.mockReturnValue(makeTheme('America/Los_Angeles'));
+
+    // No "Z" or numeric offset -- this is how record data and the existing
+    // day-precision preset/picker output are shaped, and must not be re-converted.
+    const dimension = makeDimension({
+      dateBounds: {
+        from: '2026-01-01T00:00:00.000',
+        to: '2026-01-01T23:59:59.999',
+      },
+    });
+
+    const results = makeResults([
+      { 'daily_listens.listened_date': '2026-01-01T03:00:00.000', value: 1 },
+    ]);
+
+    const { result } = renderHook(() => useFillGaps({ results, dimension }));
+
+    const keys = result.current.data?.map((r) => r['daily_listens.listened_date']) ?? [];
+    expect(keys.length).toBe(24);
+    expect(keys[0]).toBe('2026-01-01T00:00:00.000');
+    expect(keys[23]).toBe('2026-01-01T23:00:00.000');
+  });
 });

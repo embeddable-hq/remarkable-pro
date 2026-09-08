@@ -39,17 +39,28 @@ const isCleanBoundary = (value: dayjs.Dayjs): boolean => {
   return isStartOfDay || isEndOfDay;
 };
 
+// A `Date` object always represents a genuine instant, but so does an ISO string
+// carrying an explicit offset (`Z` or `+HH:MM`/`-HH:MM`) — some callers (e.g. a
+// live/rolling date-range variable set outside our own picker components) hand
+// `dateBounds`/`externalDateBounds` through as plain strings rather than `Date`
+// instances, and that signal is just as valid as `instanceof Date`.
+const hasExplicitTimezoneOffset = (value: unknown): boolean =>
+  typeof value === 'string' && /(?:Z|[+-]\d{2}:?\d{2})$/i.test(value);
+
 const resolveBoundary = (rawValue: unknown, tz?: string): dayjs.Dayjs => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const asUtc = dayjs.utc(rawValue as any);
-  const isGenuineInstant = rawValue instanceof Date && tz && !isCleanBoundary(asUtc);
+  const isGenuineInstant =
+    (rawValue instanceof Date || hasExplicitTimezoneOffset(rawValue)) &&
+    tz &&
+    !isCleanBoundary(asUtc);
 
   if (!isGenuineInstant) {
     return asUtc;
   }
 
   return dayjs.utc(
-    dayjs(rawValue as Date)
+    dayjs(rawValue as Date | string)
       .tz(tz)
       .format('YYYY-MM-DDTHH:mm:ss.SSS'),
   );
