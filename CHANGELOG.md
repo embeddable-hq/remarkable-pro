@@ -1,5 +1,15 @@
 # @embeddable/remarkable-ui
 
+## 0.6.0
+
+### Minor Changes
+
+- ed3d313: Add FunnelChartPro component
+
+### Patch Changes
+
+- df764d7: Improves time zone handling in chart fillGaps function
+
 ## 0.5.0
 
 ### Minor Changes
