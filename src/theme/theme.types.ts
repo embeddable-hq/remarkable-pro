@@ -48,6 +48,7 @@ export type ThemeCharts = {
   areaChartPro?: { options: Partial<ChartOptions<'line'>> };
   scatterChartPro?: { options: Partial<ChartOptions<'scatter'>> };
   bubbleChartPro?: { options: Partial<ChartOptions<'bubble'>> };
+  funnelChartPro?: { options: Partial<ChartOptions<'funnel'>> };
 };
 
 export type ThemeDefaults = {
