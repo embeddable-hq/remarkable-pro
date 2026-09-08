@@ -2,14 +2,25 @@ import { renderHook } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
 import type { Dimension, DataResponse } from '@embeddable.com/core';
 import { useFillGaps } from './charts.fillGaps.hooks';
 import { defaultDateRangeOptions } from '../../theme/defaults/defaults.DateRanges.constants';
 import { getTimeRangeFromDateRange } from '../editors/dates/dates.utils';
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 
-const isoKey = (date: Date): string => dayjs.utc(date).toISOString().split('Z')[0]!;
+// `dateBounds` values from a preset/picker are genuine real instants (e.g.
+// "Today" at midnight America/Los_Angeles is a real 07:00 UTC in PDT) -- not
+// raw UTC digits standing in for local ones. Mirror the same real-timezone
+// conversion `resolveBoundary` applies in charts.fillGaps.hooks.ts to compute
+// the local-digit key a matching record/bucket should have.
+const localAnchor = (date: Date, tz: string): dayjs.Dayjs =>
+  dayjs.utc(dayjs(date).tz(tz).format('YYYY-MM-DDTHH:mm:ss.SSS'));
+
+const localKey = (date: Date, tz: string): string =>
+  localAnchor(date, tz).toISOString().split('Z')[0]!;
 
 const mockUseTheme = vi.fn();
 
@@ -67,19 +78,10 @@ describe('useFillGaps', () => {
 
     // Compute every expected/seed key once, up front, and reuse the saved strings below
     // rather than re-deriving them after renderHook -- see PR discussion for why.
-    const firstKey = isoKey(from as Date);
-    const thirdHourKey = isoKey(
-      dayjs
-        .utc(from as Date)
-        .add(3, 'hour')
-        .toDate(),
-    );
-    const lastKey = isoKey(
-      dayjs
-        .utc(from as Date)
-        .add(23, 'hour')
-        .toDate(),
-    );
+    const anchor = localAnchor(from as Date, 'America/Los_Angeles');
+    const firstKey = anchor.toISOString().split('Z')[0]!;
+    const thirdHourKey = anchor.add(3, 'hour').toISOString().split('Z')[0]!;
+    const lastKey = anchor.add(23, 'hour').toISOString().split('Z')[0]!;
 
     const dimension = makeDimension({
       granularity: 'hour',
@@ -106,7 +108,7 @@ describe('useFillGaps', () => {
 
     // Compute the expected/seed key once, up front, and reuse the saved string below
     // rather than re-deriving it after renderHook -- see PR discussion for why.
-    const firstKey = isoKey(pickedRange.from as Date);
+    const firstKey = localKey(pickedRange.from as Date, 'America/Los_Angeles');
 
     const dimension = makeDimension({
       granularity: 'hour',
