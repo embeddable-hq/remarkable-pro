@@ -16,13 +16,18 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartGroupedProOptionsClickArg } from '../lines.types';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { createGroupedClickHandler } from '../../charts.utils';
+import { createGroupedClickHandler, mergeGroupOtherResults } from '../../charts.utils';
+import { useUpdateGroupOrderAndCacheKey } from '../../charts.hooks';
 
 export type LineChartGroupedProProp = {
   xAxis: Dimension;
   groupBy: Dimension;
   measure: Measure;
-  results: DataResponse;
+  results?: DataResponse;
+  resultsGroupOrder?: DataResponse;
+  resultsGroupOther?: DataResponse;
+  groupOrderCacheKey?: string;
+  setGroupOrderAndCacheKey?: (values: string[], cacheKey: string) => void;
   reverseXAxis?: boolean;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
@@ -61,16 +66,29 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
     onLineClicked,
     componentName,
     trackingId,
+    resultsGroupOrder,
+    groupOrderCacheKey,
+    setGroupOrderAndCacheKey,
+    resultsGroupOther,
   } = props;
 
+  useUpdateGroupOrderAndCacheKey({
+    resultsGroupOrder,
+    groupDimension: groupBy,
+    setGroupOrderAndCacheKey,
+    groupOrderCacheKey,
+  });
+
+  const mergedResults = mergeGroupOtherResults(props.results, resultsGroupOther, groupBy);
+
   const results = useFillGaps({
-    results: props.results,
+    results: mergedResults,
     dimension: props.xAxis,
   });
 
   const data = getLineChartGroupedProData(
     {
-      data: results.data,
+      data: results?.data,
       dimension: xAxis,
       groupDimension: groupBy,
       measure,
@@ -100,7 +118,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
     <ChartCard
       data={results}
       dimensionsAndMeasures={[measure, xAxis, groupBy]}
-      errorMessage={results.error}
+      errorMessage={results?.error || resultsGroupOrder?.error}
       {...asChartCardHeaderProps(props)}
     >
       {setGranularity && (

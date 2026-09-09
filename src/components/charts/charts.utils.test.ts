@@ -1,12 +1,15 @@
 import type { ChartClickArgs } from '@embeddable.com/remarkable-ui';
 import type { ChartData } from 'chart.js';
-import type { Dimension, Measure } from '@embeddable.com/core';
+import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import {
   createGroupedClickHandler,
   createSimpleClickHandler,
   getDatalabelPercentage,
   getDimensionWithoutTruncation,
   groupTailAsOther,
+  isOtherBucketableMeasure,
+  mergeGroupOtherResults,
+  tagRowsAsOtherGroup,
 } from './charts.utils';
 import { i18n } from '../../theme/i18n/i18n';
 import { getTimeRangeFromDimensionValue } from '../utils/dimension.utils';
@@ -260,6 +263,165 @@ describe('groupTailAsOther', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = groupTailAsOther(undefined as any, dimension, [measure], 3);
     expect(result).toEqual([]);
+  });
+});
+
+describe('isOtherBucketableMeasure', () => {
+  it('returns true when the measure has no aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value'))).toBe(true);
+  });
+
+  it('returns true for sum aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'sum'))).toBe(true);
+  });
+
+  it('returns true for count aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'count'))).toBe(true);
+  });
+
+  it('returns false for avg aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'avg'))).toBe(false);
+  });
+
+  it('returns false for min aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'min'))).toBe(false);
+  });
+
+  it('returns false for max aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'max'))).toBe(false);
+  });
+});
+
+describe('tagRowsAsOtherGroup', () => {
+  const groupBy = makeDimension('product');
+
+  it('tags every row with i18n.t("common.other") under the groupBy field name', () => {
+    const data = [
+      { product: 'Widget', value: 5 },
+      { product: 'Gadget', value: 7 },
+    ];
+    const result = tagRowsAsOtherGroup(data, groupBy);
+    expect(result).toEqual([
+      { product: 't(common.other)', value: 5 },
+      { product: 't(common.other)', value: 7 },
+    ]);
+  });
+
+  it('defaults to an empty array when data is undefined', () => {
+    expect(tagRowsAsOtherGroup(undefined, groupBy)).toEqual([]);
+  });
+
+  it('uses the granularity-suffixed field name for a time-typed groupBy dimension', () => {
+    const timeGroupBy = {
+      name: 'date',
+      __type__: 'dimension',
+      nativeType: 'time',
+      inputs: { granularity: 'month' },
+    } as unknown as Dimension;
+    const data = [{ 'date.month': 'irrelevant', value: 9 }];
+    const result = tagRowsAsOtherGroup(data, timeGroupBy);
+    expect(result).toEqual([{ 'date.month': 't(common.other)', value: 9 }]);
+  });
+});
+
+describe('mergeGroupOtherResults', () => {
+  const groupBy = makeDimension('product');
+
+  it('returns mainResults unchanged when it is undefined', () => {
+    expect(mergeGroupOtherResults(undefined, undefined, groupBy)).toBeUndefined();
+  });
+
+  it('appends tagged Other rows once mainResults has settled', () => {
+    const mainResults = {
+      data: [{ product: 'Widget', value: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const resultsGroupOther = {
+      data: [{ value: 30 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+
+    const result = mergeGroupOtherResults(mainResults, resultsGroupOther, groupBy);
+
+    expect(result?.data).toEqual([
+      { product: 'Widget', value: 10 },
+      { product: 't(common.other)', value: 30 },
+    ]);
+    expect(result?.isLoading).toBe(false);
+  });
+
+  it('does NOT include Other rows while mainResults is still loading, even if resultsGroupOther already has data', () => {
+    // This is the regression case: resultsGroupOther resolving before mainResults
+    // must never produce a merged dataset containing only the Other row, since
+    // that would permanently cache Other's color at index 0 and collide with
+    // whichever real group value later lands at index 0.
+    const mainResults = { data: [], isLoading: true } as unknown as DataResponse;
+    const resultsGroupOther = {
+      data: [{ value: 30 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+
+    const result = mergeGroupOtherResults(mainResults, resultsGroupOther, groupBy);
+
+    expect(result?.data).toEqual([]);
+  });
+
+  it('includes Other rows once mainResults settles on a later call, after being excluded while loading', () => {
+    const loadingMain = { data: [], isLoading: true } as unknown as DataResponse;
+    const resultsGroupOther = {
+      data: [{ value: 30 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+
+    expect(mergeGroupOtherResults(loadingMain, resultsGroupOther, groupBy)?.data).toEqual([]);
+
+    const settledMain = {
+      data: [{ product: 'Widget', value: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+
+    expect(mergeGroupOtherResults(settledMain, resultsGroupOther, groupBy)?.data).toEqual([
+      { product: 'Widget', value: 10 },
+      { product: 't(common.other)', value: 30 },
+    ]);
+  });
+
+  it('marks the merged result as loading when resultsGroupOther is still loading, even if mainResults has settled', () => {
+    const mainResults = {
+      data: [{ product: 'Widget', value: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const resultsGroupOther = { data: undefined, isLoading: true } as unknown as DataResponse;
+
+    const result = mergeGroupOtherResults(mainResults, resultsGroupOther, groupBy);
+
+    expect(result?.isLoading).toBe(true);
+    expect(result?.data).toEqual([{ product: 'Widget', value: 10 }]);
+  });
+
+  it('combines errors from both sources', () => {
+    const mainResults = { data: [], isLoading: false, error: undefined } as unknown as DataResponse;
+    const resultsGroupOther = {
+      data: [],
+      isLoading: false,
+      error: 'other query failed',
+    } as unknown as DataResponse;
+
+    const result = mergeGroupOtherResults(mainResults, resultsGroupOther, groupBy);
+
+    expect(result?.error).toBe('other query failed');
+  });
+
+  it('treats a missing resultsGroupOther as no Other rows', () => {
+    const mainResults = {
+      data: [{ product: 'Widget', value: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+
+    const result = mergeGroupOtherResults(mainResults, undefined, groupBy);
+
+    expect(result?.data).toEqual([{ product: 'Widget', value: 10 }]);
+    expect(result?.isLoading).toBe(false);
   });
 });
 

@@ -5,6 +5,7 @@ import { dispatchEventUserInteraction } from '../../utils/events.utils';
 import { i18n } from '../../theme/i18n/i18n';
 import { DimensionValueOrTimeRange, GroupedClickArg, SimpleClickArg } from './charts.types';
 import { ChartData } from 'chart.js';
+import { getDimensionFieldName } from '../../utils/data.utils';
 
 export const getDimensionWithoutTruncation = (dimension: Dimension): Dimension => ({
   ...dimension,
@@ -46,6 +47,52 @@ export const groupTailAsOther = (
   }
 
   return [...head, aggregatedRow];
+};
+
+// Measures whose aggType is avg/min/max can't be correctly represented by a
+// NOT-IN "everything else" aggregate — you can't derive the average/min/max of
+// the excluded groups from anything server-aggregatable without re-computing
+// over row-level data. Group "Other" bucketing is limited to sum/count.
+export const isOtherBucketableMeasure = (measure: Measure): boolean => {
+  const aggType = (measure.meta as Record<string, unknown> | undefined)?.aggType;
+  return aggType !== 'avg' && aggType !== 'min' && aggType !== 'max';
+};
+
+export const tagRowsAsOtherGroup = (
+  data: DataResponse['data'],
+  groupBy: Dimension,
+): NonNullable<DataResponse['data']> => {
+  const groupByFieldName = getDimensionFieldName(groupBy);
+  return (data ?? []).map((row) => ({ ...row, [groupByFieldName]: i18n.t('common.other') }));
+};
+
+// Merges the top-N-groups query with the "Other" aggregate query. The two are
+// independent async calls that can resolve in either order — critically, the
+// "Other" rows are only spliced in once mainResults has actually settled
+// (isLoading: false). Without that gate, a render where resultsGroupOther has
+// arrived but mainResults hasn't yet would produce a merged dataset containing
+// ONLY the Other row, placing it at index 0. Per-value chart colors are cached
+// by value and reused forever once assigned (see getDimensionMeasureColor), so
+// "Other" would permanently keep index 0's color — then collide with whichever
+// real group value later computes at index 0 once mainResults finally arrives.
+export const mergeGroupOtherResults = (
+  mainResults: DataResponse | undefined,
+  resultsGroupOther: DataResponse | undefined,
+  groupBy: Dimension,
+): DataResponse | undefined => {
+  if (!mainResults) return mainResults;
+
+  const mainIsSettled = !mainResults.isLoading;
+
+  return {
+    ...mainResults,
+    isLoading: mainResults.isLoading || Boolean(resultsGroupOther?.isLoading),
+    error: mainResults.error || resultsGroupOther?.error,
+    data: [
+      ...(mainResults.data ?? []),
+      ...(mainIsSettled ? tagRowsAsOtherGroup(resultsGroupOther?.data, groupBy) : []),
+    ],
+  };
 };
 
 export const getDatalabelPercentage = (

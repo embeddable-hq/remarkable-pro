@@ -4,6 +4,7 @@ import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import LineChartGroupedPro from './index';
 import type { LineChartGroupedProProp } from './index';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
+import { mergeGroupOtherResults } from '../../charts.utils';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
@@ -52,6 +53,11 @@ vi.mock('./LineChartGroupedPro.utils', () => ({
 
 vi.mock('../../charts.utils', () => ({
   createGroupedClickHandler: vi.fn(() => vi.fn()),
+  mergeGroupOtherResults: vi.fn((mainResults) => mainResults),
+}));
+
+vi.mock('../../charts.hooks', () => ({
+  useUpdateGroupOrderAndCacheKey: vi.fn(),
 }));
 
 vi.mock('../../shared/ChartGranularitySelectField/ChartGranularitySelectField', () => ({
@@ -74,6 +80,7 @@ describe('LineChartGroupedPro', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useFillGaps).mockReturnValue(emptyResults);
+    vi.mocked(mergeGroupOtherResults).mockImplementation((mainResults) => mainResults);
   });
 
   it('renders ChartCard', () => {
@@ -90,5 +97,36 @@ describe('LineChartGroupedPro', () => {
   it('renders LineChart', () => {
     render(<LineChartGroupedPro {...defaultProps} />);
     expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+  });
+
+  it('merges results with the Other query via mergeGroupOtherResults before filling gaps', () => {
+    const mainResults = {
+      data: [{ date: '2026-01-01', group: 'Widget', revenue: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const resultsGroupOther = {
+      data: [{ date: '2026-01-01', revenue: 30 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const mergedResults = {
+      data: [
+        { date: '2026-01-01', group: 'Widget', revenue: 10 },
+        { date: '2026-01-01', group: 't(common.other)', revenue: 30 },
+      ],
+      isLoading: false,
+    } as unknown as DataResponse;
+    vi.mocked(mergeGroupOtherResults).mockReturnValue(mergedResults);
+
+    render(
+      <LineChartGroupedPro
+        {...defaultProps}
+        results={mainResults}
+        resultsGroupOther={resultsGroupOther}
+      />,
+    );
+
+    expect(mergeGroupOtherResults).toHaveBeenCalledWith(mainResults, resultsGroupOther, groupBy);
+    const fillGapsArg = vi.mocked(useFillGaps).mock.calls[0]?.[0];
+    expect(fillGapsArg?.results).toBe(mergedResults);
   });
 });

@@ -4,6 +4,7 @@ import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import BarChartStackedHorizontalPro from './index';
 import type { BarChartStackedHorizontalProProps } from './index';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
+import { mergeGroupOtherResults } from '../../charts.utils';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
@@ -52,10 +53,12 @@ vi.mock('../bars.utils', () => ({
 
 vi.mock('../../charts.utils', () => ({
   createGroupedClickHandler: vi.fn(() => vi.fn()),
+  mergeGroupOtherResults: vi.fn((mainResults) => mainResults),
 }));
 
-vi.mock('../bars.hooks', () => ({
+vi.mock('../../charts.hooks', () => ({
   useUpdateAxisOrderAndCacheKey: vi.fn(),
+  useUpdateGroupOrderAndCacheKey: vi.fn(),
 }));
 
 vi.mock('../../shared/ChartGranularitySelectField/ChartGranularitySelectField', () => ({
@@ -78,6 +81,7 @@ describe('BarChartStackedHorizontalPro', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useFillGaps).mockReturnValue(emptyResults);
+    vi.mocked(mergeGroupOtherResults).mockImplementation((mainResults) => mainResults);
   });
 
   it('renders ChartCard', () => {
@@ -94,5 +98,36 @@ describe('BarChartStackedHorizontalPro', () => {
   it('renders BarChart', () => {
     render(<BarChartStackedHorizontalPro {...defaultProps} />);
     expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+  });
+
+  it('merges results with the Other query via mergeGroupOtherResults before filling gaps', () => {
+    const mainResults = {
+      data: [{ category: 'A', group: 'Widget', revenue: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const resultsGroupOther = {
+      data: [{ category: 'A', revenue: 30 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const mergedResults = {
+      data: [
+        { category: 'A', group: 'Widget', revenue: 10 },
+        { category: 'A', group: 't(common.other)', revenue: 30 },
+      ],
+      isLoading: false,
+    } as unknown as DataResponse;
+    vi.mocked(mergeGroupOtherResults).mockReturnValue(mergedResults);
+
+    render(
+      <BarChartStackedHorizontalPro
+        {...defaultProps}
+        results={mainResults}
+        resultsGroupOther={resultsGroupOther}
+      />,
+    );
+
+    expect(mergeGroupOtherResults).toHaveBeenCalledWith(mainResults, resultsGroupOther, groupBy);
+    const fillGapsArg = vi.mocked(useFillGaps).mock.calls[0]?.[0];
+    expect(fillGapsArg?.results).toBe(mergedResults);
   });
 });
