@@ -233,6 +233,8 @@ type LoadDataResultsGroupOtherArgs = {
   groupBy: Dimension;
   measure: Measure;
   groupOrder: string[];
+  axisOrder?: string[];
+  maxResults?: number;
   timezone?: string;
 };
 
@@ -242,13 +244,24 @@ export const loadDataResultsGroupOtherArgs = ({
   groupBy,
   measure,
   groupOrder,
+  axisOrder,
+  maxResults,
   timezone,
-}: LoadDataResultsGroupOtherArgs): LoadDataRequest => ({
-  from: dataset,
-  select: [axis, measure],
-  filters: [{ property: groupBy, operator: 'notContains', value: groupOrder }],
-  timezone,
-});
+}: LoadDataResultsGroupOtherArgs): LoadDataRequest => {
+  const filters: NonNullable<LoadDataRequest['filters']> = [
+    { property: groupBy, operator: 'notContains', value: groupOrder },
+  ];
+  if (axisOrder?.length) {
+    filters.push({ property: axis, operator: 'equals', value: axisOrder });
+  }
+  return {
+    from: dataset,
+    select: [axis, measure],
+    filters,
+    limit: getLimit(maxResults),
+    timezone,
+  };
+};
 
 type LoadDataResultsGroupOther = {
   dataset: Dataset;
@@ -257,6 +270,8 @@ type LoadDataResultsGroupOther = {
   measure: Measure;
   granularity?: Granularity;
   groupOrder?: string[];
+  axisOrder?: string[];
+  maxResults?: number;
   timezone?: string;
 };
 
@@ -267,6 +282,8 @@ export const loadDataResultsGroupOther = ({
   measure,
   granularity,
   groupOrder,
+  axisOrder,
+  maxResults,
   timezone,
 }: LoadDataResultsGroupOther): DataResponse | undefined => {
   if (groupOrder == null) return undefined;
@@ -279,6 +296,8 @@ export const loadDataResultsGroupOther = ({
       groupBy,
       measure,
       groupOrder,
+      axisOrder,
+      maxResults,
       timezone,
     }),
   );

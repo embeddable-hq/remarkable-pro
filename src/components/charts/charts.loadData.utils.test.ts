@@ -608,6 +608,63 @@ describe('loadDataResultsGroupOtherArgs', () => {
     expect(result.filters).toEqual([
       { property: groupBy, operator: 'notContains', value: ['Widget', 'Gadget'] },
     ]);
+    expect(result.limit).toBeUndefined();
+  });
+
+  it('does not add an axis filter when axisOrder is not provided', () => {
+    const result = loadDataResultsGroupOtherArgs({
+      dataset: makeDataset(),
+      axis: makeDimension('date'),
+      groupBy: makeDimension('product'),
+      measure: makeMeasure(),
+      groupOrder: ['Widget'],
+    });
+
+    expect(result.filters).toHaveLength(1);
+  });
+
+  it('adds an axis equals filter when axisOrder has values, scoping the Other aggregate to the same displayed axis range as the main query', () => {
+    const axis = makeDimension('date');
+    const groupBy = makeDimension('product');
+    const result = loadDataResultsGroupOtherArgs({
+      dataset: makeDataset(),
+      axis,
+      groupBy,
+      measure: makeMeasure(),
+      groupOrder: ['Widget'],
+      axisOrder: ['2026-01-01', '2026-01-02'],
+    });
+
+    expect(result.filters).toEqual([
+      { property: groupBy, operator: 'notContains', value: ['Widget'] },
+      { property: axis, operator: 'equals', value: ['2026-01-01', '2026-01-02'] },
+    ]);
+  });
+
+  it('does not add an axis filter when axisOrder is empty', () => {
+    const result = loadDataResultsGroupOtherArgs({
+      dataset: makeDataset(),
+      axis: makeDimension('date'),
+      groupBy: makeDimension('product'),
+      measure: makeMeasure(),
+      groupOrder: ['Widget'],
+      axisOrder: [],
+    });
+
+    expect(result.filters).toHaveLength(1);
+  });
+
+  it('applies maxResults as the query limit', () => {
+    const result = loadDataResultsGroupOtherArgs({
+      dataset: makeDataset(),
+      axis: makeDimension('date'),
+      groupBy: makeDimension('product'),
+      measure: makeMeasure(),
+      groupOrder: ['Widget'],
+      maxResults: 500,
+    });
+
+    expect(result.limit).toBe(500);
   });
 });
 
@@ -660,6 +717,30 @@ describe('loadDataResultsGroupOther', () => {
     expect(request?.filters).toEqual([
       { property: makeDimension('product'), operator: 'notContains', value: ['Widget', 'Gadget'] },
     ]);
+  });
+
+  it('passes axisOrder and maxResults through to the underlying request', () => {
+    const fakeResponse = { data: [], isLoading: false } as DataResponse;
+    mockLoadData.mockReturnValue(fakeResponse);
+    const axis = makeDimension('date');
+    const groupBy = makeDimension('product');
+
+    loadDataResultsGroupOther({
+      dataset: makeDataset(),
+      axis,
+      groupBy,
+      measure: makeMeasure(),
+      groupOrder: ['Widget'],
+      axisOrder: ['2026-01-01'],
+      maxResults: 250,
+    });
+
+    const request = mockLoadData.mock.calls[0]?.[0];
+    expect(request?.filters).toEqual([
+      { property: groupBy, operator: 'notContains', value: ['Widget'] },
+      { property: axis, operator: 'equals', value: ['2026-01-01'] },
+    ]);
+    expect(request?.limit).toBe(250);
   });
 });
 

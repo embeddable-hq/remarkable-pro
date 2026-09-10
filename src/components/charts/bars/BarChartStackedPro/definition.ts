@@ -176,6 +176,8 @@ const props = (
       groupBy: inputs.groupBy,
       measure: inputs.measure,
       groupOrder: cachedGroupOrder,
+      axisOrder: cachedAxisOrder,
+      maxResults: inputs.maxResults,
       timezone,
     }),
     results: loadDataResults({
