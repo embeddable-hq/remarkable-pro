@@ -1,6 +1,17 @@
 import { renderHook } from '@testing-library/react';
-import type { DataResponse, Dimension } from '@embeddable.com/core';
-import { useUpdateAxisOrderAndCacheKey, useUpdateGroupOrderAndCacheKey } from './charts.hooks';
+import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import {
+  useGroupOtherResults,
+  useUpdateAxisOrderAndCacheKey,
+  useUpdateGroupOrderAndCacheKey,
+} from './charts.hooks';
+
+vi.mock('../../theme/i18n/i18n', () => ({
+  i18n: { t: (key: string) => `t(${key})` },
+}));
+
+const makeMeasure = (name = 'revenue'): Measure =>
+  ({ name, title: 'Revenue', nativeType: 'number', inputs: {} }) as unknown as Measure;
 
 const makeDimension = (name = 'country'): Dimension =>
   ({ name, title: 'Country', nativeType: 'string', inputs: {} }) as unknown as Dimension;
@@ -248,5 +259,80 @@ describe('useUpdateGroupOrderAndCacheKey', () => {
     );
 
     expect(setGroupOrderAndCacheKey).toHaveBeenCalledWith(['2026-01', '2026-02'], 'key-1');
+  });
+});
+
+describe('useGroupOtherResults', () => {
+  const axis = makeDimension('date');
+  const groupBy = { name: 'product', inputs: {} } as unknown as Dimension;
+  const measure = makeMeasure('value');
+
+  it('updates the cached group order when resultsGroupOrder resolves', () => {
+    const setGroupOrderAndCacheKey = vi.fn();
+    const resultsGroupOrder = makeDataResponse(
+      [{ product: 'Widget' }, { product: 'Gadget' }],
+      false,
+    );
+
+    renderHook(() =>
+      useGroupOtherResults({
+        mainResults: makeDataResponse([], false),
+        resultsGroupOrder,
+        resultsGroupOther: undefined,
+        groupBy,
+        axis,
+        measure,
+        groupOrderCacheKey: 'key-1',
+        setGroupOrderAndCacheKey,
+      }),
+    );
+
+    expect(setGroupOrderAndCacheKey).toHaveBeenCalledWith(['Widget', 'Gadget'], 'key-1');
+  });
+
+  it('returns mainResults merged with the Other query, computed by subtraction', () => {
+    const mainResults = {
+      data: [{ date: '2026-01-01', product: 'Widget', value: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const resultsGroupOther = {
+      data: [{ date: '2026-01-01', value: 30 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+
+    const { result } = renderHook(() =>
+      useGroupOtherResults({
+        mainResults,
+        resultsGroupOrder: undefined,
+        resultsGroupOther,
+        groupBy,
+        axis,
+        measure,
+        groupOrderCacheKey: undefined,
+        setGroupOrderAndCacheKey: undefined,
+      }),
+    );
+
+    expect(result.current?.data).toEqual([
+      { date: '2026-01-01', product: 'Widget', value: 10 },
+      { date: '2026-01-01', product: 't(common.other)', value: 20 },
+    ]);
+  });
+
+  it('returns undefined when mainResults is undefined', () => {
+    const { result } = renderHook(() =>
+      useGroupOtherResults({
+        mainResults: undefined,
+        resultsGroupOrder: undefined,
+        resultsGroupOther: undefined,
+        groupBy,
+        axis,
+        measure,
+        groupOrderCacheKey: undefined,
+        setGroupOrderAndCacheKey: undefined,
+      }),
+    );
+
+    expect(result.current).toBeUndefined();
   });
 });

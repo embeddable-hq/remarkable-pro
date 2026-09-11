@@ -16,8 +16,8 @@ import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { LineChartGroupedProOptionsClickArg } from '../lines.types';
 import { LineChart } from '@embeddable.com/remarkable-ui';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { createGroupedClickHandler, mergeGroupOtherResults } from '../../charts.utils';
-import { useUpdateGroupOrderAndCacheKey } from '../../charts.hooks';
+import { createGroupedClickHandler } from '../../charts.utils';
+import { useGroupOtherResults } from '../../charts.hooks';
 
 export type LineChartGroupedProProp = {
   xAxis: Dimension;
@@ -72,20 +72,16 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
     resultsGroupOther,
   } = props;
 
-  useUpdateGroupOrderAndCacheKey({
+  const mergedResults = useGroupOtherResults({
+    mainResults: props.results,
     resultsGroupOrder,
-    groupDimension: groupBy,
-    setGroupOrderAndCacheKey,
-    groupOrderCacheKey,
-  });
-
-  const mergedResults = mergeGroupOtherResults(
-    props.results,
     resultsGroupOther,
     groupBy,
-    xAxis,
+    axis: xAxis,
     measure,
-  );
+    groupOrderCacheKey,
+    setGroupOrderAndCacheKey,
+  });
 
   const results = useFillGaps({
     results: mergedResults,

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { DataResponse, Dimension } from '@embeddable.com/core';
+import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { getDimensionFieldName } from '../../utils/data.utils';
+import { mergeGroupOtherResults } from './charts.utils';
 
 export function useUpdateAxisOrderAndCacheKey(opts: {
   resultsAxisOrder?: DataResponse;
@@ -57,4 +58,40 @@ export function useUpdateGroupOrderAndCacheKey(opts: {
     setGroupOrderAndCacheKey(values, groupOrderCacheKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- setGroupOrderAndCacheKey is recreated each render; other deps always change together with resultsGroupOrder
   }, [resultsGroupOrder]);
+}
+
+// Combines useUpdateGroupOrderAndCacheKey with mergeGroupOtherResults — the
+// per-component wiring every groupBy-bucketing chart needs (cache the ranked
+// group order, then merge the main query with the "Other" aggregate) is
+// otherwise identical across every chart that supports it, differing only in
+// which dimension/measure objects get passed in.
+export function useGroupOtherResults(opts: {
+  mainResults?: DataResponse;
+  resultsGroupOrder?: DataResponse;
+  resultsGroupOther?: DataResponse;
+  groupBy: Dimension;
+  axis: Dimension;
+  measure: Measure;
+  groupOrderCacheKey?: string;
+  setGroupOrderAndCacheKey?: (values: string[], cacheKey: string) => void;
+}): DataResponse | undefined {
+  const {
+    mainResults,
+    resultsGroupOrder,
+    resultsGroupOther,
+    groupBy,
+    axis,
+    measure,
+    groupOrderCacheKey,
+    setGroupOrderAndCacheKey,
+  } = opts;
+
+  useUpdateGroupOrderAndCacheKey({
+    resultsGroupOrder,
+    groupDimension: groupBy,
+    setGroupOrderAndCacheKey,
+    groupOrderCacheKey,
+  });
+
+  return mergeGroupOtherResults(mainResults, resultsGroupOther, groupBy, axis, measure);
 }

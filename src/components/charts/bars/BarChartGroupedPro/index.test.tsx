@@ -4,7 +4,7 @@ import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import BarChartGroupedPro from './index';
 import type { BarChartGroupedProProps } from './index';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { mergeGroupOtherResults } from '../../charts.utils';
+import { useGroupOtherResults } from '../../charts.hooks';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
@@ -53,12 +53,11 @@ vi.mock('../bars.utils', () => ({
 
 vi.mock('../../charts.utils', () => ({
   createGroupedClickHandler: vi.fn(() => vi.fn()),
-  mergeGroupOtherResults: vi.fn((mainResults) => mainResults),
 }));
 
 vi.mock('../../charts.hooks', () => ({
   useUpdateAxisOrderAndCacheKey: vi.fn(),
-  useUpdateGroupOrderAndCacheKey: vi.fn(),
+  useGroupOtherResults: vi.fn((opts) => opts.mainResults),
 }));
 
 vi.mock('../../shared/ChartGranularitySelectField/ChartGranularitySelectField', () => ({
@@ -81,7 +80,7 @@ describe('BarChartGroupedPro', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useFillGaps).mockReturnValue(emptyResults);
-    vi.mocked(mergeGroupOtherResults).mockImplementation((mainResults) => mainResults);
+    vi.mocked(useGroupOtherResults).mockImplementation((opts) => opts.mainResults);
   });
 
   it('renders ChartCard', () => {
@@ -100,7 +99,7 @@ describe('BarChartGroupedPro', () => {
     expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
   });
 
-  it('merges results with the Other query via mergeGroupOtherResults before filling gaps', () => {
+  it('wires useGroupOtherResults and feeds its result into useFillGaps', () => {
     const mainResults = {
       data: [{ category: 'A', group: 'Widget', revenue: 10 }],
       isLoading: false,
@@ -116,7 +115,7 @@ describe('BarChartGroupedPro', () => {
       ],
       isLoading: false,
     } as unknown as DataResponse;
-    vi.mocked(mergeGroupOtherResults).mockReturnValue(mergedResults);
+    vi.mocked(useGroupOtherResults).mockReturnValue(mergedResults);
 
     render(
       <BarChartGroupedPro
@@ -126,13 +125,16 @@ describe('BarChartGroupedPro', () => {
       />,
     );
 
-    expect(mergeGroupOtherResults).toHaveBeenCalledWith(
+    expect(useGroupOtherResults).toHaveBeenCalledWith({
       mainResults,
+      resultsGroupOrder: undefined,
       resultsGroupOther,
       groupBy,
-      xAxis,
+      axis: xAxis,
       measure,
-    );
+      groupOrderCacheKey: undefined,
+      setGroupOrderAndCacheKey: undefined,
+    });
     const fillGapsArg = vi.mocked(useFillGaps).mock.calls[0]?.[0];
     expect(fillGapsArg?.results).toBe(mergedResults);
   });

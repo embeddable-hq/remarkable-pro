@@ -9,9 +9,9 @@ import { mergician } from 'mergician';
 import { Dimension } from '@embeddable.com/core';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
 import { ChartGranularitySelectField } from '../../shared/ChartGranularitySelectField/ChartGranularitySelectField';
-import { useUpdateAxisOrderAndCacheKey, useUpdateGroupOrderAndCacheKey } from '../../charts.hooks';
+import { useGroupOtherResults, useUpdateAxisOrderAndCacheKey } from '../../charts.hooks';
 import { BarChartStackedBaseProps } from '../bars.types';
-import { createGroupedClickHandler, mergeGroupOtherResults } from '../../charts.utils';
+import { createGroupedClickHandler } from '../../charts.utils';
 
 export type BarChartGroupedProProps = BarChartStackedBaseProps & {
   xAxis: Dimension;
@@ -61,20 +61,16 @@ const BarChartGroupedPro = (props: BarChartGroupedProProps) => {
     axisOrderCacheKey,
   });
 
-  useUpdateGroupOrderAndCacheKey({
+  const mergedResults = useGroupOtherResults({
+    mainResults: props.results,
     resultsGroupOrder,
-    groupDimension: groupBy,
-    setGroupOrderAndCacheKey,
-    groupOrderCacheKey,
-  });
-
-  const mergedResults = mergeGroupOtherResults(
-    props.results,
     resultsGroupOther,
     groupBy,
-    xAxis,
+    axis: xAxis,
     measure,
-  );
+    groupOrderCacheKey,
+    setGroupOrderAndCacheKey,
+  });
 
   const results = useFillGaps({
     results: mergedResults,

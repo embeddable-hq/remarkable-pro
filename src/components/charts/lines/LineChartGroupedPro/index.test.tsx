@@ -4,7 +4,7 @@ import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import LineChartGroupedPro from './index';
 import type { LineChartGroupedProProp } from './index';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
-import { mergeGroupOtherResults } from '../../charts.utils';
+import { useGroupOtherResults } from '../../charts.hooks';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
@@ -53,11 +53,10 @@ vi.mock('./LineChartGroupedPro.utils', () => ({
 
 vi.mock('../../charts.utils', () => ({
   createGroupedClickHandler: vi.fn(() => vi.fn()),
-  mergeGroupOtherResults: vi.fn((mainResults) => mainResults),
 }));
 
 vi.mock('../../charts.hooks', () => ({
-  useUpdateGroupOrderAndCacheKey: vi.fn(),
+  useGroupOtherResults: vi.fn((opts) => opts.mainResults),
 }));
 
 vi.mock('../../shared/ChartGranularitySelectField/ChartGranularitySelectField', () => ({
@@ -80,7 +79,7 @@ describe('LineChartGroupedPro', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useFillGaps).mockReturnValue(emptyResults);
-    vi.mocked(mergeGroupOtherResults).mockImplementation((mainResults) => mainResults);
+    vi.mocked(useGroupOtherResults).mockImplementation((opts) => opts.mainResults);
   });
 
   it('renders ChartCard', () => {
@@ -99,7 +98,7 @@ describe('LineChartGroupedPro', () => {
     expect(screen.getByTestId('line-chart')).toBeInTheDocument();
   });
 
-  it('merges results with the Other query via mergeGroupOtherResults before filling gaps', () => {
+  it('wires useGroupOtherResults and feeds its result into useFillGaps', () => {
     const mainResults = {
       data: [{ date: '2026-01-01', group: 'Widget', revenue: 10 }],
       isLoading: false,
@@ -115,7 +114,7 @@ describe('LineChartGroupedPro', () => {
       ],
       isLoading: false,
     } as unknown as DataResponse;
-    vi.mocked(mergeGroupOtherResults).mockReturnValue(mergedResults);
+    vi.mocked(useGroupOtherResults).mockReturnValue(mergedResults);
 
     render(
       <LineChartGroupedPro
@@ -125,13 +124,16 @@ describe('LineChartGroupedPro', () => {
       />,
     );
 
-    expect(mergeGroupOtherResults).toHaveBeenCalledWith(
+    expect(useGroupOtherResults).toHaveBeenCalledWith({
       mainResults,
+      resultsGroupOrder: undefined,
       resultsGroupOther,
       groupBy,
-      xAxis,
+      axis: xAxis,
       measure,
-    );
+      groupOrderCacheKey: undefined,
+      setGroupOrderAndCacheKey: undefined,
+    });
     const fillGapsArg = vi.mocked(useFillGaps).mock.calls[0]?.[0];
     expect(fillGapsArg?.results).toBe(mergedResults);
   });
