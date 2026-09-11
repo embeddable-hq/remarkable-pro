@@ -462,6 +462,10 @@ describe('shouldGetTopGroupItems', () => {
   it('returns false for a max measure', () => {
     expect(shouldGetTopGroupItems(makeMeasure('revenue', 'max'), 5)).toBe(false);
   });
+
+  it('returns false for a count_distinct measure', () => {
+    expect(shouldGetTopGroupItems(makeMeasure('revenue', 'count_distinct'), 5)).toBe(false);
+  });
 });
 
 describe('loadDataResultsGroupOrderArgs', () => {

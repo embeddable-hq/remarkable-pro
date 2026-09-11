@@ -291,6 +291,21 @@ describe('isOtherBucketableMeasure', () => {
   it('returns false for max aggType', () => {
     expect(isOtherBucketableMeasure(makeMeasure('value', 'max'))).toBe(false);
   });
+
+  it('returns false for count_distinct aggType', () => {
+    // Not additive across groups: a value counted under more than one group
+    // would be counted once per group, so grandTotal - sum(kept groups) does
+    // not recover the excluded groups' true distinct count.
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'count_distinct'))).toBe(false);
+  });
+
+  it('returns false for count_distinct_approx aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'count_distinct_approx'))).toBe(false);
+  });
+
+  it('returns false for an unrecognized aggType (rejects by default rather than assuming safe)', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'some_future_aggtype'))).toBe(false);
+  });
 });
 
 describe('tagRowsAsOtherGroup', () => {

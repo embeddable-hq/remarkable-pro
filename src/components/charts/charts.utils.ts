@@ -49,13 +49,19 @@ export const groupTailAsOther = (
   return [...head, aggregatedRow];
 };
 
-// Measures whose aggType is avg/min/max can't be correctly represented by a
-// NOT-IN "everything else" aggregate — you can't derive the average/min/max of
-// the excluded groups from anything server-aggregatable without re-computing
-// over row-level data. Group "Other" bucketing is limited to sum/count.
+// Only sum/count (or an unset aggType, which behaves as sum — see
+// groupTailAsOther's default case) are additive across groups, so only those
+// are safe for computeOtherRows' grandTotal-minus-kept-groups subtraction.
+// This is deliberately an allowlist, not a blocklist of avg/min/max: aggType
+// can also be count_distinct/count_distinct_approx, and those aren't
+// additive either — a value counted under more than one group would be
+// counted once per group it appears in, so summing per-group distinct counts
+// and subtracting from a grand total doesn't recover "the excluded groups'
+// distinct count." Any other/future aggType is rejected by default too,
+// rather than silently assumed safe.
 export const isOtherBucketableMeasure = (measure: Measure): boolean => {
   const aggType = (measure.meta as Record<string, unknown> | undefined)?.aggType;
-  return aggType !== 'avg' && aggType !== 'min' && aggType !== 'max';
+  return aggType == null || aggType === 'sum' || aggType === 'count';
 };
 
 export const tagRowsAsOtherGroup = (
