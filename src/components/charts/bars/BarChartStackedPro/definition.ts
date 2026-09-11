@@ -8,8 +8,12 @@ import {
   getAxisOrderCacheKey,
   getCachedAxisOrder,
   loadDataResultsAxisOrder,
+  getGroupOrderCacheKey,
+  getCachedGroupOrder,
+  loadDataResultsGroupOrder,
+  loadDataResultsGroupOther,
   loadDataResults,
-} from '../bars.loadData.utils';
+} from '../../charts.loadData.utils';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
 import { BarChartStackedProOptionsClickArg } from '../bars.types';
@@ -35,6 +39,8 @@ const meta = {
     inputs.showLogarithmicScale,
     inputs.sortDirectionTopXAxis,
     inputs.limitTopXAxis,
+    inputs.sortDirectionTopGroupBy,
+    inputs.limitTopGroupBy,
     inputs.xAxisLabel,
     inputs.yAxisLabel,
     inputs.reverseXAxis,
@@ -78,6 +84,8 @@ export type BarChartStackedProState = {
   granularity?: Granularity;
   axisOrder?: string[];
   axisOrderCacheKey?: string;
+  groupOrder?: string[];
+  groupOrderCacheKey?: string;
 };
 
 const previewConfig = {
@@ -119,21 +127,56 @@ const props = (
 
   const cachedAxisOrder = getCachedAxisOrder(axisOrderCacheKey, state);
 
+  const groupSortDirection = inputs.sortDirectionTopGroupBy as OrderDirection | undefined;
+
+  const groupOrderCacheKey = getGroupOrderCacheKey({
+    dataset: inputs.dataset,
+    groupBy: inputs.groupBy,
+    measure: inputs.measure,
+    sortDirection: groupSortDirection,
+    limit: inputs.limitTopGroupBy,
+    timezone,
+  });
+
+  const cachedGroupOrder = getCachedGroupOrder(groupOrderCacheKey, state);
+
   return {
     ...inputs,
     xAxis: xAxisWithGranularity,
     axisOrder: cachedAxisOrder,
     axisOrderCacheKey,
+    groupOrder: cachedGroupOrder,
+    groupOrderCacheKey,
     granularity: state?.granularity,
     setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
     setAxisOrderAndCacheKey: (axisOrder: string[], cacheKey: string) =>
       setState({ ...state, axisOrder, axisOrderCacheKey: cacheKey }),
+    setGroupOrderAndCacheKey: (groupOrder: string[], cacheKey: string) =>
+      setState({ ...state, groupOrder, groupOrderCacheKey: cacheKey }),
     resultsAxisOrder: loadDataResultsAxisOrder({
       dataset: inputs.dataset,
       limitTopAxis: inputs.limitTopXAxis,
       axis: xAxisWithGranularity,
       measure: inputs.measure,
       sortDirection,
+      timezone,
+    }),
+    resultsGroupOrder: loadDataResultsGroupOrder({
+      dataset: inputs.dataset,
+      limitTopGroupBy: inputs.limitTopGroupBy,
+      groupBy: inputs.groupBy,
+      measure: inputs.measure,
+      sortDirection: groupSortDirection,
+      timezone,
+    }),
+    resultsGroupOther: loadDataResultsGroupOther({
+      dataset: inputs.dataset,
+      axis: inputs.xAxis,
+      granularity: state?.granularity,
+      measure: inputs.measure,
+      groupOrder: cachedGroupOrder,
+      axisOrder: cachedAxisOrder,
+      maxResults: inputs.maxResults,
       timezone,
     }),
     results: loadDataResults({
@@ -143,8 +186,10 @@ const props = (
       measure: inputs.measure,
       sortDirection,
       limitTopAxis: inputs.limitTopXAxis,
+      limitTopGroupBy: inputs.limitTopGroupBy,
       maxResults: inputs.maxResults,
       axisOrder: cachedAxisOrder,
+      groupOrder: cachedGroupOrder,
       timezone,
     }),
     componentName: meta.name,

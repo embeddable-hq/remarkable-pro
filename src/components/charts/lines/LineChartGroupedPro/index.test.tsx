@@ -4,6 +4,7 @@ import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import LineChartGroupedPro from './index';
 import type { LineChartGroupedProProp } from './index';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
+import { useGroupOtherResults } from '../../charts.hooks';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
@@ -54,6 +55,10 @@ vi.mock('../../charts.utils', () => ({
   createGroupedClickHandler: vi.fn(() => vi.fn()),
 }));
 
+vi.mock('../../charts.hooks', () => ({
+  useGroupOtherResults: vi.fn((opts) => opts.mainResults),
+}));
+
 vi.mock('../../shared/ChartGranularitySelectField/ChartGranularitySelectField', () => ({
   ChartGranularitySelectField: () => <div data-testid="granularity-select" />,
 }));
@@ -74,6 +79,7 @@ describe('LineChartGroupedPro', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useFillGaps).mockReturnValue(emptyResults);
+    vi.mocked(useGroupOtherResults).mockImplementation((opts) => opts.mainResults);
   });
 
   it('renders ChartCard', () => {
@@ -90,5 +96,45 @@ describe('LineChartGroupedPro', () => {
   it('renders LineChart', () => {
     render(<LineChartGroupedPro {...defaultProps} />);
     expect(screen.getByTestId('line-chart')).toBeInTheDocument();
+  });
+
+  it('wires useGroupOtherResults and feeds its result into useFillGaps', () => {
+    const mainResults = {
+      data: [{ date: '2026-01-01', group: 'Widget', revenue: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const resultsGroupOther = {
+      data: [{ date: '2026-01-01', revenue: 30 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const mergedResults = {
+      data: [
+        { date: '2026-01-01', group: 'Widget', revenue: 10 },
+        { date: '2026-01-01', group: 't(common.other)', revenue: 30 },
+      ],
+      isLoading: false,
+    } as unknown as DataResponse;
+    vi.mocked(useGroupOtherResults).mockReturnValue(mergedResults);
+
+    render(
+      <LineChartGroupedPro
+        {...defaultProps}
+        results={mainResults}
+        resultsGroupOther={resultsGroupOther}
+      />,
+    );
+
+    expect(useGroupOtherResults).toHaveBeenCalledWith({
+      mainResults,
+      resultsGroupOrder: undefined,
+      resultsGroupOther,
+      groupBy,
+      axis: xAxis,
+      measure,
+      groupOrderCacheKey: undefined,
+      setGroupOrderAndCacheKey: undefined,
+    });
+    const fillGapsArg = vi.mocked(useFillGaps).mock.calls[0]?.[0];
+    expect(fillGapsArg?.results).toBe(mergedResults);
   });
 });

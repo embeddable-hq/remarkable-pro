@@ -1,17 +1,17 @@
-import {
-  DataResponse,
-  Dimension,
-  Granularity,
-  LoadDataRequest,
-  Value,
-  loadData,
-} from '@embeddable.com/core';
+import { Granularity, OrderDirection, Value } from '@embeddable.com/core';
 import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/react';
 import Component from './index';
 import { LineChartGroupedProOptionsClickArg } from '../lines.types';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getDimensionWithGranularity } from '../../utils/granularity.utils';
+import {
+  getGroupOrderCacheKey,
+  getCachedGroupOrder,
+  loadDataResultsGroupOrder,
+  loadDataResultsGroupOther,
+  loadDataResults,
+} from '../../charts.loadData.utils';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
 
@@ -52,6 +52,8 @@ const meta = {
     inputs.showTooltips,
     inputs.showValueLabels,
     inputs.showLogarithmicScale,
+    inputs.sortDirectionTopGroupBy,
+    inputs.limitTopGroupBy,
     inputs.xAxisLabel,
     inputs.yAxisLabel,
     inputs.reverseXAxis,
@@ -92,6 +94,8 @@ const meta = {
 
 export type LineChartGroupedProState = {
   granularity?: Granularity;
+  groupOrder?: string[];
+  groupOrderCacheKey?: string;
 };
 
 const previewConfig = {
@@ -103,23 +107,6 @@ const previewConfig = {
 };
 
 const preview = definePreview(Component, previewConfig);
-
-const loadDataResultsArgs = (
-  inputs: Inputs<typeof meta>,
-  xAxis?: Dimension,
-  clientContext?: ThemeClientContext,
-): LoadDataRequest => ({
-  limit: inputs.maxResults,
-  from: inputs.dataset,
-  select: [xAxis ?? inputs.xAxis, inputs.groupBy, inputs.measure],
-  timezone: getClientContextTimezone(clientContext?.timezone),
-});
-
-const loadDataResults = (
-  inputs: Inputs<typeof meta>,
-  xAxis: Dimension,
-  clientContext: ThemeClientContext,
-): DataResponse => loadData(loadDataResultsArgs(inputs, xAxis, clientContext));
 
 const events = {
   onLineClicked: (value: LineChartGroupedProOptionsClickArg) => ({
@@ -136,13 +123,56 @@ const props = (
   clientContext: ThemeClientContext,
 ) => {
   const xAxisWithGranularity = getDimensionWithGranularity(inputs.xAxis, state?.granularity);
+  const timezone = getClientContextTimezone(clientContext?.timezone);
+  const groupSortDirection = inputs.sortDirectionTopGroupBy as OrderDirection | undefined;
+
+  const groupOrderCacheKey = getGroupOrderCacheKey({
+    dataset: inputs.dataset,
+    groupBy: inputs.groupBy,
+    measure: inputs.measure,
+    sortDirection: groupSortDirection,
+    limit: inputs.limitTopGroupBy,
+    timezone,
+  });
+
+  const cachedGroupOrder = getCachedGroupOrder(groupOrderCacheKey, state);
 
   return {
     ...inputs,
     xAxis: xAxisWithGranularity,
     granularity: state?.granularity,
-    setGranularity: (granularity: Granularity) => setState({ granularity }),
-    results: loadDataResults(inputs, xAxisWithGranularity, clientContext),
+    groupOrder: cachedGroupOrder,
+    groupOrderCacheKey,
+    setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
+    setGroupOrderAndCacheKey: (groupOrder: string[], cacheKey: string) =>
+      setState({ ...state, groupOrder, groupOrderCacheKey: cacheKey }),
+    resultsGroupOrder: loadDataResultsGroupOrder({
+      dataset: inputs.dataset,
+      limitTopGroupBy: inputs.limitTopGroupBy,
+      groupBy: inputs.groupBy,
+      measure: inputs.measure,
+      sortDirection: groupSortDirection,
+      timezone,
+    }),
+    resultsGroupOther: loadDataResultsGroupOther({
+      dataset: inputs.dataset,
+      axis: inputs.xAxis,
+      granularity: state?.granularity,
+      measure: inputs.measure,
+      groupOrder: cachedGroupOrder,
+      maxResults: inputs.maxResults,
+      timezone,
+    }),
+    results: loadDataResults({
+      dataset: inputs.dataset,
+      axis: xAxisWithGranularity,
+      groupBy: inputs.groupBy,
+      measure: inputs.measure,
+      limitTopGroupBy: inputs.limitTopGroupBy,
+      maxResults: inputs.maxResults,
+      groupOrder: cachedGroupOrder,
+      timezone,
+    }),
     componentName: meta.name,
   };
 };
@@ -155,9 +185,5 @@ export const lineChartGroupedPro = {
   config: {
     props,
     events,
-  },
-  results: {
-    loadDataArgs: loadDataResultsArgs,
-    loadData: loadDataResults,
   },
 } as const;

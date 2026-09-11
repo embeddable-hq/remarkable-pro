@@ -1,12 +1,16 @@
 import type { ChartClickArgs } from '@embeddable.com/remarkable-ui';
 import type { ChartData } from 'chart.js';
-import type { Dimension, Measure } from '@embeddable.com/core';
+import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import {
+  computeOtherRows,
   createGroupedClickHandler,
   createSimpleClickHandler,
   getDatalabelPercentage,
   getDimensionWithoutTruncation,
   groupTailAsOther,
+  isOtherBucketableMeasure,
+  mergeGroupOtherResults,
+  tagRowsAsOtherGroup,
 } from './charts.utils';
 import { i18n } from '../../theme/i18n/i18n';
 import { getTimeRangeFromDimensionValue } from '../utils/dimension.utils';
@@ -260,6 +264,324 @@ describe('groupTailAsOther', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = groupTailAsOther(undefined as any, dimension, [measure], 3);
     expect(result).toEqual([]);
+  });
+});
+
+describe('isOtherBucketableMeasure', () => {
+  it('returns true when the measure has no aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value'))).toBe(true);
+  });
+
+  it('returns true for sum aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'sum'))).toBe(true);
+  });
+
+  it('returns true for count aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'count'))).toBe(true);
+  });
+
+  it('returns false for avg aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'avg'))).toBe(false);
+  });
+
+  it('returns false for min aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'min'))).toBe(false);
+  });
+
+  it('returns false for max aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'max'))).toBe(false);
+  });
+
+  it('returns false for count_distinct aggType', () => {
+    // Not additive across groups: a value counted under more than one group
+    // would be counted once per group, so grandTotal - sum(kept groups) does
+    // not recover the excluded groups' true distinct count.
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'count_distinct'))).toBe(false);
+  });
+
+  it('returns false for count_distinct_approx aggType', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'count_distinct_approx'))).toBe(false);
+  });
+
+  it('returns false for an unrecognized aggType (rejects by default rather than assuming safe)', () => {
+    expect(isOtherBucketableMeasure(makeMeasure('value', 'some_future_aggtype'))).toBe(false);
+  });
+});
+
+describe('tagRowsAsOtherGroup', () => {
+  const groupBy = makeDimension('product');
+
+  it('tags every row with i18n.t("common.other") under the groupBy field name', () => {
+    const data = [
+      { product: 'Widget', value: 5 },
+      { product: 'Gadget', value: 7 },
+    ];
+    const result = tagRowsAsOtherGroup(data, groupBy);
+    expect(result).toEqual([
+      { product: 't(common.other)', value: 5 },
+      { product: 't(common.other)', value: 7 },
+    ]);
+  });
+
+  it('defaults to an empty array when data is undefined', () => {
+    expect(tagRowsAsOtherGroup(undefined, groupBy)).toEqual([]);
+  });
+
+  it('uses the granularity-suffixed field name for a time-typed groupBy dimension', () => {
+    const timeGroupBy = {
+      name: 'date',
+      __type__: 'dimension',
+      nativeType: 'time',
+      inputs: { granularity: 'month' },
+    } as unknown as Dimension;
+    const data = [{ 'date.month': 'irrelevant', value: 9 }];
+    const result = tagRowsAsOtherGroup(data, timeGroupBy);
+    expect(result).toEqual([{ 'date.month': 't(common.other)', value: 9 }]);
+  });
+});
+
+describe('computeOtherRows', () => {
+  const axis = makeDimension('date');
+  const groupBy = makeDimension('product');
+  const measure = makeMeasure('value');
+
+  it('returns [] when grandTotalData is empty or undefined', () => {
+    expect(
+      computeOtherRows(
+        [{ date: '2026-01-01', product: 'Widget', value: 10 }],
+        [],
+        axis,
+        measure,
+        groupBy,
+      ),
+    ).toEqual([]);
+    expect(
+      computeOtherRows(
+        [{ date: '2026-01-01', product: 'Widget', value: 10 }],
+        undefined,
+        axis,
+        measure,
+        groupBy,
+      ),
+    ).toEqual([]);
+  });
+
+  it('computes Other as grandTotal minus the sum of kept groups, per axis bucket', () => {
+    const mainData = [{ date: '2026-01-01', product: 'Widget', value: 10 }];
+    const grandTotalData = [{ date: '2026-01-01', value: 30 }];
+
+    const result = computeOtherRows(mainData, grandTotalData, axis, measure, groupBy);
+
+    expect(result).toEqual([{ date: '2026-01-01', product: 't(common.other)', value: 20 }]);
+  });
+
+  it('sums multiple kept groups for the same axis bucket before subtracting', () => {
+    const mainData = [
+      { date: '2026-01-01', product: 'Widget', value: 10 },
+      { date: '2026-01-01', product: 'Gizmo', value: 5 },
+    ];
+    const grandTotalData = [{ date: '2026-01-01', value: 30 }];
+
+    const result = computeOtherRows(mainData, grandTotalData, axis, measure, groupBy);
+
+    expect(result).toEqual([{ date: '2026-01-01', product: 't(common.other)', value: 15 }]);
+  });
+
+  it('is correct regardless of excluded-group naming — the exact bug notContains would hit', () => {
+    // Kept: "Widget" only. Excluded (never named here, that's the point): "Widget
+    // Pro" and "Gadget". A notContains(['Widget']) filter would ALSO match
+    // "Widget Pro" as a substring and wrongly exclude its contribution from the
+    // Other aggregate entirely. Subtraction doesn't care what the excluded
+    // groups are named — it's just grandTotal minus kept, so "Widget Pro"'s
+    // value correctly ends up inside Other.
+    const mainData = [{ date: '2026-01-01', product: 'Widget', value: 10 }];
+    // grand total = Widget(10) + "Widget Pro"(15) + Gadget(5) = 30
+    const grandTotalData = [{ date: '2026-01-01', value: 30 }];
+
+    const result = computeOtherRows(mainData, grandTotalData, axis, measure, groupBy);
+
+    expect(result).toEqual([{ date: '2026-01-01', product: 't(common.other)', value: 20 }]);
+  });
+
+  it('treats an axis bucket with no kept-group data as a kept total of 0', () => {
+    const mainData: DataResponse['data'] = [];
+    const grandTotalData = [{ date: '2026-01-01', value: 30 }];
+
+    const result = computeOtherRows(mainData, grandTotalData, axis, measure, groupBy);
+
+    expect(result).toEqual([{ date: '2026-01-01', product: 't(common.other)', value: 30 }]);
+  });
+
+  it('computes independently per axis bucket', () => {
+    const mainData = [
+      { date: '2026-01-01', product: 'Widget', value: 10 },
+      { date: '2026-01-02', product: 'Widget', value: 4 },
+    ];
+    const grandTotalData = [
+      { date: '2026-01-01', value: 30 },
+      { date: '2026-01-02', value: 4 },
+    ];
+
+    const result = computeOtherRows(mainData, grandTotalData, axis, measure, groupBy);
+
+    expect(result).toEqual([
+      { date: '2026-01-01', product: 't(common.other)', value: 20 },
+      { date: '2026-01-02', product: 't(common.other)', value: 0 },
+    ]);
+  });
+
+  it('clamps to 0 instead of going negative on floating-point noise', () => {
+    const mainData = [{ date: '2026-01-01', product: 'Widget', value: 10.0000001 }];
+    const grandTotalData = [{ date: '2026-01-01', value: 10 }];
+
+    const result = computeOtherRows(mainData, grandTotalData, axis, measure, groupBy);
+
+    expect(result).toEqual([{ date: '2026-01-01', product: 't(common.other)', value: 0 }]);
+  });
+
+  it('drops grand-total rows with a null/undefined axis value', () => {
+    const mainData: DataResponse['data'] = [];
+    const grandTotalData = [{ date: null, value: 30 }];
+
+    const result = computeOtherRows(mainData, grandTotalData, axis, measure, groupBy);
+
+    expect(result).toEqual([]);
+  });
+});
+
+describe('mergeGroupOtherResults', () => {
+  const axis = makeDimension('date');
+  const groupBy = makeDimension('product');
+  const measure = makeMeasure('value');
+
+  it('returns mainResults unchanged when it is undefined', () => {
+    expect(mergeGroupOtherResults(undefined, undefined, groupBy, axis, measure)).toBeUndefined();
+  });
+
+  it('appends Other rows (computed by subtraction) once mainResults has settled', () => {
+    const mainResults = {
+      data: [{ date: '2026-01-01', product: 'Widget', value: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const resultsGroupOther = {
+      data: [{ date: '2026-01-01', value: 30 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+
+    const result = mergeGroupOtherResults(mainResults, resultsGroupOther, groupBy, axis, measure);
+
+    expect(result?.data).toEqual([
+      { date: '2026-01-01', product: 'Widget', value: 10 },
+      { date: '2026-01-01', product: 't(common.other)', value: 20 },
+    ]);
+    expect(result?.isLoading).toBe(false);
+  });
+
+  it('does NOT include Other rows while mainResults is still loading, even if resultsGroupOther already has data', () => {
+    // This is the regression case: resultsGroupOther resolving before mainResults
+    // must never produce a merged dataset containing only the Other row, since
+    // that would permanently cache Other's color at index 0 and collide with
+    // whichever real group value later lands at index 0. It also matters more
+    // now: mainResults still loading means "kept totals" are incomplete, so
+    // computing Other early would massively over-count it too.
+    const mainResults = { data: [], isLoading: true } as unknown as DataResponse;
+    const resultsGroupOther = {
+      data: [{ date: '2026-01-01', value: 30 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+
+    const result = mergeGroupOtherResults(mainResults, resultsGroupOther, groupBy, axis, measure);
+
+    expect(result?.data).toEqual([]);
+  });
+
+  it('includes Other rows once mainResults settles on a later call, after being excluded while loading', () => {
+    const loadingMain = { data: [], isLoading: true } as unknown as DataResponse;
+    const resultsGroupOther = {
+      data: [{ date: '2026-01-01', value: 30 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+
+    expect(
+      mergeGroupOtherResults(loadingMain, resultsGroupOther, groupBy, axis, measure)?.data,
+    ).toEqual([]);
+
+    const settledMain = {
+      data: [{ date: '2026-01-01', product: 'Widget', value: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+
+    expect(
+      mergeGroupOtherResults(settledMain, resultsGroupOther, groupBy, axis, measure)?.data,
+    ).toEqual([
+      { date: '2026-01-01', product: 'Widget', value: 10 },
+      { date: '2026-01-01', product: 't(common.other)', value: 20 },
+    ]);
+  });
+
+  it('marks the merged result as loading when resultsGroupOther is still loading, even if mainResults has settled', () => {
+    const mainResults = {
+      data: [{ date: '2026-01-01', product: 'Widget', value: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const resultsGroupOther = { data: undefined, isLoading: true } as unknown as DataResponse;
+
+    const result = mergeGroupOtherResults(mainResults, resultsGroupOther, groupBy, axis, measure);
+
+    expect(result?.isLoading).toBe(true);
+    expect(result?.data).toEqual([{ date: '2026-01-01', product: 'Widget', value: 10 }]);
+  });
+
+  it('does NOT compute Other rows from stale resultsGroupOther.data while it is still loading, even though mainResults has settled', () => {
+    // Regression case: a data layer that keeps a query's previous data visible
+    // while it re-fetches (isLoading: true, data: <stale rows from an earlier
+    // config>) must not have that stale data folded into Other just because
+    // mainResults happens to have already settled — both queries must settle
+    // before Other is computed at all.
+    const mainResults = {
+      data: [{ date: '2026-01-01', product: 'Widget', value: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const staleResultsGroupOther = {
+      data: [{ date: '2026-01-01', value: 999 }], // stale grand total from a prior render
+      isLoading: true,
+    } as unknown as DataResponse;
+
+    const result = mergeGroupOtherResults(
+      mainResults,
+      staleResultsGroupOther,
+      groupBy,
+      axis,
+      measure,
+    );
+
+    expect(result?.data).toEqual([{ date: '2026-01-01', product: 'Widget', value: 10 }]);
+    expect(result?.isLoading).toBe(true);
+  });
+
+  it('combines errors from both sources', () => {
+    const mainResults = { data: [], isLoading: false, error: undefined } as unknown as DataResponse;
+    const resultsGroupOther = {
+      data: [],
+      isLoading: false,
+      error: 'other query failed',
+    } as unknown as DataResponse;
+
+    const result = mergeGroupOtherResults(mainResults, resultsGroupOther, groupBy, axis, measure);
+
+    expect(result?.error).toBe('other query failed');
+  });
+
+  it('treats a missing resultsGroupOther as no Other rows', () => {
+    const mainResults = {
+      data: [{ date: '2026-01-01', product: 'Widget', value: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+
+    const result = mergeGroupOtherResults(mainResults, undefined, groupBy, axis, measure);
+
+    expect(result?.data).toEqual([{ date: '2026-01-01', product: 'Widget', value: 10 }]);
+    expect(result?.isLoading).toBe(false);
   });
 });
 
