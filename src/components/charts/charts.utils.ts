@@ -118,16 +118,23 @@ export const computeOtherRows = (
 
 // Merges the top-N-groups query with the "Other" aggregate query. The two are
 // independent async calls that can resolve in either order — critically, the
-// "Other" rows are only computed/spliced in once mainResults has actually
-// settled (isLoading: false). Without that gate, a render where
-// resultsGroupOther has arrived but mainResults hasn't yet would either (a)
-// under the old tag-based approach, produce a merged dataset containing ONLY
-// the Other row, placing it at index 0 — or (b), under subtraction, treat
-// "kept totals" as all-zero and so massively over-count Other. Either way,
-// per-value chart colors are cached by value and reused forever once
+// "Other" rows are only computed/spliced in once BOTH mainResults and
+// resultsGroupOther have actually settled (isLoading: false on each).
+// Checking only mainResults isn't enough: if the data layer keeps a query's
+// previous data visible while it re-fetches (common in cache-backed
+// loaders), resultsGroupOther.data could be stale from an earlier
+// configuration while still reporting isLoading: true, and mainResults
+// having settled says nothing about that. Without this gate, a render could
+// either (a) under the old tag-based approach, produce a merged dataset
+// containing ONLY the Other row, placing it at index 0 — or (b), under
+// subtraction, treat "kept totals" as all-zero and so massively over-count
+// Other, or compute Other from stale grand totals against fresh kept-group
+// data. Per-value chart colors are cached by value and reused forever once
 // assigned (see getDimensionMeasureColor), so a bad intermediate render can
-// permanently pollute a color/value — settling on mainResults first avoids
-// both failure modes.
+// permanently pollute a color/value — waiting on both queries avoids all of
+// these failure modes. This mirrors the same "never trust .data while
+// .isLoading is true" rule already used in
+// useUpdateAxisOrderAndCacheKey/useUpdateGroupOrderAndCacheKey.
 export const mergeGroupOtherResults = (
   mainResults: DataResponse | undefined,
   resultsGroupOther: DataResponse | undefined,
@@ -137,7 +144,7 @@ export const mergeGroupOtherResults = (
 ): DataResponse | undefined => {
   if (!mainResults) return mainResults;
 
-  const mainIsSettled = !mainResults.isLoading;
+  const bothSettled = !mainResults.isLoading && !resultsGroupOther?.isLoading;
 
   return {
     ...mainResults,
@@ -145,7 +152,7 @@ export const mergeGroupOtherResults = (
     error: mainResults.error || resultsGroupOther?.error,
     data: [
       ...(mainResults.data ?? []),
-      ...(mainIsSettled
+      ...(bothSettled
         ? computeOtherRows(mainResults.data, resultsGroupOther?.data, axis, measure, groupBy)
         : []),
     ],

@@ -532,6 +532,33 @@ describe('mergeGroupOtherResults', () => {
     expect(result?.data).toEqual([{ date: '2026-01-01', product: 'Widget', value: 10 }]);
   });
 
+  it('does NOT compute Other rows from stale resultsGroupOther.data while it is still loading, even though mainResults has settled', () => {
+    // Regression case: a data layer that keeps a query's previous data visible
+    // while it re-fetches (isLoading: true, data: <stale rows from an earlier
+    // config>) must not have that stale data folded into Other just because
+    // mainResults happens to have already settled — both queries must settle
+    // before Other is computed at all.
+    const mainResults = {
+      data: [{ date: '2026-01-01', product: 'Widget', value: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const staleResultsGroupOther = {
+      data: [{ date: '2026-01-01', value: 999 }], // stale grand total from a prior render
+      isLoading: true,
+    } as unknown as DataResponse;
+
+    const result = mergeGroupOtherResults(
+      mainResults,
+      staleResultsGroupOther,
+      groupBy,
+      axis,
+      measure,
+    );
+
+    expect(result?.data).toEqual([{ date: '2026-01-01', product: 'Widget', value: 10 }]);
+    expect(result?.isLoading).toBe(true);
+  });
+
   it('combines errors from both sources', () => {
     const mainResults = { data: [], isLoading: false, error: undefined } as unknown as DataResponse;
     const resultsGroupOther = {
