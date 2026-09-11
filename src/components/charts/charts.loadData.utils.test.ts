@@ -593,50 +593,29 @@ describe('loadDataResultsGroupOrder', () => {
 });
 
 describe('loadDataResultsGroupOtherArgs', () => {
-  it('builds a notContains-filtered aggregate request excluding the kept groups', () => {
+  it('builds a groupBy-agnostic grand-total request (no groupBy filter at all)', () => {
     const axis = makeDimension('date');
-    const groupBy = makeDimension('product');
     const result = loadDataResultsGroupOtherArgs({
       dataset: makeDataset(),
       axis,
-      groupBy,
       measure: makeMeasure(),
-      groupOrder: ['Widget', 'Gadget'],
     });
 
     expect(result.select).toEqual([axis, makeMeasure()]);
-    expect(result.filters).toEqual([
-      { property: groupBy, operator: 'notContains', value: ['Widget', 'Gadget'] },
-    ]);
+    expect(result.filters).toBeUndefined();
     expect(result.limit).toBeUndefined();
   });
 
-  it('does not add an axis filter when axisOrder is not provided', () => {
-    const result = loadDataResultsGroupOtherArgs({
-      dataset: makeDataset(),
-      axis: makeDimension('date'),
-      groupBy: makeDimension('product'),
-      measure: makeMeasure(),
-      groupOrder: ['Widget'],
-    });
-
-    expect(result.filters).toHaveLength(1);
-  });
-
-  it('adds an axis equals filter when axisOrder has values, scoping the Other aggregate to the same displayed axis range as the main query', () => {
+  it('adds an axis equals filter when axisOrder has values, scoping the grand total to the same displayed axis range as the main query', () => {
     const axis = makeDimension('date');
-    const groupBy = makeDimension('product');
     const result = loadDataResultsGroupOtherArgs({
       dataset: makeDataset(),
       axis,
-      groupBy,
       measure: makeMeasure(),
-      groupOrder: ['Widget'],
       axisOrder: ['2026-01-01', '2026-01-02'],
     });
 
     expect(result.filters).toEqual([
-      { property: groupBy, operator: 'notContains', value: ['Widget'] },
       { property: axis, operator: 'equals', value: ['2026-01-01', '2026-01-02'] },
     ]);
   });
@@ -645,22 +624,18 @@ describe('loadDataResultsGroupOtherArgs', () => {
     const result = loadDataResultsGroupOtherArgs({
       dataset: makeDataset(),
       axis: makeDimension('date'),
-      groupBy: makeDimension('product'),
       measure: makeMeasure(),
-      groupOrder: ['Widget'],
       axisOrder: [],
     });
 
-    expect(result.filters).toHaveLength(1);
+    expect(result.filters).toBeUndefined();
   });
 
   it('applies maxResults as the query limit', () => {
     const result = loadDataResultsGroupOtherArgs({
       dataset: makeDataset(),
       axis: makeDimension('date'),
-      groupBy: makeDimension('product'),
       measure: makeMeasure(),
-      groupOrder: ['Widget'],
       maxResults: 500,
     });
 
@@ -675,7 +650,6 @@ describe('loadDataResultsGroupOther', () => {
     const result = loadDataResultsGroupOther({
       dataset: makeDataset(),
       axis: makeDimension('date'),
-      groupBy: makeDimension('product'),
       measure: makeMeasure(),
       groupOrder: undefined,
     });
@@ -688,7 +662,6 @@ describe('loadDataResultsGroupOther', () => {
     const result = loadDataResultsGroupOther({
       dataset: makeDataset(),
       axis: makeDimension('date'),
-      groupBy: makeDimension('product'),
       measure: makeMeasure(),
       groupOrder: [],
     });
@@ -697,7 +670,7 @@ describe('loadDataResultsGroupOther', () => {
     expect(mockLoadData).not.toHaveBeenCalled();
   });
 
-  it('calls loadData with the notContains filter when groupOrder has values', () => {
+  it('calls loadData once groupOrder has values, even though the request has no groupBy filter', () => {
     const fakeResponse = {
       data: [{ date: '2026-01-01', revenue: 42 }],
       isLoading: false,
@@ -707,28 +680,23 @@ describe('loadDataResultsGroupOther', () => {
     const result = loadDataResultsGroupOther({
       dataset: makeDataset(),
       axis: makeDimension('date'),
-      groupBy: makeDimension('product'),
       measure: makeMeasure(),
       groupOrder: ['Widget', 'Gadget'],
     });
 
     expect(result).toBe(fakeResponse);
     const request = mockLoadData.mock.calls[0]?.[0];
-    expect(request?.filters).toEqual([
-      { property: makeDimension('product'), operator: 'notContains', value: ['Widget', 'Gadget'] },
-    ]);
+    expect(request?.filters).toBeUndefined();
   });
 
   it('passes axisOrder and maxResults through to the underlying request', () => {
     const fakeResponse = { data: [], isLoading: false } as DataResponse;
     mockLoadData.mockReturnValue(fakeResponse);
     const axis = makeDimension('date');
-    const groupBy = makeDimension('product');
 
     loadDataResultsGroupOther({
       dataset: makeDataset(),
       axis,
-      groupBy,
       measure: makeMeasure(),
       groupOrder: ['Widget'],
       axisOrder: ['2026-01-01'],
@@ -737,7 +705,6 @@ describe('loadDataResultsGroupOther', () => {
 
     const request = mockLoadData.mock.calls[0]?.[0];
     expect(request?.filters).toEqual([
-      { property: groupBy, operator: 'notContains', value: ['Widget'] },
       { property: axis, operator: 'equals', value: ['2026-01-01'] },
     ]);
     expect(request?.limit).toBe(250);

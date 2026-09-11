@@ -173,7 +173,6 @@ const props = (
       dataset: inputs.dataset,
       axis: inputs.xAxis,
       granularity: state?.granularity,
-      groupBy: inputs.groupBy,
       measure: inputs.measure,
       groupOrder: cachedGroupOrder,
       axisOrder: cachedAxisOrder,

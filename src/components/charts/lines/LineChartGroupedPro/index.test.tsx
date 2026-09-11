@@ -125,7 +125,13 @@ describe('LineChartGroupedPro', () => {
       />,
     );
 
-    expect(mergeGroupOtherResults).toHaveBeenCalledWith(mainResults, resultsGroupOther, groupBy);
+    expect(mergeGroupOtherResults).toHaveBeenCalledWith(
+      mainResults,
+      resultsGroupOther,
+      groupBy,
+      xAxis,
+      measure,
+    );
     const fillGapsArg = vi.mocked(useFillGaps).mock.calls[0]?.[0];
     expect(fillGapsArg?.results).toBe(mergedResults);
   });

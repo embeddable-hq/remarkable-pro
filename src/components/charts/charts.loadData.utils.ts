@@ -221,18 +221,21 @@ export const getCachedGroupOrder = (
 
 // ---- Group Other (the "Other" bucket aggregate) ----
 //
-// Fetches one aggregated row per axis bucket for everything NOT in the kept
-// top group values, using notContains rather than notEquals — this codebase's
-// own filter-builder (filters.utils.ts) uses notContains for multi-value
-// "is not one of" exclusion, so this mirrors an established, working pattern
-// rather than relying on unproven notEquals + array semantics.
+// Fetches one grand-total row per axis bucket, with NO groupBy filter at all
+// — "Other" is computed client-side as grandTotal - sum(kept groups) in
+// mergeGroupOtherResults/computeOtherRows (charts.utils.ts). That subtraction
+// is only valid for additive measures, which is exactly what this feature is
+// already scoped to (see isOtherBucketableMeasure). It's deliberately NOT
+// done via an exclusion filter: notContains does substring matching, so a
+// group value that's a superstring of a kept value (e.g. "Widget Pro" vs a
+// kept "Widget") would be wrongly excluded from Other too and its
+// contribution silently dropped; notEquals + an array value has no precedent
+// anywhere else in this codebase. Subtraction sidesteps both risks.
 
 type LoadDataResultsGroupOtherArgs = {
   dataset: Dataset;
   axis: Dimension;
-  groupBy: Dimension;
   measure: Measure;
-  groupOrder: string[];
   axisOrder?: string[];
   maxResults?: number;
   timezone?: string;
@@ -241,32 +244,26 @@ type LoadDataResultsGroupOtherArgs = {
 export const loadDataResultsGroupOtherArgs = ({
   dataset,
   axis,
-  groupBy,
   measure,
-  groupOrder,
   axisOrder,
   maxResults,
   timezone,
 }: LoadDataResultsGroupOtherArgs): LoadDataRequest => {
-  const filters: NonNullable<LoadDataRequest['filters']> = [
-    { property: groupBy, operator: 'notContains', value: groupOrder },
-  ];
-  if (axisOrder?.length) {
-    filters.push({ property: axis, operator: 'equals', value: axisOrder });
-  }
-  return {
+  const request: LoadDataRequest = {
     from: dataset,
     select: [axis, measure],
-    filters,
     limit: getLimit(maxResults),
     timezone,
   };
+  if (axisOrder?.length) {
+    request.filters = [{ property: axis, operator: 'equals', value: axisOrder }];
+  }
+  return request;
 };
 
 type LoadDataResultsGroupOther = {
   dataset: Dataset;
   axis: Dimension;
-  groupBy: Dimension;
   measure: Measure;
   granularity?: Granularity;
   groupOrder?: string[];
@@ -278,7 +275,6 @@ type LoadDataResultsGroupOther = {
 export const loadDataResultsGroupOther = ({
   dataset,
   axis,
-  groupBy,
   measure,
   granularity,
   groupOrder,
@@ -293,9 +289,7 @@ export const loadDataResultsGroupOther = ({
     loadDataResultsGroupOtherArgs({
       dataset,
       axis: getDimensionWithGranularity(axis, granularity),
-      groupBy,
       measure,
-      groupOrder,
       axisOrder,
       maxResults,
       timezone,

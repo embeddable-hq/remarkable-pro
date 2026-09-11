@@ -68,7 +68,13 @@ const BarChartGroupedHorizontalPro = (props: BarChartGroupedHorizontalProProps) 
     groupOrderCacheKey,
   });
 
-  const mergedResults = mergeGroupOtherResults(props.results, resultsGroupOther, groupBy);
+  const mergedResults = mergeGroupOtherResults(
+    props.results,
+    resultsGroupOther,
+    groupBy,
+    yAxis,
+    measure,
+  );
 
   const results = useFillGaps({
     results: mergedResults,

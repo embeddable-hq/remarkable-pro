@@ -126,7 +126,13 @@ describe('BarChartGroupedHorizontalPro', () => {
       />,
     );
 
-    expect(mergeGroupOtherResults).toHaveBeenCalledWith(mainResults, resultsGroupOther, groupBy);
+    expect(mergeGroupOtherResults).toHaveBeenCalledWith(
+      mainResults,
+      resultsGroupOther,
+      groupBy,
+      yAxis,
+      measure,
+    );
     const fillGapsArg = vi.mocked(useFillGaps).mock.calls[0]?.[0];
     expect(fillGapsArg?.results).toBe(mergedResults);
   });

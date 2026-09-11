@@ -79,7 +79,13 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
     groupOrderCacheKey,
   });
 
-  const mergedResults = mergeGroupOtherResults(props.results, resultsGroupOther, groupBy);
+  const mergedResults = mergeGroupOtherResults(
+    props.results,
+    resultsGroupOther,
+    groupBy,
+    xAxis,
+    measure,
+  );
 
   const results = useFillGaps({
     results: mergedResults,

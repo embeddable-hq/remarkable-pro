@@ -66,19 +66,68 @@ export const tagRowsAsOtherGroup = (
   return (data ?? []).map((row) => ({ ...row, [groupByFieldName]: i18n.t('common.other') }));
 };
 
+const sumMeasureByAxis = (
+  data: DataResponse['data'],
+  axisFieldName: string,
+  measureFieldName: string,
+): Map<unknown, number> => {
+  const totals = new Map<unknown, number>();
+  for (const row of data ?? []) {
+    const axisValue = row[axisFieldName];
+    if (axisValue == null) continue;
+    const current = totals.get(axisValue) ?? 0;
+    totals.set(axisValue, current + Number.parseFloat(row[measureFieldName] ?? '0'));
+  }
+  return totals;
+};
+
+// Computes "Other" rows by subtraction — grandTotal[axis] minus the sum of
+// the kept groups' contributions for that axis, from mainResults (the
+// top-N-kept-groups query) and grandTotalData (a groupBy-agnostic total per
+// axis bucket, see loadDataResultsGroupOther). Clamped to 0 to guard against
+// floating-point noise producing a tiny negative value rather than an exact
+// zero. See the comment on loadDataResultsGroupOther for why subtraction is
+// used instead of an exclusion filter operator.
+export const computeOtherRows = (
+  mainData: DataResponse['data'],
+  grandTotalData: DataResponse['data'],
+  axis: Dimension,
+  measure: Measure,
+  groupBy: Dimension,
+): NonNullable<DataResponse['data']> => {
+  if (!grandTotalData?.length) return [];
+
+  const keptTotals = sumMeasureByAxis(mainData, axis.name, measure.name);
+
+  const otherRows = grandTotalData
+    .filter((row) => row[axis.name] != null)
+    .map((row) => {
+      const grandTotal = Number.parseFloat(row[measure.name] ?? '0');
+      const keptTotal = keptTotals.get(row[axis.name]) ?? 0;
+      return { ...row, [measure.name]: Math.max(grandTotal - keptTotal, 0) };
+    });
+
+  return tagRowsAsOtherGroup(otherRows, groupBy);
+};
+
 // Merges the top-N-groups query with the "Other" aggregate query. The two are
 // independent async calls that can resolve in either order — critically, the
-// "Other" rows are only spliced in once mainResults has actually settled
-// (isLoading: false). Without that gate, a render where resultsGroupOther has
-// arrived but mainResults hasn't yet would produce a merged dataset containing
-// ONLY the Other row, placing it at index 0. Per-value chart colors are cached
-// by value and reused forever once assigned (see getDimensionMeasureColor), so
-// "Other" would permanently keep index 0's color — then collide with whichever
-// real group value later computes at index 0 once mainResults finally arrives.
+// "Other" rows are only computed/spliced in once mainResults has actually
+// settled (isLoading: false). Without that gate, a render where
+// resultsGroupOther has arrived but mainResults hasn't yet would either (a)
+// under the old tag-based approach, produce a merged dataset containing ONLY
+// the Other row, placing it at index 0 — or (b), under subtraction, treat
+// "kept totals" as all-zero and so massively over-count Other. Either way,
+// per-value chart colors are cached by value and reused forever once
+// assigned (see getDimensionMeasureColor), so a bad intermediate render can
+// permanently pollute a color/value — settling on mainResults first avoids
+// both failure modes.
 export const mergeGroupOtherResults = (
   mainResults: DataResponse | undefined,
   resultsGroupOther: DataResponse | undefined,
   groupBy: Dimension,
+  axis: Dimension,
+  measure: Measure,
 ): DataResponse | undefined => {
   if (!mainResults) return mainResults;
 
@@ -90,7 +139,9 @@ export const mergeGroupOtherResults = (
     error: mainResults.error || resultsGroupOther?.error,
     data: [
       ...(mainResults.data ?? []),
-      ...(mainIsSettled ? tagRowsAsOtherGroup(resultsGroupOther?.data, groupBy) : []),
+      ...(mainIsSettled
+        ? computeOtherRows(mainResults.data, resultsGroupOther?.data, axis, measure, groupBy)
+        : []),
     ],
   };
 };

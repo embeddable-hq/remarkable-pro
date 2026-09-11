@@ -175,7 +175,6 @@ const props = (
       dataset: inputs.dataset,
       axis: inputs.yAxis,
       granularity: state?.granularity,
-      groupBy: inputs.groupBy,
       measure: inputs.measure,
       groupOrder: cachedGroupOrder,
       axisOrder: cachedAxisOrder,
