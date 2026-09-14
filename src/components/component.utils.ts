@@ -31,7 +31,7 @@ export const resolveI18nProps = <T extends object>(props: T): T => {
 
 /**
  * Resolves "Reverse trend direction", falling back to the legacy
- * "Reverse positive/negative colors" value when unset (TPS-1470).
+ * "Reverse positive/negative colors" value when unset.
  */
 export const resolveReverseTrendDirection = (
   reverseTrendDirection: boolean | undefined,

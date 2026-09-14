@@ -77,7 +77,7 @@ describe('LineChartComparisonWithKpiTabsPro definition', () => {
     expect(reverseTrendDirectionInput?.label).toBe('Reverse trend direction');
     expect(invertChangeColorsInput?.label).toBe('Reverse positive/negative colors');
 
-    // No static defaultValue, so it can fall back to the legacy colors value (TPS-1470).
+    // No static defaultValue, so it can fall back to the legacy colors value.
     expect(reverseTrendDirectionInput).not.toHaveProperty('defaultValue');
   });
 });

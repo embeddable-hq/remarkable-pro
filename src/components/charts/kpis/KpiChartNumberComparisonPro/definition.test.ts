@@ -54,7 +54,7 @@ describe('KpiChartNumberComparisonPro definition', () => {
     expect(reverseTrendDirectionInput).not.toHaveProperty('defaultValue');
   });
 
-  describe('config.props backwards compatibility (TPS-1470)', () => {
+  describe('config.props backwards compatibility', () => {
     const measure = { name: 'revenue', inputs: {} } as unknown as Measure;
     const dateRange = {} as unknown as TimeRange;
 

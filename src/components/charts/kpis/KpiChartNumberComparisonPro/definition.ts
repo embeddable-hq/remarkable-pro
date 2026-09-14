@@ -62,7 +62,7 @@ const meta = {
       name: 'reverseTrendDirection',
       label: 'Reverse trend direction',
       description:
-        'Reverses the up/down trend arrow independently of "Reverse positive/negative colors" above. Existing dashboards keep their current look until this is changed explicitly (TPS-1470).',
+        'Reverses the up/down trend arrow independently of "Reverse positive/negative colors" above. Existing dashboards keep their current look until this is changed explicitly.',
       category: 'Component Settings',
     },
     inputs.fontSize,
@@ -158,7 +158,7 @@ const props = (
 ) => ({
   ...inputs,
   comparisonPeriod: inputs.comparisonPeriod as string | undefined,
-  // Falls back to the legacy colors value until explicitly set (TPS-1470).
+  // Falls back to the legacy colors value until explicitly set.
   reverseTrendDirection: resolveReverseTrendDirection(
     inputs.reverseTrendDirection,
     inputs.reversePositiveNegativeColors,

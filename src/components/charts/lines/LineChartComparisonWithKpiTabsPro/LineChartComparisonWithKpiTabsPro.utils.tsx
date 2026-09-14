@@ -62,7 +62,7 @@ const getKpiTrendSlot = ({
 
   const diff = (kpiValue as number) - (kpiComparisonValue as number);
   const isPositive = diff > 0;
-  // TODO(TPS-1470): switch to reverseTrendDirection once KpiTrend supports it.
+  // TODO: switch to reverseTrendDirection once KpiTrend supports it.
   const reverseTrend = measure.inputs?.['invertChangeColors'] ? isPositive : !isPositive;
   const trendText = getTrendText({
     diff,
