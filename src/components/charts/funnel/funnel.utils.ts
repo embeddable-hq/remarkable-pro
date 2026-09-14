@@ -90,6 +90,19 @@ export const getFunnelChartProOptions = (
     plugins: {
       legend: {
         position: theme.charts.legendPosition ?? 'bottom',
+        labels: {
+          generateLabels: (chart) => {
+            const colors = chart.data.datasets[0]?.backgroundColor ?? [];
+            const labelColor = chart.options.plugins?.legend?.labels?.color as string | undefined;
+            return (chart.data.labels ?? []).map((label, index) => ({
+              text: String(label ?? ''),
+              fillStyle: (colors as string[])[index],
+              strokeStyle: (colors as string[])[index],
+              fontColor: labelColor,
+              index,
+            }));
+          },
+        },
       },
     },
   };
