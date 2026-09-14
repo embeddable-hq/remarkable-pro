@@ -27,6 +27,9 @@ export type KpiChartNumberComparisonProProp = {
   results: DataResponse;
   resultsComparison: DataResponse | undefined;
   reversePositiveNegativeColors?: boolean;
+  // Resolved with backwards-compatible fallback in definition.ts (see resolveReverseTrendDirection).
+  // Not yet wired below — see TODO(TPS-1470) near the KpiChart render.
+  reverseTrendDirection?: boolean;
   percentageDecimalPlaces?: number;
   comparisonDateRange: TimeRange;
   displayNullAs?: string;
@@ -114,6 +117,10 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
         valueFormatter={valueFormatter}
         valueFontSize={fontSize}
         trendFontSize={changeFontSize}
+        // TODO(TPS-1470): `@embeddable.com/remarkable-ui`'s KpiChart only exposes this
+        // single boolean, which drives both the trend colors and the arrow direction.
+        // Once it exposes an independent direction control, pass `reverseTrendDirection`
+        // (already resolved with backwards-compatible fallback — see definition.ts) to it.
         invertChangeColors={reversePositiveNegativeColors}
         showChangeAsPercentage={displayChangeAsPercentage}
         comparisonLabel={comparisonLabel}

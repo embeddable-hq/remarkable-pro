@@ -28,3 +28,19 @@ export const resolveI18nProps = <T extends object>(props: T): T => {
 
   return resolved;
 };
+
+/**
+ * Resolves the effective "Reverse trend direction" value from a (possibly unset)
+ * dedicated input, falling back to the legacy "Reverse positive/negative colors"
+ * value for backwards compatibility.
+ *
+ * A single "Reverse positive/negative colors" toggle used to control both the KPI
+ * trend colors and the up/down arrow direction (see TPS-1470). Splitting these
+ * into two independent settings must not change how existing dashboards look, so
+ * whenever the new field hasn't been explicitly configured yet, it mirrors
+ * whatever the legacy colors field is set to.
+ */
+export const resolveReverseTrendDirection = (
+  reverseTrendDirection: boolean | undefined,
+  reversePositiveNegativeColors: boolean | undefined,
+): boolean => reverseTrendDirection ?? reversePositiveNegativeColors ?? false;
