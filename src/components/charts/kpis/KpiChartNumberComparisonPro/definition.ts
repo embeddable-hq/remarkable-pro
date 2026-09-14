@@ -5,7 +5,7 @@ import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
-import { resolveReverseTrendDirection } from '../../../component.utils';
+import { resolveReverseTrendDirection } from '../../../utils/trend.utils';
 
 const meta = {
   name: 'KpiChartNumberComparisonPro',

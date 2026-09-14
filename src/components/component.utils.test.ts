@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolveReverseTrendDirection } from './component.utils';
+import { resolveReverseTrendDirection } from './utils/trend.utils';
 
 describe('resolveReverseTrendDirection', () => {
   it('mirrors the legacy colors value when the new field is unset (backwards compatibility)', () => {
