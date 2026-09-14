@@ -56,7 +56,11 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
   );
 
   const options = mergician(
-    getFunnelChartProOptions(theme, { showStageLabels, showValueLabels, displayPercentages }),
+    getFunnelChartProOptions(theme, countMeasure, {
+      showStageLabels,
+      showValueLabels,
+      displayPercentages,
+    }),
     theme.charts.funnelChartPro?.options ?? {},
   );
 

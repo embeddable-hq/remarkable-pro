@@ -84,8 +84,11 @@ export type FunnelChartProOptionsConfig = {
 
 export const getFunnelChartProOptions = (
   theme: Theme = remarkableTheme,
+  countMeasure: Measure,
   config: FunnelChartProOptionsConfig = {},
 ): Partial<ChartOptions<'funnel'>> => {
+  const themeFormatter = getThemeFormatter(theme);
+
   const base: Partial<ChartOptions<'funnel'>> = {
     plugins: {
       legend: {
@@ -101,6 +104,14 @@ export const getFunnelChartProOptions = (
               fontColor: labelColor,
               index,
             }));
+          },
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const raw = context.raw as number;
+            return `${themeFormatter.dimensionOrMeasureTitle(countMeasure)}: ${themeFormatter.data(countMeasure, raw)}`;
           },
         },
       },

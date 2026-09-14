@@ -293,13 +293,18 @@ describe('getDefaultFunnelPalette', () => {
 });
 
 describe('getFunnelChartProOptions', () => {
+  const countMeasure = makeMeasure('count');
+
   it('uses legendPosition from theme', () => {
-    const options = getFunnelChartProOptions({ charts: { legendPosition: 'right' } } as never);
+    const options = getFunnelChartProOptions(
+      { charts: { legendPosition: 'right' } } as never,
+      countMeasure,
+    );
     expect(options.plugins?.legend?.position).toBe('right');
   });
 
   it('defaults legendPosition to "bottom" when theme does not specify one', () => {
-    const options = getFunnelChartProOptions({ charts: {} } as never);
+    const options = getFunnelChartProOptions({ charts: {} } as never, countMeasure);
     expect(options.plugins?.legend?.position).toBe('bottom');
   });
 });
