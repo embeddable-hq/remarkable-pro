@@ -27,7 +27,6 @@ export type KpiChartNumberComparisonProProp = {
   results: DataResponse;
   resultsComparison: DataResponse | undefined;
   reversePositiveNegativeColors?: boolean;
-  // Not yet wired — see TODO below.
   reverseTrendDirection?: boolean;
   percentageDecimalPlaces?: number;
   comparisonDateRange: TimeRange;
@@ -52,6 +51,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
     results,
     resultsComparison,
     reversePositiveNegativeColors,
+    reverseTrendDirection,
     percentageDecimalPlaces,
     setComparisonDateRange,
   } = props;
@@ -116,7 +116,7 @@ const KpiChartNumberComparisonPro = (props: KpiChartNumberComparisonProProp) => 
         valueFormatter={valueFormatter}
         valueFontSize={fontSize}
         trendFontSize={changeFontSize}
-        // TODO: switch to reverseTrendDirection once KpiChart supports it.
+        invertTrendDirection={reverseTrendDirection}
         invertChangeColors={reversePositiveNegativeColors}
         showChangeAsPercentage={displayChangeAsPercentage}
         comparisonLabel={comparisonLabel}
