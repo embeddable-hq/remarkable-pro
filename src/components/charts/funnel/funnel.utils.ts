@@ -93,6 +93,10 @@ export const getFunnelChartProOptions = (
     plugins: {
       legend: {
         position: theme.charts.legendPosition ?? 'bottom',
+        onClick: (_event, legendItem, legend) => {
+          legend.chart.toggleDataVisibility(legendItem.index!);
+          legend.chart.update();
+        },
         labels: {
           generateLabels: (chart) => {
             const colors = chart.data.datasets[0]?.backgroundColor ?? [];
@@ -102,6 +106,7 @@ export const getFunnelChartProOptions = (
               fillStyle: (colors as string[])[index],
               strokeStyle: (colors as string[])[index],
               fontColor: labelColor,
+              hidden: !chart.getDataVisibility(index),
               index,
             }));
           },
