@@ -37,13 +37,14 @@ const meta = {
       ...inputs.color,
       name: 'startColor',
       label: 'Start color (lowest stage)',
-      description: 'Overrides the theme default gradient. The other end auto-derives if unset.',
+      description: 'Color for the lowest stage. Leave blank to auto-generate from the end color.',
     },
     {
       ...inputs.color,
       name: 'endColor',
       label: 'End color (highest stage)',
-      description: 'Overrides the theme default gradient. The other end auto-derives if unset.',
+      description:
+        'Color for the highest stage. Leave blank to auto-generate from the start color.',
     },
     inputs.title,
     inputs.description,
