@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { DataResponse, Measure } from '@embeddable.com/core';
 import { ChartTabsProps, KpiTrend } from '@embeddable.com/remarkable-ui';
 import { GetThemeFormatter } from '../../../../theme/formatter/formatter.utils';
+import { resolveReverseTrendDirection } from '../../../utils/trend.utils';
 
 type ComparisonKpiTabsParams = {
   measures: Measure[];
@@ -62,7 +63,15 @@ const getKpiTrendSlot = ({
 
   const diff = (kpiValue as number) - (kpiComparisonValue as number);
   const isPositive = diff > 0;
-  const reverseTrend = measure.inputs?.['invertChangeColors'] ? isPositive : !isPositive;
+
+  const reverseTrend = resolveReverseTrendDirection(
+    measure.inputs?.['reverseTrendDirection'],
+    measure.inputs?.['invertChangeColors'],
+  )
+    ? isPositive
+    : !isPositive;
+
+  const reverseColor = measure.inputs?.['invertChangeColors'] ? isPositive : !isPositive;
   const trendText = getTrendText({
     diff,
     kpiComparisonValue: kpiComparisonValue as number,
@@ -72,7 +81,7 @@ const getKpiTrendSlot = ({
     themeFormatter,
   });
 
-  return <KpiTrend value={trendText} reverseTrend={reverseTrend} />;
+  return <KpiTrend value={trendText} reverseTrend={reverseTrend} reverseColor={reverseColor} />;
 };
 
 const getTrendText = ({

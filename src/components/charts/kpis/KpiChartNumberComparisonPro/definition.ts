@@ -5,6 +5,7 @@ import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 import { ThemeClientContext } from '../../../../theme/theme.types';
+import { resolveReverseTrendDirection } from '../../../utils/trend.utils';
 
 const meta = {
   name: 'KpiChartNumberComparisonPro',
@@ -54,6 +55,14 @@ const meta = {
       name: 'reversePositiveNegativeColors',
       label: 'Reverse positive/negative colors',
       defaultValue: false,
+      category: 'Component Settings',
+    },
+    {
+      ...inputs.boolean,
+      name: 'reverseTrendDirection',
+      label: 'Reverse trend direction',
+      description:
+        'Reverses the up/down trend arrow independently of "Reverse positive/negative colors" above. Existing dashboards keep their current look until this is changed explicitly.',
       category: 'Component Settings',
     },
     inputs.fontSize,
@@ -149,6 +158,11 @@ const props = (
 ) => ({
   ...inputs,
   comparisonPeriod: inputs.comparisonPeriod as string | undefined,
+  // Falls back to the legacy colors value until explicitly set.
+  reverseTrendDirection: resolveReverseTrendDirection(
+    inputs.reverseTrendDirection,
+    inputs.reversePositiveNegativeColors,
+  ),
   comparisonDateRange: state?.comparisonDateRange,
   setComparisonDateRange: (comparisonDateRange: TimeRange) => setState({ comparisonDateRange }),
   results: loadDataResults(inputs, clientContext),

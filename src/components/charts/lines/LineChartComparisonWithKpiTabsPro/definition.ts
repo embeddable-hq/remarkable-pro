@@ -44,6 +44,13 @@ const meta = {
             },
             {
               ...subInputs.boolean,
+              name: 'reverseTrendDirection',
+              label: 'Reverse trend direction',
+              description:
+                'Reverses the up/down trend arrow independently of "Reverse positive/negative colors" above. Existing dashboards keep their current look until this is changed explicitly.',
+            },
+            {
+              ...subInputs.boolean,
               name: 'displayChangeAsPercentage',
               label: 'Display change as %',
               defaultValue: false,
