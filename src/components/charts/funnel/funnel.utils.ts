@@ -77,13 +77,8 @@ const aggregateFunnelStages = (
   return names.map((name) => ({ name, count: stageMap.get(name) ?? 0 }));
 };
 
-export type FunnelChartProOptionsConfig = Pick<
-  FunnelChartProProps,
-  'showStageLabels' | 'showValueLabels' | 'displayPercentages'
->;
-
 export const getFunnelOptionsDatalabelsFormatter =
-  (config: FunnelChartProOptionsConfig) => (value: number, context: Context) => {
+  (config: Partial<FunnelChartProProps>) => (value: number, context: Context) => {
     const label = context.chart.data.labels?.[context.dataIndex] ?? '';
     if (!config.showValueLabels) return label;
     const data = (context.chart.data.datasets[context.datasetIndex]?.data ?? []) as number[];
@@ -97,7 +92,7 @@ export const getFunnelOptionsDatalabelsFormatter =
 export const getFunnelChartProOptions = (
   theme: Theme = remarkableTheme,
   countMeasure: Measure,
-  config: FunnelChartProOptionsConfig = {},
+  config: Partial<FunnelChartProProps> = {},
 ): Partial<ChartOptions<'funnel'>> => {
   const themeFormatter = getThemeFormatter(theme);
 

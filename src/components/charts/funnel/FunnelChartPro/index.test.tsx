@@ -109,7 +109,7 @@ describe('FunnelChartPro', () => {
     expect(screen.getByTestId('funnel-chart')).toHaveAttribute('data-show-value-labels', 'true');
   });
 
-  it('forwards showStageLabels, showValueLabels and displayPercentages to getFunnelChartProOptions', () => {
+  it('forwards the component props to getFunnelChartProOptions', () => {
     render(
       <FunnelChartPro
         {...defaultProps}
@@ -119,11 +119,15 @@ describe('FunnelChartPro', () => {
       />,
     );
 
-    expect(getFunnelChartProOptions).toHaveBeenCalledWith(expect.anything(), countMeasure, {
-      showStageLabels: true,
-      showValueLabels: true,
-      displayPercentages: true,
-    });
+    expect(getFunnelChartProOptions).toHaveBeenCalledWith(
+      expect.anything(),
+      countMeasure,
+      expect.objectContaining({
+        showStageLabels: true,
+        showValueLabels: true,
+        displayPercentages: true,
+      }),
+    );
   });
 
   it('merges theme.charts.funnelChartPro.options over getFunnelChartProOptions', () => {
