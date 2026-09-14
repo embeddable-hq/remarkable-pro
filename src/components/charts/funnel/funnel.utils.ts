@@ -5,6 +5,7 @@ import { ChartData, ChartOptions } from 'chart.js';
 // Type-only: pulls in chartjs-chart-funnel's module augmentation so 'funnel' is a valid Chart.js chart type.
 import type {} from 'chartjs-chart-funnel';
 import type { Context } from 'chartjs-plugin-datalabels';
+import type { FunnelChartProProps } from './FunnelChartPro';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { i18n } from '../../../theme/i18n/i18n';
 import { remarkableTheme } from '../../../theme/theme.constants';
@@ -76,11 +77,22 @@ const aggregateFunnelStages = (
   return names.map((name) => ({ name, count: stageMap.get(name) ?? 0 }));
 };
 
-export type FunnelChartProOptionsConfig = {
-  showStageLabels?: boolean;
-  showValueLabels?: boolean;
-  displayPercentages?: boolean;
-};
+export type FunnelChartProOptionsConfig = Pick<
+  FunnelChartProProps,
+  'showStageLabels' | 'showValueLabels' | 'displayPercentages'
+>;
+
+export const getFunnelOptionsDatalabelsFormatter =
+  (config: FunnelChartProOptionsConfig) => (value: number, context: Context) => {
+    const label = context.chart.data.labels?.[context.dataIndex] ?? '';
+    if (!config.showValueLabels) return label;
+    const data = (context.chart.data.datasets[context.datasetIndex]?.data ?? []) as number[];
+    const total = data.reduce((sum, v) => sum + (v || 0), 0);
+    const valueText = config.displayPercentages
+      ? `${(total > 0 ? (value / total) * 100 : 0).toFixed(1)}%`
+      : value.toLocaleString();
+    return `${label}: ${valueText}`;
+  };
 
 export const getFunnelChartProOptions = (
   theme: Theme = remarkableTheme,
@@ -99,16 +111,19 @@ export const getFunnelChartProOptions = (
         },
         labels: {
           generateLabels: (chart) => {
-            const colors = chart.data.datasets[0]?.backgroundColor ?? [];
+            const colors = (chart.data.datasets[0]?.backgroundColor ?? []) as string[];
             const labelColor = chart.options.plugins?.legend?.labels?.color as string | undefined;
-            return (chart.data.labels ?? []).map((label, index) => ({
-              text: String(label ?? ''),
-              fillStyle: (colors as string[])[index],
-              strokeStyle: (colors as string[])[index],
-              fontColor: labelColor,
-              hidden: !chart.getDataVisibility(index),
-              index,
-            }));
+            return (chart.data.labels ?? []).map((label, index) => {
+              const color = colors[index];
+              return {
+                text: String(label ?? ''),
+                fillStyle: color,
+                strokeStyle: color,
+                fontColor: labelColor,
+                hidden: !chart.getDataVisibility(index),
+                index,
+              };
+            });
           },
         },
       },
@@ -131,16 +146,7 @@ export const getFunnelChartProOptions = (
       ...base.plugins,
       datalabels: {
         display: 'auto',
-        formatter: (value: number, context: Context) => {
-          const label = context.chart.data.labels?.[context.dataIndex] ?? '';
-          if (!config.showValueLabels) return label;
-          const data = (context.chart.data.datasets[context.datasetIndex]?.data ?? []) as number[];
-          const total = data.reduce((sum, v) => sum + (v || 0), 0);
-          const valueText = config.displayPercentages
-            ? `${(total > 0 ? (value / total) * 100 : 0).toFixed(1)}%`
-            : value.toLocaleString();
-          return `${label}: ${valueText}`;
-        },
+        formatter: getFunnelOptionsDatalabelsFormatter(config),
       },
     },
   };

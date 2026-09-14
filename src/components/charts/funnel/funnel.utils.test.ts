@@ -6,6 +6,7 @@ import {
   getDefaultFunnelPalette,
   getFunnelChartProData,
   getFunnelChartProOptions,
+  getFunnelOptionsDatalabelsFormatter,
 } from './funnel.utils';
 
 vi.mock('../../../utils/color.utils', () => ({
@@ -377,7 +378,7 @@ describe('getFunnelChartProOptions', () => {
     expect(options.plugins?.datalabels).toBeUndefined();
   });
 
-  it('shows only the stage label when showStageLabels is enabled without showValueLabels', () => {
+  it('wires the datalabels formatter from the config when showStageLabels is enabled', () => {
     const options = getFunnelChartProOptions({ charts: {} } as never, countMeasure, {
       showStageLabels: true,
     });
@@ -391,9 +392,22 @@ describe('getFunnelChartProOptions', () => {
 
     expect(text).toBe('Recordable');
   });
+});
 
-  it('appends the raw value when showValueLabels is also enabled', () => {
-    const options = getFunnelChartProOptions({ charts: {} } as never, countMeasure, {
+describe('getFunnelOptionsDatalabelsFormatter', () => {
+  it('returns only the stage label when showValueLabels is disabled', () => {
+    const formatter = getFunnelOptionsDatalabelsFormatter({ showStageLabels: true });
+    const context = {
+      chart: { data: { labels: ['Recordable'], datasets: [{ data: [10] }] } },
+      dataIndex: 0,
+      datasetIndex: 0,
+    } as unknown as Context;
+
+    expect(formatter(10, context)).toBe('Recordable');
+  });
+
+  it('appends the raw value when showValueLabels is enabled', () => {
+    const formatter = getFunnelOptionsDatalabelsFormatter({
       showStageLabels: true,
       showValueLabels: true,
     });
@@ -403,13 +417,11 @@ describe('getFunnelChartProOptions', () => {
       datasetIndex: 0,
     } as unknown as Context;
 
-    const text = options.plugins?.datalabels?.formatter?.(10, context);
-
-    expect(text).toBe('Recordable: 10');
+    expect(formatter(10, context)).toBe('Recordable: 10');
   });
 
   it('appends the percentage of total when displayPercentages is also enabled', () => {
-    const options = getFunnelChartProOptions({ charts: {} } as never, countMeasure, {
+    const formatter = getFunnelOptionsDatalabelsFormatter({
       showStageLabels: true,
       showValueLabels: true,
       displayPercentages: true,
@@ -420,13 +432,11 @@ describe('getFunnelChartProOptions', () => {
       datasetIndex: 0,
     } as unknown as Context;
 
-    const text = options.plugins?.datalabels?.formatter?.(10, context);
-
-    expect(text).toBe('Recordable: 25.0%');
+    expect(formatter(10, context)).toBe('Recordable: 25.0%');
   });
 
   it('reports a 0% value when the dataset total is 0', () => {
-    const options = getFunnelChartProOptions({ charts: {} } as never, countMeasure, {
+    const formatter = getFunnelOptionsDatalabelsFormatter({
       showStageLabels: true,
       showValueLabels: true,
       displayPercentages: true,
@@ -437,8 +447,6 @@ describe('getFunnelChartProOptions', () => {
       datasetIndex: 0,
     } as unknown as Context;
 
-    const text = options.plugins?.datalabels?.formatter?.(0, context);
-
-    expect(text).toBe('Recordable: 0.0%');
+    expect(formatter(0, context)).toBe('Recordable: 0.0%');
   });
 });

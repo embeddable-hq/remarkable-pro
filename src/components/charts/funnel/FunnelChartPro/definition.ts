@@ -52,7 +52,13 @@ const meta = {
     inputs.showLegend,
     inputs.showTooltips,
     inputs.showValueLabels,
-    inputs.showStageLabels,
+    {
+      ...inputs.boolean,
+      name: 'showStageLabels',
+      label: 'Show stage names on slices',
+      defaultValue: false,
+      category: 'Component Settings',
+    },
     {
       ...inputs.displayPercentages,
       description: 'Show percentage of total instead of the raw count on each stage.',
