@@ -1,9 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 
-// definition.ts pulls in the real component (./index), which imports
-// @embeddable.com/remarkable-ui and other UI dependencies. Mock the same
-// modules index.test.tsx mocks so importing the definition doesn't try to
-// load real CSS-bundled UI packages under the test runner.
+// Mock UI deps so importing the definition doesn't load real CSS-bundled packages.
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
   definePreview: vi.fn(() => ({})),
@@ -80,9 +77,7 @@ describe('LineChartComparisonWithKpiTabsPro definition', () => {
     expect(reverseTrendDirectionInput?.label).toBe('Reverse trend direction');
     expect(invertChangeColorsInput?.label).toBe('Reverse positive/negative colors');
 
-    // No static defaultValue: existing measure configs that never set this sub-input
-    // fall back to the legacy colors value (see LineChartComparisonWithKpiTabsPro.utils.tsx),
-    // preserving current behaviour until it's explicitly configured (TPS-1470).
+    // No static defaultValue, so it can fall back to the legacy colors value (TPS-1470).
     expect(reverseTrendDirectionInput).not.toHaveProperty('defaultValue');
   });
 });

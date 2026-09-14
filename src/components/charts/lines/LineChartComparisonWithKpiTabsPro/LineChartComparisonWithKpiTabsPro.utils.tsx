@@ -62,13 +62,7 @@ const getKpiTrendSlot = ({
 
   const diff = (kpiValue as number) - (kpiComparisonValue as number);
   const isPositive = diff > 0;
-  // TODO(TPS-1470): `KpiTrend` only exposes a single `reverseTrend` boolean, which
-  // drives both the badge color and the arrow icon. The "Reverse trend direction"
-  // sub-input (see definition.ts) is ready to control the arrow independently, but
-  // there's nothing to wire it to until `@embeddable.com/remarkable-ui`'s KpiTrend
-  // exposes a separate direction control. Once it does, resolve it the same way as
-  // KpiChartNumberComparisonPro does, via:
-  //   resolveReverseTrendDirection(measure.inputs?.['reverseTrendDirection'], invertChangeColors)
+  // TODO(TPS-1470): switch to reverseTrendDirection once KpiTrend supports it.
   const reverseTrend = measure.inputs?.['invertChangeColors'] ? isPositive : !isPositive;
   const trendText = getTrendText({
     diff,

@@ -1,10 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { Measure, TimeRange } from '@embeddable.com/core';
 
-// definition.ts pulls in the real component (./index), which imports
-// @embeddable.com/remarkable-ui and other UI dependencies. Mock the same
-// modules index.test.tsx mocks so importing the definition doesn't try to
-// load real CSS-bundled UI packages under the test runner.
+// Mock UI deps so importing the definition doesn't load real CSS-bundled packages.
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
   definePreview: vi.fn(() => ({})),
@@ -37,8 +34,7 @@ vi.mock('../../../utils/timeRange.utils', () => ({
   getComparisonPeriodLabel: vi.fn(() => ''),
 }));
 
-// resolveReverseTrendDirection is intentionally left un-mocked: it's the real
-// backwards-compatibility logic under test.
+// Left un-mocked: it's the logic under test.
 const { kpiChartNumberComparisonPro } = await import('./definition');
 
 describe('KpiChartNumberComparisonPro definition', () => {
@@ -54,9 +50,7 @@ describe('KpiChartNumberComparisonPro definition', () => {
     expect(reverseTrendDirectionInput?.label).toBe('Reverse trend direction');
     expect(reversePositiveNegativeColorsInput?.label).toBe('Reverse positive/negative colors');
 
-    // No static defaultValue: this is what lets us tell an existing config (never
-    // configured this field) apart from a user who has explicitly set it, so the
-    // backwards-compatible fallback in `config.props` below can kick in.
+    // No static defaultValue, so config.props can tell "unset" from "explicitly false".
     expect(reverseTrendDirectionInput).not.toHaveProperty('defaultValue');
   });
 

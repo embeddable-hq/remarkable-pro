@@ -158,10 +158,7 @@ const props = (
 ) => ({
   ...inputs,
   comparisonPeriod: inputs.comparisonPeriod as string | undefined,
-  // Backwards compatibility (TPS-1470): "Reverse trend direction" is a new field split
-  // out of the legacy "Reverse positive/negative colors" toggle. Existing dashboards
-  // that never configured it must keep looking exactly as they do today, so it mirrors
-  // the legacy field's value until a user explicitly sets it independently.
+  // Falls back to the legacy colors value until explicitly set (TPS-1470).
   reverseTrendDirection: resolveReverseTrendDirection(
     inputs.reverseTrendDirection,
     inputs.reversePositiveNegativeColors,
