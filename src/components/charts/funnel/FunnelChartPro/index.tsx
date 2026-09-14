@@ -20,6 +20,8 @@ export type FunnelChartProProps = {
   results: DataResponse;
   showLegend?: boolean;
   showTooltips?: boolean;
+  showValueLabels?: boolean;
+  showStageLabels?: boolean;
   displayPercentages?: boolean;
 } & ChartCardHeaderProps;
 
@@ -36,6 +38,8 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
     results,
     showLegend,
     showTooltips,
+    showValueLabels,
+    showStageLabels,
     displayPercentages,
   } = props;
 
@@ -52,7 +56,7 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
   );
 
   const options = mergician(
-    getFunnelChartProOptions(theme),
+    getFunnelChartProOptions(theme, { showStageLabels, showValueLabels, displayPercentages }),
     theme.charts.funnelChartPro?.options ?? {},
   );
 
@@ -72,6 +76,7 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
         options={options}
         showLegend={showLegend}
         showTooltips={showTooltips}
+        showValueLabels={showValueLabels}
         showPercentage={displayPercentages}
       />
     </ChartCard>

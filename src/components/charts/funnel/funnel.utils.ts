@@ -4,6 +4,7 @@ import { styles } from '@embeddable.com/remarkable-ui/styles';
 import { ChartData, ChartOptions } from 'chart.js';
 // Type-only: pulls in chartjs-chart-funnel's module augmentation so 'funnel' is a valid Chart.js chart type.
 import type {} from 'chartjs-chart-funnel';
+import type { Context } from 'chartjs-plugin-datalabels';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { i18n } from '../../../theme/i18n/i18n';
 import { remarkableTheme } from '../../../theme/theme.constants';
@@ -75,15 +76,46 @@ const aggregateFunnelStages = (
   return names.map((name) => ({ name, count: stageMap.get(name) ?? 0 }));
 };
 
+export type FunnelChartProOptionsConfig = {
+  showStageLabels?: boolean;
+  showValueLabels?: boolean;
+  displayPercentages?: boolean;
+};
+
 export const getFunnelChartProOptions = (
   theme: Theme = remarkableTheme,
-): Partial<ChartOptions<'funnel'>> => ({
-  plugins: {
-    legend: {
-      position: theme.charts.legendPosition ?? 'bottom',
+  config: FunnelChartProOptionsConfig = {},
+): Partial<ChartOptions<'funnel'>> => {
+  const base: Partial<ChartOptions<'funnel'>> = {
+    plugins: {
+      legend: {
+        position: theme.charts.legendPosition ?? 'bottom',
+      },
     },
-  },
-});
+  };
+
+  if (!config.showStageLabels) return base;
+
+  return {
+    ...base,
+    plugins: {
+      ...base.plugins,
+      datalabels: {
+        display: 'auto',
+        formatter: (value: number, context: Context) => {
+          const label = context.chart.data.labels?.[context.dataIndex] ?? '';
+          if (!config.showValueLabels) return label;
+          const data = (context.chart.data.datasets[context.datasetIndex]?.data ?? []) as number[];
+          const total = data.reduce((sum, v) => sum + (v || 0), 0);
+          const valueText = config.displayPercentages
+            ? `${(total > 0 ? (value / total) * 100 : 0).toFixed(1)}%`
+            : value.toLocaleString();
+          return `${label}: ${valueText}`;
+        },
+      },
+    },
+  };
+};
 
 export const getFunnelChartProData = (
   props: {

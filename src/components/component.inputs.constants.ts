@@ -312,6 +312,14 @@ const showTotalLabels = {
   category: 'Component Settings',
 } as const;
 
+const showStageLabels = {
+  name: 'showStageLabels',
+  type: 'boolean',
+  label: 'Show stage names on slices',
+  defaultValue: false,
+  category: 'Component Settings',
+} as const;
+
 const showLogarithmicScale = {
   name: 'showLogarithmicScale',
   type: 'boolean',
@@ -547,6 +555,7 @@ export const inputs = {
   showLegend,
   showTooltips,
   showValueLabels,
+  showStageLabels,
   showTotalLabels,
   showLogarithmicScale,
   displayPercentages,

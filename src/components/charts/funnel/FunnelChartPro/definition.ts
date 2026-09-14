@@ -51,6 +51,8 @@ const meta = {
     inputs.tooltip,
     inputs.showLegend,
     inputs.showTooltips,
+    inputs.showValueLabels,
+    inputs.showStageLabels,
     {
       ...inputs.displayPercentages,
       description: 'Show percentage of total instead of the raw count on each stage.',
