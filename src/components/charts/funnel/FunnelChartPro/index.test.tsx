@@ -120,13 +120,13 @@ describe('FunnelChartPro', () => {
     );
 
     expect(getFunnelChartProOptions).toHaveBeenCalledWith(
-      expect.anything(),
-      countMeasure,
       expect.objectContaining({
+        countMeasure,
         showStageLabels: true,
         showValueLabels: true,
         displayPercentages: true,
       }),
+      expect.anything(),
     );
   });
 

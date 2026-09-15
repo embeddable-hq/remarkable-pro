@@ -299,20 +299,19 @@ describe('getFunnelChartProOptions', () => {
   const countMeasure = makeMeasure('count');
 
   it('uses legendPosition from theme', () => {
-    const options = getFunnelChartProOptions(
-      { charts: { legendPosition: 'right' } } as never,
-      countMeasure,
-    );
+    const options = getFunnelChartProOptions({ countMeasure }, {
+      charts: { legendPosition: 'right' },
+    } as never);
     expect(options.plugins?.legend?.position).toBe('right');
   });
 
   it('defaults legendPosition to "bottom" when theme does not specify one', () => {
-    const options = getFunnelChartProOptions({ charts: {} } as never, countMeasure);
+    const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
     expect(options.plugins?.legend?.position).toBe('bottom');
   });
 
   it('toggles data visibility and updates the chart when a legend item is clicked', () => {
-    const options = getFunnelChartProOptions({ charts: {} } as never, countMeasure);
+    const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
     const chart = {
       toggleDataVisibility: vi.fn(),
       update: vi.fn(),
@@ -330,7 +329,7 @@ describe('getFunnelChartProOptions', () => {
   });
 
   it('generates legend labels from the dataset colors and visibility state', () => {
-    const options = getFunnelChartProOptions({ charts: {} } as never, countMeasure);
+    const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
     const chart = {
       data: {
         labels: ['A', 'B'],
@@ -363,7 +362,7 @@ describe('getFunnelChartProOptions', () => {
   });
 
   it('formats the tooltip label with the measure title and formatted value', () => {
-    const options = getFunnelChartProOptions({ charts: {} } as never, countMeasure);
+    const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
 
     const labelCallback = options.plugins?.tooltip?.callbacks?.label as (
       context: unknown,
@@ -374,14 +373,14 @@ describe('getFunnelChartProOptions', () => {
   });
 
   it('omits datalabels when showStageLabels is not enabled', () => {
-    const options = getFunnelChartProOptions({ charts: {} } as never, countMeasure, {});
+    const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
     expect(options.plugins?.datalabels).toBeUndefined();
   });
 
   it('wires the datalabels formatter from the config when showStageLabels is enabled', () => {
-    const options = getFunnelChartProOptions({ charts: {} } as never, countMeasure, {
-      showStageLabels: true,
-    });
+    const options = getFunnelChartProOptions({ countMeasure, showStageLabels: true }, {
+      charts: {},
+    } as never);
     const context = {
       chart: { data: { labels: ['Recordable'], datasets: [{ data: [10] }] } },
       dataIndex: 0,

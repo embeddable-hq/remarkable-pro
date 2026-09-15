@@ -90,10 +90,10 @@ export const getFunnelOptionsDatalabelsFormatter =
   };
 
 export const getFunnelChartProOptions = (
+  options: { countMeasure: Measure } & Partial<FunnelChartProProps>,
   theme: Theme = remarkableTheme,
-  countMeasure: Measure,
-  config: Partial<FunnelChartProProps> = {},
 ): Partial<ChartOptions<'funnel'>> => {
+  const { countMeasure } = options;
   const themeFormatter = getThemeFormatter(theme);
 
   const base: Partial<ChartOptions<'funnel'>> = {
@@ -133,7 +133,7 @@ export const getFunnelChartProOptions = (
     },
   };
 
-  if (!config.showStageLabels) return base;
+  if (!options.showStageLabels) return base;
 
   return {
     ...base,
@@ -141,7 +141,7 @@ export const getFunnelChartProOptions = (
       ...base.plugins,
       datalabels: {
         display: 'auto',
-        formatter: getFunnelOptionsDatalabelsFormatter(config),
+        formatter: getFunnelOptionsDatalabelsFormatter(options),
       },
     },
   };

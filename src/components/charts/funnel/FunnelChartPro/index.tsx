@@ -55,7 +55,7 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
   );
 
   const options = mergician(
-    getFunnelChartProOptions(theme, countMeasure, props),
+    getFunnelChartProOptions(props, theme),
     theme.charts.funnelChartPro?.options ?? {},
   );
 
