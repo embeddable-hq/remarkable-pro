@@ -158,11 +158,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props
 
   if (showMaximizedDialog) {
     return (
-      <Dialog
-        open
-        onClose={() => setShowMaximizedDialog(false)}
-        ariaLabel={title ?? i18n.t('charts.menuOptions.maximize')}
-      >
+      <Dialog open onClose={() => setShowMaximizedDialog(false)} ariaLabel={title}>
         {chartCard}
       </Dialog>
     );
