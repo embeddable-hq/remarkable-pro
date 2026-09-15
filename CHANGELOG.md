@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.8.0
+
+### Minor Changes
+
+- 8c219ed: FunnelChartPro: add showStageLabels option to display stage names (and optionally values or percentages) on slices, use theme colors for legend labels, and fix a console error when toggling legend items
+
 ## 0.7.0
 
 ### Minor Changes
