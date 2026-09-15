@@ -1,10 +1,12 @@
 import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
+import type { Context } from 'chartjs-plugin-datalabels';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import {
   getDefaultFunnelPalette,
   getFunnelChartProData,
   getFunnelChartProOptions,
+  getFunnelOptionsDatalabelsFormatter,
 } from './funnel.utils';
 
 vi.mock('../../../utils/color.utils', () => ({
@@ -22,6 +24,7 @@ vi.mock('../../../theme/formatter/formatter.utils', () => ({
   // By default: returns the value unchanged, so value === formattedValue (i18n fallback path)
   getThemeFormatter: vi.fn(() => ({
     data: vi.fn((_dim: unknown, value: unknown) => value),
+    dimensionOrMeasureTitle: vi.fn((measure: { name: string }) => measure.name),
   })),
 }));
 
@@ -293,13 +296,156 @@ describe('getDefaultFunnelPalette', () => {
 });
 
 describe('getFunnelChartProOptions', () => {
+  const countMeasure = makeMeasure('count');
+
   it('uses legendPosition from theme', () => {
-    const options = getFunnelChartProOptions({ charts: { legendPosition: 'right' } } as never);
+    const options = getFunnelChartProOptions({ countMeasure }, {
+      charts: { legendPosition: 'right' },
+    } as never);
     expect(options.plugins?.legend?.position).toBe('right');
   });
 
   it('defaults legendPosition to "bottom" when theme does not specify one', () => {
-    const options = getFunnelChartProOptions({ charts: {} } as never);
+    const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
     expect(options.plugins?.legend?.position).toBe('bottom');
+  });
+
+  it('toggles data visibility and updates the chart when a legend item is clicked', () => {
+    const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
+    const chart = {
+      toggleDataVisibility: vi.fn(),
+      update: vi.fn(),
+    };
+
+    const onClick = options.plugins?.legend?.onClick as (
+      event: unknown,
+      legendItem: unknown,
+      legend: unknown,
+    ) => void;
+    onClick({}, { index: 1 }, { chart });
+
+    expect(chart.toggleDataVisibility).toHaveBeenCalledWith(1);
+    expect(chart.update).toHaveBeenCalled();
+  });
+
+  it('generates legend labels from the dataset colors and visibility state', () => {
+    const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
+    const chart = {
+      data: {
+        labels: ['A', 'B'],
+        datasets: [{ backgroundColor: ['#111111', '#222222'] }],
+      },
+      options: { plugins: { legend: { labels: { color: '#abcdef' } } } },
+      getDataVisibility: vi.fn((index: number) => index !== 1),
+    };
+
+    const labels = options.plugins?.legend?.labels?.generateLabels?.(chart as never);
+
+    expect(labels).toEqual([
+      {
+        text: 'A',
+        fillStyle: '#111111',
+        strokeStyle: '#111111',
+        fontColor: '#abcdef',
+        hidden: false,
+        index: 0,
+      },
+      {
+        text: 'B',
+        fillStyle: '#222222',
+        strokeStyle: '#222222',
+        fontColor: '#abcdef',
+        hidden: true,
+        index: 1,
+      },
+    ]);
+  });
+
+  it('formats the tooltip label with the measure title and formatted value', () => {
+    const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
+
+    const labelCallback = options.plugins?.tooltip?.callbacks?.label as (
+      context: unknown,
+    ) => string;
+    const label = labelCallback({ raw: 42 });
+
+    expect(label).toBe('count: 42');
+  });
+
+  it('omits datalabels when showStageLabels is not enabled', () => {
+    const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
+    expect(options.plugins?.datalabels).toBeUndefined();
+  });
+
+  it('wires the datalabels formatter from the config when showStageLabels is enabled', () => {
+    const options = getFunnelChartProOptions({ countMeasure, showStageLabels: true }, {
+      charts: {},
+    } as never);
+    const context = {
+      chart: { data: { labels: ['Recordable'], datasets: [{ data: [10] }] } },
+      dataIndex: 0,
+      datasetIndex: 0,
+    } as unknown as Context;
+
+    const text = options.plugins?.datalabels?.formatter?.(10, context);
+
+    expect(text).toBe('Recordable');
+  });
+});
+
+describe('getFunnelOptionsDatalabelsFormatter', () => {
+  it('returns only the stage label when showValueLabels is disabled', () => {
+    const formatter = getFunnelOptionsDatalabelsFormatter({ showStageLabels: true });
+    const context = {
+      chart: { data: { labels: ['Recordable'], datasets: [{ data: [10] }] } },
+      dataIndex: 0,
+      datasetIndex: 0,
+    } as unknown as Context;
+
+    expect(formatter(10, context)).toBe('Recordable');
+  });
+
+  it('appends the raw value when showValueLabels is enabled', () => {
+    const formatter = getFunnelOptionsDatalabelsFormatter({
+      showStageLabels: true,
+      showValueLabels: true,
+    });
+    const context = {
+      chart: { data: { labels: ['Recordable'], datasets: [{ data: [10, 30] }] } },
+      dataIndex: 0,
+      datasetIndex: 0,
+    } as unknown as Context;
+
+    expect(formatter(10, context)).toBe('Recordable: 10');
+  });
+
+  it('appends the percentage of total when displayPercentages is also enabled', () => {
+    const formatter = getFunnelOptionsDatalabelsFormatter({
+      showStageLabels: true,
+      showValueLabels: true,
+      displayPercentages: true,
+    });
+    const context = {
+      chart: { data: { labels: ['Recordable'], datasets: [{ data: [10, 30] }] } },
+      dataIndex: 0,
+      datasetIndex: 0,
+    } as unknown as Context;
+
+    expect(formatter(10, context)).toBe('Recordable: 25.0%');
+  });
+
+  it('reports a 0% value when the dataset total is 0', () => {
+    const formatter = getFunnelOptionsDatalabelsFormatter({
+      showStageLabels: true,
+      showValueLabels: true,
+      displayPercentages: true,
+    });
+    const context = {
+      chart: { data: { labels: ['Recordable'], datasets: [{ data: [0] }] } },
+      dataIndex: 0,
+      datasetIndex: 0,
+    } as unknown as Context;
+
+    expect(formatter(0, context)).toBe('Recordable: 0.0%');
   });
 });

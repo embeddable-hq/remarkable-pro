@@ -43,22 +43,27 @@ vi.mock('../../shared/ChartCard/ChartCard', () => ({
 vi.mock('@embeddable.com/remarkable-ui', () => ({
   FunnelChart: ({
     showPercentage,
+    showValueLabels,
     options,
   }: {
     showPercentage?: boolean;
+    showValueLabels?: boolean;
     options?: { plugins?: { legend?: { position?: string } } };
   }) => (
     <div
       data-testid="funnel-chart"
       data-show-percentage={String(Boolean(showPercentage))}
+      data-show-value-labels={String(Boolean(showValueLabels))}
       data-legend-position={options?.plugins?.legend?.position}
     />
   ),
 }));
 
+const getFunnelChartProOptions = vi.fn((..._args: unknown[]) => ({}));
+
 vi.mock('../funnel.utils', () => ({
   getFunnelChartProData: vi.fn(() => ({ labels: [], datasets: [{ data: [] }] })),
-  getFunnelChartProOptions: vi.fn(() => ({})),
+  getFunnelChartProOptions: (...args: unknown[]) => getFunnelChartProOptions(...args),
 }));
 
 const emptyResults: DataResponse = { data: [], isLoading: false } as unknown as DataResponse;
@@ -97,6 +102,32 @@ describe('FunnelChartPro', () => {
   it('passes displayPercentages through to FunnelChart', () => {
     render(<FunnelChartPro {...defaultProps} displayPercentages={true} />);
     expect(screen.getByTestId('funnel-chart')).toHaveAttribute('data-show-percentage', 'true');
+  });
+
+  it('passes showValueLabels through to FunnelChart', () => {
+    render(<FunnelChartPro {...defaultProps} showValueLabels={true} />);
+    expect(screen.getByTestId('funnel-chart')).toHaveAttribute('data-show-value-labels', 'true');
+  });
+
+  it('forwards the component props to getFunnelChartProOptions', () => {
+    render(
+      <FunnelChartPro
+        {...defaultProps}
+        showStageLabels={true}
+        showValueLabels={true}
+        displayPercentages={true}
+      />,
+    );
+
+    expect(getFunnelChartProOptions).toHaveBeenCalledWith(
+      expect.objectContaining({
+        countMeasure,
+        showStageLabels: true,
+        showValueLabels: true,
+        displayPercentages: true,
+      }),
+      expect.anything(),
+    );
   });
 
   it('merges theme.charts.funnelChartPro.options over getFunnelChartProOptions', () => {

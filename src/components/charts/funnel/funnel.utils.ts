@@ -4,6 +4,8 @@ import { styles } from '@embeddable.com/remarkable-ui/styles';
 import { ChartData, ChartOptions } from 'chart.js';
 // Type-only: pulls in chartjs-chart-funnel's module augmentation so 'funnel' is a valid Chart.js chart type.
 import type {} from 'chartjs-chart-funnel';
+import type { Context } from 'chartjs-plugin-datalabels';
+import type { FunnelChartProProps } from './FunnelChartPro';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { i18n } from '../../../theme/i18n/i18n';
 import { remarkableTheme } from '../../../theme/theme.constants';
@@ -75,15 +77,78 @@ const aggregateFunnelStages = (
   return names.map((name) => ({ name, count: stageMap.get(name) ?? 0 }));
 };
 
+export const getFunnelOptionsDatalabelsFormatter =
+  (config: Partial<FunnelChartProProps>) => (value: number, context: Context) => {
+    const labels = context.chart.data.labels as (string | number)[] | undefined;
+    const label = String(labels?.[context.dataIndex] ?? '');
+    if (!config.showValueLabels) return label;
+    const data = (context.chart.data.datasets[context.datasetIndex]?.data ?? []) as number[];
+    const total = data.reduce((sum, v) => sum + (v || 0), 0);
+    const percentage = total > 0 ? (value / total) * 100 : 0;
+    const valueText = config.displayPercentages
+      ? `${percentage.toFixed(1)}%`
+      : value.toLocaleString();
+    return `${label}: ${valueText}`;
+  };
+
 export const getFunnelChartProOptions = (
+  options: { countMeasure: Measure } & Partial<FunnelChartProProps>,
   theme: Theme = remarkableTheme,
-): Partial<ChartOptions<'funnel'>> => ({
-  plugins: {
-    legend: {
-      position: theme.charts.legendPosition ?? 'bottom',
+): Partial<ChartOptions<'funnel'>> => {
+  const { countMeasure } = options;
+  const themeFormatter = getThemeFormatter(theme);
+
+  const base: Partial<ChartOptions<'funnel'>> = {
+    plugins: {
+      legend: {
+        position: theme.charts.legendPosition ?? 'bottom',
+        onClick: (_event, legendItem, legend) => {
+          legend.chart.toggleDataVisibility(legendItem.index!);
+          legend.chart.update();
+        },
+        labels: {
+          generateLabels: (chart) => {
+            const colors = (chart.data.datasets[0]?.backgroundColor ?? []) as string[];
+            const labelColor = chart.options.plugins?.legend?.labels?.color as string | undefined;
+            const labels = (chart.data.labels ?? []) as (string | number)[];
+            return labels.map((label, index) => {
+              const color = colors[index];
+              return {
+                text: String(label ?? ''),
+                fillStyle: color,
+                strokeStyle: color,
+                fontColor: labelColor,
+                hidden: !chart.getDataVisibility(index),
+                index,
+              };
+            });
+          },
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const raw = context.raw as number;
+            return `${themeFormatter.dimensionOrMeasureTitle(countMeasure)}: ${themeFormatter.data(countMeasure, raw)}`;
+          },
+        },
+      },
     },
-  },
-});
+  };
+
+  if (!options.showStageLabels) return base;
+
+  return {
+    ...base,
+    plugins: {
+      ...base.plugins,
+      datalabels: {
+        display: 'auto',
+        formatter: getFunnelOptionsDatalabelsFormatter(options),
+      },
+    },
+  };
+};
 
 export const getFunnelChartProData = (
   props: {
