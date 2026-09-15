@@ -6,6 +6,7 @@ describe('ExportOptionTypeOptions', () => {
     expect(ExportOptionTypeOptions.csv).toBe('csv');
     expect(ExportOptionTypeOptions.xlsx).toBe('xlsx');
     expect(ExportOptionTypeOptions.png).toBe('png');
+    expect(ExportOptionTypeOptions.maximize).toBe('maximize');
   });
 });
 
@@ -19,9 +20,9 @@ describe('ExportOptionType', () => {
     expect(ExportOptionType.typeConfig.optionLabel('json')).toBe('json');
   });
 
-  it('registers csv, xlsx and png options in the global registry', () => {
+  it('registers csv, xlsx, png and maximize options in the global registry', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const options = (globalThis as any).__EMBEDDABLE__?.types?.exportOption?.options;
-    expect(options).toEqual(expect.arrayContaining(['csv', 'xlsx', 'png']));
+    expect(options).toEqual(expect.arrayContaining(['csv', 'xlsx', 'png', 'maximize']));
   });
 });

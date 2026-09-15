@@ -79,45 +79,25 @@ describe('InlineSvgFromData', () => {
 describe('ChartCardMenuPro', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useTheme as ReturnType<typeof vi.fn>).mockReturnValue({
-      defaults: {
-        chartMenuOptions: [
+    (useTheme as ReturnType<typeof vi.fn>).mockReturnValue({ defaults: {} });
+  });
+
+  it('renders the provided menu options', () => {
+    render(
+      <ChartCardMenuPro
+        menuOptions={[
           { value: 'csv', labelKey: 'export.csv', onClick: vi.fn() },
           { value: 'png', labelKey: 'export.png', onClick: vi.fn() },
-          { value: 'pdf', labelKey: 'export.pdf', onClick: vi.fn() },
-        ],
-      },
-    });
-  });
-
-  it('renders all menu options when enabledExportOptions is not provided', () => {
-    render(<ChartCardMenuPro />);
+        ]}
+      />,
+    );
 
     expect(screen.getByText('export.csv')).toBeInTheDocument();
     expect(screen.getByText('export.png')).toBeInTheDocument();
-    expect(screen.getByText('export.pdf')).toBeInTheDocument();
   });
 
-  it('renders only the enabled options when enabledExportOptions filters to a subset', () => {
-    render(<ChartCardMenuPro menuOptions={['csv', 'png']} />);
-
-    expect(screen.getByText('export.csv')).toBeInTheDocument();
-    expect(screen.getByText('export.png')).toBeInTheDocument();
-    expect(screen.queryByText('export.pdf')).not.toBeInTheDocument();
-  });
-
-  it('renders nothing when enabledExportOptions is an empty array', () => {
+  it('renders nothing when menuOptions is an empty array', () => {
     const { container } = render(<ChartCardMenuPro menuOptions={[]} />);
-
-    expect(container.firstChild).toBeNull();
-  });
-
-  it('renders nothing when theme has no chartMenuOptions', () => {
-    (useTheme as ReturnType<typeof vi.fn>).mockReturnValue({
-      defaults: {},
-    });
-
-    const { container } = render(<ChartCardMenuPro />);
 
     expect(container.firstChild).toBeNull();
   });
@@ -125,13 +105,13 @@ describe('ChartCardMenuPro', () => {
   it('calls the option onClick with theme and props when an option is clicked', async () => {
     vi.useFakeTimers();
     const onClickMock = vi.fn().mockResolvedValue(undefined);
-    (useTheme as ReturnType<typeof vi.fn>).mockReturnValue({
-      defaults: {
-        chartMenuOptions: [{ value: 'csv', labelKey: 'export.csv', onClick: onClickMock }],
-      },
-    });
 
-    render(<ChartCardMenuPro title="My Chart" />);
+    render(
+      <ChartCardMenuPro
+        title="My Chart"
+        menuOptions={[{ value: 'csv', labelKey: 'export.csv', onClick: onClickMock }]}
+      />,
+    );
     fireEvent.click(screen.getByText('export.csv'));
 
     await vi.runAllTimersAsync();
@@ -144,13 +124,13 @@ describe('ChartCardMenuPro', () => {
     vi.useFakeTimers();
     const onClickMock = vi.fn().mockResolvedValue(undefined);
     const onCustomDownload = vi.fn((cb) => cb({ title: 'custom' }));
-    (useTheme as ReturnType<typeof vi.fn>).mockReturnValue({
-      defaults: {
-        chartMenuOptions: [{ value: 'csv', labelKey: 'export.csv', onClick: onClickMock }],
-      },
-    });
 
-    render(<ChartCardMenuPro onCustomDownload={onCustomDownload} />);
+    render(
+      <ChartCardMenuPro
+        onCustomDownload={onCustomDownload}
+        menuOptions={[{ value: 'csv', labelKey: 'export.csv', onClick: onClickMock }]}
+      />,
+    );
     fireEvent.click(screen.getByText('export.csv'));
 
     await vi.runAllTimersAsync();
@@ -158,6 +138,25 @@ describe('ChartCardMenuPro', () => {
     expect(onCustomDownload).toHaveBeenCalled();
     expect(onClickMock).toHaveBeenCalledWith(expect.objectContaining({ title: 'custom' }));
     vi.useRealTimers();
+  });
+
+  it('runs instant action options immediately, without loading state or onCustomDownload', () => {
+    const onClickMock = vi.fn();
+    const onCustomDownload = vi.fn();
+
+    render(
+      <ChartCardMenuPro
+        onCustomDownload={onCustomDownload}
+        menuOptions={[
+          { value: 'maximize', labelKey: 'maximize', isInstantAction: true, onClick: onClickMock },
+        ]}
+      />,
+    );
+    fireEvent.click(screen.getByText('maximize'));
+
+    expect(onClickMock).toHaveBeenCalledTimes(1);
+    expect(onCustomDownload).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('chart-card-loading')).not.toBeInTheDocument();
   });
 
   it('shows loading state while export is in progress', async () => {
@@ -169,13 +168,12 @@ describe('ChartCardMenuPro', () => {
           resolveExport = resolve;
         }),
     );
-    (useTheme as ReturnType<typeof vi.fn>).mockReturnValue({
-      defaults: {
-        chartMenuOptions: [{ value: 'csv', labelKey: 'export.csv', onClick: onClickMock }],
-      },
-    });
 
-    render(<ChartCardMenuPro />);
+    render(
+      <ChartCardMenuPro
+        menuOptions={[{ value: 'csv', labelKey: 'export.csv', onClick: onClickMock }]}
+      />,
+    );
     fireEvent.click(screen.getByText('export.csv'));
 
     await vi.advanceTimersByTimeAsync(150);

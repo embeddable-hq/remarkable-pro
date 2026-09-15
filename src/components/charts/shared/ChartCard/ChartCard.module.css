@@ -17,6 +17,7 @@
   position: absolute;
   display: flex;
   justify-content: end;
+  gap: 0.5rem;
   z-index: 3;
   top: calc(var(--em-card-padding, 2rem));
   right: calc(var(--em-card-padding, 2rem));

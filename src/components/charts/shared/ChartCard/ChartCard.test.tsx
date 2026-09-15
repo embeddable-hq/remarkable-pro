@@ -1,10 +1,16 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { ChartCard } from './ChartCard';
 import type { DataResponse } from '@embeddable.com/core';
 
 vi.mock('@embeddable.com/react', () => ({
-  useTheme: vi.fn(() => ({})),
+  useTheme: vi.fn(() => ({
+    defaults: {
+      chartMenuOptions: [
+        { value: 'maximize', labelKey: 'charts.menuOptions.maximize', onClick: vi.fn() },
+      ],
+    },
+  })),
 }));
 
 vi.mock('@embeddable.com/remarkable-ui', () => ({
@@ -49,6 +55,30 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
     />
   ),
   Skeleton: () => <div data-testid="skeleton" />,
+  ActionIcon: ({
+    onClick,
+    'aria-label': ariaLabel,
+  }: {
+    onClick?: () => void;
+    'aria-label'?: string;
+  }) => <button data-testid="action-icon" aria-label={ariaLabel} onClick={onClick} />,
+  Dialog: ({
+    open,
+    onClose,
+    ariaLabel,
+    children,
+  }: {
+    open: boolean;
+    onClose: () => void;
+    ariaLabel?: string;
+    children?: React.ReactNode;
+  }) =>
+    open ? (
+      <div data-testid="dialog" aria-label={ariaLabel}>
+        <button data-testid="dialog-close" onClick={onClose} />
+        {children}
+      </div>
+    ) : null,
 }));
 
 vi.mock('./ChartCardLoading/ChartCardLoading', () => ({
@@ -56,7 +86,20 @@ vi.mock('./ChartCardLoading/ChartCardLoading', () => ({
 }));
 
 vi.mock('./ChartCardMenuPro/ChartCardMenuPro', () => ({
-  ChartCardMenuPro: () => <div data-testid="chart-card-menu" />,
+  ChartCardMenuPro: ({
+    menuOptions,
+  }: {
+    menuOptions?: { labelKey: string; onClick: () => void }[];
+  }) => {
+    const maximizeOption = menuOptions?.[0];
+    return (
+      <button
+        data-testid="chart-card-menu"
+        data-label={maximizeOption?.labelKey}
+        onClick={maximizeOption?.onClick}
+      />
+    );
+  },
 }));
 
 vi.mock('../../../../theme/i18n/i18n', () => ({
@@ -64,7 +107,7 @@ vi.mock('../../../../theme/i18n/i18n', () => ({
   i18nSetup: vi.fn(),
 }));
 
-vi.mock('@tabler/icons-react', () => ({ IconAlertCircle: {} }));
+vi.mock('@tabler/icons-react', () => ({ IconAlertCircle: {}, IconX: {} }));
 
 const loadingData = { isLoading: true, data: [] } as unknown as DataResponse;
 const emptyData = { isLoading: false, data: [] } as unknown as DataResponse;
@@ -145,5 +188,74 @@ describe('ChartCard', () => {
     render(<ChartCard data={withData}>content</ChartCard>);
     expect(screen.getByTestId('chart-card-menu')).toBeInTheDocument();
     expect(screen.getByTestId('chart-card-loading')).toBeInTheDocument(); // rendered but hidden via CSS
+  });
+});
+
+describe('ChartCard maximize', () => {
+  it('renders the card inside a dialog when the menu toggles maximize', () => {
+    render(
+      <ChartCard data={withData} menuOptions={['maximize']}>
+        content
+      </ChartCard>,
+    );
+
+    expect(screen.queryByTestId('dialog')).not.toBeInTheDocument();
+    expect(screen.getByTestId('chart-card-menu')).toHaveAttribute(
+      'data-label',
+      'charts.menuOptions.maximize',
+    );
+
+    fireEvent.click(screen.getByTestId('chart-card-menu'));
+
+    const dialog = screen.getByTestId('dialog');
+    expect(dialog).toContainElement(screen.getByTestId('card'));
+    expect(screen.getByTestId('chart-card-menu')).toHaveAttribute(
+      'data-label',
+      'charts.menuOptions.minimize',
+    );
+  });
+
+  it('labels the dialog with the chart title and shows a close button', () => {
+    render(
+      <ChartCard data={withData} title="My chart" menuOptions={['maximize']}>
+        content
+      </ChartCard>,
+    );
+
+    fireEvent.click(screen.getByTestId('chart-card-menu'));
+
+    expect(screen.getByTestId('dialog')).toHaveAttribute('aria-label', 'My chart');
+    expect(screen.getByTestId('action-icon')).toHaveAttribute(
+      'aria-label',
+      'charts.menuOptions.minimize',
+    );
+  });
+
+  it('restores the card when the close button is clicked', () => {
+    render(
+      <ChartCard data={withData} menuOptions={['maximize']}>
+        content
+      </ChartCard>,
+    );
+
+    fireEvent.click(screen.getByTestId('chart-card-menu'));
+    fireEvent.click(screen.getByTestId('action-icon'));
+
+    expect(screen.queryByTestId('dialog')).not.toBeInTheDocument();
+    expect(screen.getByTestId('card')).toBeInTheDocument();
+  });
+
+  it('restores the card when the dialog requests close', () => {
+    render(
+      <ChartCard data={withData} menuOptions={['maximize']}>
+        content
+      </ChartCard>,
+    );
+
+    fireEvent.click(screen.getByTestId('chart-card-menu'));
+    fireEvent.click(screen.getByTestId('dialog-close'));
+
+    expect(screen.queryByTestId('dialog')).not.toBeInTheDocument();
+    expect(screen.getByTestId('card')).toBeInTheDocument();
   });
 });
