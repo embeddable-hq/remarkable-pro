@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.7.0
+
+### Minor Changes
+
+- da40bd4: Add a Maximize option to the chart card menu. The chart expands into a full-viewport Lightbox (close via button, Escape, or backdrop click). 'maximize' is selectable per chart in the builder's menu options input and is off by default.
+
 ## 0.6.1
 
 ### Patch Changes
