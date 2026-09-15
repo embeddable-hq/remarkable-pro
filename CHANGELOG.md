@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.6.1
+
+### Patch Changes
+
+- 66aabba: allow reverse trend direction, separated from the reverse trend colors
+
 ## 0.6.0
 
 ### Minor Changes
