@@ -11,7 +11,10 @@ import {
   SelectListOption,
 } from '@embeddable.com/remarkable-ui';
 import styles from './ChartCardMenuPro.module.css';
-import { ChartCardMenuOptionOnClickProps } from '../../../../../theme/defaults/defaults.ChartCardMenu.constants';
+import {
+  ChartCardMenuOption,
+  ChartCardMenuOptionOnClickProps,
+} from '../../../../../theme/defaults/defaults.ChartCardMenu.constants';
 
 type InlineSvgFromDataProps = React.HTMLAttributes<HTMLSpanElement> & {
   src: string;
@@ -25,7 +28,7 @@ export function InlineSvgFromData({ src, className, ...rest }: InlineSvgFromData
 }
 
 type ChartCardMenuProProps = Omit<ChartCardMenuOptionOnClickProps, 'theme'> & {
-  menuOptions?: string[];
+  menuOptions?: ChartCardMenuOption[];
 };
 
 export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
@@ -34,13 +37,9 @@ export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
 
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const allOptions = theme.defaults.chartMenuOptions ?? [];
   const { menuOptions } = props;
-  const options = menuOptions
-    ? allOptions.filter((option) => menuOptions.includes(option.value))
-    : allOptions;
 
-  if (options.length === 0) {
+  if (menuOptions?.length === 0) {
     return null;
   }
 
@@ -50,13 +49,17 @@ export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
     }, 100);
   };
 
-  const handleExport = (onClick: (props: ChartCardMenuOptionOnClickProps) => void) => {
-    setIsLoading(true);
-    if (props.onCustomDownload) {
-      props.onCustomDownload((args) => startAction(() => onClick(args)));
+  const handleOptionClick = (option: ChartCardMenuOption) => {
+    if (option.isInstantAction) {
+      option.onClick({ ...props, theme });
       return;
     }
-    startAction(() => onClick({ ...props, theme }));
+    setIsLoading(true);
+    if (props.onCustomDownload) {
+      props.onCustomDownload((args) => startAction(() => option.onClick(args)));
+      return;
+    }
+    startAction(() => option.onClick({ ...props, theme }));
   };
 
   return (
@@ -66,14 +69,12 @@ export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
       triggerComponent={isLoading ? <ChartCardLoading /> : <ActionIcon icon={IconDotsVertical} />}
     >
       <SelectFieldContent className={styles.list} autoFocus>
-        {options.map((option, index) => {
-          const label = i18n.t(option.labelKey);
-
+        {menuOptions?.map((option) => {
           return (
             <SelectListOption
-              key={index}
-              label={label}
-              onClick={() => handleExport(option.onClick)}
+              key={option.value}
+              label={i18n.t(option.labelKey)}
+              onClick={() => handleOptionClick(option)}
               startIcon={option.iconSrc ? <InlineSvgFromData src={option.iconSrc} /> : undefined}
             />
           );

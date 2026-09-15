@@ -1,10 +1,12 @@
-import React, { CSSProperties, useRef } from 'react';
-import { IconAlertCircle } from '@tabler/icons-react';
+import React, { CSSProperties, useRef, useState } from 'react';
+import { IconAlertCircle, IconX } from '@tabler/icons-react';
 import {
+  ActionIcon,
   Card,
   CardContent,
   CardFeedback,
   CardHeader,
+  Dialog,
   Skeleton,
 } from '@embeddable.com/remarkable-ui';
 import styles from './ChartCard.module.css';
@@ -16,7 +18,11 @@ import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../../component.utils';
 import clsx from 'clsx';
-import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
+import {
+  ChartCardMenuOption,
+  ChartCardMenuOptionOnClickProps,
+} from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
+import { ExportOptionTypeOptions } from '../../../types/ExportOption.type.emb';
 
 export type ChartCardHeaderProps = {
   title?: string;
@@ -65,6 +71,8 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props
 
   const chartRef = useRef<HTMLDivElement>(null);
 
+  const [showMaximizedDialog, setShowMaximizedDialog] = useState(false);
+
   const hasData = Boolean(data?.data && data.data?.length > 0);
 
   const isLoading = !data || data?.isLoading;
@@ -94,7 +102,25 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props
     return children;
   };
 
-  return (
+  const allOptions = theme.defaults.chartMenuOptions ?? [];
+
+  const menuOptionsResolved: ChartCardMenuOption[] = allOptions
+    .filter((option) => menuOptions?.includes(option.value))
+    .map((option) => {
+      if (option.value === ExportOptionTypeOptions.maximize) {
+        return {
+          ...option,
+          labelKey: showMaximizedDialog
+            ? 'charts.menuOptions.minimize'
+            : 'charts.menuOptions.maximize',
+          onClick: () => setShowMaximizedDialog((current) => !current),
+        };
+      }
+
+      return option;
+    });
+
+  const chartCard = (
     <Card className={styles.chartCard}>
       {hideMenu ? null : (
         <>
@@ -112,9 +138,16 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props
                 data={data?.data}
                 dimensionsAndMeasures={dimensionsAndMeasures}
                 onCustomDownload={onCustomDownload}
-                menuOptions={menuOptions}
+                menuOptions={menuOptionsResolved}
               />
             </div>
+            {showMaximizedDialog && (
+              <ActionIcon
+                icon={IconX}
+                aria-label={i18n.t('charts.menuOptions.minimize')}
+                onClick={() => setShowMaximizedDialog(false)}
+              />
+            )}
           </div>
         </>
       )}
@@ -122,6 +155,16 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props
       <CardContent ref={onCustomDownload ? ref : chartRef}>{getDisplay()}</CardContent>
     </Card>
   );
+
+  if (showMaximizedDialog) {
+    return (
+      <Dialog open onClose={() => setShowMaximizedDialog(false)} ariaLabel={title}>
+        {chartCard}
+      </Dialog>
+    );
+  }
+
+  return chartCard;
 });
 
 ChartCard.displayName = 'ChartCard';
