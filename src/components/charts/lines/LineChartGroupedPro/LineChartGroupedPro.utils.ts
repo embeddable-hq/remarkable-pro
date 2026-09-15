@@ -9,6 +9,18 @@ import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { getDimensionWithoutTruncation, groupTailAsOtherPerGroup } from '../../charts.utils';
 import { i18n } from '../../../../theme/i18n/i18n';
 
+// Explicit stand-in for Array.prototype.sort()'s default comparator (converts
+// operands to strings and compares them lexicographically) — required by
+// typescript:S2871, which flags a bare .sort() call as relying on implicit
+// string coercion.
+const compareAsString = (a: unknown, b: unknown): number => {
+  const aStr = String(a);
+  const bStr = String(b);
+  if (aStr < bStr) return -1;
+  if (aStr > bStr) return 1;
+  return 0;
+};
+
 export const getLineChartGroupedProData = (
   props: {
     data: DataResponse['data'];
@@ -29,7 +41,7 @@ export const getLineChartGroupedProData = (
   const axisValues = [...new Set(data.map((d) => d[dimension.name]).filter((d) => d != null))];
   const axis = axisValues
     .filter((value) => value !== otherLabel)
-    .sort()
+    .sort(compareAsString)
     .concat(axisValues.includes(otherLabel) ? [otherLabel] : []);
   const groupBy = [...new Set(data.map((d) => d[groupDimension.name]))].filter((d) => d != null);
 
