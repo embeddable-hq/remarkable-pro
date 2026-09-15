@@ -4,6 +4,7 @@ import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import BarChartGroupedPro from './index';
 import type { BarChartGroupedProProps } from './index';
 import { useFillGaps } from '../../charts.fillGaps.hooks';
+import { useGroupOtherResults } from '../../charts.hooks';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
@@ -54,8 +55,9 @@ vi.mock('../../charts.utils', () => ({
   createGroupedClickHandler: vi.fn(() => vi.fn()),
 }));
 
-vi.mock('../bars.hooks', () => ({
+vi.mock('../../charts.hooks', () => ({
   useUpdateAxisOrderAndCacheKey: vi.fn(),
+  useGroupOtherResults: vi.fn((opts) => opts.mainResults),
 }));
 
 vi.mock('../../shared/ChartGranularitySelectField/ChartGranularitySelectField', () => ({
@@ -78,6 +80,7 @@ describe('BarChartGroupedPro', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(useFillGaps).mockReturnValue(emptyResults);
+    vi.mocked(useGroupOtherResults).mockImplementation((opts) => opts.mainResults);
   });
 
   it('renders ChartCard', () => {
@@ -94,5 +97,45 @@ describe('BarChartGroupedPro', () => {
   it('renders BarChart', () => {
     render(<BarChartGroupedPro {...defaultProps} />);
     expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+  });
+
+  it('wires useGroupOtherResults and feeds its result into useFillGaps', () => {
+    const mainResults = {
+      data: [{ category: 'A', group: 'Widget', revenue: 10 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const resultsGroupOther = {
+      data: [{ category: 'A', revenue: 30 }],
+      isLoading: false,
+    } as unknown as DataResponse;
+    const mergedResults = {
+      data: [
+        { category: 'A', group: 'Widget', revenue: 10 },
+        { category: 'A', group: 't(common.other)', revenue: 30 },
+      ],
+      isLoading: false,
+    } as unknown as DataResponse;
+    vi.mocked(useGroupOtherResults).mockReturnValue(mergedResults);
+
+    render(
+      <BarChartGroupedPro
+        {...defaultProps}
+        results={mainResults}
+        resultsGroupOther={resultsGroupOther}
+      />,
+    );
+
+    expect(useGroupOtherResults).toHaveBeenCalledWith({
+      mainResults,
+      resultsGroupOrder: undefined,
+      resultsGroupOther,
+      groupBy,
+      axis: xAxis,
+      measure,
+      groupOrderCacheKey: undefined,
+      setGroupOrderAndCacheKey: undefined,
+    });
+    const fillGapsArg = vi.mocked(useFillGaps).mock.calls[0]?.[0];
+    expect(fillGapsArg?.results).toBe(mergedResults);
   });
 });
