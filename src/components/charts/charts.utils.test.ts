@@ -8,6 +8,7 @@ import {
   getDatalabelPercentage,
   getDimensionWithoutTruncation,
   groupTailAsOther,
+  groupTailAsOtherPerGroup,
   isOtherBucketableMeasure,
   mergeGroupOtherResults,
   tagRowsAsOtherGroup,
@@ -263,6 +264,94 @@ describe('groupTailAsOther', () => {
   it('defaults data to an empty array when undefined', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = groupTailAsOther(undefined as any, dimension, [measure], 3);
+    expect(result).toEqual([]);
+  });
+});
+
+describe('groupTailAsOtherPerGroup', () => {
+  const dimension = makeDimension('category');
+  const groupBy = makeDimension('group');
+  const measure = makeMeasure('value');
+
+  it('returns data unchanged when maxItems is not provided', () => {
+    const data = [
+      { category: 'A', group: 'g1', value: 1 },
+      { category: 'B', group: 'g1', value: 2 },
+      { category: 'C', group: 'g1', value: 3 },
+    ];
+    expect(groupTailAsOtherPerGroup(data, dimension, groupBy, measure)).toBe(data);
+  });
+
+  it('returns data unchanged when distinct axis value count is within maxItems', () => {
+    const data = [
+      { category: 'A', group: 'g1', value: 1 },
+      { category: 'A', group: 'g2', value: 2 },
+      { category: 'B', group: 'g1', value: 3 },
+    ];
+    expect(groupTailAsOtherPerGroup(data, dimension, groupBy, measure, 2)).toBe(data);
+  });
+
+  it('counts distinct axis values rather than rows when deciding whether to bucket', () => {
+    // 2 distinct axis values (A, B) spread across 4 rows — must not bucket at maxItems=3
+    const data = [
+      { category: 'A', group: 'g1', value: 1 },
+      { category: 'A', group: 'g2', value: 2 },
+      { category: 'B', group: 'g1', value: 3 },
+      { category: 'B', group: 'g2', value: 4 },
+    ];
+    expect(groupTailAsOtherPerGroup(data, dimension, groupBy, measure, 3)).toBe(data);
+  });
+
+  it('buckets tail axis values into one "Other" row per group', () => {
+    const data = [
+      { category: 'A', group: 'g1', value: 1 },
+      { category: 'A', group: 'g2', value: 10 },
+      { category: 'B', group: 'g1', value: 2 },
+      { category: 'B', group: 'g2', value: 20 },
+      { category: 'C', group: 'g1', value: 3 },
+      { category: 'C', group: 'g2', value: 30 },
+    ];
+
+    const result = groupTailAsOtherPerGroup(data, dimension, groupBy, measure, 2);
+
+    // head = axis "A" only (2 rows, one per group), tail = axis "B" and "C" (bucketed into 1 Other row per group)
+    expect(result).toHaveLength(4);
+    expect(result.filter((row) => row.category === 'A')).toHaveLength(2);
+
+    const otherG1 = result.find((row) => row.category === 't(common.other)' && row.group === 'g1');
+    const otherG2 = result.find((row) => row.category === 't(common.other)' && row.group === 'g2');
+    expect(otherG1?.value).toBe(5); // B(2) + C(3)
+    expect(otherG2?.value).toBe(50); // B(20) + C(30)
+  });
+
+  it('treats missing measure values as 0 during aggregation', () => {
+    const data = [
+      { category: 'A', group: 'g1', value: 1 },
+      { category: 'B', group: 'g1' },
+      { category: 'C', group: 'g1', value: 3 },
+    ];
+
+    const result = groupTailAsOtherPerGroup(data, dimension, groupBy, measure, 2);
+    const other = result.find((row) => row.category === 't(common.other)');
+    expect(other?.value).toBe(3); // 0 + 3
+  });
+
+  it('averages tail values for avg measures', () => {
+    const avgMeasure = makeMeasure('value', 'avg');
+    const data = [
+      { category: 'A', group: 'g1', value: 10 },
+      { category: 'B', group: 'g1', value: 20 },
+      { category: 'C', group: 'g1', value: 30 },
+    ];
+
+    const result = groupTailAsOtherPerGroup(data, dimension, groupBy, avgMeasure, 2);
+    const other = result.find((row) => row.category === 't(common.other)');
+    expect(other?.value).toBe(25); // avg(20, 30)
+  });
+
+  it('defaults data to an empty array when undefined', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = groupTailAsOtherPerGroup(undefined as any, dimension, groupBy, measure, 3);
     expect(result).toEqual([]);
   });
 });

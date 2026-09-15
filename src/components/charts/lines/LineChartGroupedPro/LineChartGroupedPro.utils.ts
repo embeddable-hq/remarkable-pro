@@ -6,7 +6,8 @@ import { mergician } from 'mergician';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import { setColorAlpha } from '../../../../utils/color.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
-import { getDimensionWithoutTruncation } from '../../charts.utils';
+import { getDimensionWithoutTruncation, groupTailAsOtherPerGroup } from '../../charts.utils';
+import { i18n } from '../../../../theme/i18n/i18n';
 
 export const getLineChartGroupedProData = (
   props: {
@@ -15,13 +16,21 @@ export const getLineChartGroupedProData = (
     groupDimension: Dimension;
     measure: Measure;
     hasMinMaxYAxisRange: boolean;
+    maxItems?: number;
   },
   theme: Theme,
 ): ChartData<'line'> => {
   const themeFormatter = getThemeFormatter(theme);
-  const { data = [], dimension, groupDimension, measure, hasMinMaxYAxisRange } = props;
+  const { dimension, groupDimension, measure, hasMinMaxYAxisRange, maxItems } = props;
 
-  const axis = [...new Set(data.map((d) => d[dimension.name]).filter((d) => d != null))].sort();
+  const data = groupTailAsOtherPerGroup(props.data, dimension, groupDimension, measure, maxItems);
+
+  const otherLabel = i18n.t('common.other');
+  const axisValues = [...new Set(data.map((d) => d[dimension.name]).filter((d) => d != null))];
+  const axis = axisValues
+    .filter((value) => value !== otherLabel)
+    .sort()
+    .concat(axisValues.includes(otherLabel) ? [otherLabel] : []);
   const groupBy = [...new Set(data.map((d) => d[groupDimension.name]))].filter((d) => d != null);
 
   const chartColors = getChartColors();
