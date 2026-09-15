@@ -13,15 +13,14 @@ export type ChartCardMenuOptionOnClickProps = {
   containerRef?: React.RefObject<HTMLDivElement | null>;
   theme: Theme;
   onCustomDownload?: (props: (props: ChartCardMenuOptionOnClickProps) => void) => void;
-  onToggleMaximize?: () => void;
 };
 
 export type ChartCardMenuOption = {
   value: string;
   labelKey: string;
   iconSrc?: string;
-  /** UI actions run immediately: no loading state and no onCustomDownload interception. */
-  isUiAction?: boolean;
+  /** Instant actions run immediately: no loading state and no onCustomDownload interception. */
+  isInstantAction?: boolean;
   onClick: (props: ChartCardMenuOptionOnClickProps) => void;
 };
 
@@ -47,8 +46,9 @@ export const defaultChartMenuProOptions: ChartCardMenuOption[] = [
   {
     value: ExportOptionTypeOptions.maximize,
     labelKey: 'charts.menuOptions.maximize',
-    onClick: (props) => props.onToggleMaximize?.(),
+    // Maximize state lives in ChartCard, which always overrides this onClick.
+    onClick: () => {},
     iconSrc: ArrowsMaximize,
-    isUiAction: true,
+    isInstantAction: true,
   },
 ] as const;

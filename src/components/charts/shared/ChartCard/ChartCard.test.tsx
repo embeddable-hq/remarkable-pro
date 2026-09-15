@@ -4,7 +4,13 @@ import { ChartCard } from './ChartCard';
 import type { DataResponse } from '@embeddable.com/core';
 
 vi.mock('@embeddable.com/react', () => ({
-  useTheme: vi.fn(() => ({})),
+  useTheme: vi.fn(() => ({
+    defaults: {
+      chartMenuOptions: [
+        { value: 'maximize', labelKey: 'charts.menuOptions.maximize', onClick: vi.fn() },
+      ],
+    },
+  })),
 }));
 
 vi.mock('@embeddable.com/remarkable-ui', () => ({
@@ -56,7 +62,7 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
     onClick?: () => void;
     'aria-label'?: string;
   }) => <button data-testid="action-icon" aria-label={ariaLabel} onClick={onClick} />,
-  Lightbox: ({
+  Dialog: ({
     open,
     onClose,
     ariaLabel,
@@ -68,8 +74,8 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
     children?: React.ReactNode;
   }) =>
     open ? (
-      <div data-testid="lightbox" aria-label={ariaLabel}>
-        <button data-testid="lightbox-close" onClick={onClose} />
+      <div data-testid="dialog" aria-label={ariaLabel}>
+        <button data-testid="dialog-close" onClick={onClose} />
         {children}
       </div>
     ) : null,
@@ -81,14 +87,19 @@ vi.mock('./ChartCardLoading/ChartCardLoading', () => ({
 
 vi.mock('./ChartCardMenuPro/ChartCardMenuPro', () => ({
   ChartCardMenuPro: ({
-    onToggleMaximize,
-    isMaximized,
+    menuOptions,
   }: {
-    onToggleMaximize?: () => void;
-    isMaximized?: boolean;
-  }) => (
-    <button data-testid="chart-card-menu" data-maximized={isMaximized} onClick={onToggleMaximize} />
-  ),
+    menuOptions?: { labelKey: string; onClick: () => void }[];
+  }) => {
+    const maximizeOption = menuOptions?.[0];
+    return (
+      <button
+        data-testid="chart-card-menu"
+        data-label={maximizeOption?.labelKey}
+        onClick={maximizeOption?.onClick}
+      />
+    );
+  },
 }));
 
 vi.mock('../../../../theme/i18n/i18n', () => ({
@@ -181,28 +192,39 @@ describe('ChartCard', () => {
 });
 
 describe('ChartCard maximize', () => {
-  it('renders the card inside a lightbox when the menu toggles maximize', () => {
-    render(<ChartCard data={withData}>content</ChartCard>);
+  it('renders the card inside a dialog when the menu toggles maximize', () => {
+    render(
+      <ChartCard data={withData} menuOptions={['maximize']}>
+        content
+      </ChartCard>,
+    );
 
-    expect(screen.queryByTestId('lightbox')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('dialog')).not.toBeInTheDocument();
+    expect(screen.getByTestId('chart-card-menu')).toHaveAttribute(
+      'data-label',
+      'charts.menuOptions.maximize',
+    );
 
     fireEvent.click(screen.getByTestId('chart-card-menu'));
 
-    const lightbox = screen.getByTestId('lightbox');
-    expect(lightbox).toContainElement(screen.getByTestId('card'));
-    expect(screen.getByTestId('chart-card-menu')).toHaveAttribute('data-maximized', 'true');
+    const dialog = screen.getByTestId('dialog');
+    expect(dialog).toContainElement(screen.getByTestId('card'));
+    expect(screen.getByTestId('chart-card-menu')).toHaveAttribute(
+      'data-label',
+      'charts.menuOptions.minimize',
+    );
   });
 
-  it('labels the lightbox with the chart title and shows a close button', () => {
+  it('labels the dialog with the chart title and shows a close button', () => {
     render(
-      <ChartCard data={withData} title="My chart">
+      <ChartCard data={withData} title="My chart" menuOptions={['maximize']}>
         content
       </ChartCard>,
     );
 
     fireEvent.click(screen.getByTestId('chart-card-menu'));
 
-    expect(screen.getByTestId('lightbox')).toHaveAttribute('aria-label', 'My chart');
+    expect(screen.getByTestId('dialog')).toHaveAttribute('aria-label', 'My chart');
     expect(screen.getByTestId('action-icon')).toHaveAttribute(
       'aria-label',
       'charts.menuOptions.minimize',
@@ -210,22 +232,30 @@ describe('ChartCard maximize', () => {
   });
 
   it('restores the card when the close button is clicked', () => {
-    render(<ChartCard data={withData}>content</ChartCard>);
+    render(
+      <ChartCard data={withData} menuOptions={['maximize']}>
+        content
+      </ChartCard>,
+    );
 
     fireEvent.click(screen.getByTestId('chart-card-menu'));
     fireEvent.click(screen.getByTestId('action-icon'));
 
-    expect(screen.queryByTestId('lightbox')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('dialog')).not.toBeInTheDocument();
     expect(screen.getByTestId('card')).toBeInTheDocument();
   });
 
-  it('restores the card when the lightbox requests close', () => {
-    render(<ChartCard data={withData}>content</ChartCard>);
+  it('restores the card when the dialog requests close', () => {
+    render(
+      <ChartCard data={withData} menuOptions={['maximize']}>
+        content
+      </ChartCard>,
+    );
 
     fireEvent.click(screen.getByTestId('chart-card-menu'));
-    fireEvent.click(screen.getByTestId('lightbox-close'));
+    fireEvent.click(screen.getByTestId('dialog-close'));
 
-    expect(screen.queryByTestId('lightbox')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('dialog')).not.toBeInTheDocument();
     expect(screen.getByTestId('card')).toBeInTheDocument();
   });
 });

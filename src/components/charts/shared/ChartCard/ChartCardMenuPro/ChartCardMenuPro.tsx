@@ -15,7 +15,6 @@ import {
   ChartCardMenuOption,
   ChartCardMenuOptionOnClickProps,
 } from '../../../../../theme/defaults/defaults.ChartCardMenu.constants';
-import { ExportOptionTypeOptions } from '../../../../types/ExportOption.type.emb';
 
 type InlineSvgFromDataProps = React.HTMLAttributes<HTMLSpanElement> & {
   src: string;
@@ -29,8 +28,7 @@ export function InlineSvgFromData({ src, className, ...rest }: InlineSvgFromData
 }
 
 type ChartCardMenuProProps = Omit<ChartCardMenuOptionOnClickProps, 'theme'> & {
-  menuOptions?: string[];
-  isMaximized?: boolean;
+  menuOptions?: ChartCardMenuOption[];
 };
 
 export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
@@ -39,13 +37,9 @@ export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
 
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const allOptions = theme.defaults.chartMenuOptions ?? [];
-  const { menuOptions, isMaximized } = props;
-  const options = menuOptions
-    ? allOptions.filter((option) => menuOptions.includes(option.value))
-    : allOptions;
+  const { menuOptions } = props;
 
-  if (options.length === 0) {
+  if (menuOptions?.length === 0) {
     return null;
   }
 
@@ -56,7 +50,7 @@ export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
   };
 
   const handleOptionClick = (option: ChartCardMenuOption) => {
-    if (option.isUiAction) {
+    if (option.isInstantAction) {
       option.onClick({ ...props, theme });
       return;
     }
@@ -75,17 +69,11 @@ export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
       triggerComponent={isLoading ? <ChartCardLoading /> : <ActionIcon icon={IconDotsVertical} />}
     >
       <SelectFieldContent className={styles.list} autoFocus>
-        {options.map((option, index) => {
-          const label = i18n.t(
-            option.value === ExportOptionTypeOptions.maximize && isMaximized
-              ? 'charts.menuOptions.minimize'
-              : option.labelKey,
-          );
-
+        {menuOptions?.map((option) => {
           return (
             <SelectListOption
-              key={index}
-              label={label}
+              key={option.value}
+              label={i18n.t(option.labelKey)}
               onClick={() => handleOptionClick(option)}
               startIcon={option.iconSrc ? <InlineSvgFromData src={option.iconSrc} /> : undefined}
             />

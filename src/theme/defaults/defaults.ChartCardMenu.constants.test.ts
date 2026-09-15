@@ -37,15 +37,6 @@ describe('defaultChartMenuProOptions', () => {
 
   it('has a Maximize option flagged as a UI action', () => {
     expect(defaultChartMenuProOptions[3]!.labelKey).toBe('charts.menuOptions.maximize');
-    expect(defaultChartMenuProOptions[3]!.isUiAction).toBe(true);
-  });
-
-  it('Maximize option calls onToggleMaximize', () => {
-    const onToggleMaximize = vi.fn();
-    defaultChartMenuProOptions[3]!.onClick({
-      theme: {} as never,
-      onToggleMaximize,
-    });
-    expect(onToggleMaximize).toHaveBeenCalledTimes(1);
+    expect(defaultChartMenuProOptions[3]!.isInstantAction).toBe(true);
   });
 });
