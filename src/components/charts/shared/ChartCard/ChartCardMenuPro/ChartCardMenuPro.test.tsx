@@ -160,6 +160,45 @@ describe('ChartCardMenuPro', () => {
     vi.useRealTimers();
   });
 
+  it('shows the minimize label for the maximize option while maximized', () => {
+    (useTheme as ReturnType<typeof vi.fn>).mockReturnValue({
+      defaults: {
+        chartMenuOptions: [
+          {
+            value: 'maximize',
+            labelKey: 'charts.menuOptions.maximize',
+            isUiAction: true,
+            onClick: vi.fn(),
+          },
+        ],
+      },
+    });
+
+    render(<ChartCardMenuPro isMaximized />);
+
+    expect(screen.getByText('charts.menuOptions.minimize')).toBeInTheDocument();
+    expect(screen.queryByText('charts.menuOptions.maximize')).not.toBeInTheDocument();
+  });
+
+  it('runs UI action options immediately, without loading state or onCustomDownload', () => {
+    const onClickMock = vi.fn();
+    const onCustomDownload = vi.fn();
+    (useTheme as ReturnType<typeof vi.fn>).mockReturnValue({
+      defaults: {
+        chartMenuOptions: [
+          { value: 'maximize', labelKey: 'maximize', isUiAction: true, onClick: onClickMock },
+        ],
+      },
+    });
+
+    render(<ChartCardMenuPro onCustomDownload={onCustomDownload} />);
+    fireEvent.click(screen.getByText('maximize'));
+
+    expect(onClickMock).toHaveBeenCalledTimes(1);
+    expect(onCustomDownload).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('chart-card-loading')).not.toBeInTheDocument();
+  });
+
   it('shows loading state while export is in progress', async () => {
     vi.useFakeTimers();
     let resolveExport!: () => void;

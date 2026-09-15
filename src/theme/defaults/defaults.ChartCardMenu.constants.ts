@@ -1,6 +1,7 @@
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import CloudDownload from '../../assets/icons/cloud-download.svg';
 import PhotoDown from '../../assets/icons/photo-down.svg';
+import ArrowsMaximize from '../../assets/icons/arrows-maximize.svg';
 import { exportCSV, exportPNG, exportXLSX } from '../utils/export.utils';
 import { Theme } from '../theme.types';
 import { ExportOptionTypeOptions } from '../../components/types/ExportOption.type.emb';
@@ -12,12 +13,15 @@ export type ChartCardMenuOptionOnClickProps = {
   containerRef?: React.RefObject<HTMLDivElement | null>;
   theme: Theme;
   onCustomDownload?: (props: (props: ChartCardMenuOptionOnClickProps) => void) => void;
+  onToggleMaximize?: () => void;
 };
 
 export type ChartCardMenuOption = {
   value: string;
   labelKey: string;
   iconSrc?: string;
+  /** UI actions run immediately: no loading state and no onCustomDownload interception. */
+  isUiAction?: boolean;
   onClick: (props: ChartCardMenuOptionOnClickProps) => void;
 };
 
@@ -39,5 +43,12 @@ export const defaultChartMenuProOptions: ChartCardMenuOption[] = [
     labelKey: 'charts.menuOptions.downloadPNG',
     onClick: exportPNG,
     iconSrc: PhotoDown,
+  },
+  {
+    value: ExportOptionTypeOptions.maximize,
+    labelKey: 'charts.menuOptions.maximize',
+    onClick: (props) => props.onToggleMaximize?.(),
+    iconSrc: ArrowsMaximize,
+    isUiAction: true,
   },
 ] as const;

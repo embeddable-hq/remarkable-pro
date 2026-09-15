@@ -29,6 +29,8 @@ export const de: ResourceLanguage = {
       'menuOptions.downloadCSV': 'CSV herunterladen',
       'menuOptions.downloadPNG': 'PNG herunterladen',
       'menuOptions.downloadXLSX': 'XLSX herunterladen',
+      'menuOptions.maximize': 'Maximieren',
+      'menuOptions.minimize': 'Minimieren',
       errorTitle: 'Etwas ist schiefgelaufen.',
       errorMessage: 'Beim Laden des Diagramms ist ein Fehler aufgetreten.',
       emptyTitle: 'Keine Ergebnisse.',

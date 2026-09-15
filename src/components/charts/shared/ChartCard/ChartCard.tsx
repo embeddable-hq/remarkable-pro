@@ -1,10 +1,12 @@
-import React, { CSSProperties, useRef } from 'react';
-import { IconAlertCircle } from '@tabler/icons-react';
+import React, { CSSProperties, useRef, useState } from 'react';
+import { IconAlertCircle, IconX } from '@tabler/icons-react';
 import {
+  ActionIcon,
   Card,
   CardContent,
   CardFeedback,
   CardHeader,
+  Lightbox,
   Skeleton,
 } from '@embeddable.com/remarkable-ui';
 import styles from './ChartCard.module.css';
@@ -65,6 +67,8 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props
 
   const chartRef = useRef<HTMLDivElement>(null);
 
+  const [isMaximized, setIsMaximized] = useState(false);
+
   const hasData = Boolean(data?.data && data.data?.length > 0);
 
   const isLoading = !data || data?.isLoading;
@@ -94,7 +98,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props
     return children;
   };
 
-  return (
+  const card = (
     <Card className={styles.chartCard}>
       {hideMenu ? null : (
         <>
@@ -112,15 +116,38 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props
                 data={data?.data}
                 dimensionsAndMeasures={dimensionsAndMeasures}
                 onCustomDownload={onCustomDownload}
+                onToggleMaximize={() => setIsMaximized((current) => !current)}
+                isMaximized={isMaximized}
                 menuOptions={menuOptions}
               />
             </div>
+            {isMaximized && (
+              <ActionIcon
+                icon={IconX}
+                aria-label={i18n.t('charts.menuOptions.minimize')}
+                onClick={() => setIsMaximized(false)}
+              />
+            )}
           </div>
         </>
       )}
 
       <CardContent ref={onCustomDownload ? ref : chartRef}>{getDisplay()}</CardContent>
     </Card>
+  );
+
+  if (!isMaximized) {
+    return card;
+  }
+
+  return (
+    <Lightbox
+      open={isMaximized}
+      onClose={() => setIsMaximized(false)}
+      ariaLabel={title ?? i18n.t('charts.menuOptions.maximize')}
+    >
+      {card}
+    </Lightbox>
   );
 });
 

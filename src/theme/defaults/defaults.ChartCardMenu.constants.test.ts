@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 
 vi.mock('../../assets/icons/cloud-download.svg', () => ({ default: 'cloud-download.svg' }));
 vi.mock('../../assets/icons/photo-down.svg', () => ({ default: 'photo-down.svg' }));
+vi.mock('../../assets/icons/arrows-maximize.svg', () => ({ default: 'arrows-maximize.svg' }));
 vi.mock('../utils/export.utils', () => ({
   exportCSV: vi.fn(),
   exportXLSX: vi.fn(),
@@ -11,8 +12,8 @@ vi.mock('../utils/export.utils', () => ({
 import { defaultChartMenuProOptions } from './defaults.ChartCardMenu.constants';
 
 describe('defaultChartMenuProOptions', () => {
-  it('has 3 options', () => {
-    expect(defaultChartMenuProOptions).toHaveLength(3);
+  it('has 4 options', () => {
+    expect(defaultChartMenuProOptions).toHaveLength(4);
   });
 
   it('each option has a labelKey and onClick function', () => {
@@ -32,5 +33,19 @@ describe('defaultChartMenuProOptions', () => {
 
   it('has a Download PNG option', () => {
     expect(defaultChartMenuProOptions[2]!.labelKey).toBe('charts.menuOptions.downloadPNG');
+  });
+
+  it('has a Maximize option flagged as a UI action', () => {
+    expect(defaultChartMenuProOptions[3]!.labelKey).toBe('charts.menuOptions.maximize');
+    expect(defaultChartMenuProOptions[3]!.isUiAction).toBe(true);
+  });
+
+  it('Maximize option calls onToggleMaximize', () => {
+    const onToggleMaximize = vi.fn();
+    defaultChartMenuProOptions[3]!.onClick({
+      theme: {} as never,
+      onToggleMaximize,
+    });
+    expect(onToggleMaximize).toHaveBeenCalledTimes(1);
   });
 });

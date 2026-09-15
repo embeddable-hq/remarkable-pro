@@ -18,6 +18,8 @@ export const en: ResourceLanguage = {
       'menuOptions.downloadCSV': 'Download CSV',
       'menuOptions.downloadPNG': 'Download PNG',
       'menuOptions.downloadXLSX': 'Download XLSX',
+      'menuOptions.maximize': 'Maximize',
+      'menuOptions.minimize': 'Minimize',
       errorTitle: 'Something went wrong.',
       errorMessage: 'An error occurred while loading the chart.',
       emptyTitle: 'No results.',

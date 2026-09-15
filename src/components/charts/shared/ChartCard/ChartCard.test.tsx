@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { ChartCard } from './ChartCard';
 import type { DataResponse } from '@embeddable.com/core';
@@ -49,6 +49,30 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
     />
   ),
   Skeleton: () => <div data-testid="skeleton" />,
+  ActionIcon: ({
+    onClick,
+    'aria-label': ariaLabel,
+  }: {
+    onClick?: () => void;
+    'aria-label'?: string;
+  }) => <button data-testid="action-icon" aria-label={ariaLabel} onClick={onClick} />,
+  Lightbox: ({
+    open,
+    onClose,
+    ariaLabel,
+    children,
+  }: {
+    open: boolean;
+    onClose: () => void;
+    ariaLabel?: string;
+    children?: React.ReactNode;
+  }) =>
+    open ? (
+      <div data-testid="lightbox" aria-label={ariaLabel}>
+        <button data-testid="lightbox-close" onClick={onClose} />
+        {children}
+      </div>
+    ) : null,
 }));
 
 vi.mock('./ChartCardLoading/ChartCardLoading', () => ({
@@ -56,7 +80,15 @@ vi.mock('./ChartCardLoading/ChartCardLoading', () => ({
 }));
 
 vi.mock('./ChartCardMenuPro/ChartCardMenuPro', () => ({
-  ChartCardMenuPro: () => <div data-testid="chart-card-menu" />,
+  ChartCardMenuPro: ({
+    onToggleMaximize,
+    isMaximized,
+  }: {
+    onToggleMaximize?: () => void;
+    isMaximized?: boolean;
+  }) => (
+    <button data-testid="chart-card-menu" data-maximized={isMaximized} onClick={onToggleMaximize} />
+  ),
 }));
 
 vi.mock('../../../../theme/i18n/i18n', () => ({
@@ -64,7 +96,7 @@ vi.mock('../../../../theme/i18n/i18n', () => ({
   i18nSetup: vi.fn(),
 }));
 
-vi.mock('@tabler/icons-react', () => ({ IconAlertCircle: {} }));
+vi.mock('@tabler/icons-react', () => ({ IconAlertCircle: {}, IconX: {} }));
 
 const loadingData = { isLoading: true, data: [] } as unknown as DataResponse;
 const emptyData = { isLoading: false, data: [] } as unknown as DataResponse;
@@ -145,5 +177,55 @@ describe('ChartCard', () => {
     render(<ChartCard data={withData}>content</ChartCard>);
     expect(screen.getByTestId('chart-card-menu')).toBeInTheDocument();
     expect(screen.getByTestId('chart-card-loading')).toBeInTheDocument(); // rendered but hidden via CSS
+  });
+});
+
+describe('ChartCard maximize', () => {
+  it('renders the card inside a lightbox when the menu toggles maximize', () => {
+    render(<ChartCard data={withData}>content</ChartCard>);
+
+    expect(screen.queryByTestId('lightbox')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('chart-card-menu'));
+
+    const lightbox = screen.getByTestId('lightbox');
+    expect(lightbox).toContainElement(screen.getByTestId('card'));
+    expect(screen.getByTestId('chart-card-menu')).toHaveAttribute('data-maximized', 'true');
+  });
+
+  it('labels the lightbox with the chart title and shows a close button', () => {
+    render(
+      <ChartCard data={withData} title="My chart">
+        content
+      </ChartCard>,
+    );
+
+    fireEvent.click(screen.getByTestId('chart-card-menu'));
+
+    expect(screen.getByTestId('lightbox')).toHaveAttribute('aria-label', 'My chart');
+    expect(screen.getByTestId('action-icon')).toHaveAttribute(
+      'aria-label',
+      'charts.menuOptions.minimize',
+    );
+  });
+
+  it('restores the card when the close button is clicked', () => {
+    render(<ChartCard data={withData}>content</ChartCard>);
+
+    fireEvent.click(screen.getByTestId('chart-card-menu'));
+    fireEvent.click(screen.getByTestId('action-icon'));
+
+    expect(screen.queryByTestId('lightbox')).not.toBeInTheDocument();
+    expect(screen.getByTestId('card')).toBeInTheDocument();
+  });
+
+  it('restores the card when the lightbox requests close', () => {
+    render(<ChartCard data={withData}>content</ChartCard>);
+
+    fireEvent.click(screen.getByTestId('chart-card-menu'));
+    fireEvent.click(screen.getByTestId('lightbox-close'));
+
+    expect(screen.queryByTestId('lightbox')).not.toBeInTheDocument();
+    expect(screen.getByTestId('card')).toBeInTheDocument();
   });
 });
