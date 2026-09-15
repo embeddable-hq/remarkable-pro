@@ -502,6 +502,7 @@ const menuOptions = {
     ExportOptionTypeOptions.csv,
     ExportOptionTypeOptions.xlsx,
     ExportOptionTypeOptions.png,
+    ExportOptionTypeOptions.maximize,
   ],
   category: 'Component Settings',
 } as const;
