@@ -79,12 +79,14 @@ const aggregateFunnelStages = (
 
 export const getFunnelOptionsDatalabelsFormatter =
   (config: Partial<FunnelChartProProps>) => (value: number, context: Context) => {
-    const label = context.chart.data.labels?.[context.dataIndex] ?? '';
+    const labels = context.chart.data.labels as (string | number)[] | undefined;
+    const label = String(labels?.[context.dataIndex] ?? '');
     if (!config.showValueLabels) return label;
     const data = (context.chart.data.datasets[context.datasetIndex]?.data ?? []) as number[];
     const total = data.reduce((sum, v) => sum + (v || 0), 0);
+    const percentage = total > 0 ? (value / total) * 100 : 0;
     const valueText = config.displayPercentages
-      ? `${(total > 0 ? (value / total) * 100 : 0).toFixed(1)}%`
+      ? `${percentage.toFixed(1)}%`
       : value.toLocaleString();
     return `${label}: ${valueText}`;
   };
@@ -108,7 +110,8 @@ export const getFunnelChartProOptions = (
           generateLabels: (chart) => {
             const colors = (chart.data.datasets[0]?.backgroundColor ?? []) as string[];
             const labelColor = chart.options.plugins?.legend?.labels?.color as string | undefined;
-            return (chart.data.labels ?? []).map((label, index) => {
+            const labels = (chart.data.labels ?? []) as (string | number)[];
+            return labels.map((label, index) => {
               const color = colors[index];
               return {
                 text: String(label ?? ''),
