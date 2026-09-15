@@ -205,7 +205,7 @@ export const getGroupOrderCacheKey = ({
   sortDirection,
   limit,
   timezone,
-}: LoadDataResultsGroupOrderArgs & { limit?: number }): string | undefined => {
+}: LoadDataResultsGroupOrderArgs): string | undefined => {
   if (!shouldGetTopGroupItems(measure, limit)) return undefined;
   return JSON.stringify(
     loadDataResultsGroupOrderArgs({
