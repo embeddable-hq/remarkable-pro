@@ -136,6 +136,15 @@ type LoadDataResultsGroupOrderArgs = {
   timezone?: string;
 };
 
+// Deliberately no axis filter here, even when axis top-N (limitTopXAxis) is
+// also configured: groups are ranked by their total across the WHOLE axis
+// range, not just the axis buckets that end up displayed. That means a
+// group ranked "top" here can look small (or empty) within just the shown
+// buckets — an accepted tradeoff, not a bug. Scoping the ranking query to
+// the displayed buckets too would need a second, axis-order-dependent
+// ranking pass (an extra round-trip gated behind axisOrder resolving first),
+// and "top by all-time total" is arguably the more expected reading of "top
+// group" than "top only within whatever the x-axis limit already kept."
 export const loadDataResultsGroupOrderArgs = ({
   dataset,
   groupBy,
