@@ -26,15 +26,16 @@ const aggregateMeasureValues = (vals: number[], aggType: unknown): number => {
 };
 
 export const groupTailAsOther = (
-  data: DataResponse['data'] = [],
+  data: DataResponse['data'],
   dimension: Dimension,
   measures: Measure[],
   maxItems?: number,
 ) => {
-  if (!maxItems || data.length <= maxItems) return data;
+  const rows = data ?? [];
+  if (!maxItems || rows.length <= maxItems) return rows;
 
-  const head = data.slice(0, maxItems - 1);
-  const tail = data.slice(maxItems - 1);
+  const head = rows.slice(0, maxItems - 1);
+  const tail = rows.slice(maxItems - 1);
 
   const aggregatedRow: Record<string, unknown> = {
     [dimension.name]: i18n.t('common.other'),
@@ -58,7 +59,7 @@ export const groupTailAsOther = (
 // determined, aggregates each group's tail values into one synthetic row per
 // group, tagged with the "Other" axis label.
 export const groupTailAsOtherPerGroup = (
-  data: DataResponse['data'] = [],
+  data: DataResponse['data'],
   dimension: Dimension,
   groupBy: Dimension,
   measure: Measure,
