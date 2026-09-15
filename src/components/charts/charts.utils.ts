@@ -12,6 +12,19 @@ export const getDimensionWithoutTruncation = (dimension: Dimension): Dimension =
   inputs: { ...dimension.inputs, maxCharacters: null },
 });
 
+const aggregateMeasureValues = (vals: number[], aggType: unknown): number => {
+  switch (aggType) {
+    case 'avg':
+      return vals.reduce((s, v) => s + v, 0) / (vals.length || 1);
+    case 'min':
+      return Math.min(...vals);
+    case 'max':
+      return Math.max(...vals);
+    default:
+      return vals.reduce((s, v) => s + v, 0);
+  }
+};
+
 export const groupTailAsOther = (
   data: DataResponse['data'] = [],
   dimension: Dimension,
@@ -30,23 +43,54 @@ export const groupTailAsOther = (
   for (const measure of measures) {
     const vals = tail.map((row) => Number.parseFloat(row[measure.name] ?? '0'));
     const aggType = (measure.meta as Record<string, unknown> | undefined)?.aggType;
-
-    switch (aggType) {
-      case 'avg':
-        aggregatedRow[measure.name] = vals.reduce((s, v) => s + v, 0) / (vals.length || 1);
-        break;
-      case 'min':
-        aggregatedRow[measure.name] = Math.min(...vals);
-        break;
-      case 'max':
-        aggregatedRow[measure.name] = Math.max(...vals);
-        break;
-      default:
-        aggregatedRow[measure.name] = vals.reduce((s, v) => s + v, 0);
-    }
+    aggregatedRow[measure.name] = aggregateMeasureValues(vals, aggType);
   }
 
   return [...head, aggregatedRow];
+};
+
+// Grouped-chart equivalent of groupTailAsOther: the source data has one row
+// per (axis, group) pair rather than one row per axis value, so the tail
+// can't be sliced by row count or collapsed into a single row — each group
+// needs its own "Other" point so its line stays continuous. Ranks axis
+// values by first appearance in `data` (no server-side ordering exists for
+// this chart, same caveat as groupTailAsOther) and, once the axis tail is
+// determined, aggregates each group's tail values into one synthetic row per
+// group, tagged with the "Other" axis label.
+export const groupTailAsOtherPerGroup = (
+  data: DataResponse['data'] = [],
+  dimension: Dimension,
+  groupBy: Dimension,
+  measure: Measure,
+  maxItems?: number,
+): NonNullable<DataResponse['data']> => {
+  const rows = data ?? [];
+  const axisValues = [...new Set(rows.map((row) => row[dimension.name]).filter((v) => v != null))];
+
+  if (!maxItems || axisValues.length <= maxItems) return rows;
+
+  const headAxisValues = new Set(axisValues.slice(0, maxItems - 1));
+  const head = rows.filter((row) => headAxisValues.has(row[dimension.name]));
+  const tail = rows.filter(
+    (row) => row[dimension.name] != null && !headAxisValues.has(row[dimension.name]),
+  );
+
+  const groupValues = [...new Set(tail.map((row) => row[groupBy.name]).filter((v) => v != null))];
+  const aggType = (measure.meta as Record<string, unknown> | undefined)?.aggType;
+
+  const otherRows = groupValues.map((groupValue) => {
+    const vals = tail
+      .filter((row) => row[groupBy.name] === groupValue)
+      .map((row) => Number.parseFloat(row[measure.name] ?? '0'));
+
+    return {
+      [dimension.name]: i18n.t('common.other'),
+      [groupBy.name]: groupValue,
+      [measure.name]: aggregateMeasureValues(vals, aggType),
+    };
+  });
+
+  return [...head, ...otherRows];
 };
 
 // Only sum/count (or an unset aggType, which behaves as sum — see

@@ -28,6 +28,7 @@ export type LineChartGroupedProProp = {
   resultsGroupOther?: DataResponse;
   groupOrderCacheKey?: string;
   setGroupOrderAndCacheKey?: (values: string[], cacheKey: string) => void;
+  xAxisMaxItems?: number;
   reverseXAxis?: boolean;
   showLegend?: boolean;
   showLogarithmicScale?: boolean;
@@ -54,6 +55,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
     measure,
     xAxis,
     groupBy,
+    xAxisMaxItems,
     reverseXAxis,
     showLegend,
     showLogarithmicScale,
@@ -95,6 +97,7 @@ const LineChartGroupedPro = (props: LineChartGroupedProProp) => {
       groupDimension: groupBy,
       measure,
       hasMinMaxYAxisRange: Boolean(yAxisRangeMin != null || yAxisRangeMax != null),
+      maxItems: xAxisMaxItems,
     },
     theme,
   );

@@ -54,6 +54,7 @@ const meta = {
     inputs.showLogarithmicScale,
     inputs.sortDirectionTopGroupBy,
     inputs.limitTopGroupBy,
+    inputs.xAxisMaxItems,
     inputs.xAxisLabel,
     inputs.yAxisLabel,
     inputs.reverseXAxis,
