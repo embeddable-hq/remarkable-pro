@@ -21,7 +21,6 @@ export type BarChartStackedBaseProps = {
   setAxisOrderAndCacheKey?: (values: string[], cacheKey: string) => void;
   resultsGroupOrder?: DataResponse;
   resultsGroupOther?: DataResponse;
-  groupOrder?: string[];
   groupOrderCacheKey?: string;
   setGroupOrderAndCacheKey?: (values: string[], cacheKey: string) => void;
   showLegend?: boolean;

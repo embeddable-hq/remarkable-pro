@@ -713,6 +713,81 @@ describe('loadDataResultsGroupOther', () => {
     ]);
     expect(request?.limit).toBe(250);
   });
+
+  it('waits for axisOrder before firing when axis top-N is configured, even though groupOrder is ready', () => {
+    // Regression case: without this gate, the request would fire unfiltered
+    // (every axis bucket) as soon as groupOrder lands, then fire again once
+    // axisOrder arrives — a wasted round-trip. loadDataResults already waits
+    // for axisOrder the same way; this mirrors that.
+    const result = loadDataResultsGroupOther({
+      dataset: makeDataset(),
+      axis: makeDimension('date'),
+      measure: makeMeasure(),
+      groupOrder: ['Widget', 'Gadget'],
+      sortDirection: 'desc',
+      limitTopAxis: 5,
+      axisOrder: undefined,
+    });
+
+    expect(result).toBeUndefined();
+    expect(mockLoadData).not.toHaveBeenCalled();
+  });
+
+  it('returns empty results without querying when axis top-N is configured and axisOrder resolves empty', () => {
+    const result = loadDataResultsGroupOther({
+      dataset: makeDataset(),
+      axis: makeDimension('date'),
+      measure: makeMeasure(),
+      groupOrder: ['Widget'],
+      sortDirection: 'desc',
+      limitTopAxis: 5,
+      axisOrder: [],
+    });
+
+    expect(result).toEqual({ data: [], isLoading: false });
+    expect(mockLoadData).not.toHaveBeenCalled();
+  });
+
+  it('fires once both groupOrder and axisOrder are ready, when axis top-N is configured', () => {
+    const fakeResponse = { data: [], isLoading: false } as DataResponse;
+    mockLoadData.mockReturnValue(fakeResponse);
+    const axis = makeDimension('date');
+
+    const result = loadDataResultsGroupOther({
+      dataset: makeDataset(),
+      axis,
+      measure: makeMeasure(),
+      groupOrder: ['Widget'],
+      sortDirection: 'desc',
+      limitTopAxis: 5,
+      axisOrder: ['2026-01-01'],
+    });
+
+    expect(result).toBe(fakeResponse);
+    const request = mockLoadData.mock.calls[0]?.[0];
+    expect(request?.filters).toEqual([
+      { property: axis, operator: 'equals', value: ['2026-01-01'] },
+    ]);
+  });
+
+  it('does not gate on axisOrder when axis top-N is not configured (e.g. LineChartGroupedPro, which has no x-axis limiting)', () => {
+    const fakeResponse = { data: [], isLoading: false } as DataResponse;
+    mockLoadData.mockReturnValue(fakeResponse);
+
+    const result = loadDataResultsGroupOther({
+      dataset: makeDataset(),
+      axis: makeDimension('date'),
+      measure: makeMeasure(),
+      groupOrder: ['Widget'],
+      sortDirection: undefined,
+      limitTopAxis: undefined,
+      axisOrder: undefined,
+    });
+
+    expect(result).toBe(fakeResponse);
+    const request = mockLoadData.mock.calls[0]?.[0];
+    expect(request?.filters).toBeUndefined();
+  });
 });
 
 describe('loadDataResultsArgs (groupOrder)', () => {

@@ -145,7 +145,6 @@ const props = (
     granularity: state?.granularity,
     axisOrder: cachedAxisOrder,
     axisOrderCacheKey,
-    groupOrder: cachedGroupOrder,
     groupOrderCacheKey,
     setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
     setAxisOrderAndCacheKey: (axisOrder: string[], cacheKey: string) =>
@@ -170,10 +169,11 @@ const props = (
     }),
     resultsGroupOther: loadDataResultsGroupOther({
       dataset: inputs.dataset,
-      axis: inputs.xAxis,
-      granularity: state?.granularity,
+      axis: xAxisWithGranularity,
       measure: inputs.measure,
       groupOrder: cachedGroupOrder,
+      sortDirection,
+      limitTopAxis: inputs.limitTopXAxis,
       axisOrder: cachedAxisOrder,
       maxResults: inputs.maxResults,
       timezone,

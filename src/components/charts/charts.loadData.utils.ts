@@ -267,6 +267,8 @@ type LoadDataResultsGroupOther = {
   measure: Measure;
   granularity?: Granularity;
   groupOrder?: string[];
+  sortDirection?: OrderDirection;
+  limitTopAxis?: number;
   axisOrder?: string[];
   maxResults?: number;
   timezone?: string;
@@ -278,12 +280,26 @@ export const loadDataResultsGroupOther = ({
   measure,
   granularity,
   groupOrder,
+  sortDirection,
+  limitTopAxis,
   axisOrder,
   maxResults,
   timezone,
 }: LoadDataResultsGroupOther): DataResponse | undefined => {
   if (groupOrder == null) return undefined;
   if (!groupOrder.length) return EMPTY_RESULTS;
+
+  // Wait for axisOrder too when axis top-N is configured, same as
+  // loadDataResults — otherwise this fires once unfiltered (fetching every
+  // axis bucket) as soon as groupOrder lands, then again once axisOrder
+  // arrives. Not a correctness issue (mergeGroupOtherResults only acts once
+  // both queries have settled, and the main query is blocked on axisOrder
+  // too, so the unfiltered response is never actually consumed) — just a
+  // wasted round-trip.
+  if (shouldGetTopItems(sortDirection, limitTopAxis)) {
+    if (axisOrder == null) return undefined;
+    if (!axisOrder.length) return EMPTY_RESULTS;
+  }
 
   return loadData(
     loadDataResultsGroupOtherArgs({

@@ -141,7 +141,6 @@ const props = (
     ...inputs,
     xAxis: xAxisWithGranularity,
     granularity: state?.granularity,
-    groupOrder: cachedGroupOrder,
     groupOrderCacheKey,
     setGranularity: (granularity: Granularity) => setState({ ...state, granularity }),
     setGroupOrderAndCacheKey: (groupOrder: string[], cacheKey: string) =>
@@ -156,8 +155,7 @@ const props = (
     }),
     resultsGroupOther: loadDataResultsGroupOther({
       dataset: inputs.dataset,
-      axis: inputs.xAxis,
-      granularity: state?.granularity,
+      axis: xAxisWithGranularity,
       measure: inputs.measure,
       groupOrder: cachedGroupOrder,
       maxResults: inputs.maxResults,
