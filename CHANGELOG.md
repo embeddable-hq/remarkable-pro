@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.9.1
+
+### Patch Changes
+
+- 5e77cf6: Translate the dropdown search placeholder and Apply button. Adds common.search and common.apply theme i18n keys (en/de) and wires them into every searchable select and multi-select, which previously always showed the English "Search…" and "Apply" defaults.
+
 ## 0.9.0
 
 ### Minor Changes
