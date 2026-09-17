@@ -5,6 +5,7 @@ import { dispatchEventUserInteraction } from '../../utils/events.utils';
 import { i18n } from '../../theme/i18n/i18n';
 import { DimensionValueOrTimeRange, GroupedClickArg, SimpleClickArg } from './charts.types';
 import { ChartData } from 'chart.js';
+import { getDimensionFieldName } from '../../utils/data.utils';
 
 export const getDimensionWithoutTruncation = (dimension: Dimension): Dimension => ({
   ...dimension,
@@ -46,6 +47,116 @@ export const groupTailAsOther = (
   }
 
   return [...head, aggregatedRow];
+};
+
+// Only sum/count (or an unset aggType, which behaves as sum — see
+// groupTailAsOther's default case) are additive across groups, so only those
+// are safe for computeOtherRows' grandTotal-minus-kept-groups subtraction.
+// This is deliberately an allowlist, not a blocklist of avg/min/max: aggType
+// can also be count_distinct/count_distinct_approx, and those aren't
+// additive either — a value counted under more than one group would be
+// counted once per group it appears in, so summing per-group distinct counts
+// and subtracting from a grand total doesn't recover "the excluded groups'
+// distinct count." Any other/future aggType is rejected by default too,
+// rather than silently assumed safe.
+export const isOtherBucketableMeasure = (measure: Measure): boolean => {
+  const aggType = (measure.meta as Record<string, unknown> | undefined)?.aggType;
+  return aggType == null || aggType === 'sum' || aggType === 'count';
+};
+
+export const tagRowsAsOtherGroup = (
+  data: DataResponse['data'],
+  groupBy: Dimension,
+): NonNullable<DataResponse['data']> => {
+  const groupByFieldName = getDimensionFieldName(groupBy);
+  return (data ?? []).map((row) => ({ ...row, [groupByFieldName]: i18n.t('common.other') }));
+};
+
+const sumMeasureByAxis = (
+  data: DataResponse['data'],
+  axisFieldName: string,
+  measureFieldName: string,
+): Map<unknown, number> => {
+  const totals = new Map<unknown, number>();
+  for (const row of data ?? []) {
+    const axisValue = row[axisFieldName];
+    if (axisValue == null) continue;
+    const current = totals.get(axisValue) ?? 0;
+    totals.set(axisValue, current + Number.parseFloat(row[measureFieldName] ?? '0'));
+  }
+  return totals;
+};
+
+// Computes "Other" rows by subtraction — grandTotal[axis] minus the sum of
+// the kept groups' contributions for that axis, from mainResults (the
+// top-N-kept-groups query) and grandTotalData (a groupBy-agnostic total per
+// axis bucket, see loadDataResultsGroupOther). Clamped to 0 to guard against
+// floating-point noise producing a tiny negative value rather than an exact
+// zero. See the comment on loadDataResultsGroupOther for why subtraction is
+// used instead of an exclusion filter operator.
+export const computeOtherRows = (
+  mainData: DataResponse['data'],
+  grandTotalData: DataResponse['data'],
+  axis: Dimension,
+  measure: Measure,
+  groupBy: Dimension,
+): NonNullable<DataResponse['data']> => {
+  if (!grandTotalData?.length) return [];
+
+  const keptTotals = sumMeasureByAxis(mainData, axis.name, measure.name);
+
+  const otherRows = grandTotalData
+    .filter((row) => row[axis.name] != null)
+    .map((row) => {
+      const grandTotal = Number.parseFloat(row[measure.name] ?? '0');
+      const keptTotal = keptTotals.get(row[axis.name]) ?? 0;
+      return { ...row, [measure.name]: Math.max(grandTotal - keptTotal, 0) };
+    });
+
+  return tagRowsAsOtherGroup(otherRows, groupBy);
+};
+
+// Merges the top-N-groups query with the "Other" aggregate query. The two are
+// independent async calls that can resolve in either order — critically, the
+// "Other" rows are only computed/spliced in once BOTH mainResults and
+// resultsGroupOther have actually settled (isLoading: false on each).
+// Checking only mainResults isn't enough: if the data layer keeps a query's
+// previous data visible while it re-fetches (common in cache-backed
+// loaders), resultsGroupOther.data could be stale from an earlier
+// configuration while still reporting isLoading: true, and mainResults
+// having settled says nothing about that. Without this gate, a render could
+// either (a) under the old tag-based approach, produce a merged dataset
+// containing ONLY the Other row, placing it at index 0 — or (b), under
+// subtraction, treat "kept totals" as all-zero and so massively over-count
+// Other, or compute Other from stale grand totals against fresh kept-group
+// data. Per-value chart colors are cached by value and reused forever once
+// assigned (see getDimensionMeasureColor), so a bad intermediate render can
+// permanently pollute a color/value — waiting on both queries avoids all of
+// these failure modes. This mirrors the same "never trust .data while
+// .isLoading is true" rule already used in
+// useUpdateAxisOrderAndCacheKey/useUpdateGroupOrderAndCacheKey.
+export const mergeGroupOtherResults = (
+  mainResults: DataResponse | undefined,
+  resultsGroupOther: DataResponse | undefined,
+  groupBy: Dimension,
+  axis: Dimension,
+  measure: Measure,
+): DataResponse | undefined => {
+  if (!mainResults) return mainResults;
+
+  const bothSettled = !mainResults.isLoading && !resultsGroupOther?.isLoading;
+
+  return {
+    ...mainResults,
+    isLoading: mainResults.isLoading || Boolean(resultsGroupOther?.isLoading),
+    error: mainResults.error || resultsGroupOther?.error,
+    data: [
+      ...(mainResults.data ?? []),
+      ...(bothSettled
+        ? computeOtherRows(mainResults.data, resultsGroupOther?.data, axis, measure, groupBy)
+        : []),
+    ],
+  };
 };
 
 export const getDatalabelPercentage = (

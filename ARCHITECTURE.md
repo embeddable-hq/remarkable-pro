@@ -12,6 +12,8 @@ src
 │   ├── preview.data.constants.ts             > static preview data used in the editor canvas
 │   ├── charts                                > chart components
 │   │   ├── charts.utils.ts                   > shared utils across all chart groups
+│   │   ├── charts.loadData.utils.ts          > shared query builders for multi-query, state-dependent charts (see "Multi-query, state-dependent charts" below)
+│   │   ├── charts.hooks.ts                   > shared hooks that pair with charts.loadData.utils.ts
 │   │   ├── pies                              > component group (only when multiple variants exist)
 │   │   │   ├── pies.utils.ts                 > shared utils for the group
 │   │   │   ├── pies.types.ts                 > shared types for the group (if needed)
@@ -250,6 +252,60 @@ export const kpiChartNumberComparisonPro = {
   },
 } as const;
 ```
+
+### Multi-query, state-dependent charts
+
+The `results: { loadDataArgs, loadData }` pattern above assumes the query is a pure function of `inputs` (and optionally `clientContext`) — call it, get data back. Some charts don't fit that: a chart that lets the user rank/limit an axis or a grouping dimension (e.g. "top 10 categories by total", "top N groups + an Other bucket") needs a **pipeline**, not a single call —
+
+1. A ranking query (`select: [dimension, measure]`, sorted, limited) determines which values to keep.
+2. Its result is written into the component's persisted state.
+3. Only once that cached value is available does the real query fire, filtered/scoped to it.
+
+That real query is gated on state that doesn't exist until a previous query has round-tripped through a render — there's no single `loadDataArgs`/`loadData` pair that honestly represents "the query" for these charts, so they intentionally **do not export a top-level `results`**. `BarChartGroupedPro`, `BarChartGroupedHorizontalPro`, `BarChartStackedPro`, `BarChartStackedHorizontalPro`, and `LineChartGroupedPro` are all in this category today.
+
+The reusable pieces still live outside the SDK-wired `.emb.ts`, same as the simple case — they're just shared across every chart in this category rather than duplicated per chart:
+
+- `charts.loadData.utils.ts` — the query builders (`loadDataResults`, `loadDataResultsAxisOrder`, `loadDataResultsGroupOrder`, `loadDataResultsGroupOther`, ...) and their cache-key helpers, all pure functions of their arguments
+- `charts.hooks.ts` — the React hooks (`useUpdateAxisOrderAndCacheKey`, `useUpdateGroupOrderAndCacheKey`, `useGroupOtherResults`) that write a resolved ranking into state once its query settles
+
+A `definition.ts` in this category wires those together in `props`: compute a cache key from the current inputs, read any cached value for that key out of state, pass it to the gated query, and expose a setter the component's hook calls once the ranking query resolves:
+
+```ts
+const props = (inputs: Inputs<typeof meta>, [state, setState]: [State, (s: State) => void]) => {
+  const axisOrderCacheKey = getAxisOrderCacheKey({
+    dataset: inputs.dataset,
+    axis: inputs.xAxis,
+    measure: inputs.measure,
+    limit: inputs.limitTopXAxis,
+  });
+  const cachedAxisOrder = getCachedAxisOrder(axisOrderCacheKey, state);
+
+  return {
+    ...inputs,
+    axisOrder: cachedAxisOrder,
+    axisOrderCacheKey,
+    setAxisOrderAndCacheKey: (axisOrder: string[], cacheKey: string) =>
+      setState({ ...state, axisOrder, axisOrderCacheKey: cacheKey }),
+    resultsAxisOrder: loadDataResultsAxisOrder({
+      dataset: inputs.dataset,
+      axis: inputs.xAxis,
+      measure: inputs.measure,
+      limitTopAxis: inputs.limitTopXAxis,
+    }),
+    results: loadDataResults({
+      dataset: inputs.dataset,
+      axis: inputs.xAxis,
+      measure: inputs.measure,
+      limitTopAxis: inputs.limitTopXAxis,
+      axisOrder: cachedAxisOrder,
+    }),
+  };
+};
+```
+
+`index.tsx` calls the matching hook (e.g. `useUpdateAxisOrderAndCacheKey`) to close the loop once `resultsAxisOrder` settles.
+
+Reach for this pattern whenever a new input needs to rank or limit a dimension server-side; reach for the simple `results` export whenever it doesn't.
 
 ### `ComponentName.emb.ts` — The integration wrapper
 
