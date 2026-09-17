@@ -74,6 +74,7 @@ const FilterBuilderItem = ({
       <SingleSelectField
         triggerComponent={getMemberTriggerComponent()}
         searchable
+        searchPlaceholder={i18n.t('common.search')}
         value={dimensionOrMeasure?.name}
         onChange={onSelectDimensionOrMeasure}
         onSearch={setSearch}

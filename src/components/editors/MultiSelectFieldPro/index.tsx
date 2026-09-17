@@ -84,6 +84,8 @@ const MultiSelectFieldPro = (props: MultiSelectFieldProProps) => {
         values={selectedValues ?? []}
         options={options}
         placeholder={placeholder}
+        searchPlaceholder={i18n.t('common.search')}
+        submitLabel={i18n.t('common.apply')}
         noOptionsMessage={showNoOptionsMessage ? i18n.t('common.noOptionsFound') : undefined}
         showSelectAll={displaySelectAll}
         selectAllLabel={i18n.t('common.selectAll')}

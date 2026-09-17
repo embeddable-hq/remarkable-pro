@@ -73,6 +73,7 @@ const SingleSelectFieldPro = (props: SingleSelectFieldProProps) => {
         value={selectedValue}
         options={options}
         placeholder={placeholder}
+        searchPlaceholder={i18n.t('common.search')}
         noOptionsMessage={showNoOptionsMessage ? i18n.t('common.noOptionsFound') : undefined}
         onChange={(newValue) => {
           dispatchEventUserInteraction({ componentName, trackingId, value: newValue });

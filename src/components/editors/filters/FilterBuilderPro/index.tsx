@@ -251,6 +251,7 @@ const FilterBuilderPro = (props: FilterBuilderProProps) => {
           <SingleSelectField
             triggerComponent={<ActionIcon icon={IconPlus} />}
             searchable
+            searchPlaceholder={i18n.t('common.search')}
             onChange={(value) => handleAddFilter(value)}
             onSearch={setSearchNew}
             options={dimensionOptionsNew}

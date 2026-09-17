@@ -91,6 +91,8 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
         values={currentMeasureName}
         options={options}
         placeholder={placeholder}
+        searchPlaceholder={i18n.t('common.search')}
+        submitLabel={i18n.t('common.apply')}
         noOptionsMessage={i18n.t('common.noOptionsFound')}
         onChange={handleChange}
         onPendingChange={setPendingValues}

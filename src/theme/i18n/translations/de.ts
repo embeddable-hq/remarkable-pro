@@ -10,6 +10,8 @@ export const de: ResourceLanguage = {
       deselectAll: 'Alle abwählen',
       compared: 'Verglichen',
       loading: 'Laden...',
+      search: 'Suchen…',
+      apply: 'Anwenden',
     },
     dimension: {
       'customers.country.United States': 'Vereinigte Staaten',
