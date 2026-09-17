@@ -86,6 +86,7 @@ export const FilterBuilderWithGroupingGroup = ({
               </button>
             }
             searchable
+            searchPlaceholder={i18n.t('common.search')}
             onChange={onAddFilter}
             onSearch={setSearch}
             options={options}

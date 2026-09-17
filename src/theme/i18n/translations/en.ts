@@ -10,6 +10,8 @@ export const en: ResourceLanguage = {
       deselectAll: 'Deselect all',
       compared: 'Compared',
       loading: 'Loading...',
+      search: 'Search…',
+      apply: 'Apply',
     },
     charts: {
       label: 'Label',
