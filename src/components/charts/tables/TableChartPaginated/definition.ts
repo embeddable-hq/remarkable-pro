@@ -15,6 +15,8 @@ import { inputs } from '../../../component.inputs.constants';
 import { getSortDirectionValue } from '../../../types/SortDirection.type.emb';
 import { subInputs } from '../../../component.subinputs.constants';
 import { previewData } from '../../../preview.data.constants';
+import { ThemeClientContext } from '../../../../theme/theme.types';
+import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 
 const meta = {
   name: 'TableChartPaginated',
@@ -122,12 +124,14 @@ const loadDataResultsArgs = (
   pageSize: number,
   orderBy: OrderBy[],
   dimensionsAndMeasuresToLoad: Parameters<typeof loadData>[0]['select'],
+  clientContext?: ThemeClientContext,
 ): LoadDataRequest => ({
   from: inputs.dataset,
   select: dimensionsAndMeasuresToLoad,
   offset: page * pageSize,
   limit: pageSize,
   orderBy,
+  timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
 const loadDataResults = (
@@ -136,37 +140,56 @@ const loadDataResults = (
   pageSize: number,
   orderBy: OrderBy[],
   dimensionsAndMeasuresToLoad: Parameters<typeof loadData>[0]['select'],
+  clientContext: ThemeClientContext,
 ): DataResponse =>
-  loadData(loadDataResultsArgs(inputs, page, pageSize, orderBy, dimensionsAndMeasuresToLoad));
+  loadData(
+    loadDataResultsArgs(
+      inputs,
+      page,
+      pageSize,
+      orderBy,
+      dimensionsAndMeasuresToLoad,
+      clientContext,
+    ),
+  );
 
 const loadDataTotalResultsArgs = (
   inputs: Inputs<typeof meta>,
   dimensionsAndMeasuresToLoad: Parameters<typeof loadData>[0]['select'],
+  clientContext?: ThemeClientContext,
 ): LoadDataRequest => ({
   from: inputs.dataset,
   select: dimensionsAndMeasuresToLoad,
   offset: 0,
   limit: 0,
   countRows: true,
+  timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
 const loadDataTotalResults = (
   inputs: Inputs<typeof meta>,
   dimensionsAndMeasuresToLoad: Parameters<typeof loadData>[0]['select'],
-): DataResponse => loadData(loadDataTotalResultsArgs(inputs, dimensionsAndMeasuresToLoad));
+  clientContext: ThemeClientContext,
+): DataResponse =>
+  loadData(loadDataTotalResultsArgs(inputs, dimensionsAndMeasuresToLoad, clientContext));
 
 const loadDataAllResultsArgs = (
   inputs: Inputs<typeof meta>,
   orderBy: OrderBy[],
+  clientContext?: ThemeClientContext,
 ): LoadDataRequest => ({
   from: inputs.dataset,
   select: inputs.dimensionsAndMeasures,
   orderBy,
   limit: inputs.maxResults,
+  timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
-const loadDataAllResults = (inputs: Inputs<typeof meta>, orderBy: OrderBy[]): DataResponse =>
-  loadData(loadDataAllResultsArgs(inputs, orderBy));
+const loadDataAllResults = (
+  inputs: Inputs<typeof meta>,
+  orderBy: OrderBy[],
+  clientContext: ThemeClientContext,
+): DataResponse => loadData(loadDataAllResultsArgs(inputs, orderBy, clientContext));
 
 const events = {
   onRowClicked: (value: TableChartPaginatedProOnRowClickArg) => ({
@@ -178,6 +201,7 @@ const events = {
 const props = (
   inputs: Inputs<typeof meta>,
   [state, setState]: [TableChartPaginatedProState, (state: TableChartPaginatedProState) => void],
+  clientContext: ThemeClientContext,
 ) => {
   const mergedState: TableChartPaginatedProState = {
     ...defaultTableChartPaginatedState(inputs),
@@ -212,10 +236,13 @@ const props = (
           mergedState.pageSize,
           orderBy,
           dimensionsAndMeasuresToLoad,
+          clientContext,
         )
       : undefined,
-    totalResults: loadDataTotalResults(inputs, dimensionsAndMeasuresToLoad),
-    allResults: mergedState.isLoadingDownloadData ? loadDataAllResults(inputs, orderBy) : undefined,
+    totalResults: loadDataTotalResults(inputs, dimensionsAndMeasuresToLoad, clientContext),
+    allResults: mergedState.isLoadingDownloadData
+      ? loadDataAllResults(inputs, orderBy, clientContext)
+      : undefined,
     componentName: meta.name,
   };
 };

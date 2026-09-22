@@ -3,6 +3,8 @@ import { definePreview, EmbeddedComponentMeta, Inputs } from '@embeddable.com/re
 import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
+import { ThemeClientContext } from '../../../../theme/theme.types';
+import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 
 const meta = {
   name: 'FunnelChartPro',
@@ -78,21 +80,31 @@ const previewConfig = {
 
 const preview = definePreview(Component, previewConfig);
 
-const loadDataResultsArgs = (inputs: Inputs<typeof meta>): LoadDataRequest => ({
+const loadDataResultsArgs = (
+  inputs: Inputs<typeof meta>,
+  clientContext?: ThemeClientContext,
+): LoadDataRequest => ({
   from: inputs.dataset,
   select: [
     inputs.stageDimension,
     inputs.countMeasure,
     ...(inputs.orderDimension ? [inputs.orderDimension] : []),
   ],
+  timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
-const loadDataResults = (inputs: Inputs<typeof meta>): DataResponse =>
-  loadData(loadDataResultsArgs(inputs));
+const loadDataResults = (
+  inputs: Inputs<typeof meta>,
+  clientContext?: ThemeClientContext,
+): DataResponse => loadData(loadDataResultsArgs(inputs, clientContext));
 
-const props = (inputs: Inputs<typeof meta>) => ({
+const props = (
+  inputs: Inputs<typeof meta>,
+  _state: unknown,
+  clientContext?: ThemeClientContext,
+) => ({
   ...inputs,
-  results: loadDataResults(inputs),
+  results: loadDataResults(inputs, clientContext),
 });
 
 export const funnelChartPro = {

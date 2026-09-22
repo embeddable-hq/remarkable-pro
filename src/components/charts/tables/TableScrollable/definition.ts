@@ -17,6 +17,8 @@ import { getSortDirectionValue } from '../../../types/SortDirection.type.emb';
 import { subInputs } from '../../../component.subinputs.constants';
 import { TABLE_SCROLLABLE_SIZE } from './TableScrollable.utils';
 import { previewData } from '../../../preview.data.constants';
+import { ThemeClientContext } from '../../../../theme/theme.types';
+import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 
 const meta = {
   name: 'TableScrollable',
@@ -115,12 +117,14 @@ const loadDataResultsArgs = (
   page: number,
   orderBy: OrderBy[],
   dimensionsAndMeasuresToLoad: Parameters<typeof loadData>[0]['select'],
+  clientContext?: ThemeClientContext,
 ): LoadDataRequest => ({
   from: inputs.dataset,
   select: dimensionsAndMeasuresToLoad,
   offset: page * TABLE_SCROLLABLE_SIZE,
   limit: TABLE_SCROLLABLE_SIZE,
   orderBy,
+  timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
 const loadDataResults = (
@@ -128,26 +132,30 @@ const loadDataResults = (
   page: number,
   orderBy: OrderBy[],
   dimensionsAndMeasuresToLoad: Parameters<typeof loadData>[0]['select'],
+  clientContext: ThemeClientContext,
 ): DataResponse =>
-  loadData(loadDataResultsArgs(inputs, page, orderBy, dimensionsAndMeasuresToLoad));
+  loadData(loadDataResultsArgs(inputs, page, orderBy, dimensionsAndMeasuresToLoad, clientContext));
 
 const loadDataAllResultsArgs = (
   inputs: Inputs<typeof meta>,
   orderBy: OrderBy[],
+  clientContext?: ThemeClientContext,
 ): LoadDataRequest => ({
   from: inputs.dataset,
   select: inputs.dimensionsAndMeasures,
   orderBy,
   limit: inputs.maxResults,
+  timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
 const loadDataAllResults = (
   inputs: Inputs<typeof meta>,
   orderBy: OrderBy[],
   state: TableScrollableProState,
+  clientContext: ThemeClientContext,
 ): DataResponse | undefined => {
   if (state?.isLoadingDownloadData) {
-    return loadData(loadDataAllResultsArgs(inputs, orderBy));
+    return loadData(loadDataAllResultsArgs(inputs, orderBy, clientContext));
   }
   return undefined;
 };
@@ -162,6 +170,7 @@ const events = {
 const props = (
   inputs: Inputs<typeof meta>,
   [state, setState]: [TableScrollableProState, (state: TableScrollableProState) => void],
+  clientContext: ThemeClientContext,
 ) => {
   const mergedState: TableScrollableProState = { ...defaultTableScrollableState(inputs), ...state };
 
@@ -186,8 +195,14 @@ const props = (
     ...inputs,
     state: mergedState,
     setState,
-    results: loadDataResults(inputs, mergedState.page, orderBy, dimensionsAndMeasuresToLoad),
-    allResults: loadDataAllResults(inputs, orderBy, mergedState),
+    results: loadDataResults(
+      inputs,
+      mergedState.page,
+      orderBy,
+      dimensionsAndMeasuresToLoad,
+      clientContext,
+    ),
+    allResults: loadDataAllResults(inputs, orderBy, mergedState, clientContext),
     componentName: meta.name,
   };
 };
