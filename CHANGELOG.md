@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.9.2
+
+### Patch Changes
+
+- dd98d8a: Review and update component with no timezone usage
+
 ## 0.9.1
 
 ### Patch Changes
