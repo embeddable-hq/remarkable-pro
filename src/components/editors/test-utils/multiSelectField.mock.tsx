@@ -6,6 +6,7 @@ export const MultiSelectFieldMock = ({
   placeholder,
   noOptionsMessage,
   showSelectAll,
+  showApplyButton,
   selectAllLabel,
   deselectAllLabel,
   options,
@@ -17,6 +18,7 @@ export const MultiSelectFieldMock = ({
   placeholder?: string;
   noOptionsMessage?: string;
   showSelectAll?: boolean;
+  showApplyButton?: boolean;
   selectAllLabel?: string;
   deselectAllLabel?: string;
   options: { value: string; label: string }[];
@@ -28,6 +30,7 @@ export const MultiSelectFieldMock = ({
     data-placeholder={placeholder ?? ''}
     data-no-options-message={noOptionsMessage ?? ''}
     data-show-select-all={String(showSelectAll ?? false)}
+    data-show-apply-button={String(showApplyButton ?? true)}
     data-select-all-label={selectAllLabel ?? ''}
     data-deselect-all-label={deselectAllLabel ?? ''}
   >

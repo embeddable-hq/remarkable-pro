@@ -36,6 +36,15 @@ const meta = {
         'Adds a "select / deselect all" option to the dropdown. Only appears when the full list of values is loaded: if the number of values reaches "Maximum options", the list may be incomplete and the option stays hidden.',
     },
     {
+      ...inputs.boolean,
+      name: 'showApplyButton',
+      label: 'Show apply button',
+      category: 'Component Settings',
+      defaultValue: true,
+      description:
+        'When disabled, the apply button is hidden and ticking a value applies the selection immediately.',
+    },
+    {
       ...inputs.string,
       name: 'selectedValues',
       array: true,
