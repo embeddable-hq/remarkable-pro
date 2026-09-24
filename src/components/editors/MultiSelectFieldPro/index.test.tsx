@@ -184,19 +184,19 @@ describe('MultiSelectFieldPro', () => {
     expect(onChange).toHaveBeenCalledWith(['US']);
   });
 
-  it('passes showApplyButton through to MultiSelectField', () => {
+  it('passes autoApply through to MultiSelectField', () => {
     const { getByTestId } = render(
       <MultiSelectFieldPro
         dimension={country}
         results={resultsWith([{ country: 'US' }])}
-        showApplyButton={false}
+        autoApply
         onChange={vi.fn()}
       />,
     );
-    expect(getByTestId('multi-select')).toHaveAttribute('data-show-apply-button', 'false');
+    expect(getByTestId('multi-select')).toHaveAttribute('data-auto-apply', 'true');
   });
 
-  it('defaults to showing the apply button when showApplyButton is not provided', () => {
+  it('defaults autoApply to false when not provided', () => {
     const { getByTestId } = render(
       <MultiSelectFieldPro
         dimension={country}
@@ -204,7 +204,7 @@ describe('MultiSelectFieldPro', () => {
         onChange={vi.fn()}
       />,
     );
-    expect(getByTestId('multi-select')).toHaveAttribute('data-show-apply-button', 'true');
+    expect(getByTestId('multi-select')).toHaveAttribute('data-auto-apply', 'false');
   });
 
   it('wires setSearchValue to the MultiSelectField search input', () => {

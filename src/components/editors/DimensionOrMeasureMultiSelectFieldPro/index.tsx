@@ -14,6 +14,7 @@ export type DimensionMeasureMultiSelectFieldProProps = {
   dimensionAndMeasureOptions?: DimensionOrMeasure[];
   placeholder?: string;
   clearable?: boolean;
+  autoApply?: boolean;
   componentName?: string;
   trackingId?: string;
   onChange: (value: DimensionOrMeasure[]) => void;
@@ -27,6 +28,7 @@ const DimensionMeasureMultiSelectFieldPro = (props: DimensionMeasureMultiSelectF
     selectedDimensionsAndMeasures = [],
     dimensionAndMeasureOptions = [],
     clearable,
+    autoApply,
     componentName,
     trackingId,
     onChange,
@@ -91,6 +93,7 @@ const DimensionMeasureMultiSelectFieldPro = (props: DimensionMeasureMultiSelectF
         isClearable={clearable}
         disableApplyButton={!clearable && pendingValues.length === 0}
         isSearchable
+        autoApply={autoApply}
         values={currentDimensionAndMeasureNames}
         options={options}
         placeholder={placeholder}

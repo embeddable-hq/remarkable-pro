@@ -14,6 +14,7 @@ export type MeasureMultiSelectFieldProProps = {
   measureOptions?: Measure[];
   placeholder?: string;
   clearable?: boolean;
+  autoApply?: boolean;
   componentName?: string;
   trackingId?: string;
   onChange: (value: Measure[]) => void;
@@ -27,6 +28,7 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
     selectedMeasures = [],
     measureOptions = [],
     clearable,
+    autoApply,
     componentName,
     trackingId,
     onChange,
@@ -88,6 +90,7 @@ const MeasureMultiSelectFieldPro = (props: MeasureMultiSelectFieldProProps) => {
         isClearable={clearable}
         disableApplyButton={!clearable && pendingValues.length === 0}
         isSearchable
+        autoApply={autoApply}
         values={currentMeasureName}
         options={options}
         placeholder={placeholder}

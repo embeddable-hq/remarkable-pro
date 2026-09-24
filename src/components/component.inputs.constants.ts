@@ -350,6 +350,16 @@ const clearable = {
   category: 'Component Settings',
 } as const;
 
+const autoApply = {
+  ...boolean,
+  name: 'autoApply',
+  label: 'Auto apply',
+  category: 'Component Settings',
+  defaultValue: false,
+  description:
+    'When enabled, the apply button is hidden and ticking a value applies the selection immediately.',
+} as const;
+
 const displayNullAs = {
   ...string,
   name: 'displayNullAs',
@@ -569,6 +579,7 @@ export const inputs = {
   color,
   fontSize,
   clearable,
+  autoApply,
   displayNullAs,
   xAxisLabel,
   yAxisLabel,
