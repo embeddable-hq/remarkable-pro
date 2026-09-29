@@ -63,6 +63,8 @@ const meta = {
       ...inputs.displayPercentages,
       description: 'Show percentage of total instead of the raw count on each stage.',
     },
+    inputs.shrinkAnchor,
+    inputs.shrinkFraction,
     inputs.menuOptions,
   ],
 } as const satisfies EmbeddedComponentMeta;

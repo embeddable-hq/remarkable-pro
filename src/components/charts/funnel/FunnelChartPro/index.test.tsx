@@ -44,16 +44,22 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
   FunnelChart: ({
     showPercentage,
     showValueLabels,
+    shrinkAnchor,
+    shrinkFraction,
     options,
   }: {
     showPercentage?: boolean;
     showValueLabels?: boolean;
+    shrinkAnchor?: string;
+    shrinkFraction?: number;
     options?: { plugins?: { legend?: { position?: string } } };
   }) => (
     <div
       data-testid="funnel-chart"
       data-show-percentage={String(Boolean(showPercentage))}
       data-show-value-labels={String(Boolean(showValueLabels))}
+      data-shrink-anchor={shrinkAnchor}
+      data-shrink-fraction={shrinkFraction}
       data-legend-position={options?.plugins?.legend?.position}
     />
   ),
@@ -107,6 +113,13 @@ describe('FunnelChartPro', () => {
   it('passes showValueLabels through to FunnelChart', () => {
     render(<FunnelChartPro {...defaultProps} showValueLabels={true} />);
     expect(screen.getByTestId('funnel-chart')).toHaveAttribute('data-show-value-labels', 'true');
+  });
+
+  it('passes shrinkAnchor and shrinkFraction through to FunnelChart', () => {
+    render(<FunnelChartPro {...defaultProps} shrinkAnchor="middle" shrinkFraction={0.5} />);
+    const chart = screen.getByTestId('funnel-chart');
+    expect(chart).toHaveAttribute('data-shrink-anchor', 'middle');
+    expect(chart).toHaveAttribute('data-shrink-fraction', '0.5');
   });
 
   it('forwards the component props to getFunnelChartProOptions', () => {

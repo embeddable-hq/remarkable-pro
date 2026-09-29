@@ -23,6 +23,8 @@ export type FunnelChartProProps = {
   showValueLabels?: boolean;
   showStageLabels?: boolean;
   displayPercentages?: boolean;
+  shrinkAnchor?: 'top' | 'middle' | 'bottom' | 'none';
+  shrinkFraction?: number;
 } & ChartCardHeaderProps;
 
 const FunnelChartPro = (props: FunnelChartProProps) => {
@@ -40,6 +42,8 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
     showTooltips,
     showValueLabels,
     displayPercentages,
+    shrinkAnchor,
+    shrinkFraction,
   } = props;
 
   const data = getFunnelChartProData(
@@ -77,6 +81,8 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
         showTooltips={showTooltips}
         showValueLabels={showValueLabels}
         showPercentage={displayPercentages}
+        shrinkAnchor={shrinkAnchor}
+        shrinkFraction={shrinkFraction}
       />
     </ChartCard>
   );
