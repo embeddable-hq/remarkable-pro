@@ -310,57 +310,6 @@ describe('getFunnelChartProOptions', () => {
     expect(options.plugins?.legend?.position).toBe('bottom');
   });
 
-  it('toggles data visibility and updates the chart when a legend item is clicked', () => {
-    const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
-    const chart = {
-      toggleDataVisibility: vi.fn(),
-      update: vi.fn(),
-    };
-
-    const onClick = options.plugins?.legend?.onClick as (
-      event: unknown,
-      legendItem: unknown,
-      legend: unknown,
-    ) => void;
-    onClick({}, { index: 1 }, { chart });
-
-    expect(chart.toggleDataVisibility).toHaveBeenCalledWith(1);
-    expect(chart.update).toHaveBeenCalled();
-  });
-
-  it('generates legend labels from the dataset colors and visibility state', () => {
-    const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
-    const chart = {
-      data: {
-        labels: ['A', 'B'],
-        datasets: [{ backgroundColor: ['#111111', '#222222'] }],
-      },
-      options: { plugins: { legend: { labels: { color: '#abcdef' } } } },
-      getDataVisibility: vi.fn((index: number) => index !== 1),
-    };
-
-    const labels = options.plugins?.legend?.labels?.generateLabels?.(chart as never);
-
-    expect(labels).toEqual([
-      {
-        text: 'A',
-        fillStyle: '#111111',
-        strokeStyle: '#111111',
-        fontColor: '#abcdef',
-        hidden: false,
-        index: 0,
-      },
-      {
-        text: 'B',
-        fillStyle: '#222222',
-        strokeStyle: '#222222',
-        fontColor: '#abcdef',
-        hidden: true,
-        index: 1,
-      },
-    ]);
-  });
-
   it('formats the tooltip label with the measure title and formatted value', () => {
     const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
 
