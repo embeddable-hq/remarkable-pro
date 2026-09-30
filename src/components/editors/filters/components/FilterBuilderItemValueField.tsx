@@ -135,6 +135,8 @@ const FilterBuilderItemValueField = ({
         isLoading={isLoading}
         values={filterValue}
         options={options}
+        searchPlaceholder={i18n.t('common.search')}
+        submitLabel={i18n.t('common.apply')}
         onChange={(newValue) => onSelectValue(newValue.length === 0 ? null : newValue)}
         onSearch={onSearchValue}
         avoidCollisions={false}
@@ -165,6 +167,7 @@ const FilterBuilderItemValueField = ({
         isLoading={isLoading}
         value={filter.value as string}
         options={options}
+        searchPlaceholder={i18n.t('common.search')}
         onChange={onSelectValue}
         onSearch={onSearchValue}
         avoidCollisions={false}

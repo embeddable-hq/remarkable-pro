@@ -351,6 +351,16 @@ const clearable = {
   category: 'Component Settings',
 } as const;
 
+const autoApply = {
+  ...boolean,
+  name: 'autoApply',
+  label: 'Auto apply',
+  category: 'Component Settings',
+  defaultValue: false,
+  description:
+    'When enabled, the apply button is hidden and ticking a value applies the selection immediately.',
+} as const;
+
 const displayNullAs = {
   ...string,
   name: 'displayNullAs',
@@ -484,6 +494,21 @@ const limitTopYAxis = {
   category: 'Component Settings',
 } as const;
 
+const sortDirectionTopGroupBy = {
+  ...sortDirection,
+  name: 'sortDirectionTopGroupBy',
+  label: 'Sort by group total',
+} as const;
+
+const limitTopGroupBy = {
+  name: 'limitTopGroupBy',
+  type: 'number',
+  label: 'Limit top group by',
+  description:
+    'Show only the top or bottom groups, based on group totals, and combine the rest into an "Other" group. Only applies to sum/count measures. Minimum useful value is 2 (1 kept group + Other) — a value of 1 has no effect.',
+  category: 'Component Settings',
+} as const;
+
 const markdown = {
   name: 'markdown',
   type: MarkdownType,
@@ -574,6 +599,7 @@ export const inputs = {
   color,
   fontSize,
   clearable,
+  autoApply,
   displayNullAs,
   xAxisLabel,
   yAxisLabel,
@@ -592,6 +618,8 @@ export const inputs = {
   shrinkFraction,
   limitTopXAxis,
   limitTopYAxis,
+  sortDirectionTopGroupBy,
+  limitTopGroupBy,
   granularity,
   granularities,
   markdown,

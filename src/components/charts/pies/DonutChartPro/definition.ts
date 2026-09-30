@@ -5,6 +5,8 @@ import Component from './index';
 import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { subInputs } from '../../../component.subinputs.constants';
+import { ThemeClientContext } from '../../../../theme/theme.types';
+import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
 
 const meta = {
   name: 'DonutChartPro',
@@ -58,13 +60,19 @@ const previewConfig = {
 
 const preview = definePreview(Component, previewConfig);
 
-const loadDataResultsArgs = (inputs: Inputs<typeof meta>): LoadDataRequest => ({
+const loadDataResultsArgs = (
+  inputs: Inputs<typeof meta>,
+  clientContext?: ThemeClientContext,
+): LoadDataRequest => ({
   from: inputs.dataset,
   select: [inputs.measure, inputs.dimension],
+  timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
-const loadDataResults = (inputs: Inputs<typeof meta>): DataResponse =>
-  loadData(loadDataResultsArgs(inputs));
+const loadDataResults = (
+  inputs: Inputs<typeof meta>,
+  clientContext?: ThemeClientContext,
+): DataResponse => loadData(loadDataResultsArgs(inputs, clientContext));
 
 const events = {
   onSegmentClick: (value: PieChartClickArg) => ({
@@ -73,9 +81,13 @@ const events = {
   }),
 };
 
-const props = (inputs: Inputs<typeof meta>) => ({
+const props = (
+  inputs: Inputs<typeof meta>,
+  _state: unknown,
+  clientContext?: ThemeClientContext,
+) => ({
   ...inputs,
-  results: loadDataResults(inputs),
+  results: loadDataResults(inputs, clientContext),
   componentName: meta.name,
 });
 

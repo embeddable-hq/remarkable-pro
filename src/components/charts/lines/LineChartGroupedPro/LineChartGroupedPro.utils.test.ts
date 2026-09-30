@@ -1,13 +1,25 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Dimension, Measure } from '@embeddable.com/core';
-import { getLineChartGroupedProOptions } from './LineChartGroupedPro.utils';
+import {
+  getLineChartGroupedProData,
+  getLineChartGroupedProOptions,
+} from './LineChartGroupedPro.utils';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
-import { getDimensionWithoutTruncation } from '../../charts.utils';
+import { getDimensionWithoutTruncation, groupTailAsOtherPerGroup } from '../../charts.utils';
+import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
+import { setColorAlpha } from '../../../../utils/color.utils';
+import { i18n } from '../../../../theme/i18n/i18n';
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
 vi.mock('@embeddable.com/remarkable-ui', () => ({ getChartColors: vi.fn() }));
 vi.mock('../../charts.utils', () => ({
   getDimensionWithoutTruncation: vi.fn((d) => d),
+  groupTailAsOtherPerGroup: vi.fn((data) => data ?? []),
 }));
+vi.mock('../../../../theme/styles/styles.utils', () => ({
+  getDimensionMeasureColor: vi.fn(() => '#000'),
+}));
+vi.mock('../../../../utils/color.utils', () => ({ setColorAlpha: vi.fn((color) => color) }));
+vi.mock('../../../../theme/i18n/i18n', () => ({ i18n: { t: vi.fn(() => 'Other') } }));
 
 // -- helpers -----------------------------------------------------------------
 
@@ -43,6 +55,94 @@ const makeChartData = (
 ) => ({ labels, datasets });
 
 // ----------------------------------------------------------------------------
+
+describe('getLineChartGroupedProData', () => {
+  let mockFormatter: ReturnType<typeof makeMockFormatter>;
+  let dimension: Dimension;
+  let groupDimension: Dimension;
+  let measure: Measure;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockFormatter = makeMockFormatter();
+    vi.mocked(getThemeFormatter).mockReturnValue(mockFormatter as never);
+    vi.mocked(getDimensionMeasureColor).mockReturnValue('#000');
+    vi.mocked(setColorAlpha).mockImplementation((color) => color);
+    vi.mocked(i18n.t).mockReturnValue('Other');
+    vi.mocked(groupTailAsOtherPerGroup).mockImplementation((data) => data ?? []);
+
+    dimension = makeDimension({ name: 'date' });
+    groupDimension = makeDimension({ name: 'group' });
+    measure = makeMeasure({ name: 'revenue' });
+  });
+
+  it('passes dimension, groupDimension, measure and maxItems through to groupTailAsOtherPerGroup', () => {
+    const data = [{ date: 'A', group: 'g1', revenue: 1 }];
+
+    getLineChartGroupedProData(
+      { data, dimension, groupDimension, measure, hasMinMaxYAxisRange: false, maxItems: 5 },
+      makeTheme(),
+    );
+
+    expect(groupTailAsOtherPerGroup).toHaveBeenCalledWith(
+      data,
+      dimension,
+      groupDimension,
+      measure,
+      5,
+    );
+  });
+
+  it('sorts axis labels alphabetically', () => {
+    const data = [
+      { date: 'C', group: 'g1', revenue: 3 },
+      { date: 'A', group: 'g1', revenue: 1 },
+      { date: 'B', group: 'g1', revenue: 2 },
+    ];
+
+    const result = getLineChartGroupedProData(
+      { data, dimension, groupDimension, measure, hasMinMaxYAxisRange: false },
+      makeTheme(),
+    );
+
+    expect(result.labels).toEqual(['A', 'B', 'C']);
+  });
+
+  it('pins the "Other" axis label to the end instead of sorting it alphabetically', () => {
+    const data = [
+      { date: 'Other', group: 'g1', revenue: 99 },
+      { date: 'B', group: 'g1', revenue: 2 },
+      { date: 'A', group: 'g1', revenue: 1 },
+    ];
+
+    const result = getLineChartGroupedProData(
+      { data, dimension, groupDimension, measure, hasMinMaxYAxisRange: false },
+      makeTheme(),
+    );
+
+    expect(result.labels).toEqual(['A', 'B', 'Other']);
+  });
+
+  it('gives every group its own point for the "Other" axis bucket', () => {
+    const data = [
+      { date: 'Other', group: 'g1', revenue: 5 },
+      { date: 'Other', group: 'g2', revenue: 50 },
+      { date: 'A', group: 'g1', revenue: 1 },
+      { date: 'A', group: 'g2', revenue: 10 },
+    ];
+
+    const result = getLineChartGroupedProData(
+      { data, dimension, groupDimension, measure, hasMinMaxYAxisRange: false },
+      makeTheme(),
+    );
+
+    expect(result.labels).toEqual(['A', 'Other']);
+    const g1Dataset = result.datasets.find((d) => (d as { rawLabel?: string }).rawLabel === 'g1');
+    const g2Dataset = result.datasets.find((d) => (d as { rawLabel?: string }).rawLabel === 'g2');
+    expect(g1Dataset?.data).toEqual([1, 5]);
+    expect(g2Dataset?.data).toEqual([10, 50]);
+  });
+});
 
 describe('getLineChartGroupedProOptions', () => {
   let mockFormatter: ReturnType<typeof makeMockFormatter>;

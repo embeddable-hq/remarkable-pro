@@ -31,6 +31,7 @@ const meta = {
       },
     },
     { ...inputs.clearable, defaultValue: false },
+    inputs.autoApply,
     inputs.trackingId,
   ],
   events: [

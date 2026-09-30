@@ -1,5 +1,29 @@
 # @embeddable/remarkable-ui
 
+## 0.10.0
+
+### Minor Changes
+
+- 59d4f14: Add an "Auto apply" input (default off) to the Multi Select Field, Measure Multi Select Field and Dimension and Measure Multi Select Field. When enabled, the apply button is hidden and ticking a value applies the selection immediately through the existing onChange event and variable.
+
+## 0.9.2
+
+### Patch Changes
+
+- dd98d8a: Review and update component with no timezone usage
+
+## 0.9.1
+
+### Patch Changes
+
+- 5e77cf6: Translate the dropdown search placeholder and Apply button. Adds common.search and common.apply theme i18n keys (en/de) and wires them into every searchable select and multi-select, which previously always showed the English "Search…" and "Apply" defaults.
+
+## 0.9.0
+
+### Minor Changes
+
+- bd537dc: Add "Limit top group by" bucketing (server-ranked, with an "Other" bucket) to BarChartGroupedPro, BarChartGroupedHorizontalPro, BarChartStackedPro, BarChartStackedHorizontalPro, and LineChartGroupedPro. Ranks the groupBy dimension by total measure contribution and folds everything past the limit into a single "Other" series, independent of any x/y-axis limiting. Limited to sum/count measures.
+
 ## 0.8.0
 
 ### Minor Changes

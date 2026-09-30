@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { SingleSelectField } from '@embeddable.com/remarkable-ui';
 import { getDimensionAndMeasureOptions } from '../../utils/dimensionsAndMeasures.utils';
 import { Dimension, Measure } from '@embeddable.com/core';
+import { i18n } from '../../../../theme/i18n/i18n';
 
 export type DimensionAndMeasureSingleSelectFieldProps<T> = {
   selectedValue?: T;
@@ -45,6 +46,7 @@ export const DimensionAndMeasureSingleSelectField = <T extends Dimension | Measu
       searchable
       clearable={clearable}
       placeholder={placeholder}
+      searchPlaceholder={i18n.t('common.search')}
       value={selectedValue?.name}
       onChange={handleChange}
       onSearch={setSearchValue}

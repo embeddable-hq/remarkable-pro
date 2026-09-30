@@ -370,6 +370,7 @@ const FilterBuilderWithGroupingPro = (props: FilterBuilderWithGroupingProProps) 
               </button>
             }
             searchable
+            searchPlaceholder={i18n.t('common.search')}
             onChange={(value) => handleAddFilter(value)}
             onSearch={setSearchNew}
             options={dimensionOptionsNew}

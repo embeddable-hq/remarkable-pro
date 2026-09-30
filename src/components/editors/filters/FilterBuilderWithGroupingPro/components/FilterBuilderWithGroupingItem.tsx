@@ -89,6 +89,7 @@ const FilterBuilderWithGroupingItem = ({
       <SingleSelectField
         triggerComponent={memberTrigger}
         searchable
+        searchPlaceholder={i18n.t('common.search')}
         value={dimensionOrMeasure?.name}
         onChange={onSelectDimensionOrMeasure}
         onSearch={setSearch}
@@ -144,6 +145,7 @@ const FilterBuilderWithGroupingItem = ({
                       </button>
                     }
                     searchable
+                    searchPlaceholder={i18n.t('common.search')}
                     onChange={(value) => onCreateGroup?.(value)}
                     onSearch={setSearch}
                     options={createGroupOptions}

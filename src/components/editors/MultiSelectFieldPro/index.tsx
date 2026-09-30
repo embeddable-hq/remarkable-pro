@@ -19,6 +19,7 @@ export type MultiSelectFieldProProps = {
   selectedValues?: string[];
   maxOptions?: number;
   showSelectAll?: boolean;
+  autoApply?: boolean;
   clearable?: boolean;
   componentName?: string;
   trackingId?: string;
@@ -38,6 +39,7 @@ const MultiSelectFieldPro = (props: MultiSelectFieldProProps) => {
     selectedValues,
     maxOptions,
     showSelectAll,
+    autoApply,
     clearable,
     componentName,
     trackingId,
@@ -84,8 +86,11 @@ const MultiSelectFieldPro = (props: MultiSelectFieldProProps) => {
         values={selectedValues ?? []}
         options={options}
         placeholder={placeholder}
+        searchPlaceholder={i18n.t('common.search')}
+        submitLabel={i18n.t('common.apply')}
         noOptionsMessage={showNoOptionsMessage ? i18n.t('common.noOptionsFound') : undefined}
         showSelectAll={displaySelectAll}
+        autoApply={autoApply}
         selectAllLabel={i18n.t('common.selectAll')}
         deselectAllLabel={i18n.t('common.deselectAll')}
         onChange={(newValues) => {

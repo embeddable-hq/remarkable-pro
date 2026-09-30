@@ -184,6 +184,29 @@ describe('MultiSelectFieldPro', () => {
     expect(onChange).toHaveBeenCalledWith(['US']);
   });
 
+  it('passes autoApply through to MultiSelectField', () => {
+    const { getByTestId } = render(
+      <MultiSelectFieldPro
+        dimension={country}
+        results={resultsWith([{ country: 'US' }])}
+        autoApply
+        onChange={vi.fn()}
+      />,
+    );
+    expect(getByTestId('multi-select')).toHaveAttribute('data-auto-apply', 'true');
+  });
+
+  it('defaults autoApply to false when not provided', () => {
+    const { getByTestId } = render(
+      <MultiSelectFieldPro
+        dimension={country}
+        results={resultsWith([{ country: 'US' }])}
+        onChange={vi.fn()}
+      />,
+    );
+    expect(getByTestId('multi-select')).toHaveAttribute('data-auto-apply', 'false');
+  });
+
   it('wires setSearchValue to the MultiSelectField search input', () => {
     const setSearchValue = vi.fn();
     const { getByTestId } = render(
