@@ -5,7 +5,7 @@ import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { ThemeClientContext } from '../../../../theme/theme.types';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
-import ShrinkAnchorType, { ShrinkAnchorTypeOptions } from '../../../types/ShrinkAnchor.type.emb';
+import PositionType, { PositionTypeOptions } from '../../../types/Position.type.emb';
 
 const meta = {
   name: 'FunnelChartPro',
@@ -68,11 +68,11 @@ const meta = {
     },
     {
       name: 'shrinkAnchor',
-      type: ShrinkAnchorType,
+      type: PositionType,
       label: 'Shrink anchor',
       description:
         'Where each stage tapers from. "Middle" keeps area roughly proportional when stages are sorted by value. If stages use a custom sort order (e.g. by severity), any anchor except "None" can still make a stage look bigger or smaller than its true share — use "None" for exact proportionality, at the cost of the tapered funnel look.',
-      defaultValue: ShrinkAnchorTypeOptions.middle,
+      defaultValue: PositionTypeOptions.middle,
       category: 'Component Settings',
     },
     {
