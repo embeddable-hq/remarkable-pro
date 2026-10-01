@@ -3,7 +3,7 @@ import { FunnelChart } from '@embeddable.com/remarkable-ui';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { mergician } from 'mergician';
 import { Theme } from '../../../../theme/theme.types';
-import { getFunnelChartProData, getFunnelChartProOptions } from '../funnel.utils';
+import { getFunnelChartProData, getFunnelChartProOptions } from './FunnelChartPro.utils';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
 import { PositionValue } from '../../../types/Position.type.emb';
 import {

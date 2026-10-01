@@ -1,15 +1,15 @@
 import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import type { Context } from 'chartjs-plugin-datalabels';
-import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
+import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import {
   getDefaultFunnelPalette,
   getFunnelChartProData,
   getFunnelChartProOptions,
   getFunnelOptionsDatalabelsFormatter,
-} from './funnel.utils';
+} from './FunnelChartPro.utils';
 
-vi.mock('../../../utils/color.utils', () => ({
+vi.mock('../../../../utils/color.utils', () => ({
   getColorGradient: vi.fn((start: string, end: string, steps: number) =>
     Array.from({ length: steps }, (_, i) => `${start}->${end}@${i}`),
   ),
@@ -20,7 +20,7 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
   getChartColors: vi.fn(() => ['#336699', '#112233', '#445566', '#778899', '#99aabb']),
 }));
 
-vi.mock('../../../theme/formatter/formatter.utils', () => ({
+vi.mock('../../../../theme/formatter/formatter.utils', () => ({
   // By default: returns the value unchanged, so value === formattedValue (i18n fallback path)
   getThemeFormatter: vi.fn(() => ({
     data: vi.fn((_dim: unknown, value: unknown) => value),
@@ -28,11 +28,11 @@ vi.mock('../../../theme/formatter/formatter.utils', () => ({
   })),
 }));
 
-vi.mock('../../../theme/i18n/i18n', () => ({
+vi.mock('../../../../theme/i18n/i18n', () => ({
   i18n: { t: vi.fn((key: string) => `t(${key})`) },
 }));
 
-vi.mock('../charts.utils', () => ({
+vi.mock('../../charts.utils', () => ({
   getDimensionWithoutTruncation: vi.fn((dimension: unknown) => dimension),
 }));
 

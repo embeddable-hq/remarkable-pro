@@ -67,7 +67,7 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
 
 const getFunnelChartProOptions = vi.fn((..._args: unknown[]) => ({}));
 
-vi.mock('../funnel.utils', () => ({
+vi.mock('./FunnelChartPro.utils', () => ({
   getFunnelChartProData: vi.fn(() => ({ labels: [], datasets: [{ data: [] }] })),
   getFunnelChartProOptions: (...args: unknown[]) => getFunnelChartProOptions(...args),
 }));

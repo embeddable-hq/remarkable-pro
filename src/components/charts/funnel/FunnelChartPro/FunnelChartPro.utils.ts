@@ -5,13 +5,13 @@ import { ChartData, ChartOptions } from 'chart.js';
 // Type-only: pulls in chartjs-chart-funnel's module augmentation so 'funnel' is a valid Chart.js chart type.
 import type {} from 'chartjs-chart-funnel';
 import type { Context } from 'chartjs-plugin-datalabels';
-import type { FunnelChartProProps } from './FunnelChartPro';
-import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { i18n } from '../../../theme/i18n/i18n';
-import { remarkableTheme } from '../../../theme/theme.constants';
-import { Theme } from '../../../theme/theme.types';
-import { brightenColor, getColorGradient } from '../../../utils/color.utils';
-import { getDimensionWithoutTruncation } from '../charts.utils';
+import type { FunnelChartProProps } from './index';
+import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
+import { i18n } from '../../../../theme/i18n/i18n';
+import { remarkableTheme } from '../../../../theme/theme.constants';
+import { Theme } from '../../../../theme/theme.types';
+import { brightenColor, getColorGradient } from '../../../../utils/color.utils';
+import { getDimensionWithoutTruncation } from '../../charts.utils';
 
 export type FunnelPalette = { start: string; end: string };
 
