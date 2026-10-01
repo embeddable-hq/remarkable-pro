@@ -12,7 +12,7 @@ import {
 } from '../../shared/ChartCard/ChartCard';
 
 export type FunnelChartProProps = {
-  stageDimension: Dimension;
+  sectionDimension: Dimension;
   countMeasure: Measure;
   orderDimension?: Dimension;
   startColor?: string;
@@ -21,7 +21,7 @@ export type FunnelChartProProps = {
   showLegend?: boolean;
   showTooltips?: boolean;
   showValueLabels?: boolean;
-  showStageLabels?: boolean;
+  showSectionLabels?: boolean;
   displayPercentages?: boolean;
   shrinkAnchor?: 'top' | 'middle' | 'bottom' | 'none';
   shrinkFraction?: number;
@@ -32,7 +32,7 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
   i18nSetup(theme);
 
   const {
-    stageDimension,
+    sectionDimension,
     countMeasure,
     orderDimension,
     startColor,
@@ -49,7 +49,7 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
   const data = getFunnelChartProData(
     {
       data: results.data,
-      stageDimension,
+      sectionDimension,
       countMeasure,
       orderDimension,
       startColor,
@@ -67,7 +67,7 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
     <ChartCard
       data={results}
       dimensionsAndMeasures={[
-        stageDimension,
+        sectionDimension,
         countMeasure,
         ...(orderDimension ? [orderDimension] : []),
       ]}

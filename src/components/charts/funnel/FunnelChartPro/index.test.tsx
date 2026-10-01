@@ -73,12 +73,12 @@ vi.mock('../funnel.utils', () => ({
 }));
 
 const emptyResults: DataResponse = { data: [], isLoading: false } as unknown as DataResponse;
-const stageDimension = { name: 'severity', inputs: {} } as unknown as Dimension;
+const sectionDimension = { name: 'severity', inputs: {} } as unknown as Dimension;
 const countMeasure = { name: 'count', inputs: {} } as unknown as Measure;
 const orderDimension = { name: 'severity_order', inputs: {} } as unknown as Dimension;
 
 const defaultProps: FunnelChartProProps = {
-  stageDimension,
+  sectionDimension,
   countMeasure,
   results: emptyResults,
 };
@@ -126,7 +126,7 @@ describe('FunnelChartPro', () => {
     render(
       <FunnelChartPro
         {...defaultProps}
-        showStageLabels={true}
+        showSectionLabels={true}
         showValueLabels={true}
         displayPercentages={true}
       />,
@@ -135,7 +135,7 @@ describe('FunnelChartPro', () => {
     expect(getFunnelChartProOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         countMeasure,
-        showStageLabels: true,
+        showSectionLabels: true,
         showValueLabels: true,
         displayPercentages: true,
       }),
