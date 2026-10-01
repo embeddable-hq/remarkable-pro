@@ -12,6 +12,32 @@ export const getDimensionWithoutTruncation = (dimension: Dimension): Dimension =
   inputs: { ...dimension.inputs, maxCharacters: null },
 });
 
+// Explicit stand-in for Array.prototype.sort()'s default comparator (converts
+// operands to strings and compares them lexicographically) — required by
+// typescript:S2871, which flags a bare .sort() call as relying on implicit
+// string coercion.
+const compareAsString = (a: unknown, b: unknown): number => {
+  const aStr = String(a);
+  const bStr = String(b);
+  if (aStr < bStr) return -1;
+  if (aStr > bStr) return 1;
+  return 0;
+};
+
+// Sorts values alphabetically but pins the "Other" bucket to the end. Used for
+// both axis labels and groupBy series order — series order otherwise follows
+// first appearance in the row stream, which useFillGaps re-sorts by date, so
+// the appended "Other" rows end up interleaved and "Other" lands mid-list in
+// tooltips and legends.
+export const sortWithOtherLast = <T>(values: T[]): T[] => {
+  const otherLabel = i18n.t('common.other');
+  const hasOther = values.some((value) => value === otherLabel);
+  return values
+    .filter((value) => value !== otherLabel)
+    .sort(compareAsString)
+    .concat(hasOther ? [otherLabel as T] : []);
+};
+
 const aggregateMeasureValues = (vals: number[], aggType: unknown): number => {
   switch (aggType) {
     case 'avg':
