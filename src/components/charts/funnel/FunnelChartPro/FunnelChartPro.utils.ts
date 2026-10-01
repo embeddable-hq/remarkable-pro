@@ -1,9 +1,8 @@
+/// <reference types="chartjs-chart-funnel" />
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { styles } from '@embeddable.com/remarkable-ui/styles';
 import { ChartData, ChartOptions } from 'chart.js';
-// Type-only: pulls in chartjs-chart-funnel's module augmentation so 'funnel' is a valid Chart.js chart type.
-import type {} from 'chartjs-chart-funnel';
 import type { Context } from 'chartjs-plugin-datalabels';
 import type { FunnelChartProProps } from './index';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
@@ -19,8 +18,7 @@ const PALETTE_BRIGHTEN_AMOUNT = 2.2;
 
 export const getDefaultFunnelPalette = (): FunnelPalette => {
   const chartColors = getChartColors();
-  const end =
-    chartColors[0] || chartColors[chartColors.length - 1] || styles['--em-sem-chart-color--1'];
+  const end = chartColors[0] || chartColors.at(-1) || styles['--em-sem-chart-color--1'];
   return { start: brightenColor(end, PALETTE_BRIGHTEN_AMOUNT), end };
 };
 
