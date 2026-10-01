@@ -5,6 +5,7 @@ import { mergician } from 'mergician';
 import { Theme } from '../../../../theme/theme.types';
 import { getFunnelChartProData, getFunnelChartProOptions } from '../funnel.utils';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
+import { PositionValue } from '../../../types/Position.type.emb';
 import {
   ChartCard,
   ChartCardHeaderProps,
@@ -23,7 +24,7 @@ export type FunnelChartProProps = {
   showValueLabels?: boolean;
   showSectionLabels?: boolean;
   displayPercentages?: boolean;
-  shrinkAnchor?: 'top' | 'middle' | 'bottom' | 'none';
+  shrinkAnchor?: PositionValue;
   shrinkFraction?: number;
 } & ChartCardHeaderProps;
 

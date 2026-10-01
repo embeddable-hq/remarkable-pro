@@ -7,7 +7,7 @@ export const PositionTypeOptions = {
   none: 'none',
 } as const;
 
-type PositionValue = (typeof PositionTypeOptions)[keyof typeof PositionTypeOptions];
+export type PositionValue = (typeof PositionTypeOptions)[keyof typeof PositionTypeOptions];
 
 const positionLabelMap: Record<PositionValue, string> = {
   [PositionTypeOptions.top]: 'Top',
