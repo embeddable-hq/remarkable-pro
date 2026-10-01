@@ -3,8 +3,9 @@ import { FunnelChart } from '@embeddable.com/remarkable-ui';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { mergician } from 'mergician';
 import { Theme } from '../../../../theme/theme.types';
-import { getFunnelChartProData, getFunnelChartProOptions } from '../funnel.utils';
+import { getFunnelChartProData, getFunnelChartProOptions } from './FunnelChartPro.utils';
 import { i18nSetup } from '../../../../theme/i18n/i18n';
+import { PositionValue } from '../../../types/Position.type.emb';
 import {
   ChartCard,
   ChartCardHeaderProps,
@@ -12,7 +13,7 @@ import {
 } from '../../shared/ChartCard/ChartCard';
 
 export type FunnelChartProProps = {
-  stageDimension: Dimension;
+  sectionDimension: Dimension;
   countMeasure: Measure;
   orderDimension?: Dimension;
   startColor?: string;
@@ -21,8 +22,10 @@ export type FunnelChartProProps = {
   showLegend?: boolean;
   showTooltips?: boolean;
   showValueLabels?: boolean;
-  showStageLabels?: boolean;
+  showSectionLabels?: boolean;
   displayPercentages?: boolean;
+  shrinkAnchor?: PositionValue;
+  shrinkFraction?: number;
 } & ChartCardHeaderProps;
 
 const FunnelChartPro = (props: FunnelChartProProps) => {
@@ -30,7 +33,7 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
   i18nSetup(theme);
 
   const {
-    stageDimension,
+    sectionDimension,
     countMeasure,
     orderDimension,
     startColor,
@@ -40,12 +43,14 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
     showTooltips,
     showValueLabels,
     displayPercentages,
+    shrinkAnchor,
+    shrinkFraction,
   } = props;
 
   const data = getFunnelChartProData(
     {
       data: results.data,
-      stageDimension,
+      sectionDimension,
       countMeasure,
       orderDimension,
       startColor,
@@ -63,7 +68,7 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
     <ChartCard
       data={results}
       dimensionsAndMeasures={[
-        stageDimension,
+        sectionDimension,
         countMeasure,
         ...(orderDimension ? [orderDimension] : []),
       ]}
@@ -77,6 +82,8 @@ const FunnelChartPro = (props: FunnelChartProProps) => {
         showTooltips={showTooltips}
         showValueLabels={showValueLabels}
         showPercentage={displayPercentages}
+        shrinkAnchor={shrinkAnchor}
+        shrinkFraction={shrinkFraction}
       />
     </ChartCard>
   );

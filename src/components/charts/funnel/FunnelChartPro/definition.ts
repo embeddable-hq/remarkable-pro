@@ -5,11 +5,12 @@ import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { ThemeClientContext } from '../../../../theme/theme.types';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
+import PositionType, { PositionTypeOptions } from '../../../types/Position.type.emb';
 
 const meta = {
   name: 'FunnelChartPro',
   label: 'Funnel Chart',
-  description: 'Funnel chart for a count over an ordered set of stages, e.g. a severity pyramid.',
+  description: 'Funnel chart for a count over an ordered set of sections, e.g. a severity pyramid.',
   category: 'Charts',
   defaultHeight: 442,
   defaultWidth: 630,
@@ -17,15 +18,15 @@ const meta = {
     inputs.dataset,
     {
       ...inputs.dimension,
-      name: 'stageDimension',
-      label: 'Stage',
-      description: 'The column that identifies each funnel stage, e.g. severity_level',
+      name: 'sectionDimension',
+      label: 'Section',
+      description: 'The column that identifies each funnel section, e.g. severity_level',
     },
     {
       ...inputs.measure,
       name: 'countMeasure',
       label: 'Count',
-      description: 'The measure that counts events at each stage',
+      description: 'The measure that counts events in each section',
     },
     {
       ...inputs.dimension,
@@ -33,20 +34,20 @@ const meta = {
       label: 'Order (optional)',
       required: false,
       description:
-        'Optional numeric dimension that defines stage order (ascending). When set, overrides the default descending-by-count order, e.g. severity_order INTEGER.',
+        'Optional numeric dimension that defines section order (ascending). When set, overrides the default descending-by-count order, e.g. severity_order INTEGER.',
     },
     {
       ...inputs.color,
       name: 'startColor',
-      label: 'Start color (lowest stage)',
-      description: 'Color for the lowest stage. Leave blank to auto-generate from the end color.',
+      label: 'Start color (lowest section)',
+      description: 'Color for the lowest section. Leave blank to auto-generate from the end color.',
     },
     {
       ...inputs.color,
       name: 'endColor',
-      label: 'End color (highest stage)',
+      label: 'End color (highest section)',
       description:
-        'Color for the highest stage. Leave blank to auto-generate from the start color.',
+        'Color for the highest section. Leave blank to auto-generate from the start color.',
     },
     inputs.title,
     inputs.description,
@@ -56,21 +57,38 @@ const meta = {
     inputs.showValueLabels,
     {
       ...inputs.boolean,
-      name: 'showStageLabels',
-      label: 'Show stage names on slices',
+      name: 'showSectionLabels',
+      label: 'Show section names',
       defaultValue: false,
       category: 'Component Settings',
     },
     {
       ...inputs.displayPercentages,
-      description: 'Show percentage of total instead of the raw count on each stage.',
+      description: 'Show percentage of total instead of the raw count on each section.',
+    },
+    {
+      name: 'shrinkAnchor',
+      type: PositionType,
+      label: 'Taper from',
+      description:
+        'Where each section tapers from. "Middle" keeps area roughly proportional when sections are sorted by value. If sections use a custom sort order (e.g. by severity), any option except "None" can still make a section look bigger or smaller than its true share — use "None" for exact proportionality, at the cost of the tapered funnel look.',
+      defaultValue: PositionTypeOptions.middle,
+      category: 'Component Settings',
+    },
+    {
+      name: 'shrinkFraction',
+      type: 'number',
+      label: 'Taper amount',
+      description: 'How much each section tapers, from 0 (no taper) to 1 (full taper).',
+      defaultValue: 1,
+      category: 'Component Settings',
     },
     inputs.menuOptions,
   ],
 } as const satisfies EmbeddedComponentMeta;
 
 const previewConfig = {
-  stageDimension: previewData.dimension,
+  sectionDimension: previewData.dimension,
   countMeasure: previewData.measure,
   displayPercentages: false,
   showLegend: true,
@@ -86,7 +104,7 @@ const loadDataResultsArgs = (
 ): LoadDataRequest => ({
   from: inputs.dataset,
   select: [
-    inputs.stageDimension,
+    inputs.sectionDimension,
     inputs.countMeasure,
     ...(inputs.orderDimension ? [inputs.orderDimension] : []),
   ],

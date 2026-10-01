@@ -44,16 +44,22 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
   FunnelChart: ({
     showPercentage,
     showValueLabels,
+    shrinkAnchor,
+    shrinkFraction,
     options,
   }: {
     showPercentage?: boolean;
     showValueLabels?: boolean;
+    shrinkAnchor?: string;
+    shrinkFraction?: number;
     options?: { plugins?: { legend?: { position?: string } } };
   }) => (
     <div
       data-testid="funnel-chart"
       data-show-percentage={String(Boolean(showPercentage))}
       data-show-value-labels={String(Boolean(showValueLabels))}
+      data-shrink-anchor={shrinkAnchor}
+      data-shrink-fraction={shrinkFraction}
       data-legend-position={options?.plugins?.legend?.position}
     />
   ),
@@ -61,18 +67,18 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
 
 const getFunnelChartProOptions = vi.fn((..._args: unknown[]) => ({}));
 
-vi.mock('../funnel.utils', () => ({
+vi.mock('./FunnelChartPro.utils', () => ({
   getFunnelChartProData: vi.fn(() => ({ labels: [], datasets: [{ data: [] }] })),
   getFunnelChartProOptions: (...args: unknown[]) => getFunnelChartProOptions(...args),
 }));
 
 const emptyResults: DataResponse = { data: [], isLoading: false } as unknown as DataResponse;
-const stageDimension = { name: 'severity', inputs: {} } as unknown as Dimension;
+const sectionDimension = { name: 'severity', inputs: {} } as unknown as Dimension;
 const countMeasure = { name: 'count', inputs: {} } as unknown as Measure;
 const orderDimension = { name: 'severity_order', inputs: {} } as unknown as Dimension;
 
 const defaultProps: FunnelChartProProps = {
-  stageDimension,
+  sectionDimension,
   countMeasure,
   results: emptyResults,
 };
@@ -109,11 +115,18 @@ describe('FunnelChartPro', () => {
     expect(screen.getByTestId('funnel-chart')).toHaveAttribute('data-show-value-labels', 'true');
   });
 
+  it('passes shrinkAnchor and shrinkFraction through to FunnelChart', () => {
+    render(<FunnelChartPro {...defaultProps} shrinkAnchor="middle" shrinkFraction={0.5} />);
+    const chart = screen.getByTestId('funnel-chart');
+    expect(chart).toHaveAttribute('data-shrink-anchor', 'middle');
+    expect(chart).toHaveAttribute('data-shrink-fraction', '0.5');
+  });
+
   it('forwards the component props to getFunnelChartProOptions', () => {
     render(
       <FunnelChartPro
         {...defaultProps}
-        showStageLabels={true}
+        showSectionLabels={true}
         showValueLabels={true}
         displayPercentages={true}
       />,
@@ -122,7 +135,7 @@ describe('FunnelChartPro', () => {
     expect(getFunnelChartProOptions).toHaveBeenCalledWith(
       expect.objectContaining({
         countMeasure,
-        showStageLabels: true,
+        showSectionLabels: true,
         showValueLabels: true,
         displayPercentages: true,
       }),

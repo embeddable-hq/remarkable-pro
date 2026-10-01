@@ -1,17 +1,16 @@
+/// <reference types="chartjs-chart-funnel" />
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
 import { styles } from '@embeddable.com/remarkable-ui/styles';
 import { ChartData, ChartOptions } from 'chart.js';
-// Type-only: pulls in chartjs-chart-funnel's module augmentation so 'funnel' is a valid Chart.js chart type.
-import type {} from 'chartjs-chart-funnel';
 import type { Context } from 'chartjs-plugin-datalabels';
-import type { FunnelChartProProps } from './FunnelChartPro';
-import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { i18n } from '../../../theme/i18n/i18n';
-import { remarkableTheme } from '../../../theme/theme.constants';
-import { Theme } from '../../../theme/theme.types';
-import { brightenColor, getColorGradient } from '../../../utils/color.utils';
-import { getDimensionWithoutTruncation } from '../charts.utils';
+import type { FunnelChartProProps } from './index';
+import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
+import { i18n } from '../../../../theme/i18n/i18n';
+import { remarkableTheme } from '../../../../theme/theme.constants';
+import { Theme } from '../../../../theme/theme.types';
+import { brightenColor, getColorGradient } from '../../../../utils/color.utils';
+import { getDimensionWithoutTruncation } from '../../charts.utils';
 
 export type FunnelPalette = { start: string; end: string };
 
@@ -19,8 +18,7 @@ const PALETTE_BRIGHTEN_AMOUNT = 2.2;
 
 export const getDefaultFunnelPalette = (): FunnelPalette => {
   const chartColors = getChartColors();
-  const end =
-    chartColors[0] || chartColors[chartColors.length - 1] || styles['--em-sem-chart-color--1'];
+  const end = chartColors[0] || chartColors.at(-1) || styles['--em-sem-chart-color--1'];
   return { start: brightenColor(end, PALETTE_BRIGHTEN_AMOUNT), end };
 };
 
@@ -32,49 +30,49 @@ const resolveFunnelPalette = (startColor?: string, endColor?: string): FunnelPal
   return getDefaultFunnelPalette();
 };
 
-const getStageColorOverride = (
-  stageDimension: Dimension,
+const getSectionColorOverride = (
+  sectionDimension: Dimension,
   theme: Theme,
-  stageName: string,
+  sectionName: string,
 ): string | undefined => {
-  const value = `${stageDimension.name}.${stageName}`;
+  const value = `${sectionDimension.name}.${sectionName}`;
   return (
-    stageDimension.inputs?.color ??
+    sectionDimension.inputs?.color ??
     theme.charts.backgroundColorMap?.dimensionValue?.[value] ??
     theme.charts.borderColorMap?.dimensionValue?.[value]
   );
 };
 
-type FunnelStage = { name: string; count: number };
+type FunnelSection = { name: string; count: number };
 
-const aggregateFunnelStages = (
+const aggregateFunnelSections = (
   data: DataResponse['data'],
-  stageDimension: Dimension,
+  sectionDimension: Dimension,
   countMeasure: Measure,
   orderDimension?: Dimension,
-): FunnelStage[] => {
-  const stageMap = new Map<string, number>();
+): FunnelSection[] => {
+  const sectionMap = new Map<string, number>();
   const orderMap = new Map<string, number>();
 
   for (const row of data ?? []) {
-    const stageName = String(row[stageDimension.name] ?? '');
-    if (!stageName) continue;
+    const sectionName = String(row[sectionDimension.name] ?? '');
+    if (!sectionName) continue;
     const count = Number(row[countMeasure.name] ?? 0);
-    stageMap.set(stageName, (stageMap.get(stageName) ?? 0) + count);
-    if (orderDimension && !orderMap.has(stageName)) {
+    sectionMap.set(sectionName, (sectionMap.get(sectionName) ?? 0) + count);
+    if (orderDimension && !orderMap.has(sectionName)) {
       const order = Number(row[orderDimension.name]);
-      orderMap.set(stageName, Number.isFinite(order) ? order : Infinity);
+      orderMap.set(sectionName, Number.isFinite(order) ? order : Infinity);
     }
   }
 
   const names =
     orderDimension && orderMap.size
-      ? [...stageMap.keys()].sort(
+      ? [...sectionMap.keys()].sort(
           (a, b) => (orderMap.get(a) ?? Infinity) - (orderMap.get(b) ?? Infinity),
         )
-      : [...stageMap.keys()].sort((a, b) => (stageMap.get(b) ?? 0) - (stageMap.get(a) ?? 0));
+      : [...sectionMap.keys()].sort((a, b) => (sectionMap.get(b) ?? 0) - (sectionMap.get(a) ?? 0));
 
-  return names.map((name) => ({ name, count: stageMap.get(name) ?? 0 }));
+  return names.map((name) => ({ name, count: sectionMap.get(name) ?? 0 }));
 };
 
 export const getFunnelOptionsDatalabelsFormatter =
@@ -102,28 +100,6 @@ export const getFunnelChartProOptions = (
     plugins: {
       legend: {
         position: theme.charts.legendPosition ?? 'bottom',
-        onClick: (_event, legendItem, legend) => {
-          legend.chart.toggleDataVisibility(legendItem.index!);
-          legend.chart.update();
-        },
-        labels: {
-          generateLabels: (chart) => {
-            const colors = (chart.data.datasets[0]?.backgroundColor ?? []) as string[];
-            const labelColor = chart.options.plugins?.legend?.labels?.color as string | undefined;
-            const labels = (chart.data.labels ?? []) as (string | number)[];
-            return labels.map((label, index) => {
-              const color = colors[index];
-              return {
-                text: String(label ?? ''),
-                fillStyle: color,
-                strokeStyle: color,
-                fontColor: labelColor,
-                hidden: !chart.getDataVisibility(index),
-                index,
-              };
-            });
-          },
-        },
       },
       tooltip: {
         callbacks: {
@@ -136,7 +112,7 @@ export const getFunnelChartProOptions = (
     },
   };
 
-  if (!options.showStageLabels) return base;
+  if (!options.showSectionLabels) return base;
 
   return {
     ...base,
@@ -153,7 +129,7 @@ export const getFunnelChartProOptions = (
 export const getFunnelChartProData = (
   props: {
     data: DataResponse['data'];
-    stageDimension: Dimension;
+    sectionDimension: Dimension;
     countMeasure: Measure;
     orderDimension?: Dimension;
     startColor?: string;
@@ -161,36 +137,38 @@ export const getFunnelChartProData = (
   },
   theme: Theme = remarkableTheme,
 ): ChartData<'funnel'> => {
-  const stages = aggregateFunnelStages(
+  const sections = aggregateFunnelSections(
     props.data,
-    props.stageDimension,
+    props.sectionDimension,
     props.countMeasure,
     props.orderDimension,
   );
 
-  if (!stages.length) {
+  if (!sections.length) {
     return { labels: [], datasets: [{ data: [] }] };
   }
 
   const palette = resolveFunnelPalette(props.startColor, props.endColor);
-  const gradientColors = getColorGradient(palette.start, palette.end, stages.length);
+  const gradientColors = getColorGradient(palette.start, palette.end, sections.length);
 
-  const backgroundColor = stages.map(
-    (stage, index) =>
-      getStageColorOverride(props.stageDimension, theme, stage.name) ?? gradientColors[index] ?? '',
+  const backgroundColor = sections.map(
+    (section, index) =>
+      getSectionColorOverride(props.sectionDimension, theme, section.name) ??
+      gradientColors[index] ??
+      '',
   );
 
   const themeFormatter = getThemeFormatter(theme);
-  const dimensionWithoutTruncation = getDimensionWithoutTruncation(props.stageDimension);
+  const dimensionWithoutTruncation = getDimensionWithoutTruncation(props.sectionDimension);
 
   return {
-    labels: stages.map((stage) => {
-      const formattedValue = themeFormatter.data(dimensionWithoutTruncation, stage.name);
-      return stage.name === formattedValue ? i18n.t(stage.name) : formattedValue;
+    labels: sections.map((section) => {
+      const formattedValue = themeFormatter.data(dimensionWithoutTruncation, section.name);
+      return section.name === formattedValue ? i18n.t(section.name) : formattedValue;
     }),
     datasets: [
       {
-        data: stages.map((stage) => stage.count),
+        data: sections.map((section) => section.count),
         backgroundColor,
       },
     ],
