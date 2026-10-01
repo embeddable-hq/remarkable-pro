@@ -15,6 +15,7 @@ import {
   loadDataResultsGroupOrder,
   getGroupOrderCacheKey,
   getCachedGroupOrder,
+  resolveGroupOrder,
   loadDataResultsGroupOtherArgs,
   loadDataResultsGroupOther,
 } from './charts.loadData.utils';
@@ -416,12 +417,12 @@ describe('getDimensionWithGranularity', () => {
 });
 
 describe('getGroupOrderLimit', () => {
-  it('reserves one slot for the Other row', () => {
-    expect(getGroupOrderLimit(5)).toBe(4);
+  it('fetches one more than the limit so overflow can be detected', () => {
+    expect(getGroupOrderLimit(5)).toBe(6);
   });
 
-  it('floors at 0 rather than going negative', () => {
-    expect(getGroupOrderLimit(1)).toBe(0);
+  it('returns undefined for a limit of 1, which leaves no room for a real group', () => {
+    expect(getGroupOrderLimit(1)).toBeUndefined();
   });
 
   it('returns undefined when limit is not set', () => {
@@ -431,6 +432,43 @@ describe('getGroupOrderLimit', () => {
   it('returns undefined for an invalid limit', () => {
     expect(getGroupOrderLimit(0)).toBeUndefined();
     expect(getGroupOrderLimit(-2)).toBeUndefined();
+  });
+});
+
+describe('resolveGroupOrder', () => {
+  it('keeps every group with no "Other" when there are fewer groups than the limit', () => {
+    expect(resolveGroupOrder(['a', 'b'], 5)).toEqual({
+      keptGroups: ['a', 'b'],
+      hasOtherGroup: false,
+    });
+  });
+
+  it('keeps every group with no "Other" when the group count exactly matches the limit', () => {
+    expect(resolveGroupOrder(['a', 'b', 'c'], 3)).toEqual({
+      keptGroups: ['a', 'b', 'c'],
+      hasOtherGroup: false,
+    });
+  });
+
+  it('keeps the top limit - 1 groups and needs "Other" when groups overflow the limit', () => {
+    expect(resolveGroupOrder(['a', 'b', 'c', 'd'], 3)).toEqual({
+      keptGroups: ['a', 'b'],
+      hasOtherGroup: true,
+    });
+  });
+
+  it('passes an uncached group order through as undefined', () => {
+    expect(resolveGroupOrder(undefined, 3)).toEqual({
+      keptGroups: undefined,
+      hasOtherGroup: false,
+    });
+  });
+
+  it('never needs "Other" when no limit is set', () => {
+    expect(resolveGroupOrder(['a', 'b', 'c'], undefined)).toEqual({
+      keptGroups: ['a', 'b', 'c'],
+      hasOtherGroup: false,
+    });
   });
 });
 
@@ -579,7 +617,7 @@ describe('loadDataResultsGroupOrder', () => {
     expect(mockLoadData).not.toHaveBeenCalled();
   });
 
-  it('calls loadData with limit - 1 when bucketable and limit is set', () => {
+  it('calls loadData with limit + 1 when bucketable and limit is set', () => {
     const fakeResponse = { data: [{ product: 'Widget' }], isLoading: false } as DataResponse;
     mockLoadData.mockReturnValue(fakeResponse);
 
@@ -592,7 +630,7 @@ describe('loadDataResultsGroupOrder', () => {
 
     expect(result).toBe(fakeResponse);
     const request = mockLoadData.mock.calls[0]?.[0];
-    expect(request?.limit).toBe(4);
+    expect(request?.limit).toBe(6);
   });
 });
 
@@ -650,6 +688,9 @@ describe('loadDataResultsGroupOtherArgs', () => {
 describe('loadDataResultsGroupOther', () => {
   beforeEach(() => mockLoadData.mockReset());
 
+  // More groups than limitTopGroupBy: 2, so an "Other" bucket is needed.
+  const OVERFLOWING_GROUP_ORDER = ['Widget', 'Gadget', 'Gizmo'];
+
   it('returns undefined when groupOrder is not yet cached', () => {
     const result = loadDataResultsGroupOther({
       dataset: makeDataset(),
@@ -674,7 +715,20 @@ describe('loadDataResultsGroupOther', () => {
     expect(mockLoadData).not.toHaveBeenCalled();
   });
 
-  it('calls loadData once groupOrder has values, even though the request has no groupBy filter', () => {
+  it('returns empty results without querying when every group fits within the limit', () => {
+    const result = loadDataResultsGroupOther({
+      dataset: makeDataset(),
+      axis: makeDimension('date'),
+      measure: makeMeasure(),
+      groupOrder: ['Widget', 'Gadget'],
+      limitTopGroupBy: 2,
+    });
+
+    expect(result).toEqual({ data: [], isLoading: false });
+    expect(mockLoadData).not.toHaveBeenCalled();
+  });
+
+  it('calls loadData when groupOrder overflows the limit, even though the request has no groupBy filter', () => {
     const fakeResponse = {
       data: [{ date: '2026-01-01', revenue: 42 }],
       isLoading: false,
@@ -685,7 +739,8 @@ describe('loadDataResultsGroupOther', () => {
       dataset: makeDataset(),
       axis: makeDimension('date'),
       measure: makeMeasure(),
-      groupOrder: ['Widget', 'Gadget'],
+      groupOrder: OVERFLOWING_GROUP_ORDER,
+      limitTopGroupBy: 2,
     });
 
     expect(result).toBe(fakeResponse);
@@ -702,7 +757,8 @@ describe('loadDataResultsGroupOther', () => {
       dataset: makeDataset(),
       axis,
       measure: makeMeasure(),
-      groupOrder: ['Widget'],
+      groupOrder: OVERFLOWING_GROUP_ORDER,
+      limitTopGroupBy: 2,
       axisOrder: ['2026-01-01'],
       maxResults: 250,
     });
@@ -723,7 +779,8 @@ describe('loadDataResultsGroupOther', () => {
       dataset: makeDataset(),
       axis: makeDimension('date'),
       measure: makeMeasure(),
-      groupOrder: ['Widget', 'Gadget'],
+      groupOrder: OVERFLOWING_GROUP_ORDER,
+      limitTopGroupBy: 2,
       sortDirection: 'desc',
       limitTopAxis: 5,
       axisOrder: undefined,
@@ -738,7 +795,8 @@ describe('loadDataResultsGroupOther', () => {
       dataset: makeDataset(),
       axis: makeDimension('date'),
       measure: makeMeasure(),
-      groupOrder: ['Widget'],
+      groupOrder: OVERFLOWING_GROUP_ORDER,
+      limitTopGroupBy: 2,
       sortDirection: 'desc',
       limitTopAxis: 5,
       axisOrder: [],
@@ -757,7 +815,8 @@ describe('loadDataResultsGroupOther', () => {
       dataset: makeDataset(),
       axis,
       measure: makeMeasure(),
-      groupOrder: ['Widget'],
+      groupOrder: OVERFLOWING_GROUP_ORDER,
+      limitTopGroupBy: 2,
       sortDirection: 'desc',
       limitTopAxis: 5,
       axisOrder: ['2026-01-01'],
@@ -778,7 +837,8 @@ describe('loadDataResultsGroupOther', () => {
       dataset: makeDataset(),
       axis: makeDimension('date'),
       measure: makeMeasure(),
-      groupOrder: ['Widget'],
+      groupOrder: OVERFLOWING_GROUP_ORDER,
+      limitTopGroupBy: 2,
       sortDirection: undefined,
       limitTopAxis: undefined,
       axisOrder: undefined,
@@ -883,6 +943,36 @@ describe('loadDataResults (groupOrder gating)', () => {
     });
 
     expect(result).toBe(fakeResponse);
+    const request = mockLoadData.mock.calls[0]?.[0];
+    expect(request?.filters).toEqual([
+      { property: baseArgs.groupBy, operator: 'equals', value: ['Widget', 'Gadget'] },
+    ]);
+  });
+
+  it('filters to all ranked groups when they fit within the limit', () => {
+    mockLoadData.mockReturnValue({ data: [], isLoading: false } as DataResponse);
+
+    loadDataResults({
+      ...baseArgs,
+      limitTopGroupBy: 3,
+      groupOrder: ['Widget', 'Gadget', 'Gizmo'],
+    });
+
+    const request = mockLoadData.mock.calls[0]?.[0];
+    expect(request?.filters).toEqual([
+      { property: baseArgs.groupBy, operator: 'equals', value: ['Widget', 'Gadget', 'Gizmo'] },
+    ]);
+  });
+
+  it('filters to the top limit - 1 groups when the ranking overflows the limit', () => {
+    mockLoadData.mockReturnValue({ data: [], isLoading: false } as DataResponse);
+
+    loadDataResults({
+      ...baseArgs,
+      limitTopGroupBy: 3,
+      groupOrder: ['Widget', 'Gadget', 'Gizmo', 'Doohickey'],
+    });
+
     const request = mockLoadData.mock.calls[0]?.[0];
     expect(request?.filters).toEqual([
       { property: baseArgs.groupBy, operator: 'equals', value: ['Widget', 'Gadget'] },

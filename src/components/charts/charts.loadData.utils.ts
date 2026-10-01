@@ -118,10 +118,30 @@ export const getCachedAxisOrder = (
 
 export const getGroupOrderLimit = (limitTopGroupBy?: number): number | undefined => {
   const limit = getLimit(limitTopGroupBy);
-  if (limit == null) return undefined;
-  // Reserve one slot for the synthetic "Other" row, matching groupTailAsOther's
-  // maxItems semantics (maxItems total = maxItems - 1 real + 1 Other).
-  return Math.max(limit - 1, 0);
+  // A limit of 1 leaves no room for a real group next to "Other", so group
+  // bucketing is disabled entirely.
+  if (limit == null || limit < 2) return undefined;
+  // Fetch one more than the limit so resolveGroupOrder can tell whether the
+  // groups actually overflow it — see resolveGroupOrder.
+  return limit + 1;
+};
+
+// Turns the ranked group order (fetched with getGroupOrderLimit's limit + 1)
+// into the groups to keep, and whether an "Other" bucket is needed. Matches
+// groupTailAsOther's maxItems semantics: if every group fits within the limit
+// they're all kept and there is no "Other"; only when there are more groups
+// than the limit are the top limit - 1 kept, with the rest bucketed into
+// "Other". Without this, "Other" was always shown — as an all-zero series
+// when nothing was left to bucket.
+export const resolveGroupOrder = (
+  groupOrder: string[] | undefined,
+  limitTopGroupBy?: number,
+): { keptGroups: string[] | undefined; hasOtherGroup: boolean } => {
+  const limit = getLimit(limitTopGroupBy);
+  if (groupOrder == null || limit == null || groupOrder.length <= limit) {
+    return { keptGroups: groupOrder, hasOtherGroup: false };
+  }
+  return { keptGroups: groupOrder.slice(0, limit - 1), hasOtherGroup: true };
 };
 
 export const shouldGetTopGroupItems = (measure: Measure, limitTopGroupBy?: number): boolean =>
@@ -276,6 +296,7 @@ type LoadDataResultsGroupOther = {
   measure: Measure;
   granularity?: Granularity;
   groupOrder?: string[];
+  limitTopGroupBy?: number;
   sortDirection?: OrderDirection;
   limitTopAxis?: number;
   axisOrder?: string[];
@@ -289,6 +310,7 @@ export const loadDataResultsGroupOther = ({
   measure,
   granularity,
   groupOrder,
+  limitTopGroupBy,
   sortDirection,
   limitTopAxis,
   axisOrder,
@@ -297,6 +319,9 @@ export const loadDataResultsGroupOther = ({
 }: LoadDataResultsGroupOther): DataResponse | undefined => {
   if (groupOrder == null) return undefined;
   if (!groupOrder.length) return EMPTY_RESULTS;
+  // Every group fits within the limit, so there's nothing to bucket — skip the
+  // grand-total query; computeOtherRows then produces no "Other" rows.
+  if (!resolveGroupOrder(groupOrder, limitTopGroupBy).hasOtherGroup) return EMPTY_RESULTS;
 
   // Wait for axisOrder too when axis top-N is configured, same as
   // loadDataResults — otherwise this fires once unfiltered (fetching every
@@ -394,14 +419,15 @@ export const loadDataResults = ({
   const needsTopAxisItems = shouldGetTopItems(sortDirection, limitTopAxis);
   const needsTopGroupItems = shouldGetTopGroupItems(measure, limitTopGroupBy);
   const axisWithGranularity = getDimensionWithGranularity(axis, granularity);
+  const { keptGroups } = resolveGroupOrder(groupOrder, limitTopGroupBy);
 
   if (needsTopAxisItems) {
     if (axisOrder == null) return undefined;
     if (!axisOrder.length) return EMPTY_RESULTS;
   }
   if (needsTopGroupItems) {
-    if (groupOrder == null) return undefined;
-    if (!groupOrder.length) return EMPTY_RESULTS;
+    if (keptGroups == null) return undefined;
+    if (!keptGroups.length) return EMPTY_RESULTS;
   }
 
   return loadData(
@@ -412,7 +438,7 @@ export const loadDataResults = ({
       measure,
       limit: maxResults,
       axisOrder: needsTopAxisItems ? axisOrder : undefined,
-      groupOrder: needsTopGroupItems ? groupOrder : undefined,
+      groupOrder: needsTopGroupItems ? keptGroups : undefined,
       timezone,
     }),
   );
