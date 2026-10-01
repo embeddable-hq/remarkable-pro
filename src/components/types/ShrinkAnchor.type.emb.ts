@@ -10,10 +10,10 @@ export const ShrinkAnchorTypeOptions = {
 type ShrinkAnchorValue = (typeof ShrinkAnchorTypeOptions)[keyof typeof ShrinkAnchorTypeOptions];
 
 const shrinkAnchorLabelMap: Record<ShrinkAnchorValue, string> = {
-  top: 'Top',
-  middle: 'Middle',
-  bottom: 'Bottom',
-  none: 'None',
+  [ShrinkAnchorTypeOptions.top]: 'Top',
+  [ShrinkAnchorTypeOptions.middle]: 'Middle',
+  [ShrinkAnchorTypeOptions.bottom]: 'Bottom',
+  [ShrinkAnchorTypeOptions.none]: 'None',
 };
 
 const ShrinkAnchorType = defineType('shrinkAnchor', {
@@ -21,6 +21,9 @@ const ShrinkAnchorType = defineType('shrinkAnchor', {
   optionLabel: (value: ShrinkAnchorValue) => shrinkAnchorLabelMap[value],
 });
 
-Object.values(ShrinkAnchorTypeOptions).forEach((value) => defineOption(ShrinkAnchorType, value));
+defineOption(ShrinkAnchorType, ShrinkAnchorTypeOptions.top);
+defineOption(ShrinkAnchorType, ShrinkAnchorTypeOptions.middle);
+defineOption(ShrinkAnchorType, ShrinkAnchorTypeOptions.bottom);
+defineOption(ShrinkAnchorType, ShrinkAnchorTypeOptions.none);
 
 export default ShrinkAnchorType;
