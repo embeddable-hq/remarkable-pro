@@ -5,6 +5,7 @@ import { inputs } from '../../../component.inputs.constants';
 import { previewData } from '../../../preview.data.constants';
 import { ThemeClientContext } from '../../../../theme/theme.types';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
+import ShrinkAnchorType, { ShrinkAnchorTypeOptions } from '../../../types/ShrinkAnchor.type.emb';
 
 const meta = {
   name: 'FunnelChartPro',
@@ -65,8 +66,23 @@ const meta = {
       ...inputs.displayPercentages,
       description: 'Show percentage of total instead of the raw count on each stage.',
     },
-    inputs.shrinkAnchor,
-    inputs.shrinkFraction,
+    {
+      name: 'shrinkAnchor',
+      type: ShrinkAnchorType,
+      label: 'Shrink anchor',
+      description:
+        'Where each stage tapers from. "Middle" keeps area roughly proportional when stages are sorted by value. If stages use a custom sort order (e.g. by severity), any anchor except "None" can still make a stage look bigger or smaller than its true share — use "None" for exact proportionality, at the cost of the tapered funnel look.',
+      defaultValue: ShrinkAnchorTypeOptions.middle,
+      category: 'Component Settings',
+    },
+    {
+      name: 'shrinkFraction',
+      type: 'number',
+      label: 'Shrink fraction',
+      description: 'How much each stage tapers, from 0 (no taper) to 1 (full taper).',
+      defaultValue: 1,
+      category: 'Component Settings',
+    },
     inputs.menuOptions,
   ],
 } as const satisfies EmbeddedComponentMeta;

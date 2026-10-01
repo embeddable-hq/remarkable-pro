@@ -8,7 +8,6 @@ import {
 } from './component.subinputs.constants';
 import ComparisonPeriodType from './types/ComparisonPeriod.type.emb';
 import SortDirectionType from './types/SortDirection.type.emb';
-import ShrinkAnchorType, { ShrinkAnchorTypeOptions } from './types/ShrinkAnchor.type.emb';
 import MarkdownType from '../editors/MarkdownEditor/Markdown.type.emb';
 
 /* -------------------- */
@@ -447,25 +446,6 @@ const sortDirection = {
   category: 'Component Settings',
 } as const;
 
-const shrinkAnchor = {
-  name: 'shrinkAnchor',
-  type: ShrinkAnchorType,
-  label: 'Shrink anchor',
-  description:
-    'Where each stage tapers from. "Middle" keeps area roughly proportional when stages are sorted by value. If stages use a custom sort order (e.g. by severity), any anchor except "None" can still make a stage look bigger or smaller than its true share — use "None" for exact proportionality, at the cost of the tapered funnel look.',
-  defaultValue: ShrinkAnchorTypeOptions.middle,
-  category: 'Component Settings',
-} as const;
-
-const shrinkFraction = {
-  name: 'shrinkFraction',
-  type: 'number',
-  label: 'Shrink fraction',
-  description: 'How much each stage tapers, from 0 (no taper) to 1 (full taper).',
-  defaultValue: 1,
-  category: 'Component Settings',
-} as const;
-
 const sortDirectionTopXAxis = {
   ...sortDirection,
   name: 'sortDirectionTopXAxis',
@@ -614,8 +594,6 @@ export const inputs = {
   sortDirection,
   sortDirectionTopXAxis,
   sortDirectionTopYAxis,
-  shrinkAnchor,
-  shrinkFraction,
   limitTopXAxis,
   limitTopYAxis,
   sortDirectionTopGroupBy,
