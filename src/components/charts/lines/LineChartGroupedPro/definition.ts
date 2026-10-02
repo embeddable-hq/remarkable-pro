@@ -159,6 +159,7 @@ const props = (
       axis: xAxisWithGranularity,
       measure: inputs.measure,
       groupOrder: cachedGroupOrder,
+      limitTopGroupBy: inputs.limitTopGroupBy,
       maxResults: inputs.maxResults,
       timezone,
     }),

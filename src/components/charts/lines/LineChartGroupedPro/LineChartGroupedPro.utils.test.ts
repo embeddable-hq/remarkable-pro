@@ -11,9 +11,11 @@ import { setColorAlpha } from '../../../../utils/color.utils';
 import { i18n } from '../../../../theme/i18n/i18n';
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
 vi.mock('@embeddable.com/remarkable-ui', () => ({ getChartColors: vi.fn() }));
-vi.mock('../../charts.utils', () => ({
+vi.mock('../../charts.utils', async (importOriginal) => ({
   getDimensionWithoutTruncation: vi.fn((d) => d),
   groupTailAsOtherPerGroup: vi.fn((data) => data ?? []),
+  uniqueSortedWithOtherLast: (await importOriginal<typeof import('../../charts.utils')>())
+    .uniqueSortedWithOtherLast,
 }));
 vi.mock('../../../../theme/styles/styles.utils', () => ({
   getDimensionMeasureColor: vi.fn(() => '#000'),
@@ -141,6 +143,28 @@ describe('getLineChartGroupedProData', () => {
     const g2Dataset = result.datasets.find((d) => (d as { rawLabel?: string }).rawLabel === 'g2');
     expect(g1Dataset?.data).toEqual([1, 5]);
     expect(g2Dataset?.data).toEqual([10, 50]);
+  });
+
+  it('orders datasets alphabetically by group with the "Other" group last', () => {
+    const data = [
+      { date: 'A', group: 'g2', revenue: 1 },
+      { date: 'A', group: 'Other', revenue: 9 },
+      { date: 'B', group: 'g3', revenue: 2 },
+      { date: 'B', group: 'g1', revenue: 3 },
+      { date: 'B', group: 'Other', revenue: 9 },
+    ];
+
+    const result = getLineChartGroupedProData(
+      { data, dimension, groupDimension, measure, hasMinMaxYAxisRange: false },
+      makeTheme(),
+    );
+
+    expect(result.datasets.map((d) => (d as { rawLabel?: string }).rawLabel)).toEqual([
+      'g1',
+      'g2',
+      'g3',
+      'Other',
+    ]);
   });
 });
 
