@@ -11,7 +11,7 @@ import {
   groupTailAsOtherPerGroup,
   isOtherBucketableMeasure,
   mergeGroupOtherResults,
-  sortWithOtherLast,
+  uniqueSortedWithOtherLast,
   tagRowsAsOtherGroup,
 } from './charts.utils';
 import { i18n } from '../../theme/i18n/i18n';
@@ -686,13 +686,13 @@ const makeClick = (index: number, datasetIndex = 0): ChartClickArgs =>
 const makeChartData = (labels: string[], datasets: { rawLabel?: string }[] = []): ChartData =>
   ({ labels, datasets }) as unknown as ChartData;
 
-describe('sortWithOtherLast', () => {
+describe('uniqueSortedWithOtherLast', () => {
   it('sorts values alphabetically', () => {
-    expect(sortWithOtherLast(['c', 'a', 'b'])).toEqual(['a', 'b', 'c']);
+    expect(uniqueSortedWithOtherLast(['c', 'a', 'b'])).toEqual(['a', 'b', 'c']);
   });
 
   it('pins the "Other" bucket to the end regardless of where it appears', () => {
-    expect(sortWithOtherLast(['b', 't(common.other)', 'a', 'z'])).toEqual([
+    expect(uniqueSortedWithOtherLast(['b', 't(common.other)', 'a', 'z'])).toEqual([
       'a',
       'b',
       'z',
@@ -701,12 +701,16 @@ describe('sortWithOtherLast', () => {
   });
 
   it('does not add an "Other" entry when none is present', () => {
-    expect(sortWithOtherLast(['b', 'a'])).toEqual(['a', 'b']);
+    expect(uniqueSortedWithOtherLast(['b', 'a'])).toEqual(['a', 'b']);
+  });
+
+  it('removes duplicates and null values', () => {
+    expect(uniqueSortedWithOtherLast(['b', null, 'a', 'b', undefined, 'a'])).toEqual(['a', 'b']);
   });
 
   it('does not mutate the input array', () => {
     const values = ['b', 'a'];
-    sortWithOtherLast(values);
+    uniqueSortedWithOtherLast(values);
     expect(values).toEqual(['b', 'a']);
   });
 });

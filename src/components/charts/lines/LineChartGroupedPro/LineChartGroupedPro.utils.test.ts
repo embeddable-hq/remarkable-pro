@@ -14,8 +14,8 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({ getChartColors: vi.fn() }));
 vi.mock('../../charts.utils', async (importOriginal) => ({
   getDimensionWithoutTruncation: vi.fn((d) => d),
   groupTailAsOtherPerGroup: vi.fn((data) => data ?? []),
-  sortWithOtherLast: (await importOriginal<typeof import('../../charts.utils')>())
-    .sortWithOtherLast,
+  uniqueSortedWithOtherLast: (await importOriginal<typeof import('../../charts.utils')>())
+    .uniqueSortedWithOtherLast,
 }));
 vi.mock('../../../../theme/styles/styles.utils', () => ({
   getDimensionMeasureColor: vi.fn(() => '#000'),
@@ -146,8 +146,6 @@ describe('getLineChartGroupedProData', () => {
   });
 
   it('orders datasets alphabetically by group with the "Other" group last', () => {
-    // Date-sorted rows (as useFillGaps produces) where "Other" first appears
-    // before some named groups — first-appearance order would put it mid-list.
     const data = [
       { date: 'A', group: 'g2', revenue: 1 },
       { date: 'A', group: 'Other', revenue: 9 },

@@ -118,21 +118,12 @@ export const getCachedAxisOrder = (
 
 export const getGroupOrderLimit = (limitTopGroupBy?: number): number | undefined => {
   const limit = getLimit(limitTopGroupBy);
-  // A limit of 1 leaves no room for a real group next to "Other", so group
-  // bucketing is disabled entirely.
   if (limit == null || limit < 2) return undefined;
-  // Fetch one more than the limit so resolveGroupOrder can tell whether the
-  // groups actually overflow it — see resolveGroupOrder.
+  // One extra row so resolveGroupOrder can detect overflow.
   return limit + 1;
 };
 
-// Turns the ranked group order (fetched with getGroupOrderLimit's limit + 1)
-// into the groups to keep, and whether an "Other" bucket is needed. Matches
-// groupTailAsOther's maxItems semantics: if every group fits within the limit
-// they're all kept and there is no "Other"; only when there are more groups
-// than the limit are the top limit - 1 kept, with the rest bucketed into
-// "Other". Without this, "Other" was always shown — as an all-zero series
-// when nothing was left to bucket.
+// Same semantics as groupTailAsOther: all groups if they fit, else top limit - 1 + "Other".
 export const resolveGroupOrder = (
   groupOrder: string[] | undefined,
   limitTopGroupBy?: number,
@@ -319,8 +310,6 @@ export const loadDataResultsGroupOther = ({
 }: LoadDataResultsGroupOther): DataResponse | undefined => {
   if (groupOrder == null) return undefined;
   if (!groupOrder.length) return EMPTY_RESULTS;
-  // Every group fits within the limit, so there's nothing to bucket — skip the
-  // grand-total query; computeOtherRows then produces no "Other" rows.
   if (!resolveGroupOrder(groupOrder, limitTopGroupBy).hasOtherGroup) return EMPTY_RESULTS;
 
   // Wait for axisOrder too when axis top-N is configured, same as

@@ -688,7 +688,6 @@ describe('loadDataResultsGroupOtherArgs', () => {
 describe('loadDataResultsGroupOther', () => {
   beforeEach(() => mockLoadData.mockReset());
 
-  // More groups than limitTopGroupBy: 2, so an "Other" bucket is needed.
   const OVERFLOWING_GROUP_ORDER = ['Widget', 'Gadget', 'Gizmo'];
 
   it('returns undefined when groupOrder is not yet cached', () => {

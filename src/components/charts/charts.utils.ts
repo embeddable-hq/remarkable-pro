@@ -12,10 +12,7 @@ export const getDimensionWithoutTruncation = (dimension: Dimension): Dimension =
   inputs: { ...dimension.inputs, maxCharacters: null },
 });
 
-// Explicit stand-in for Array.prototype.sort()'s default comparator (converts
-// operands to strings and compares them lexicographically) — required by
-// typescript:S2871, which flags a bare .sort() call as relying on implicit
-// string coercion.
+// Explicit string comparator; a bare .sort() is flagged by typescript:S2871.
 const compareAsString = (a: unknown, b: unknown): number => {
   const aStr = String(a);
   const bStr = String(b);
@@ -24,18 +21,14 @@ const compareAsString = (a: unknown, b: unknown): number => {
   return 0;
 };
 
-// Sorts values alphabetically but pins the "Other" bucket to the end. Used for
-// both axis labels and groupBy series order — series order otherwise follows
-// first appearance in the row stream, which useFillGaps re-sorts by date, so
-// the appended "Other" rows end up interleaved and "Other" lands mid-list in
-// tooltips and legends.
-export const sortWithOtherLast = <T>(values: T[]): T[] => {
+export const uniqueSortedWithOtherLast = <T>(values: T[]): NonNullable<T>[] => {
   const otherLabel = i18n.t('common.other');
-  const hasOther = values.some((value) => value === otherLabel);
-  return values
+  const unique = [...new Set(values)].filter((value): value is NonNullable<T> => value != null);
+  const hasOther = unique.some((value) => value === otherLabel);
+  return unique
     .filter((value) => value !== otherLabel)
     .sort(compareAsString)
-    .concat(hasOther ? [otherLabel as T] : []);
+    .concat(hasOther ? [otherLabel as NonNullable<T>] : []);
 };
 
 const aggregateMeasureValues = (vals: number[], aggType: unknown): number => {

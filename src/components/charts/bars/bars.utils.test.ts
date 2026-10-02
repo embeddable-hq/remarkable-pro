@@ -16,7 +16,8 @@ vi.mock('../charts.utils', async (importOriginal) => ({
   groupTailAsOther: vi.fn(),
   getDatalabelPercentage: vi.fn(),
   getDimensionWithoutTruncation: vi.fn((d) => d),
-  sortWithOtherLast: (await importOriginal<typeof import('../charts.utils')>()).sortWithOtherLast,
+  uniqueSortedWithOtherLast: (await importOriginal<typeof import('../charts.utils')>())
+    .uniqueSortedWithOtherLast,
 }));
 vi.mock('../../../theme/i18n/i18n', () => ({ i18n: { t: vi.fn(() => 'Other') } }));
 vi.mock('../../../theme/styles/styles.utils', () => ({ getDimensionMeasureColor: vi.fn() }));

@@ -9,7 +9,7 @@ import { getChartColors } from '@embeddable.com/remarkable-ui';
 import {
   getDimensionWithoutTruncation,
   groupTailAsOtherPerGroup,
-  sortWithOtherLast,
+  uniqueSortedWithOtherLast,
 } from '../../charts.utils';
 
 export const getLineChartGroupedProData = (
@@ -28,12 +28,8 @@ export const getLineChartGroupedProData = (
 
   const data = groupTailAsOtherPerGroup(props.data, dimension, groupDimension, measure, maxItems);
 
-  const axis = sortWithOtherLast([
-    ...new Set(data.map((d) => d[dimension.name]).filter((d) => d != null)),
-  ]);
-  const groupBy = sortWithOtherLast(
-    [...new Set(data.map((d) => d[groupDimension.name]))].filter((d) => d != null),
-  );
+  const axis = uniqueSortedWithOtherLast(data.map((d) => d[dimension.name]));
+  const groupBy = uniqueSortedWithOtherLast(data.map((d) => d[groupDimension.name]));
 
   const chartColors = getChartColors();
   const datasets: ChartData<'line'>['datasets'] = groupBy.map((groupByItem, index) => {

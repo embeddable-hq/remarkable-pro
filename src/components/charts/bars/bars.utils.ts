@@ -7,7 +7,7 @@ import {
   getDatalabelPercentage,
   getDimensionWithoutTruncation,
   groupTailAsOther,
-  sortWithOtherLast,
+  uniqueSortedWithOtherLast,
 } from '../charts.utils';
 import { getDimensionFieldName } from '../../../utils/data.utils';
 import { getDimensionMeasureColor } from '../../../theme/styles/styles.utils';
@@ -32,9 +32,7 @@ export const getBarStackedChartProData = (
 
   const axis = props.axisOrder ? props.axisOrder.filter((v) => uniqueAxis.includes(v)) : uniqueAxis;
   const groupDimensionName = getDimensionFieldName(groupDimension);
-  const groupBy = sortWithOtherLast(
-    [...new Set(data.map((d) => d[groupDimensionName]))].filter((d) => d != null),
-  );
+  const groupBy = uniqueSortedWithOtherLast(data.map((d) => d[groupDimensionName]));
 
   const chartColors = getChartColors();
   const datasets = groupBy.map((groupByItem, index) => {
