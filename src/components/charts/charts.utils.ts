@@ -22,13 +22,13 @@ const compareAsString = (a: unknown, b: unknown): number => {
 };
 
 export const uniqueSortedWithOtherLast = <T>(values: T[]): NonNullable<T>[] => {
-  const otherLabel = i18n.t('common.other');
+  const otherLabel = i18n.t('common.other') as NonNullable<T>;
   const unique = [...new Set(values)].filter((value): value is NonNullable<T> => value != null);
-  const hasOther = unique.some((value) => value === otherLabel);
+  const hasOther = unique.includes(otherLabel);
   return unique
     .filter((value) => value !== otherLabel)
     .sort(compareAsString)
-    .concat(hasOther ? [otherLabel as NonNullable<T>] : []);
+    .concat(hasOther ? [otherLabel] : []);
 };
 
 const aggregateMeasureValues = (vals: number[], aggType: unknown): number => {
