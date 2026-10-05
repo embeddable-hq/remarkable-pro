@@ -3,9 +3,11 @@ import type { DateRange } from '@embeddable.com/remarkable-ui';
 import type { DateRangeOption } from '../../../theme/defaults/defaults.DateRanges.constants';
 import {
   getDateRangeFromTimeRange,
+  fromCalendarDateRange,
   getTimeRangeFromDateRange,
   getTimeRangeFromPresets,
   getTimeRangeLabel,
+  toCalendarDateRange,
 } from './dates.utils';
 
 // Fixed reference point: 2024-06-15 UTC (same year for same-year tests)
@@ -207,6 +209,46 @@ describe('getTimeRangeFromDateRange', () => {
     const result = getTimeRangeFromDateRange(dateRange, 'Australia/Sydney');
     expect(result?.from).toEqual(new Date('2026-08-31T14:00:00.000Z'));
     expect(result?.to).toEqual(new Date('2026-09-01T13:59:59.999Z'));
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('calendar date ranges', () => {
+  // The calendar hands a pick of 1 to 3 Sep as these two UTC instants.
+  const calendarPick: DateRange = {
+    from: new Date('2026-09-01T00:00:00.000Z'),
+    to: new Date('2026-09-03T23:59:59.999Z'),
+  };
+
+  it.each([
+    ['America/New_York', '2026-09-01T04:00:00.000Z', '2026-09-04T03:59:59.999Z'],
+    ['Australia/Sydney', '2026-08-31T14:00:00.000Z', '2026-09-03T13:59:59.999Z'],
+    ['Europe/London', '2026-08-31T23:00:00.000Z', '2026-09-03T22:59:59.999Z'],
+    ['UTC', '2026-09-01T00:00:00.000Z', '2026-09-03T23:59:59.999Z'],
+  ])('keeps a pick of 1 to 3 Sep on those days in %s', (timezone, from, to) => {
+    const result = getTimeRangeFromDateRange(
+      fromCalendarDateRange(calendarPick, timezone),
+      timezone,
+    );
+    expect(result?.from).toEqual(new Date(from));
+    expect(result?.to).toEqual(new Date(to));
+  });
+
+  it.each(['America/New_York', 'Australia/Sydney'])(
+    'shows a range on its own calendar days in %s',
+    (timezone) => {
+      const range = fromCalendarDateRange(calendarPick, timezone);
+      expect(toCalendarDateRange(range, timezone)).toEqual({
+        from: new Date('2026-09-01T00:00:00.000Z'),
+        to: new Date('2026-09-03T00:00:00.000Z'),
+      });
+    },
+  );
+
+  it('leaves the range as it is without a timezone', () => {
+    expect(fromCalendarDateRange(calendarPick)).toBe(calendarPick);
+    expect(toCalendarDateRange(calendarPick)).toBe(calendarPick);
   });
 });
 
