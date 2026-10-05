@@ -12,6 +12,25 @@ export const getDimensionWithoutTruncation = (dimension: Dimension): Dimension =
   inputs: { ...dimension.inputs, maxCharacters: null },
 });
 
+// Explicit string comparator; a bare .sort() is flagged by typescript:S2871.
+const compareAsString = (a: unknown, b: unknown): number => {
+  const aStr = String(a);
+  const bStr = String(b);
+  if (aStr < bStr) return -1;
+  if (aStr > bStr) return 1;
+  return 0;
+};
+
+export const uniqueSortedWithOtherLast = <T>(values: T[]): NonNullable<T>[] => {
+  const otherLabel = i18n.t('common.other') as NonNullable<T>;
+  const unique = [...new Set(values)].filter((value): value is NonNullable<T> => value != null);
+  const hasOther = unique.includes(otherLabel);
+  return unique
+    .filter((value) => value !== otherLabel)
+    .sort(compareAsString)
+    .concat(hasOther ? [otherLabel] : []);
+};
+
 const aggregateMeasureValues = (vals: number[], aggType: unknown): number => {
   switch (aggType) {
     case 'avg':

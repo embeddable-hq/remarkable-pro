@@ -11,6 +11,7 @@ import {
   groupTailAsOtherPerGroup,
   isOtherBucketableMeasure,
   mergeGroupOtherResults,
+  uniqueSortedWithOtherLast,
   tagRowsAsOtherGroup,
 } from './charts.utils';
 import { i18n } from '../../theme/i18n/i18n';
@@ -684,6 +685,35 @@ const makeClick = (index: number, datasetIndex = 0): ChartClickArgs =>
 
 const makeChartData = (labels: string[], datasets: { rawLabel?: string }[] = []): ChartData =>
   ({ labels, datasets }) as unknown as ChartData;
+
+describe('uniqueSortedWithOtherLast', () => {
+  it('sorts values alphabetically', () => {
+    expect(uniqueSortedWithOtherLast(['c', 'a', 'b'])).toEqual(['a', 'b', 'c']);
+  });
+
+  it('pins the "Other" bucket to the end regardless of where it appears', () => {
+    expect(uniqueSortedWithOtherLast(['b', 't(common.other)', 'a', 'z'])).toEqual([
+      'a',
+      'b',
+      'z',
+      't(common.other)',
+    ]);
+  });
+
+  it('does not add an "Other" entry when none is present', () => {
+    expect(uniqueSortedWithOtherLast(['b', 'a'])).toEqual(['a', 'b']);
+  });
+
+  it('removes duplicates and null values', () => {
+    expect(uniqueSortedWithOtherLast(['b', null, 'a', 'b', undefined, 'a'])).toEqual(['a', 'b']);
+  });
+
+  it('does not mutate the input array', () => {
+    const values = ['b', 'a'];
+    uniqueSortedWithOtherLast(values);
+    expect(values).toEqual(['b', 'a']);
+  });
+});
 
 describe('createSimpleClickHandler', () => {
   const mockGetTimeRange = vi.mocked(getTimeRangeFromDimensionValue);

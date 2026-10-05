@@ -6,20 +6,11 @@ import { mergician } from 'mergician';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import { setColorAlpha } from '../../../../utils/color.utils';
 import { getChartColors } from '@embeddable.com/remarkable-ui';
-import { getDimensionWithoutTruncation, groupTailAsOtherPerGroup } from '../../charts.utils';
-import { i18n } from '../../../../theme/i18n/i18n';
-
-// Explicit stand-in for Array.prototype.sort()'s default comparator (converts
-// operands to strings and compares them lexicographically) — required by
-// typescript:S2871, which flags a bare .sort() call as relying on implicit
-// string coercion.
-const compareAsString = (a: unknown, b: unknown): number => {
-  const aStr = String(a);
-  const bStr = String(b);
-  if (aStr < bStr) return -1;
-  if (aStr > bStr) return 1;
-  return 0;
-};
+import {
+  getDimensionWithoutTruncation,
+  groupTailAsOtherPerGroup,
+  uniqueSortedWithOtherLast,
+} from '../../charts.utils';
 
 export const getLineChartGroupedProData = (
   props: {
@@ -37,13 +28,8 @@ export const getLineChartGroupedProData = (
 
   const data = groupTailAsOtherPerGroup(props.data, dimension, groupDimension, measure, maxItems);
 
-  const otherLabel = i18n.t('common.other');
-  const axisValues = [...new Set(data.map((d) => d[dimension.name]).filter((d) => d != null))];
-  const axis = axisValues
-    .filter((value) => value !== otherLabel)
-    .sort(compareAsString)
-    .concat(axisValues.includes(otherLabel) ? [otherLabel] : []);
-  const groupBy = [...new Set(data.map((d) => d[groupDimension.name]))].filter((d) => d != null);
+  const axis = uniqueSortedWithOtherLast(data.map((d) => d[dimension.name]));
+  const groupBy = uniqueSortedWithOtherLast(data.map((d) => d[groupDimension.name]));
 
   const chartColors = getChartColors();
   const datasets: ChartData<'line'>['datasets'] = groupBy.map((groupByItem, index) => {

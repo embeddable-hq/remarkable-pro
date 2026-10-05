@@ -12,11 +12,14 @@ import { getChartColors } from '@embeddable.com/remarkable-ui';
 import type { Context } from 'chartjs-plugin-datalabels';
 
 vi.mock('../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
-vi.mock('../charts.utils', () => ({
+vi.mock('../charts.utils', async (importOriginal) => ({
   groupTailAsOther: vi.fn(),
   getDatalabelPercentage: vi.fn(),
   getDimensionWithoutTruncation: vi.fn((d) => d),
+  uniqueSortedWithOtherLast: (await importOriginal<typeof import('../charts.utils')>())
+    .uniqueSortedWithOtherLast,
 }));
+vi.mock('../../../theme/i18n/i18n', () => ({ i18n: { t: vi.fn(() => 'Other') } }));
 vi.mock('../../../theme/styles/styles.utils', () => ({ getDimensionMeasureColor: vi.fn() }));
 vi.mock('@embeddable.com/remarkable-ui', () => ({ getChartColors: vi.fn() }));
 vi.mock('../../../theme/theme.constants', () => ({ remarkableTheme: { charts: {} } }));
@@ -281,6 +284,31 @@ describe('getBarStackedChartProData', () => {
 
     expect(result.labels).toEqual(['C', 'A']);
     expect(result.datasets[0]?.data).toEqual([30, 10]);
+  });
+
+  it('orders datasets alphabetically by group with the "Other" group last', () => {
+    const dimension = makeDimension({ name: 'category' });
+    const groupDimension = makeDimension({ name: 'region', nativeType: 'string' });
+    const measure = makeMeasure({ name: 'sales' });
+
+    const data = [
+      { category: 'A', region: 'South', sales: '10' },
+      { category: 'A', region: 'Other', sales: '5' },
+      { category: 'B', region: 'North', sales: '20' },
+      { category: 'B', region: 'East', sales: '1' },
+    ];
+
+    const result = getBarStackedChartProData(
+      { data, dimension, groupDimension, measure },
+      makeTheme(),
+    );
+
+    expect(result.datasets.map((d) => (d as { rawLabel?: string }).rawLabel)).toEqual([
+      'East',
+      'North',
+      'South',
+      'Other',
+    ]);
   });
 });
 

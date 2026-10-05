@@ -118,10 +118,21 @@ export const getCachedAxisOrder = (
 
 export const getGroupOrderLimit = (limitTopGroupBy?: number): number | undefined => {
   const limit = getLimit(limitTopGroupBy);
-  if (limit == null) return undefined;
-  // Reserve one slot for the synthetic "Other" row, matching groupTailAsOther's
-  // maxItems semantics (maxItems total = maxItems - 1 real + 1 Other).
-  return Math.max(limit - 1, 0);
+  if (limit == null || limit < 2) return undefined;
+  // One extra row so resolveGroupOrder can detect overflow.
+  return limit + 1;
+};
+
+// Same semantics as groupTailAsOther: all groups if they fit, else top limit - 1 + "Other".
+export const resolveGroupOrder = (
+  groupOrder: string[] | undefined,
+  limitTopGroupBy?: number,
+): { keptGroups: string[] | undefined; hasOtherGroup: boolean } => {
+  const limit = getLimit(limitTopGroupBy);
+  if (groupOrder == null || limit == null || groupOrder.length <= limit) {
+    return { keptGroups: groupOrder, hasOtherGroup: false };
+  }
+  return { keptGroups: groupOrder.slice(0, limit - 1), hasOtherGroup: true };
 };
 
 export const shouldGetTopGroupItems = (measure: Measure, limitTopGroupBy?: number): boolean =>
@@ -276,6 +287,7 @@ type LoadDataResultsGroupOther = {
   measure: Measure;
   granularity?: Granularity;
   groupOrder?: string[];
+  limitTopGroupBy?: number;
   sortDirection?: OrderDirection;
   limitTopAxis?: number;
   axisOrder?: string[];
@@ -289,6 +301,7 @@ export const loadDataResultsGroupOther = ({
   measure,
   granularity,
   groupOrder,
+  limitTopGroupBy,
   sortDirection,
   limitTopAxis,
   axisOrder,
@@ -297,6 +310,7 @@ export const loadDataResultsGroupOther = ({
 }: LoadDataResultsGroupOther): DataResponse | undefined => {
   if (groupOrder == null) return undefined;
   if (!groupOrder.length) return EMPTY_RESULTS;
+  if (!resolveGroupOrder(groupOrder, limitTopGroupBy).hasOtherGroup) return EMPTY_RESULTS;
 
   // Wait for axisOrder too when axis top-N is configured, same as
   // loadDataResults — otherwise this fires once unfiltered (fetching every
@@ -394,14 +408,15 @@ export const loadDataResults = ({
   const needsTopAxisItems = shouldGetTopItems(sortDirection, limitTopAxis);
   const needsTopGroupItems = shouldGetTopGroupItems(measure, limitTopGroupBy);
   const axisWithGranularity = getDimensionWithGranularity(axis, granularity);
+  const { keptGroups } = resolveGroupOrder(groupOrder, limitTopGroupBy);
 
   if (needsTopAxisItems) {
     if (axisOrder == null) return undefined;
     if (!axisOrder.length) return EMPTY_RESULTS;
   }
   if (needsTopGroupItems) {
-    if (groupOrder == null) return undefined;
-    if (!groupOrder.length) return EMPTY_RESULTS;
+    if (keptGroups == null) return undefined;
+    if (!keptGroups.length) return EMPTY_RESULTS;
   }
 
   return loadData(
@@ -412,7 +427,7 @@ export const loadDataResults = ({
       measure,
       limit: maxResults,
       axisOrder: needsTopAxisItems ? axisOrder : undefined,
-      groupOrder: needsTopGroupItems ? groupOrder : undefined,
+      groupOrder: needsTopGroupItems ? keptGroups : undefined,
       timezone,
     }),
   );

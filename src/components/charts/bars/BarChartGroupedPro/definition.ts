@@ -172,6 +172,7 @@ const props = (
       axis: xAxisWithGranularity,
       measure: inputs.measure,
       groupOrder: cachedGroupOrder,
+      limitTopGroupBy: inputs.limitTopGroupBy,
       sortDirection,
       limitTopAxis: inputs.limitTopXAxis,
       axisOrder: cachedAxisOrder,
