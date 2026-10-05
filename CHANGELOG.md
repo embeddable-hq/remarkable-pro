@@ -1,5 +1,12 @@
 # @embeddable/remarkable-ui
 
+## 0.11.1
+
+### Patch Changes
+
+- 85415e7: Only show the "Other" group in the grouped line chart and grouped/stacked bar charts when there are more groups than the configured limit. Previously "Other" always appeared (as an all-zero series when nothing was left to bucket), and exactly-at-limit data bucketed a single group into "Other" instead of showing it.
+- 85415e7: Order grouped series alphabetically with the "Other" bucket last in the grouped line chart and grouped/stacked bar charts, so tooltips and legends no longer show "Other" mid-list.
+
 ## 0.11.0
 
 ### Minor Changes
