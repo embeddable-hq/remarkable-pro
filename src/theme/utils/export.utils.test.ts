@@ -437,6 +437,28 @@ describe('exportPNG · Chart.js pixel ratio', () => {
     expect(chart.resize).toHaveBeenCalledTimes(2);
   });
 
+  it('keeps restoring the remaining charts when one restore throws', async () => {
+    const broken = fakeChart(1);
+    const healthy = fakeChart(1);
+    (Chart.getChart as Mock).mockReturnValueOnce(broken).mockReturnValueOnce(healthy);
+    broken.resize
+      .mockImplementationOnce(() => broken.calls.push('resize'))
+      .mockImplementationOnce(() => {
+        throw new Error('resize failed');
+      });
+    (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
+
+    const el = containerWithCanvas();
+    el.appendChild(document.createElement('canvas'));
+
+    await expect(
+      exportPNG({ title: 'test', containerRef: { current: el }, theme: mockTheme }),
+    ).resolves.toBeUndefined();
+
+    expect(healthy.options.devicePixelRatio).toBeUndefined();
+    expect(healthy.calls).toEqual(['stop', 'resize', 'stop', 'resize']);
+  });
+
   it('leaves charts already rendered at or above the export scale untouched', async () => {
     const chart = fakeChart(PNG_EXPORT_SCALE);
     (Chart.getChart as Mock).mockReturnValue(chart);
