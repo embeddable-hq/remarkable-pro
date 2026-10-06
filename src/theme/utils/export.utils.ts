@@ -1,6 +1,7 @@
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import * as XLSX from 'xlsx';
 import domtoimage from 'dom-to-image-more';
+import { Chart } from 'chart.js';
 import { Theme } from '../theme.types';
 import { getThemeFormatter } from '../formatter/formatter.utils';
 import { ChartCardMenuOptionOnClickProps } from '../defaults/defaults.ChartCardMenu.constants';
@@ -75,6 +76,62 @@ export function exportXLSX({
   XLSX.writeFile(workbook, `${title ?? 'untitled'}.xlsx`);
 }
 
+/**
+ * Rasterize PNG exports at 2x CSS pixels so they stay sharp on high-DPI screens and in print.
+ * Without this, dom-to-image renders at the on-screen CSS size with no device-pixel-ratio scaling.
+ */
+export const PNG_EXPORT_SCALE = 2;
+
+/**
+ * Chart.js sizes its canvas backing store from the *screen's* device pixel ratio, and dom-to-image
+ * copies that backing store as-is. On a 1x screen the chart body would therefore be upscaled and
+ * blurry even though the surrounding DOM renders crisply at PNG_EXPORT_SCALE. Temporarily
+ * re-render any lower-resolution charts at the export ratio, then restore them.
+ */
+const withChartsAtPixelRatio = async <T>(
+  element: HTMLElement,
+  pixelRatio: number,
+  render: () => Promise<T>,
+): Promise<T> => {
+  const charts = Array.from(element.querySelectorAll('canvas'))
+    .map((canvas) => Chart.getChart(canvas))
+    .filter((chart): chart is Chart => !!chart && chart.currentDevicePixelRatio < pixelRatio);
+
+  if (charts.length === 0) {
+    return render();
+  }
+
+  const originalRatios = charts.map((chart) => chart.options.devicePixelRatio);
+  const setPixelRatio = (chart: Chart, ratio: number | undefined) => {
+    // Chart.js defers a resize to its next animation frame while an animation is running, and
+    // frames never fire in a hidden tab. Stopping the animation makes the resize (and the redraw
+    // at the new ratio) synchronous.
+    chart.stop();
+    chart.options.devicePixelRatio = ratio;
+    chart.resize();
+  };
+
+  charts.forEach((chart) => setPixelRatio(chart, pixelRatio));
+  try {
+    return await render();
+  } finally {
+    charts.forEach((chart, i) => setPixelRatio(chart, originalRatios[i]));
+  }
+};
+
+/**
+ * dom-to-image copies each element's computed style onto its clone, but keeps the clone's inline
+ * `style` attribute and never overrides a property that attribute already sets. Any CSS rule that
+ * beats an inline style on screen (e.g. `align-items: center !important` over AutoTextSize's inline
+ * `align-items: start` in KpiChart) is therefore lost in the export. The computed style already
+ * reflects inline styles, so dropping the attribute from the clone loses nothing.
+ */
+export const stripInlineStyleFromClone = (_node: Node, clone: Node): void => {
+  if (clone instanceof Element) {
+    clone.removeAttribute('style');
+  }
+};
+
 export async function exportPNG({
   title,
   containerRef,
@@ -85,15 +142,19 @@ export async function exportPNG({
   }
 
   try {
-    const dataUrl = await domtoimage.toPng(element, {
-      cacheBust: true,
-      filter: (node: unknown) => {
-        if (node instanceof HTMLElement && node.hasAttribute('data-no-export')) {
-          return false; // exclude elements with data-no-export
-        }
-        return true;
-      },
-    });
+    const dataUrl = await withChartsAtPixelRatio<string>(element, PNG_EXPORT_SCALE, () =>
+      domtoimage.toPng(element, {
+        cacheBust: true,
+        scale: PNG_EXPORT_SCALE,
+        adjustClonedNode: stripInlineStyleFromClone,
+        filter: (node: unknown) => {
+          if (node instanceof HTMLElement && node.hasAttribute('data-no-export')) {
+            return false; // exclude elements with data-no-export
+          }
+          return true;
+        },
+      }),
+    );
 
     // Convert data URL to Blob for download
     const res = await fetch(dataUrl);
