@@ -12,6 +12,8 @@ export type ChartCardMenuOptionOnClickProps = {
   dimensionsAndMeasures?: (Dimension | Measure)[];
   containerRef?: React.RefObject<HTMLDivElement | null>;
   theme: Theme;
+  /** Per-option settings supplied by the theme (see ChartCardMenuOption.options). */
+  options?: Record<string, unknown>;
   onCustomDownload?: (props: (props: ChartCardMenuOptionOnClickProps) => void) => void;
 };
 
@@ -21,6 +23,8 @@ export type ChartCardMenuOption = {
   iconSrc?: string;
   /** Instant actions run immediately: no loading state and no onCustomDownload interception. */
   isInstantAction?: boolean;
+  /** Settings passed to onClick as `options`. For PNG: see PngExportOptions. */
+  options?: Record<string, unknown>;
   onClick: (props: ChartCardMenuOptionOnClickProps) => void;
 };
 

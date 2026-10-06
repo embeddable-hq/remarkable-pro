@@ -75,10 +75,18 @@ export function exportXLSX({
   XLSX.writeFile(workbook, `${title ?? 'untitled'}.xlsx`);
 }
 
+export type PngExportOptions = {
+  /** Any valid CSS color. When omitted, the PNG background is transparent. */
+  backgroundColor?: string;
+};
+
 export async function exportPNG({
   title,
   containerRef,
+  options,
 }: ChartCardMenuOptionOnClickProps): Promise<void> {
+  const { backgroundColor } = (options ?? {}) as PngExportOptions;
+
   const element = containerRef?.current;
   if (!element) {
     throw new Error('exportPNG: element is undefined');
@@ -87,6 +95,7 @@ export async function exportPNG({
   try {
     const dataUrl = await domtoimage.toPng(element, {
       cacheBust: true,
+      ...(backgroundColor && { bgcolor: backgroundColor }),
       filter: (node: unknown) => {
         if (node instanceof HTMLElement && node.hasAttribute('data-no-export')) {
           return false; // exclude elements with data-no-export

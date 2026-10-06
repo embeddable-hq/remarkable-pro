@@ -50,16 +50,19 @@ export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
   };
 
   const handleOptionClick = (option: ChartCardMenuOption) => {
+    const run = (args: ChartCardMenuOptionOnClickProps) =>
+      option.onClick({ ...args, options: option.options });
+
     if (option.isInstantAction) {
-      option.onClick({ ...props, theme });
+      run({ ...props, theme });
       return;
     }
     setIsLoading(true);
     if (props.onCustomDownload) {
-      props.onCustomDownload((args) => startAction(() => option.onClick(args)));
+      props.onCustomDownload((args) => startAction(() => run(args)));
       return;
     }
-    startAction(() => option.onClick({ ...props, theme }));
+    startAction(() => run({ ...props, theme }));
   };
 
   return (
