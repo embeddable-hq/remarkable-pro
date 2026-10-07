@@ -58,10 +58,18 @@ const toNumber = (str: string): number | undefined => {
   return num;
 };
 
+const stringifyValue = (value: unknown): string => {
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
+    return String(value);
+  }
+  // Objects would stringify to '[object Object]', so serialize them instead
+  return JSON.stringify(value) ?? '';
+};
+
 const toCell = (value: unknown, numeric: boolean): ExportCell => {
   if (value === undefined || value === null || value === '') return '';
-  // Objects would stringify to '[object Object]', so serialize them instead
-  const str = typeof value === 'object' ? JSON.stringify(value) : String(value);
+  const str = stringifyValue(value);
   if (numeric) {
     const num = toNumber(str);
     if (num !== undefined) return num;
