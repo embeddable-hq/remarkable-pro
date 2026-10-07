@@ -110,6 +110,18 @@ describe('exportCSV', () => {
     expect(await blob.text()).toBe('Name\r\n"He said ""hello"""');
   });
 
+  it('keeps blank, non-finite and unsafe-integer numeric values as the original string', async () => {
+    exportCSV({
+      title: 'test',
+      data: [{ n: '   ' }, { n: 'Infinity' }, { n: '12345678901234567890' }],
+      dimensionsAndMeasures: [measure('n', 'N')],
+      theme: mockTheme,
+    });
+
+    const blob = createObjectURL.mock.calls[0]?.[0] as Blob;
+    expect(await blob.text()).toBe('N\r\n"   "\r\nInfinity\r\n12345678901234567890');
+  });
+
   it('escapes null values as empty strings', async () => {
     exportCSV({
       title: 'test',
@@ -198,6 +210,31 @@ describe('exportXLSX', () => {
       theme: mockTheme,
     });
     expect(XLSX.utils.aoa_to_sheet).toHaveBeenCalledWith([['Revenue'], ['N/A'], [''], ['']]);
+  });
+
+  it('keeps blank, non-finite and unsafe-integer values as the original string', () => {
+    exportXLSX({
+      title: 'test',
+      data: [
+        { n: '   ' },
+        { n: 'Infinity' },
+        { n: '-Infinity' },
+        { n: '12345678901234567890' },
+        { n: '9007199254740991' },
+        { n: '3.3333333333333335' },
+      ],
+      dimensionsAndMeasures: [measure('n', 'N')],
+      theme: mockTheme,
+    });
+    expect(XLSX.utils.aoa_to_sheet).toHaveBeenCalledWith([
+      ['N'],
+      ['   '],
+      ['Infinity'],
+      ['-Infinity'],
+      ['12345678901234567890'],
+      [9007199254740991],
+      [3.3333333333333335],
+    ]);
   });
 
   it('calls writeFile with the correct filename', () => {

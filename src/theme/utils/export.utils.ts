@@ -45,13 +45,27 @@ const isNumericColumn = (dimensionOrMeasure: Dimension | Measure): boolean => {
   return false;
 };
 
+const INTEGER_STRING = /^[+-]?\d+$/;
+
+// Returns the number only when it's a faithful representation of the string value.
+const toNumber = (str: string): number | undefined => {
+  const trimmed = str.trim();
+  if (trimmed === '') return undefined; // Number('  ') is 0
+  const num = Number(trimmed);
+  if (!Number.isFinite(num)) return undefined; // NaN, Infinity
+  // Integers beyond the safe range would silently lose digits, so keep them as text
+  if (INTEGER_STRING.test(trimmed) && !Number.isSafeInteger(num)) return undefined;
+  return num;
+};
+
 const toCell = (value: unknown, numeric: boolean): ExportCell => {
   if (value === undefined || value === null || value === '') return '';
+  const str = String(value);
   if (numeric) {
-    const num = Number(value);
-    if (!Number.isNaN(num)) return num;
+    const num = toNumber(str);
+    if (num !== undefined) return num;
   }
-  return String(value);
+  return str;
 };
 
 // RFC4180 cell-escaping: only quote when needed, and double any inner quotes
