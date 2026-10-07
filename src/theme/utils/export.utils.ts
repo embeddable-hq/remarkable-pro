@@ -1,14 +1,66 @@
-import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
+import {
+  CUBE_DIMENSION_TYPE_NUMBER,
+  CUBE_MEASURE_TYPE_AVG,
+  CUBE_MEASURE_TYPE_COUNT,
+  CUBE_MEASURE_TYPE_COUNT_DISTINCT,
+  CUBE_MEASURE_TYPE_COUNT_DISTINCT_APPROX,
+  CUBE_MEASURE_TYPE_MAX,
+  CUBE_MEASURE_TYPE_MIN,
+  CUBE_MEASURE_TYPE_NUMBER,
+  CUBE_MEASURE_TYPE_SUM,
+  DataResponse,
+  Dimension,
+  Measure,
+  isDimension,
+  isMeasure,
+} from '@embeddable.com/core';
 import * as XLSX from 'xlsx';
 import domtoimage from 'dom-to-image-more';
 import { Theme } from '../theme.types';
 import { getThemeFormatter } from '../formatter/formatter.utils';
 import { ChartCardMenuOptionOnClickProps } from '../defaults/defaults.ChartCardMenu.constants';
 
-// RFC4180 cell-escaping: wrap in quotes and double any inner quotes
-const escapeCell = (val: unknown): string => {
-  const str = val == null ? '' : String(val);
-  return `"${str.replace(/"/g, '""')}"`;
+type ExportCell = string | number;
+
+const NUMERIC_MEASURE_TYPES: ReadonlyArray<string> = [
+  CUBE_MEASURE_TYPE_NUMBER,
+  CUBE_MEASURE_TYPE_COUNT,
+  CUBE_MEASURE_TYPE_COUNT_DISTINCT,
+  CUBE_MEASURE_TYPE_COUNT_DISTINCT_APPROX,
+  CUBE_MEASURE_TYPE_SUM,
+  CUBE_MEASURE_TYPE_AVG,
+  CUBE_MEASURE_TYPE_MIN,
+  CUBE_MEASURE_TYPE_MAX,
+];
+
+// Cube returns measure values as strings, so numeric columns need to be coerced explicitly.
+// Decided by column type (not by sniffing values) so text like zip codes keeps its leading zeros.
+const isNumericColumn = (dimensionOrMeasure: Dimension | Measure): boolean => {
+  if (isMeasure(dimensionOrMeasure)) {
+    return NUMERIC_MEASURE_TYPES.includes(dimensionOrMeasure.nativeType);
+  }
+  if (isDimension(dimensionOrMeasure)) {
+    return dimensionOrMeasure.nativeType === CUBE_DIMENSION_TYPE_NUMBER;
+  }
+  return false;
+};
+
+const toCell = (value: unknown, numeric: boolean): ExportCell => {
+  if (value === undefined || value === null || value === '') return '';
+  if (numeric) {
+    const num = Number(value);
+    if (!Number.isNaN(num)) return num;
+  }
+  return String(value);
+};
+
+// RFC4180 cell-escaping: only quote when needed, and double any inner quotes
+const escapeCell = (cell: ExportCell): string => {
+  const str = String(cell);
+  if (typeof cell === 'string' && /[",\r\n]|^\s|\s$/.test(str)) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
 };
 
 const downloadBlob = (url: string, fileName: string) => {
@@ -24,24 +76,19 @@ const formatData = (
   data: DataResponse['data'],
   dimensionsAndMeasures: (Dimension | Measure)[],
   theme: Theme,
-): Array<Array<string>> => {
+): Array<Array<ExportCell>> => {
   const themeFormatter = getThemeFormatter(theme);
 
   const headers = dimensionsAndMeasures.map((dm) => {
     return themeFormatter.dimensionOrMeasureTitle(dm);
   });
-  const body = data!.map((dataRow) => {
-    const row: Array<string> = [];
-    dimensionsAndMeasures.forEach((dimensionOrMeasure) => {
-      const value = dataRow[dimensionOrMeasure.name];
-      if (value !== undefined && value !== null) {
-        row.push(String(value));
-      } else {
-        row.push('');
-      }
-    });
-    return row;
-  });
+  const columns = dimensionsAndMeasures.map((dm) => ({
+    name: dm.name,
+    numeric: isNumericColumn(dm),
+  }));
+  const body = data!.map((dataRow) =>
+    columns.map(({ name, numeric }) => toCell(dataRow[name], numeric)),
+  );
 
   return [headers, ...body];
 };
