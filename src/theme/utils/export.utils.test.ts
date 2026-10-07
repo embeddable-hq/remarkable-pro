@@ -237,6 +237,16 @@ describe('exportXLSX', () => {
     ]);
   });
 
+  it('serializes object values instead of exporting "[object Object]"', () => {
+    exportXLSX({
+      title: 'test',
+      data: [{ geo: { lat: 1, lng: 2 } }],
+      dimensionsAndMeasures: [dim('geo', 'Geo')],
+      theme: mockTheme,
+    });
+    expect(XLSX.utils.aoa_to_sheet).toHaveBeenCalledWith([['Geo'], ['{"lat":1,"lng":2}']]);
+  });
+
   it('calls writeFile with the correct filename', () => {
     exportXLSX({ title: 'MyReport', data: [], dimensionsAndMeasures: [], theme: mockTheme });
     expect(XLSX.writeFile).toHaveBeenCalledWith(expect.anything(), 'MyReport.xlsx');

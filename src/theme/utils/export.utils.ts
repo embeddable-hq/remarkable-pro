@@ -22,7 +22,7 @@ import { ChartCardMenuOptionOnClickProps } from '../defaults/defaults.ChartCardM
 
 type ExportCell = string | number;
 
-const NUMERIC_MEASURE_TYPES: ReadonlyArray<string> = [
+const NUMERIC_MEASURE_TYPES: ReadonlySet<string> = new Set([
   CUBE_MEASURE_TYPE_NUMBER,
   CUBE_MEASURE_TYPE_COUNT,
   CUBE_MEASURE_TYPE_COUNT_DISTINCT,
@@ -31,13 +31,13 @@ const NUMERIC_MEASURE_TYPES: ReadonlyArray<string> = [
   CUBE_MEASURE_TYPE_AVG,
   CUBE_MEASURE_TYPE_MIN,
   CUBE_MEASURE_TYPE_MAX,
-];
+]);
 
 // Cube returns measure values as strings, so numeric columns need to be coerced explicitly.
 // Decided by column type (not by sniffing values) so text like zip codes keeps its leading zeros.
 const isNumericColumn = (dimensionOrMeasure: Dimension | Measure): boolean => {
   if (isMeasure(dimensionOrMeasure)) {
-    return NUMERIC_MEASURE_TYPES.includes(dimensionOrMeasure.nativeType);
+    return NUMERIC_MEASURE_TYPES.has(dimensionOrMeasure.nativeType);
   }
   if (isDimension(dimensionOrMeasure)) {
     return dimensionOrMeasure.nativeType === CUBE_DIMENSION_TYPE_NUMBER;
@@ -60,7 +60,8 @@ const toNumber = (str: string): number | undefined => {
 
 const toCell = (value: unknown, numeric: boolean): ExportCell => {
   if (value === undefined || value === null || value === '') return '';
-  const str = String(value);
+  // Objects would stringify to '[object Object]', so serialize them instead
+  const str = typeof value === 'object' ? JSON.stringify(value) : String(value);
   if (numeric) {
     const num = toNumber(str);
     if (num !== undefined) return num;
