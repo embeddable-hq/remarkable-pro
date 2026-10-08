@@ -2,7 +2,14 @@ import type { Dimension } from '@embeddable.com/core';
 import type { Mock } from 'vitest';
 import * as XLSX from 'xlsx';
 import domtoimage from 'dom-to-image-more';
-import { exportCSV, exportPNG, exportXLSX } from './export.utils';
+import { Chart } from 'chart.js';
+import {
+  exportCSV,
+  exportPNG,
+  exportXLSX,
+  PNG_EXPORT_SCALE,
+  stripInlineStyleFromClone,
+} from './export.utils';
 import { getThemeFormatter } from '../formatter/formatter.utils';
 import type { Theme } from '../theme.types';
 
@@ -19,6 +26,8 @@ vi.mock('xlsx', () => ({
 }));
 
 vi.mock('dom-to-image-more', () => ({ default: { toPng: vi.fn() } }));
+
+vi.mock('chart.js', () => ({ Chart: { getChart: vi.fn() } }));
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 const mockTheme = {} as Theme;
@@ -212,6 +221,18 @@ describe('exportPNG', () => {
     expect(domtoimage.toPng).toHaveBeenCalledWith(el, expect.objectContaining({ cacheBust: true }));
   });
 
+  it('rasterizes at PNG_EXPORT_SCALE so the output is not limited to on-screen CSS pixels', async () => {
+    const el = document.createElement('div');
+    (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
+
+    await exportPNG({ title: 'test', containerRef: { current: el }, theme: mockTheme });
+
+    expect(domtoimage.toPng).toHaveBeenCalledWith(
+      el,
+      expect.objectContaining({ scale: PNG_EXPORT_SCALE }),
+    );
+  });
+
   it('does not set a background color by default', async () => {
     const el = document.createElement('div');
     (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
@@ -276,6 +297,26 @@ describe('exportPNG', () => {
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:png-url');
   });
 
+  it('strips inline styles from cloned elements so computed styles win', async () => {
+    const el = document.createElement('div');
+    (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
+
+    await exportPNG({ title: 'test', containerRef: { current: el }, theme: mockTheme });
+
+    const callArgs = (domtoimage.toPng as Mock).mock.calls[0];
+    const adjustClonedNode = callArgs && callArgs[1] ? callArgs[1].adjustClonedNode : undefined;
+    expect(adjustClonedNode).toBe(stripInlineStyleFromClone);
+
+    const original = document.createElement('div');
+    original.setAttribute('style', 'display: flex; align-items: start;');
+    const clone = original.cloneNode(false) as HTMLElement;
+    adjustClonedNode(original, clone, false);
+
+    expect(clone.hasAttribute('style')).toBe(false);
+    expect(original.getAttribute('style')).toBe('display: flex; align-items: start;');
+    expect(() => adjustClonedNode(original, document.createTextNode('x'), false)).not.toThrow();
+  });
+
   it('excludes elements marked with data-no-export', async () => {
     const el = document.createElement('div');
     (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
@@ -300,5 +341,173 @@ describe('exportPNG', () => {
     await expect(
       exportPNG({ title: 'test', containerRef: { current: el }, theme: mockTheme }),
     ).rejects.toThrow('exportPNG failed: render failed');
+  });
+});
+
+// ─── exportPNG · Chart.js pixel ratio ────────────────────────────────────────
+describe('exportPNG · Chart.js pixel ratio', () => {
+  type FakeChart = {
+    currentDevicePixelRatio: number;
+    options: { devicePixelRatio?: number };
+    resize: Mock;
+    stop: Mock;
+    calls: string[];
+  };
+
+  const fakeChart = (currentDevicePixelRatio: number): FakeChart => {
+    const chart: FakeChart = {
+      currentDevicePixelRatio,
+      options: {},
+      calls: [],
+      stop: vi.fn(() => {
+        chart.calls.push('stop');
+      }),
+      resize: vi.fn(() => {
+        chart.calls.push('resize');
+        chart.currentDevicePixelRatio = chart.options.devicePixelRatio ?? currentDevicePixelRatio;
+      }),
+    };
+    return chart;
+  };
+
+  const containerWithCanvas = () => {
+    const el = document.createElement('div');
+    el.appendChild(document.createElement('canvas'));
+    return el;
+  };
+
+  beforeEach(() => {
+    vi.stubGlobal('URL', {
+      createObjectURL: vi.fn(() => 'blob:png-url'),
+      revokeObjectURL: vi.fn(),
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        blob: vi.fn().mockResolvedValue(new Blob(['png'], { type: 'image/png' })),
+      }),
+    );
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+    (Chart.getChart as Mock).mockReset();
+  });
+
+  it('re-renders low-resolution charts at the export scale while rasterizing', async () => {
+    const chart = fakeChart(1);
+    (Chart.getChart as Mock).mockReturnValue(chart);
+
+    let ratioDuringRender: number | undefined;
+    (domtoimage.toPng as Mock).mockImplementation(async () => {
+      ratioDuringRender = chart.currentDevicePixelRatio;
+      return 'data:image/png;base64,abc';
+    });
+
+    await exportPNG({
+      title: 'test',
+      containerRef: { current: containerWithCanvas() },
+      theme: mockTheme,
+    });
+
+    expect(ratioDuringRender).toBe(PNG_EXPORT_SCALE);
+  });
+
+  it('stops running animations before each resize so the redraw is synchronous', async () => {
+    const chart = fakeChart(1);
+    (Chart.getChart as Mock).mockReturnValue(chart);
+    (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
+
+    await exportPNG({
+      title: 'test',
+      containerRef: { current: containerWithCanvas() },
+      theme: mockTheme,
+    });
+
+    expect(chart.calls).toEqual(['stop', 'resize', 'stop', 'resize']);
+  });
+
+  it('restores the original pixel ratio after the export', async () => {
+    const chart = fakeChart(1);
+    (Chart.getChart as Mock).mockReturnValue(chart);
+    (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
+
+    await exportPNG({
+      title: 'test',
+      containerRef: { current: containerWithCanvas() },
+      theme: mockTheme,
+    });
+
+    expect(chart.options.devicePixelRatio).toBeUndefined();
+    expect(chart.currentDevicePixelRatio).toBe(1);
+    expect(chart.resize).toHaveBeenCalledTimes(2);
+  });
+
+  it('restores the original pixel ratio even when rasterizing fails', async () => {
+    const chart = fakeChart(1);
+    (Chart.getChart as Mock).mockReturnValue(chart);
+    (domtoimage.toPng as Mock).mockRejectedValue(new Error('render failed'));
+
+    await expect(
+      exportPNG({
+        title: 'test',
+        containerRef: { current: containerWithCanvas() },
+        theme: mockTheme,
+      }),
+    ).rejects.toThrow('exportPNG failed: render failed');
+
+    expect(chart.options.devicePixelRatio).toBeUndefined();
+    expect(chart.resize).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps restoring the remaining charts when one restore throws', async () => {
+    const broken = fakeChart(1);
+    const healthy = fakeChart(1);
+    (Chart.getChart as Mock).mockReturnValueOnce(broken).mockReturnValueOnce(healthy);
+    broken.resize
+      .mockImplementationOnce(() => broken.calls.push('resize'))
+      .mockImplementationOnce(() => {
+        throw new Error('resize failed');
+      });
+    (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
+
+    const el = containerWithCanvas();
+    el.appendChild(document.createElement('canvas'));
+
+    await expect(
+      exportPNG({ title: 'test', containerRef: { current: el }, theme: mockTheme }),
+    ).resolves.toBeUndefined();
+
+    expect(healthy.options.devicePixelRatio).toBeUndefined();
+    expect(healthy.calls).toEqual(['stop', 'resize', 'stop', 'resize']);
+  });
+
+  it('leaves charts already rendered at or above the export scale untouched', async () => {
+    const chart = fakeChart(PNG_EXPORT_SCALE);
+    (Chart.getChart as Mock).mockReturnValue(chart);
+    (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
+
+    await exportPNG({
+      title: 'test',
+      containerRef: { current: containerWithCanvas() },
+      theme: mockTheme,
+    });
+
+    expect(chart.resize).not.toHaveBeenCalled();
+  });
+
+  it('ignores canvases that are not Chart.js charts', async () => {
+    (Chart.getChart as Mock).mockReturnValue(undefined);
+    (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
+
+    await expect(
+      exportPNG({
+        title: 'test',
+        containerRef: { current: containerWithCanvas() },
+        theme: mockTheme,
+      }),
+    ).resolves.toBeUndefined();
   });
 });
