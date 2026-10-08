@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.12.0
+
+### Minor Changes
+
+- dae6656: Chart menu options can now carry an `options` object, passed to `onClick` as `options`. PNG export supports `options.backgroundColor` to override the default transparent background.
+
 ## 0.11.1
 
 ### Patch Changes
