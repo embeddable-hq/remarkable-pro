@@ -1,13 +1,8 @@
 import {
   CUBE_DIMENSION_TYPE_NUMBER,
-  CUBE_MEASURE_TYPE_AVG,
-  CUBE_MEASURE_TYPE_COUNT,
-  CUBE_MEASURE_TYPE_COUNT_DISTINCT,
-  CUBE_MEASURE_TYPE_COUNT_DISTINCT_APPROX,
-  CUBE_MEASURE_TYPE_MAX,
-  CUBE_MEASURE_TYPE_MIN,
-  CUBE_MEASURE_TYPE_NUMBER,
-  CUBE_MEASURE_TYPE_SUM,
+  CUBE_MEASURE_TYPE_BOOLEAN,
+  CUBE_MEASURE_TYPE_STRING,
+  CUBE_MEASURE_TYPE_TIME,
   DataResponse,
   Dimension,
   Measure,
@@ -22,22 +17,19 @@ import { ChartCardMenuOptionOnClickProps } from '../defaults/defaults.ChartCardM
 
 type ExportCell = string | number;
 
-const NUMERIC_MEASURE_TYPES: ReadonlySet<string> = new Set([
-  CUBE_MEASURE_TYPE_NUMBER,
-  CUBE_MEASURE_TYPE_COUNT,
-  CUBE_MEASURE_TYPE_COUNT_DISTINCT,
-  CUBE_MEASURE_TYPE_COUNT_DISTINCT_APPROX,
-  CUBE_MEASURE_TYPE_SUM,
-  CUBE_MEASURE_TYPE_AVG,
-  CUBE_MEASURE_TYPE_MIN,
-  CUBE_MEASURE_TYPE_MAX,
+// Measures are numeric unless Cube says otherwise, so new numeric types (and a missing
+// nativeType on code-configured measures) are covered without maintaining a list of them.
+const NON_NUMERIC_MEASURE_TYPES: ReadonlySet<string> = new Set([
+  CUBE_MEASURE_TYPE_STRING,
+  CUBE_MEASURE_TYPE_TIME,
+  CUBE_MEASURE_TYPE_BOOLEAN,
 ]);
 
 // Cube returns measure values as strings, so numeric columns need to be coerced explicitly.
 // Decided by column type (not by sniffing values) so text like zip codes keeps its leading zeros.
 const isNumericColumn = (dimensionOrMeasure: Dimension | Measure): boolean => {
   if (isMeasure(dimensionOrMeasure)) {
-    return NUMERIC_MEASURE_TYPES.has(dimensionOrMeasure.nativeType);
+    return !NON_NUMERIC_MEASURE_TYPES.has(dimensionOrMeasure.nativeType);
   }
   if (isDimension(dimensionOrMeasure)) {
     return dimensionOrMeasure.nativeType === CUBE_DIMENSION_TYPE_NUMBER;

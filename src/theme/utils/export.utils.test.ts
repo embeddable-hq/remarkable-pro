@@ -202,6 +202,26 @@ describe('exportXLSX', () => {
     ]);
   });
 
+  it('treats measures as numeric unless their type is string, time or boolean', () => {
+    exportXLSX({
+      title: 'test',
+      data: [{ a: '1', b: '2', c: '3', d: '4', e: '5', f: '6' }],
+      dimensionsAndMeasures: [
+        measure('a', 'A', 'count_distinct_approx'),
+        { name: 'b', title: 'B', __type__: 'measure' } as unknown as Measure, // no nativeType
+        measure('c', 'C', 'string'),
+        measure('d', 'D', 'time'),
+        measure('e', 'E', 'boolean'),
+        measure('f', 'F', 'sum'),
+      ],
+      theme: mockTheme,
+    });
+    expect(XLSX.utils.aoa_to_sheet).toHaveBeenCalledWith([
+      ['A', 'B', 'C', 'D', 'E', 'F'],
+      [1, 2, '3', '4', '5', 6],
+    ]);
+  });
+
   it('falls back to the original string when a numeric value is not a number', () => {
     exportXLSX({
       title: 'test',
