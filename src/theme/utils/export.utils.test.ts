@@ -234,6 +234,32 @@ describe('exportPNG', () => {
     );
   });
 
+  it('does not set a background color by default', async () => {
+    const el = document.createElement('div');
+    (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
+
+    await exportPNG({ title: 'test', containerRef: { current: el }, theme: mockTheme });
+
+    expect((domtoimage.toPng as Mock).mock.calls[0]![1]).not.toHaveProperty('bgcolor');
+  });
+
+  it('passes options.backgroundColor to domtoimage as bgcolor', async () => {
+    const el = document.createElement('div');
+    (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
+
+    await exportPNG({
+      title: 'test',
+      containerRef: { current: el },
+      theme: mockTheme,
+      options: { backgroundColor: '#ffffff' },
+    });
+
+    expect(domtoimage.toPng).toHaveBeenCalledWith(
+      el,
+      expect.objectContaining({ bgcolor: '#ffffff' }),
+    );
+  });
+
   it('sets the correct download filename', async () => {
     const el = document.createElement('div');
     (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');

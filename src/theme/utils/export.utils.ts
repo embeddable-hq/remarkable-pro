@@ -130,7 +130,11 @@ export const stripInlineStyleFromClone = (_node: Node, clone: Node): void => {
 export async function exportPNG({
   title,
   containerRef,
+  options,
 }: ChartCardMenuOptionOnClickProps): Promise<void> {
+  // Any valid CSS color. When omitted, the PNG background is transparent.
+  const backgroundColor = options?.backgroundColor as string | undefined;
+
   const element = containerRef?.current;
   if (!element) {
     throw new Error('exportPNG: element is undefined');
@@ -141,6 +145,7 @@ export async function exportPNG({
       domtoimage.toPng(element, {
         cacheBust: true,
         scale: PNG_EXPORT_SCALE,
+        ...(backgroundColor && { bgcolor: backgroundColor }),
         adjustClonedNode: stripInlineStyleFromClone,
         filter: (node: unknown) => {
           if (node instanceof HTMLElement && node.hasAttribute('data-no-export')) {
