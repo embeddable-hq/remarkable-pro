@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.12.1
+
+### Patch Changes
+
+- ec2c909: Export PNGs at 2x resolution and fix KPI value alignment in exported images
+
 ## 0.12.0
 
 ### Minor Changes
