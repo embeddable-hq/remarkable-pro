@@ -110,8 +110,9 @@ const withChartsAtPixelRatio = async <T>(
     charts.forEach((chart, i) => {
       try {
         setPixelRatio(chart, originalRatios[i]);
-      } catch {
+      } catch (error) {
         // keep restoring the remaining charts
+        console.warn('exportPNG: failed to restore chart pixel ratio', error);
       }
     });
   }

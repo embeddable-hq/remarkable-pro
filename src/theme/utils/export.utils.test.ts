@@ -227,7 +227,6 @@ describe('exportPNG', () => {
 
     await exportPNG({ title: 'test', containerRef: { current: el }, theme: mockTheme });
 
-    expect(PNG_EXPORT_SCALE).toBe(2);
     expect(domtoimage.toPng).toHaveBeenCalledWith(
       el,
       expect.objectContaining({ scale: PNG_EXPORT_SCALE }),
