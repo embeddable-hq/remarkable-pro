@@ -120,6 +120,58 @@ describe('ChartCardMenuPro', () => {
     vi.useRealTimers();
   });
 
+  it('passes the option options to onClick', async () => {
+    vi.useFakeTimers();
+    const onClickMock = vi.fn();
+
+    render(
+      <ChartCardMenuPro
+        menuOptions={[
+          {
+            value: 'png',
+            labelKey: 'export.png',
+            onClick: onClickMock,
+            options: { backgroundColor: '#fff' },
+          },
+        ]}
+      />,
+    );
+    fireEvent.click(screen.getByText('export.png'));
+    await vi.runAllTimersAsync();
+
+    expect(onClickMock).toHaveBeenCalledWith(
+      expect.objectContaining({ options: { backgroundColor: '#fff' } }),
+    );
+    vi.useRealTimers();
+  });
+
+  it('passes the option options to onClick when using onCustomDownload', async () => {
+    vi.useFakeTimers();
+    const onClickMock = vi.fn();
+    const onCustomDownload = vi.fn((cb) => cb({ title: 'custom' }));
+
+    render(
+      <ChartCardMenuPro
+        onCustomDownload={onCustomDownload}
+        menuOptions={[
+          {
+            value: 'png',
+            labelKey: 'export.png',
+            onClick: onClickMock,
+            options: { backgroundColor: '#fff' },
+          },
+        ]}
+      />,
+    );
+    fireEvent.click(screen.getByText('export.png'));
+    await vi.runAllTimersAsync();
+
+    expect(onClickMock).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'custom', options: { backgroundColor: '#fff' } }),
+    );
+    vi.useRealTimers();
+  });
+
   it('calls onCustomDownload instead of onClick directly when provided', async () => {
     vi.useFakeTimers();
     const onClickMock = vi.fn().mockResolvedValue(undefined);
