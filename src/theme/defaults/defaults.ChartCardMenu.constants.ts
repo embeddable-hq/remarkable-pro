@@ -23,7 +23,7 @@ export type ChartCardMenuOption = {
   iconSrc?: string;
   /** Instant actions run immediately: no loading state and no onCustomDownload interception. */
   isInstantAction?: boolean;
-  /** Settings passed to onClick as `options`. For PNG: see PngExportOptions. */
+  /** Settings passed to onClick as `options`. PNG supports `backgroundColor`. */
   options?: Record<string, unknown>;
   onClick: (props: ChartCardMenuOptionOnClickProps) => void;
 };

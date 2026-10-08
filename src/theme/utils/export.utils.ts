@@ -75,17 +75,13 @@ export function exportXLSX({
   XLSX.writeFile(workbook, `${title ?? 'untitled'}.xlsx`);
 }
 
-export type PngExportOptions = {
-  /** Any valid CSS color. When omitted, the PNG background is transparent. */
-  backgroundColor?: string;
-};
-
 export async function exportPNG({
   title,
   containerRef,
   options,
 }: ChartCardMenuOptionOnClickProps): Promise<void> {
-  const { backgroundColor } = (options ?? {}) as PngExportOptions;
+  // Any valid CSS color. When omitted, the PNG background is transparent.
+  const backgroundColor = options?.backgroundColor as string | undefined;
 
   const element = containerRef?.current;
   if (!element) {
