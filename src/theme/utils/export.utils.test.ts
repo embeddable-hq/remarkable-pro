@@ -357,16 +357,58 @@ describe('exportPNG', () => {
     );
   });
 
+  it('exports the container, not the card, by default', async () => {
+    const container = document.createElement('div');
+    const card = document.createElement('div');
+    (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
+
+    await exportPNG({
+      containerRef: { current: container },
+      cardRef: { current: card },
+      theme: mockTheme,
+    });
+
+    expect((domtoimage.toPng as Mock).mock.lastCall![0]).toBe(container);
+  });
+
+  it('exports the card when options.captureFullCard is true', async () => {
+    const container = document.createElement('div');
+    const card = document.createElement('div');
+    (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
+
+    await exportPNG({
+      containerRef: { current: container },
+      cardRef: { current: card },
+      theme: mockTheme,
+      options: { captureFullCard: true },
+    });
+
+    expect((domtoimage.toPng as Mock).mock.lastCall![0]).toBe(card);
+  });
+
+  it('falls back to the container when captureFullCard is set but there is no card', async () => {
+    const container = document.createElement('div');
+    (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
+
+    await exportPNG({
+      containerRef: { current: container },
+      theme: mockTheme,
+      options: { captureFullCard: true },
+    });
+
+    expect((domtoimage.toPng as Mock).mock.lastCall![0]).toBe(container);
+  });
+
   it('does not set a background color by default', async () => {
     const el = document.createElement('div');
     (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
 
     await exportPNG({ title: 'test', containerRef: { current: el }, theme: mockTheme });
 
-    expect((domtoimage.toPng as Mock).mock.calls[0]![1]).not.toHaveProperty('bgcolor');
+    expect((domtoimage.toPng as Mock).mock.lastCall![1]).not.toHaveProperty('bgcolor');
   });
 
-  it('passes options.backgroundColor to domtoimage as bgcolor', async () => {
+  it('passes options.pngBackgroundColor to domtoimage as bgcolor', async () => {
     const el = document.createElement('div');
     (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
 
@@ -374,7 +416,7 @@ describe('exportPNG', () => {
       title: 'test',
       containerRef: { current: el },
       theme: mockTheme,
-      options: { backgroundColor: '#ffffff' },
+      options: { pngBackgroundColor: '#ffffff' },
     });
 
     expect(domtoimage.toPng).toHaveBeenCalledWith(

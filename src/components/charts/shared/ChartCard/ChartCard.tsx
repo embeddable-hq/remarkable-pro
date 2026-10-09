@@ -70,6 +70,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props
   } = props;
 
   const chartRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const [showMaximizedDialog, setShowMaximizedDialog] = useState(false);
 
@@ -121,13 +122,13 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props
     });
 
   const chartCard = (
-    <Card className={styles.chartCard}>
+    <Card ref={cardRef} className={styles.chartCard}>
       {hideMenu ? null : (
         <>
           <div className={styles.chartCardHeader}>
             <CardHeader title={title} subtitle={description} tooltip={tooltip} />
           </div>
-          <div className={styles.chartCardRightContent}>
+          <div className={styles.chartCardRightContent} data-no-export>
             <div className={clsx(!isLoading && styles.hidden)}>
               <ChartCardLoading />
             </div>
@@ -135,6 +136,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props
               <ChartCardMenuPro
                 title={title}
                 containerRef={chartRef}
+                cardRef={cardRef}
                 data={data?.data}
                 dimensionsAndMeasures={dimensionsAndMeasures}
                 onCustomDownload={onCustomDownload}
