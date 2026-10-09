@@ -111,3 +111,37 @@ export const getTimeRangeFromDateRange = (
     to: startOfDayIn(toDayStart, timezone).endOf('day').toDate(),
   };
 };
+
+// The calendar shows and returns each day as midnight UTC. These move a range
+// between that and the same calendar days in `timezone`, so a picked day stays
+// that day on both sides of UTC.
+export const toCalendarDateRange = (
+  dateRange: DateRange | undefined,
+  timezone?: string,
+): DateRange | undefined => {
+  if (!dateRange || !timezone) {
+    return dateRange;
+  }
+
+  const toCalendarDay = (date: Date | undefined) =>
+    date && dayjs.utc(dayjs(date).tz(timezone).format('YYYY-MM-DD')).toDate();
+
+  return { from: toCalendarDay(dateRange.from), to: toCalendarDay(dateRange.to) };
+};
+
+export const fromCalendarDateRange = (
+  dateRange: DateRange | undefined,
+  timezone?: string,
+): DateRange | undefined => {
+  if (!dateRange || !timezone) {
+    return dateRange;
+  }
+
+  const fromCalendarDay = (date: Date | undefined) =>
+    date && dayjs.tz(dayjs.utc(date).format('YYYY-MM-DD'), timezone);
+
+  return {
+    from: fromCalendarDay(dateRange.from)?.toDate(),
+    to: fromCalendarDay(dateRange.to)?.endOf('day').toDate(),
+  };
+};
