@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.12.2
+
+### Patch Changes
+
+- 44d8b60: Declare the package is side-effect-free (except CSS)
+
 ## 0.12.1
 
 ### Patch Changes
