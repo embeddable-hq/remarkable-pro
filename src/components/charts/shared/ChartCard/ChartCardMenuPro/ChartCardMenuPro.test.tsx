@@ -131,7 +131,7 @@ describe('ChartCardMenuPro', () => {
             value: 'png',
             labelKey: 'export.png',
             onClick: onClickMock,
-            options: { backgroundColor: '#fff' },
+            options: { pngBackgroundColor: '#fff' },
           },
         ]}
       />,
@@ -140,7 +140,7 @@ describe('ChartCardMenuPro', () => {
     await vi.runAllTimersAsync();
 
     expect(onClickMock).toHaveBeenCalledWith(
-      expect.objectContaining({ options: { backgroundColor: '#fff' } }),
+      expect.objectContaining({ options: { pngBackgroundColor: '#fff' } }),
     );
     vi.useRealTimers();
   });
@@ -158,7 +158,7 @@ describe('ChartCardMenuPro', () => {
             value: 'png',
             labelKey: 'export.png',
             onClick: onClickMock,
-            options: { backgroundColor: '#fff' },
+            options: { pngBackgroundColor: '#fff' },
           },
         ]}
       />,
@@ -167,7 +167,7 @@ describe('ChartCardMenuPro', () => {
     await vi.runAllTimersAsync();
 
     expect(onClickMock).toHaveBeenCalledWith(
-      expect.objectContaining({ title: 'custom', options: { backgroundColor: '#fff' } }),
+      expect.objectContaining({ title: 'custom', options: { pngBackgroundColor: '#fff' } }),
     );
     vi.useRealTimers();
   });

@@ -6,6 +6,14 @@ import { exportCSV, exportPNG, exportXLSX } from '../utils/export.utils';
 import { Theme } from '../theme.types';
 import { ExportOptionTypeOptions } from '../../components/types/ExportOption.type.emb';
 
+/** Settings a theme can attach to a chart menu option. Currently only used by PNG export. */
+export type ChartCardMenuOptionSettings = {
+  /** PNG only. Any valid CSS color for the generated image. Transparent when omitted. */
+  pngBackgroundColor?: string;
+  /** PNG only. Export the whole card (title and description included), not just the chart body. */
+  captureFullCard?: boolean;
+};
+
 export type ChartCardMenuOptionOnClickProps = {
   title?: string;
   data?: DataResponse['data'];
@@ -15,7 +23,7 @@ export type ChartCardMenuOptionOnClickProps = {
   cardRef?: React.RefObject<HTMLDivElement | null>;
   theme: Theme;
   /** Per-option settings supplied by the theme (see ChartCardMenuOption.options). */
-  options?: Record<string, unknown>;
+  options?: ChartCardMenuOptionSettings;
   onCustomDownload?: (props: (props: ChartCardMenuOptionOnClickProps) => void) => void;
 };
 
@@ -25,8 +33,8 @@ export type ChartCardMenuOption = {
   iconSrc?: string;
   /** Instant actions run immediately: no loading state and no onCustomDownload interception. */
   isInstantAction?: boolean;
-  /** Settings passed to onClick as `options`. PNG supports `backgroundColor` and `captureFullCard`. */
-  options?: Record<string, unknown>;
+  /** Settings passed to onClick as `options`. */
+  options?: ChartCardMenuOptionSettings;
   onClick: (props: ChartCardMenuOptionOnClickProps) => void;
 };
 

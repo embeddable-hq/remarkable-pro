@@ -134,11 +134,8 @@ export async function exportPNG({
   cardRef,
   options,
 }: ChartCardMenuOptionOnClickProps): Promise<void> {
-  // Any valid CSS color. When omitted, the PNG background is transparent.
-  const backgroundColor = options?.backgroundColor as string | undefined;
-
-  // When set, export the whole card (title and description included), not just the chart body.
-  const captureFullCard = options?.captureFullCard === true;
+  const pngBackgroundColor = options?.pngBackgroundColor;
+  const captureFullCard = options?.captureFullCard;
 
   const element = (captureFullCard ? cardRef?.current : undefined) ?? containerRef?.current;
   if (!element) {
@@ -150,7 +147,7 @@ export async function exportPNG({
       domtoimage.toPng(element, {
         cacheBust: true,
         scale: PNG_EXPORT_SCALE,
-        ...(backgroundColor && { bgcolor: backgroundColor }),
+        ...(pngBackgroundColor && { bgcolor: pngBackgroundColor }),
         adjustClonedNode: stripInlineStyleFromClone,
         filter: (node: unknown) => {
           if (node instanceof HTMLElement && node.hasAttribute('data-no-export')) {

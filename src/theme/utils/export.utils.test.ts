@@ -284,7 +284,7 @@ describe('exportPNG', () => {
     expect((domtoimage.toPng as Mock).mock.lastCall![1]).not.toHaveProperty('bgcolor');
   });
 
-  it('passes options.backgroundColor to domtoimage as bgcolor', async () => {
+  it('passes options.pngBackgroundColor to domtoimage as bgcolor', async () => {
     const el = document.createElement('div');
     (domtoimage.toPng as Mock).mockResolvedValue('data:image/png;base64,abc');
 
@@ -292,7 +292,7 @@ describe('exportPNG', () => {
       title: 'test',
       containerRef: { current: el },
       theme: mockTheme,
-      options: { backgroundColor: '#ffffff' },
+      options: { pngBackgroundColor: '#ffffff' },
     });
 
     expect(domtoimage.toPng).toHaveBeenCalledWith(
