@@ -11,6 +11,8 @@ export type ChartCardMenuOptionOnClickProps = {
   data?: DataResponse['data'];
   dimensionsAndMeasures?: (Dimension | Measure)[];
   containerRef?: React.RefObject<HTMLDivElement | null>;
+  /** The whole card (header and body), as opposed to containerRef, which is the body only. */
+  cardRef?: React.RefObject<HTMLDivElement | null>;
   theme: Theme;
   /** Per-option settings supplied by the theme (see ChartCardMenuOption.options). */
   options?: Record<string, unknown>;
@@ -23,7 +25,7 @@ export type ChartCardMenuOption = {
   iconSrc?: string;
   /** Instant actions run immediately: no loading state and no onCustomDownload interception. */
   isInstantAction?: boolean;
-  /** Settings passed to onClick as `options`. PNG supports `backgroundColor`. */
+  /** Settings passed to onClick as `options`. PNG supports `backgroundColor` and `captureFullCard`. */
   options?: Record<string, unknown>;
   onClick: (props: ChartCardMenuOptionOnClickProps) => void;
 };

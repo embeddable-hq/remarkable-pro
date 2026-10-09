@@ -172,6 +172,27 @@ describe('ChartCardMenuPro', () => {
     vi.useRealTimers();
   });
 
+  it('adds cardRef to the args supplied through onCustomDownload', async () => {
+    vi.useFakeTimers();
+    const onClickMock = vi.fn();
+    const cardRef = { current: document.createElement('div') };
+    const containerRef = { current: document.createElement('div') };
+    const onCustomDownload = vi.fn((cb) => cb({ title: 'custom', containerRef }));
+
+    render(
+      <ChartCardMenuPro
+        cardRef={cardRef}
+        onCustomDownload={onCustomDownload}
+        menuOptions={[{ value: 'png', labelKey: 'export.png', onClick: onClickMock }]}
+      />,
+    );
+    fireEvent.click(screen.getByText('export.png'));
+    await vi.runAllTimersAsync();
+
+    expect(onClickMock).toHaveBeenCalledWith(expect.objectContaining({ cardRef, containerRef }));
+    vi.useRealTimers();
+  });
+
   it('calls onCustomDownload instead of onClick directly when provided', async () => {
     vi.useFakeTimers();
     const onClickMock = vi.fn().mockResolvedValue(undefined);

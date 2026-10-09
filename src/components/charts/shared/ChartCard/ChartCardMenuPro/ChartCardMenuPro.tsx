@@ -59,7 +59,7 @@ export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
     }
     setIsLoading(true);
     if (props.onCustomDownload) {
-      props.onCustomDownload((args) => startAction(() => run(args)));
+      props.onCustomDownload((args) => startAction(() => run({ cardRef: props.cardRef, ...args })));
       return;
     }
     startAction(() => run({ ...props, theme }));

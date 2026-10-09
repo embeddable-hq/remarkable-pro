@@ -131,12 +131,16 @@ export const stripInlineStyleFromClone = (_node: Node, clone: Node): void => {
 export async function exportPNG({
   title,
   containerRef,
+  cardRef,
   options,
 }: ChartCardMenuOptionOnClickProps): Promise<void> {
   // Any valid CSS color. When omitted, the PNG background is transparent.
   const backgroundColor = options?.backgroundColor as string | undefined;
 
-  const element = containerRef?.current;
+  // When set, export the whole card (title and description included), not just the chart body.
+  const captureFullCard = options?.captureFullCard === true;
+
+  const element = (captureFullCard ? cardRef?.current : undefined) ?? containerRef?.current;
   if (!element) {
     throw new Error('exportPNG: element is undefined');
   }
