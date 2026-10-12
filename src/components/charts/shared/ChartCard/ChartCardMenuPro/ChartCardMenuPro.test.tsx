@@ -131,7 +131,7 @@ describe('ChartCardMenuPro', () => {
             value: 'png',
             labelKey: 'export.png',
             onClick: onClickMock,
-            options: { backgroundColor: '#fff' },
+            options: { pngBackgroundColor: '#fff' },
           },
         ]}
       />,
@@ -140,7 +140,7 @@ describe('ChartCardMenuPro', () => {
     await vi.runAllTimersAsync();
 
     expect(onClickMock).toHaveBeenCalledWith(
-      expect.objectContaining({ options: { backgroundColor: '#fff' } }),
+      expect.objectContaining({ options: { pngBackgroundColor: '#fff' } }),
     );
     vi.useRealTimers();
   });
@@ -158,7 +158,7 @@ describe('ChartCardMenuPro', () => {
             value: 'png',
             labelKey: 'export.png',
             onClick: onClickMock,
-            options: { backgroundColor: '#fff' },
+            options: { pngBackgroundColor: '#fff' },
           },
         ]}
       />,
@@ -167,8 +167,29 @@ describe('ChartCardMenuPro', () => {
     await vi.runAllTimersAsync();
 
     expect(onClickMock).toHaveBeenCalledWith(
-      expect.objectContaining({ title: 'custom', options: { backgroundColor: '#fff' } }),
+      expect.objectContaining({ title: 'custom', options: { pngBackgroundColor: '#fff' } }),
     );
+    vi.useRealTimers();
+  });
+
+  it('adds cardRef to the args supplied through onCustomDownload', async () => {
+    vi.useFakeTimers();
+    const onClickMock = vi.fn();
+    const cardRef = { current: document.createElement('div') };
+    const containerRef = { current: document.createElement('div') };
+    const onCustomDownload = vi.fn((cb) => cb({ title: 'custom', containerRef }));
+
+    render(
+      <ChartCardMenuPro
+        cardRef={cardRef}
+        onCustomDownload={onCustomDownload}
+        menuOptions={[{ value: 'png', labelKey: 'export.png', onClick: onClickMock }]}
+      />,
+    );
+    fireEvent.click(screen.getByText('export.png'));
+    await vi.runAllTimersAsync();
+
+    expect(onClickMock).toHaveBeenCalledWith(expect.objectContaining({ cardRef, containerRef }));
     vi.useRealTimers();
   });
 

@@ -169,6 +169,13 @@ describe('ChartCard', () => {
     expect(screen.getByTestId('chart-card-menu')).toBeInTheDocument();
   });
 
+  it('excludes the menu and loading controls from exports via data-no-export', () => {
+    render(<ChartCard data={withData}>content</ChartCard>);
+    const controls = screen.getByTestId('chart-card-menu').closest('[data-no-export]');
+    expect(controls).not.toBeNull();
+    expect(controls).toContainElement(screen.getByTestId('chart-card-loading'));
+  });
+
   it('hides the header and menu when hideMenu is true', () => {
     render(
       <ChartCard data={withData} hideMenu>
