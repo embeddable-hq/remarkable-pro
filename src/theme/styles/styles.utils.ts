@@ -97,9 +97,7 @@ export type GetDimensionMeasureColorProps = {
   color: 'background' | 'border';
   index: number;
   chartColors: string[];
-  // Colors already taken in this chart. When passed, the returned color is added to it and
-  // a cached palette color that clashes is swapped for a free one (not persisted).
-  // Input/theme colors are never swapped.
+  // Colors already used in this chart. Palette colors avoid them; input/theme colors always win.
   usedColors?: Set<string>;
 };
 
@@ -112,40 +110,14 @@ export const getDimensionMeasureColor = ({
   chartColors,
   usedColors,
 }: GetDimensionMeasureColorProps) => {
-  const resolved = resolveDimensionMeasureColor({
-    dimensionOrMeasure,
-    theme,
-    color,
-    value,
-    index,
-    chartColors,
-  });
-  if (!usedColors) return resolved.color;
+  const markUsed = (c: string) => {
+    usedColors?.add(c);
+    return c;
+  };
 
-  if (resolved.fromPalette && usedColors.has(resolved.color)) {
-    const freeColor = resolved.palette.find((c) => !usedColors.has(c));
-    if (freeColor) resolved.color = freeColor;
-  }
-
-  usedColors.add(resolved.color);
-  return resolved.color;
-};
-
-const resolveDimensionMeasureColor = ({
-  dimensionOrMeasure,
-  theme,
-  color,
-  value,
-  index,
-  chartColors,
-}: Omit<GetDimensionMeasureColorProps, 'usedColors'>): {
-  color: string;
-  fromPalette: boolean;
-  palette: string[];
-} => {
   // 1) Color from inputs
   const inputColor = dimensionOrMeasure.inputs?.color;
-  if (inputColor) return { color: inputColor, fromPalette: false, palette: [] };
+  if (inputColor) return markUsed(inputColor);
 
   // 2) Color from theme (entity-specific)
   const entity = dimensionOrMeasure.__type__ === 'measure' ? 'measure' : 'dimensionValue';
@@ -153,13 +125,13 @@ const resolveDimensionMeasureColor = ({
   const borderColor = theme.charts['borderColorMap']?.[entity]?.[value];
 
   if (color === 'background') {
-    if (backgroundColor) return { color: backgroundColor, fromPalette: false, palette: [] };
-    if (borderColor) return { color: borderColor, fromPalette: false, palette: [] }; // fallback to border
+    if (backgroundColor) return markUsed(backgroundColor);
+    if (borderColor) return markUsed(borderColor); // fallback to border
   }
 
   if (color === 'border') {
-    if (borderColor) return { color: borderColor, fromPalette: false, palette: [] };
-    if (backgroundColor) return { color: backgroundColor, fromPalette: false, palette: [] }; // fallback to background
+    if (borderColor) return markUsed(borderColor);
+    if (backgroundColor) return markUsed(backgroundColor); // fallback to background
   }
 
   // 3) Palette fallback (theme palette -> provided palette)
@@ -169,6 +141,13 @@ const resolveDimensionMeasureColor = ({
 
   // Fallback to chartColors
   const palette = theme.charts?.[paletteKey] ?? theme.charts.backgroundColors ?? chartColors;
+  const paletteColor = getColor(key, value, palette, index);
 
-  return { color: getColor(key, value, palette, index), fromPalette: true, palette };
+  // Already used in this chart? Take the first free palette color (not saved to the cache)
+  if (usedColors?.has(paletteColor)) {
+    const freeColor = palette.find((c) => !usedColors.has(c));
+    if (freeColor) return markUsed(freeColor);
+  }
+
+  return markUsed(paletteColor);
 };
