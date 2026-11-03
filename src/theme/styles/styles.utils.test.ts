@@ -226,4 +226,42 @@ describe('getDimensionMeasureColor', () => {
       expect(result).toBe('#chart-2');
     });
   });
+
+  describe('usedColors (no repeats within a chart)', () => {
+    beforeEach(() => {
+      vi.mocked(getObjectStableKey).mockReturnValue('theme-hash');
+    });
+
+    const get = (value: string, usedColors?: Set<string>, theme = makeTheme()) =>
+      getDimensionMeasureColor({
+        dimensionOrMeasure: makeMeasure(),
+        theme,
+        value,
+        color: 'background',
+        index: 0,
+        chartColors,
+        usedColors,
+      });
+
+    it('swaps a cached color already used in the chart, without changing the cache', () => {
+      expect(get('count')).toBe('#chart-0'); // chart 1
+      expect(get('countMax')).toBe('#chart-0'); // chart 2
+
+      const used = new Set<string>(); // chart 3
+      expect(get('count', used)).toBe('#chart-0');
+      expect(get('countMax', used)).toBe('#chart-1');
+
+      expect(get('countMax')).toBe('#chart-0'); // chart 2 unchanged
+    });
+
+    it('never swaps a theme color, and palette colors avoid it', () => {
+      const theme = makeTheme({
+        backgroundColorMap: { measure: { a: '#chart-0', b: '#chart-0' } },
+      });
+      const used = new Set<string>();
+      expect(get('a', used, theme)).toBe('#chart-0');
+      expect(get('b', used, theme)).toBe('#chart-0');
+      expect(get('used-c', used)).toBe('#chart-1');
+    });
+  });
 });

@@ -19,6 +19,8 @@ vi.mock('../../charts.utils', () => ({
 vi.mock('../../../../theme/styles/styles.utils', () => ({ getDimensionMeasureColor: vi.fn() }));
 vi.mock('@embeddable.com/remarkable-ui', () => ({
   getChartColors: vi.fn(() => []),
+  getChartjsAxisOptionsScalesTicksMuted: vi.fn(() => ({})),
+  getChartjsAxisOptionsScalesTitle: vi.fn(() => ({})),
   getStyleNumber: vi.fn(() => 4),
 }));
 vi.mock('../../../../utils/color.utils', () => ({
