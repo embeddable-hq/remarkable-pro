@@ -4,8 +4,11 @@ import type { ChartData } from 'chart.js';
 import type { Dimension, Measure } from '@embeddable.com/core';
 import {
   createComparisonClickHandler,
+  getLineChartComparisonProData,
   getLineChartComparisonProOptions,
 } from './LineChartComparisonDefaultPro.utils';
+import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
+import { isColorValid } from '../../../../utils/color.utils';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getDimensionWithoutTruncation } from '../../charts.utils';
@@ -331,5 +334,58 @@ describe('getLineChartComparisonProOptions', () => {
 
       expect(options.scales).toBeDefined();
     });
+  });
+});
+
+describe('getLineChartComparisonProData', () => {
+  beforeEach(() => {
+    vi.mocked(getThemeFormatter).mockReturnValue(makeMockFormatter() as never);
+    vi.mocked(getDimensionMeasureColor).mockClear();
+  });
+
+  it('returns empty main and comparison datasets when data is undefined', () => {
+    const result = getLineChartComparisonProData(
+      {
+        data: undefined,
+        dataComparison: undefined,
+        dimension: makeDimension(),
+        measures: [makeMeasure()],
+        hasMinMaxYAxisRange: false,
+      },
+      makeTheme(),
+    );
+
+    expect(result.datasets).toHaveLength(2);
+    expect(getDimensionMeasureColor).not.toHaveBeenCalled();
+  });
+
+  it('uses a fresh used-colors set per pass so comparison lines match main lines', () => {
+    vi.mocked(isColorValid).mockImplementation((c) => c === '#custom');
+
+    const result = getLineChartComparisonProData(
+      {
+        data: [{ date: 'Jan', a: 1, b: 2 }],
+        dataComparison: [{ date: 'Jan', a: 3, b: 4 }],
+        dimension: makeDimension(),
+        measures: [
+          makeMeasure({
+            name: 'a',
+            inputs: { lineColor: '#custom', previousLineColor: '#custom' },
+          }),
+          makeMeasure({ name: 'b' }),
+        ],
+        hasMinMaxYAxisRange: false,
+      },
+      makeTheme(),
+    );
+
+    expect(result.datasets[0]?.borderColor).toBe('#custom');
+    expect(result.datasets[2]?.borderColor).toBe('#custom');
+    const calls = vi.mocked(getDimensionMeasureColor).mock.calls.map(([args]) => args);
+    expect(calls.map((c) => c.value)).toEqual(['b', 'b']);
+    expect(calls[0]?.usedColors).not.toBe(calls[1]?.usedColors);
+    expect(calls[0]?.usedColors?.has('#custom')).toBe(true);
+    expect(calls[1]?.usedColors?.has('#custom')).toBe(true);
+    vi.mocked(isColorValid).mockReturnValue(false);
   });
 });

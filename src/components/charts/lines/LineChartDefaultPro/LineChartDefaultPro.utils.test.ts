@@ -3,6 +3,8 @@ import type { Dimension, Measure } from '@embeddable.com/core';
 import { getLineChartProData, getLineChartProOptions } from './LineChartDefaultPro.utils';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getDimensionWithoutTruncation, groupTailAsOther } from '../../charts.utils';
+import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
+import { isColorValid } from '../../../../utils/color.utils';
 
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
 vi.mock('@embeddable.com/remarkable-ui', () => ({
@@ -123,6 +125,32 @@ describe('getLineChartProData', () => {
     );
 
     expect(result?.datasets?.[0]?.data).toEqual([100, 0]);
+  });
+
+  it('uses lineColor and keeps it out of the palette for other measures', () => {
+    vi.mocked(isColorValid).mockImplementation((c) => c === '#custom');
+    vi.mocked(getDimensionMeasureColor).mockClear();
+
+    const result = getLineChartProData(
+      {
+        data: [{ date: 'Jan', a: 1, b: 2 }],
+        dimension: makeDimension(),
+        measures: [
+          makeMeasure({ name: 'a', inputs: { lineColor: '#custom' } }),
+          makeMeasure({ name: 'b' }),
+        ],
+        hasMinMaxYAxisRange: false,
+      },
+      makeTheme(),
+    );
+
+    expect(result.datasets[0]?.borderColor).toBe('#custom');
+    const calls = vi.mocked(getDimensionMeasureColor).mock.calls.map(([args]) => args);
+    expect(calls.map((c) => c.value)).toEqual(['b', 'b']);
+    expect(calls[0]?.usedColors?.has('#custom')).toBe(true);
+    expect(calls[1]?.usedColors?.has('#custom')).toBe(true);
+    expect(calls[0]?.usedColors).not.toBe(calls[1]?.usedColors);
+    vi.mocked(isColorValid).mockReturnValue(false);
   });
 
   describe('maxItems', () => {

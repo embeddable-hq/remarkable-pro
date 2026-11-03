@@ -31,10 +31,20 @@ const getLineChartComparisonDataset = (
     hasMinMaxYAxisRange: boolean;
     isPreviousPeriod?: boolean;
     index: number;
+    usedColors?: Set<string>;
   },
   theme: Theme,
 ): ChartData<'line'>['datasets'][number] => {
-  const { data, measure, dimension, index, isPreviousPeriod, hasMinMaxYAxisRange, labels } = props;
+  const {
+    data,
+    measure,
+    dimension,
+    index,
+    isPreviousPeriod,
+    hasMinMaxYAxisRange,
+    labels,
+    usedColors,
+  } = props;
   const datasetLabels = data?.map((item) => item[dimension.name]);
 
   const zeroFill = Boolean(measure.inputs?.['connectGaps']);
@@ -62,7 +72,9 @@ const getLineChartComparisonDataset = (
         value: measure.name,
         chartColors,
         index,
+        usedColors,
       });
+  if (isColorValid(lineColorTemp)) usedColors?.add(lineColorTemp);
 
   const rawLabel = themeFormatter.dimensionOrMeasureTitle(measure);
 
@@ -123,6 +135,10 @@ export const getLineChartComparisonProData = (
         )
       : undefined;
 
+  // Each pass gets a fresh set, so a measure's comparison line resolves to the same color as its main line.
+  const usedColors = new Set<string>();
+  const usedComparisonColors = new Set<string>();
+
   const originalDatasets = measures.map((measure, index) =>
     getLineChartComparisonDataset(
       {
@@ -132,6 +148,7 @@ export const getLineChartComparisonProData = (
         labels,
         hasMinMaxYAxisRange,
         index,
+        usedColors,
       },
       theme,
     ),
@@ -147,6 +164,7 @@ export const getLineChartComparisonProData = (
         hasMinMaxYAxisRange,
         index,
         isPreviousPeriod: true,
+        usedColors: usedComparisonColors,
       },
       theme,
     ),

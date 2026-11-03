@@ -2,7 +2,12 @@ import { DataResponse, Dimension, Granularity, Measure } from '@embeddable.com/c
 import { ChartData, ChartOptions } from 'chart.js';
 import { mergician } from 'mergician';
 import type { ChartClickArgs } from '@embeddable.com/remarkable-ui';
-import { getChartColors, getStyleNumber } from '@embeddable.com/remarkable-ui';
+import {
+  getChartColors,
+  getChartjsAxisOptionsScalesTicksMuted,
+  getChartjsAxisOptionsScalesTitle,
+  getStyleNumber,
+} from '@embeddable.com/remarkable-ui';
 import { Theme } from '../../../../theme/theme.types';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
@@ -38,6 +43,8 @@ export const getBarLineChartProData = (
   const groupedData = groupTailAsOther(data, dimension, measures, maxItems);
   const themeFormatter = getThemeFormatter(theme);
   const chartColors = getChartColors();
+  const usedBackgroundColors = new Set<string>();
+  const usedBorderColors = new Set<string>();
 
   const labels = groupedData.map((item) => item[dimension.name]);
 
@@ -52,6 +59,7 @@ export const getBarLineChartProData = (
       value: measure.name,
       index,
       chartColors,
+      usedColors: usedBackgroundColors,
     }),
     borderColor: getDimensionMeasureColor({
       dimensionOrMeasure: measure,
@@ -60,6 +68,7 @@ export const getBarLineChartProData = (
       value: measure.name,
       index,
       chartColors,
+      usedColors: usedBorderColors,
     }),
   }));
 
@@ -67,6 +76,10 @@ export const getBarLineChartProData = (
     const colorIndex = barMeasures.length + index;
     const lineColor = measure.inputs?.['lineColor'];
     const zeroFill = Boolean(measure.inputs?.['connectGaps']);
+    if (isColorValid(lineColor)) {
+      usedBackgroundColors.add(lineColor);
+      usedBorderColors.add(lineColor);
+    }
 
     const backgroundColor = isColorValid(lineColor)
       ? lineColor
@@ -77,6 +90,7 @@ export const getBarLineChartProData = (
           value: measure.name,
           index: colorIndex,
           chartColors,
+          usedColors: usedBackgroundColors,
         });
 
     const borderColor = isColorValid(lineColor)
@@ -88,6 +102,7 @@ export const getBarLineChartProData = (
           value: measure.name,
           index: colorIndex,
           chartColors,
+          usedColors: usedBorderColors,
         });
 
     return {
@@ -217,12 +232,15 @@ export const getBarLineChartProOptions = (
             position: 'right',
             min: yAxisSecondaryMin,
             max: yAxisSecondaryMax,
+            border: { display: false },
             title: {
+              ...getChartjsAxisOptionsScalesTitle(),
               display: Boolean(yAxisSecondaryLabel),
               text: yAxisSecondaryLabel ?? '',
             },
             grid: { drawOnChartArea: false },
             ticks: {
+              ...getChartjsAxisOptionsScalesTicksMuted(),
               callback: (value) => {
                 const firstLineMeasure = lineMeasures[0];
                 if (!firstLineMeasure) return value;
