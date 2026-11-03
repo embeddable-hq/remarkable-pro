@@ -10,6 +10,7 @@ import { getDimensionWithoutTruncation, groupTailAsOther } from '../../charts.ut
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { getBarChartProOptions } from '../../bars/bars.utils';
+import { isColorValid } from '../../../../utils/color.utils';
 
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
 vi.mock('../../charts.utils', () => ({
@@ -363,6 +364,35 @@ describe('getBarLineChartProData', () => {
     const calls = vi.mocked(getDimensionMeasureColor).mock.calls;
     const lineColorCall = calls.find((call) => call[0].value === 'avg');
     expect(lineColorCall?.[0].index).toBe(1);
+  });
+
+  it('shares used colors between bar and line measures, reserving custom lineColor', () => {
+    vi.mocked(isColorValid).mockImplementation((c) => c === '#custom');
+    vi.mocked(getDimensionMeasureColor).mockClear();
+
+    const result = getBarLineChartProData(
+      {
+        data: [{ date: 'Jan', revenue: 1, avg: 2, max: 3 }],
+        dimension: makeDimension(),
+        barMeasures: [makeMeasure({ name: 'revenue' })],
+        lineMeasures: [
+          makeMeasure({ name: 'avg', inputs: { lineColor: '#custom' } }),
+          makeMeasure({ name: 'max' }),
+        ],
+        showSecondaryAxis: false,
+      },
+      makeTheme(),
+    );
+
+    expect(result.datasets[1]?.borderColor).toBe('#custom');
+    const calls = vi.mocked(getDimensionMeasureColor).mock.calls.map(([args]) => args);
+    const bgSets = calls.filter((c) => c.color === 'background').map((c) => c.usedColors);
+    const borderSets = calls.filter((c) => c.color === 'border').map((c) => c.usedColors);
+    expect(new Set(bgSets).size).toBe(1);
+    expect(new Set(borderSets).size).toBe(1);
+    expect(bgSets[0]).not.toBe(borderSets[0]);
+    expect(bgSets[0]?.has('#custom')).toBe(true);
+    vi.mocked(isColorValid).mockReturnValue(false);
   });
 
   it('calls groupTailAsOther with all measures (bar + line)', () => {

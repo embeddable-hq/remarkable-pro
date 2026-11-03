@@ -263,5 +263,10 @@ describe('getDimensionMeasureColor', () => {
       expect(get('b', used, theme)).toBe('#chart-0');
       expect(get('used-c', used)).toBe('#chart-1');
     });
+
+    it('keeps the clashing color when the palette is exhausted', () => {
+      const used = new Set(chartColors);
+      expect(get('count', used)).toBe('#chart-0');
+    });
   });
 });
