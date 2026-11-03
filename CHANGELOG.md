@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.13.1
+
+### Patch Changes
+
+- a0bfbca: Unique color assign for charts that have more than 1 measure
+
 ## 0.13.0
 
 ### Minor Changes
