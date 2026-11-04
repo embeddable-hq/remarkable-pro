@@ -1,4 +1,4 @@
-import { useTheme } from '@embeddable.com/react';
+import { HeightMode, useEmbeddableLayout, useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import {
@@ -25,7 +25,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getTableHeaders, getTableRows } from '../tables.utils';
 import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
 import { TABLE_SCROLLABLE_SIZE } from './TableScrollable.utils';
+import { isAutoHeight } from './TableScrollable.autoHeight';
 import { deepEqual } from 'fast-equals';
+import styles from './TableScrollable.module.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 let downloadData: (data: DataResponse['data']) => void;
@@ -39,6 +41,11 @@ export type TableScrollableProState = {
   pageSize?: number;
   sort?: { id: string; direction: OrderDirection } | undefined;
   isLoadingDownloadData: boolean;
+  /**
+   * The layout mode the component last saw. The definition's `props()` cannot call hooks, so the
+   * component reads it from the runtime and parks it here for the next render's query to branch on.
+   */
+  heightMode?: HeightMode;
 };
 
 export type TableScrollableProProps = {
@@ -82,6 +89,9 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     onRowClicked,
   } = props;
 
+  const { heightMode } = useEmbeddableLayout();
+  const isAutoHeightMode = isAutoHeight(heightMode);
+
   const headers = getTableHeaders({ dimensionsAndMeasures, displayNullAs }, theme);
   const rows = results?.data ?? [];
 
@@ -107,8 +117,9 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   useEffect(() => {
     if (!results?.data) return;
 
-    // First is pending
-    if (firstLoadPending.current) {
+    // Auto height asks for the whole allowance in one request, so every response replaces the rows.
+    // Appending would duplicate them when the query re-runs for a sort or a variable change.
+    if (firstLoadPending.current || isAutoHeightMode) {
       setRowsToDisplay([...rows]);
       firstLoadPending.current = false;
       tableRef.current?.scrollToTop('smooth');
@@ -117,7 +128,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
 
     // Append new rows
     setRowsToDisplay((prev) => [...prev, ...rows]);
-  }, [rows]);
+  }, [rows, isAutoHeightMode]);
 
   // Stable updater for embeddable state
   const handleUpdateEmbeddableState = useCallback(
@@ -129,6 +140,13 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     },
     [setState],
   );
+
+  // `props()` cannot call hooks, so this is how the query gets to see the mode at all.
+  useEffect(() => {
+    if (state?.heightMode !== heightMode) {
+      handleUpdateEmbeddableState({ heightMode });
+    }
+  }, [heightMode, state?.heightMode, handleUpdateEmbeddableState]);
 
   const handleCustomDownload = (onDownload: (props: ChartCardMenuOptionOnClickProps) => void) => {
     setIsDownloadingData(true);
@@ -204,7 +222,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   }, [isDownloadingData, allResults, handleUpdateEmbeddableState]);
 
   const handleNextPage = () => {
-    if (results.isLoading) return;
+    if (results.isLoading || isAutoHeightMode) return;
     handleUpdateEmbeddableState({ page: (state?.page ?? 0) + 1 });
   };
 
@@ -213,9 +231,20 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     handleUpdateEmbeddableState({ sort: newSort as TableScrollableProState['sort'], page: 0 });
   };
 
-  const hasMoreData = results?.data && results.data.length === TABLE_SCROLLABLE_SIZE;
+  // Arms the infinite-scroll prefetch in the UI table; auto height has no scroll box to drive it.
+  const hasMoreData =
+    !isAutoHeightMode && results?.data && results.data.length === TABLE_SCROLLABLE_SIZE;
   const isLoading = Boolean(results?.isLoading || allResults?.isLoading);
   const isLoadingTable = results?.isLoading && !firstLoadPending.current;
+
+  const totalRows = results?.total;
+  const truncatedRowsLabel =
+    isAutoHeightMode && totalRows !== undefined && totalRows > rowsToDisplay.length
+      ? i18n.t('charts.tableScrollable.truncatedRows', {
+          shown: rowsToDisplay.length.toLocaleString(),
+          total: totalRows.toLocaleString(),
+        })
+      : undefined;
 
   return (
     <ChartCard
@@ -242,6 +271,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
         onNextPage={handleNextPage}
         onSortChange={handleSortChange}
       />
+      {truncatedRowsLabel && <div className={styles.truncatedRows}>{truncatedRowsLabel}</div>}
     </ChartCard>
   );
 };

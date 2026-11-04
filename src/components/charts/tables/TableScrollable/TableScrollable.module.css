@@ -1,0 +1,7 @@
+.truncatedRows {
+  flex: 0 0 auto;
+  padding-top: var(--em-core-spacing--0200, 0.5rem);
+  color: var(--em-tablescrollable-truncated-color, #7c7c89);
+  font-size: var(--em-tablescrollable-truncated-font-size, 0.75rem);
+  text-align: right;
+}

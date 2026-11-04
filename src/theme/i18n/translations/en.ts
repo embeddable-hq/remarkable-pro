@@ -29,6 +29,9 @@ export const en: ResourceLanguage = {
       tablePaginated: {
         pagination: 'Page {{page}} of {{totalPages}}',
       },
+      tableScrollable: {
+        truncatedRows: 'Showing {{shown}} of {{total}} rows',
+      },
       pivotTable: {
         total: 'Total',
         sum: 'Sum',
