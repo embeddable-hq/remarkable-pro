@@ -1,6 +1,7 @@
 import { HeightMode, useEmbeddableLayout, useTheme } from '@embeddable.com/react';
 import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
+import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import {
   ChartCard,
   ChartCardHeaderProps,
@@ -98,6 +99,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   const cardContentRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<TableScrollableHandle | null>(null);
   const firstLoadPending = useRef(true);
+  const lastHeightModeRef = useRef(isAutoHeightMode);
   const lastDatasetVariableRef = useRef<Dataset['variableValues'] | null>(null);
 
   useEffect(() => {
@@ -117,9 +119,14 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   useEffect(() => {
     if (!results?.data) return;
 
+    // The host can switch the mode under a mounted table, and the rows on screen were paged under
+    // the mode it is leaving, so the list starts again rather than growing across the two.
+    const hasHeightModeChanged = lastHeightModeRef.current !== isAutoHeightMode;
+    lastHeightModeRef.current = isAutoHeightMode;
+
     // Auto height asks for the whole allowance in one request, so every response replaces the rows.
     // Appending would duplicate them when the query re-runs for a sort or a variable change.
-    if (firstLoadPending.current || isAutoHeightMode) {
+    if (firstLoadPending.current || isAutoHeightMode || hasHeightModeChanged) {
       setRowsToDisplay([...rows]);
       firstLoadPending.current = false;
       tableRef.current?.scrollToTop('smooth');
@@ -238,11 +245,14 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   const isLoadingTable = results?.isLoading && !firstLoadPending.current;
 
   const totalRows = results?.total;
+  // The cells of this table are formatted with the theme's locale, not the browser's, so its own
+  // row counts follow them.
+  const themeFormatter = getThemeFormatter(theme);
   const truncatedRowsLabel =
     isAutoHeightMode && totalRows !== undefined && totalRows > rowsToDisplay.length
       ? i18n.t('charts.tableScrollable.truncatedRows', {
-          shown: rowsToDisplay.length.toLocaleString(),
-          total: totalRows.toLocaleString(),
+          shown: themeFormatter.number(rowsToDisplay.length),
+          total: themeFormatter.number(totalRows),
         })
       : undefined;
 

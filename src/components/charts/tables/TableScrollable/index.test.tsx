@@ -22,6 +22,12 @@ vi.mock('../../../component.utils', () => ({
   resolveI18nProps: vi.fn((props) => props),
 }));
 
+// Marks the values the theme formatter produced, so a count formatted by the browser instead is
+// visible in the assertion.
+vi.mock('../../../../theme/formatter/formatter.utils', () => ({
+  getThemeFormatter: vi.fn(() => ({ number: (value: number) => `[${value}]` })),
+}));
+
 vi.mock('../../shared/ChartCard/ChartCard', () => ({
   ChartCard: vi.fn(
     ({
@@ -276,8 +282,8 @@ describe('TableScrollablePro', () => {
 
       expect(screen.getByText('charts.tableScrollable.truncatedRows')).toBeInTheDocument();
       expect(i18n.t).toHaveBeenCalledWith('charts.tableScrollable.truncatedRows', {
-        shown: '2',
-        total: '5',
+        shown: '[2]',
+        total: '[5]',
       });
     });
 
@@ -293,6 +299,16 @@ describe('TableScrollablePro', () => {
       render(<TableScrollablePro {...defaultProps} results={resultsOf(2, 5)} />);
 
       expect(screen.queryByText('charts.tableScrollable.truncatedRows')).not.toBeInTheDocument();
+    });
+
+    it('starts the list again when the host switches a mounted table to fixed height', async () => {
+      const results = resultsOf(3);
+      const { rerender } = render(<TableScrollablePro {...defaultProps} results={results} />);
+
+      vi.mocked(useEmbeddableLayout).mockReturnValue({ heightMode: 'fixed' });
+      rerender(<TableScrollablePro {...defaultProps} results={results} />);
+
+      expect(await rowsPassedToTable()).toHaveLength(3);
     });
   });
 });
