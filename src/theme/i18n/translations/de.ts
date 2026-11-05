@@ -40,6 +40,9 @@ export const de: ResourceLanguage = {
       tablePaginated: {
         pagination: 'Seite {{page}} von {{totalPages}}',
       },
+      tableScrollable: {
+        truncatedRows: '{{shown}} von {{total}} Zeilen',
+      },
       pivotTable: {
         total: 'Gesamt',
         sum: 'Summe',
