@@ -119,14 +119,22 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   useEffect(() => {
     if (!results?.data) return;
 
-    // The host can switch the mode under a mounted table, and the rows on screen were paged under
-    // the mode it is leaving, so the list starts again rather than growing across the two.
     const hasHeightModeChanged = lastHeightModeRef.current !== isAutoHeightMode;
     lastHeightModeRef.current = isAutoHeightMode;
 
+    if (hasHeightModeChanged) {
+      // The host can switch the mode under a mounted table. This response was paged under the mode
+      // being left, so it replaces the list rather than extending it, and the list stays pending so
+      // that the query the new mode has already started replaces it in turn.
+      setRowsToDisplay([...rows]);
+      firstLoadPending.current = true;
+      tableRef.current?.scrollToTop('smooth');
+      return;
+    }
+
     // Auto height asks for the whole allowance in one request, so every response replaces the rows.
     // Appending would duplicate them when the query re-runs for a sort or a variable change.
-    if (firstLoadPending.current || isAutoHeightMode || hasHeightModeChanged) {
+    if (firstLoadPending.current || isAutoHeightMode) {
       setRowsToDisplay([...rows]);
       firstLoadPending.current = false;
       tableRef.current?.scrollToTop('smooth');

@@ -309,6 +309,11 @@ describe('TableScrollablePro', () => {
       rerender(<TableScrollablePro {...defaultProps} results={results} />);
 
       expect(await rowsPassedToTable()).toHaveLength(3);
+
+      // The page the new mode was already fetching replaces that list rather than extending it.
+      rerender(<TableScrollablePro {...defaultProps} results={resultsOf(2)} />);
+
+      expect(await rowsPassedToTable()).toHaveLength(2);
     });
   });
 });
