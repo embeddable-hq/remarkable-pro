@@ -42,10 +42,6 @@ export type TableScrollableProState = {
   pageSize?: number;
   sort?: { id: string; direction: OrderDirection } | undefined;
   isLoadingDownloadData: boolean;
-  /**
-   * The layout mode the component last saw. The definition's `props()` cannot call hooks, so the
-   * component reads it from the runtime and parks it here for the next render's query to branch on.
-   */
   heightMode?: HeightMode;
 };
 
@@ -123,17 +119,14 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     lastHeightModeRef.current = isAutoHeightMode;
 
     if (hasHeightModeChanged) {
-      // The host can switch the mode under a mounted table. This response was paged under the mode
-      // being left, so it replaces the list rather than extending it, and the list stays pending so
-      // that the query the new mode has already started replaces it in turn.
+      // These rows were paged under the mode being left; the new mode's own first page replaces them.
       setRowsToDisplay([...rows]);
       firstLoadPending.current = true;
       tableRef.current?.scrollToTop('smooth');
       return;
     }
 
-    // Auto height asks for the whole allowance in one request, so every response replaces the rows.
-    // Appending would duplicate them when the query re-runs for a sort or a variable change.
+    // In auto height each response is the whole allowance, so appending would duplicate it.
     if (firstLoadPending.current || isAutoHeightMode) {
       setRowsToDisplay([...rows]);
       firstLoadPending.current = false;
@@ -246,15 +239,14 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     handleUpdateEmbeddableState({ sort: newSort as TableScrollableProState['sort'], page: 0 });
   };
 
-  // Arms the infinite-scroll prefetch in the UI table; auto height has no scroll box to drive it.
+  // No scroll box in auto height, so there is nothing to prefetch for.
   const hasMoreData =
     !isAutoHeightMode && results?.data && results.data.length === TABLE_SCROLLABLE_SIZE;
   const isLoading = Boolean(results?.isLoading || allResults?.isLoading);
   const isLoadingTable = results?.isLoading && !firstLoadPending.current;
 
   const totalRows = results?.total;
-  // The cells of this table are formatted with the theme's locale, not the browser's, so its own
-  // row counts follow them.
+  // Match the cells, which the theme's locale formats rather than the browser's.
   const themeFormatter = getThemeFormatter(theme);
   const truncatedRowsLabel =
     isAutoHeightMode && totalRows !== undefined && totalRows > rowsToDisplay.length

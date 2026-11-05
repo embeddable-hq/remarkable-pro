@@ -13,8 +13,7 @@ vi.mock('@embeddable.com/react', () => ({
 
 vi.mock('../../../../theme/i18n/i18n', () => ({
   i18nSetup: vi.fn(),
-  // Returns the key so a rendered label can be identified; the interpolated counts are asserted
-  // through the call arguments instead.
+  // Returns the key, so the rendered label is identifiable and the counts assert on the call.
   i18n: { t: vi.fn((key: string) => key) },
 }));
 
@@ -22,8 +21,7 @@ vi.mock('../../../component.utils', () => ({
   resolveI18nProps: vi.fn((props) => props),
 }));
 
-// Marks the values the theme formatter produced, so a count formatted by the browser instead is
-// visible in the assertion.
+// Marks what the theme formatter produced, so a browser-formatted count fails the assertion.
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({
   getThemeFormatter: vi.fn(() => ({ number: (value: number) => `[${value}]` })),
 }));
