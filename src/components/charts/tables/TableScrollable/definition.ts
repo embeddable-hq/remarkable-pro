@@ -53,6 +53,7 @@ const meta = {
     },
     inputs.displayNullAs,
     { ...inputs.maxResults, label: 'Max results to download' },
+    inputs.autoHeightMaxResults,
     {
       ...inputs.dimensionSimple,
       label: 'Dimension to set on click',
@@ -124,7 +125,12 @@ const loadDataResultsArgs = (
 ): LoadDataRequest => ({
   from: inputs.dataset,
   select: dimensionsAndMeasuresToLoad,
-  ...getResultsPagingArgs(state.heightMode, state.page, TABLE_SCROLLABLE_SIZE, inputs.maxResults),
+  ...getResultsPagingArgs(
+    state.heightMode,
+    state.page,
+    TABLE_SCROLLABLE_SIZE,
+    inputs.autoHeightMaxResults,
+  ),
   orderBy,
   timezone: getClientContextTimezone(clientContext?.timezone),
 });

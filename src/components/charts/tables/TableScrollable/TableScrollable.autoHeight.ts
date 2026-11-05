@@ -9,8 +9,8 @@ export const getResultsPagingArgs = (
   heightMode: HeightMode | undefined,
   page: number,
   pageSize: number,
-  maxResults: number | undefined,
+  autoHeightMaxResults: number | undefined,
 ): Pick<LoadDataRequest, 'offset' | 'limit' | 'countRows'> =>
   isAutoHeight(heightMode)
-    ? { offset: 0, limit: maxResults, countRows: true }
+    ? { offset: 0, limit: autoHeightMaxResults, countRows: true }
     : { offset: page * pageSize, limit: pageSize };
