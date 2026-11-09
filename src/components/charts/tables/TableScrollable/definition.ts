@@ -16,6 +16,7 @@ import { ExportOptionTypeOptions } from '../../../types/ExportOption.type.emb';
 import { getSortDirectionValue } from '../../../types/SortDirection.type.emb';
 import { subInputs } from '../../../component.subinputs.constants';
 import { TABLE_SCROLLABLE_SIZE } from './TableScrollable.utils';
+import { getResultsPagingArgs } from './TableScrollable.autoHeight';
 import { previewData } from '../../../preview.data.constants';
 import { ThemeClientContext } from '../../../../theme/theme.types';
 import { getClientContextTimezone } from '../../../../theme/utils/clientContext.utils';
@@ -23,8 +24,10 @@ import { getClientContextTimezone } from '../../../../theme/utils/clientContext.
 const meta = {
   name: 'TableScrollable',
   label: 'Table Chart - Scrollable',
-  description: 'Scrollable table that loads all rows at once. Pick for small or medium datasets.',
+  description:
+    'Scrollable table that loads rows as the viewer scrolls. Pick for small or medium datasets.',
   category: 'Table Charts',
+  autoHeight: true,
   inputs: [
     { ...inputs.dataset, config: { hideSort: true } },
     {
@@ -50,6 +53,7 @@ const meta = {
     },
     inputs.displayNullAs,
     { ...inputs.maxResults, label: 'Max results to download' },
+    inputs.autoHeightMaxResults,
     {
       ...inputs.dimensionSimple,
       label: 'Dimension to set on click',
@@ -114,27 +118,31 @@ export const defaultTableScrollableState = (
 
 const loadDataResultsArgs = (
   inputs: Inputs<typeof meta>,
-  page: number,
+  state: TableScrollableProState,
   orderBy: OrderBy[],
   dimensionsAndMeasuresToLoad: Parameters<typeof loadData>[0]['select'],
   clientContext?: ThemeClientContext,
 ): LoadDataRequest => ({
   from: inputs.dataset,
   select: dimensionsAndMeasuresToLoad,
-  offset: page * TABLE_SCROLLABLE_SIZE,
-  limit: TABLE_SCROLLABLE_SIZE,
+  ...getResultsPagingArgs(
+    state.heightMode,
+    state.page,
+    TABLE_SCROLLABLE_SIZE,
+    inputs.autoHeightMaxResults,
+  ),
   orderBy,
   timezone: getClientContextTimezone(clientContext?.timezone),
 });
 
 const loadDataResults = (
   inputs: Inputs<typeof meta>,
-  page: number,
+  state: TableScrollableProState,
   orderBy: OrderBy[],
   dimensionsAndMeasuresToLoad: Parameters<typeof loadData>[0]['select'],
   clientContext: ThemeClientContext,
 ): DataResponse =>
-  loadData(loadDataResultsArgs(inputs, page, orderBy, dimensionsAndMeasuresToLoad, clientContext));
+  loadData(loadDataResultsArgs(inputs, state, orderBy, dimensionsAndMeasuresToLoad, clientContext));
 
 const loadDataAllResultsArgs = (
   inputs: Inputs<typeof meta>,
@@ -197,7 +205,7 @@ const props = (
     setState,
     results: loadDataResults(
       inputs,
-      mergedState.page,
+      mergedState,
       orderBy,
       dimensionsAndMeasuresToLoad,
       clientContext,

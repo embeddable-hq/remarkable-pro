@@ -273,6 +273,16 @@ const maxResults = {
   defaultValue: 1000,
 } as const;
 
+const autoHeightMaxResults = {
+  name: 'autoHeightMaxResults',
+  type: 'number',
+  label: 'Max rows when expanded',
+  description:
+    'Rows to load when the dashboard expands this component to fit its content, which it does when embedded with height-mode="auto". Has no effect in fixed height, where rows are loaded a page at a time as the viewer scrolls.',
+  category: 'Component Settings',
+  defaultValue: 100,
+} as const;
+
 const placeholder = {
   name: 'placeholder',
   type: 'string',
@@ -569,6 +579,7 @@ export const inputs = {
   sortDimensionOrMeasure,
   comparisonPeriod,
   maxResults,
+  autoHeightMaxResults,
   placeholder,
   showLegend,
   showTooltips,
