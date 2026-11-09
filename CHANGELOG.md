@@ -1,5 +1,35 @@
 # @embeddable/remarkable-ui
 
+## 0.14.0
+
+### Minor Changes
+
+- 1f9687a: Take `@embeddable.com/core` and `@embeddable.com/react` as peer dependencies.
+
+  The package compiles with those imports left external, so they were never meant to be a second
+  installed copy — but declaring them in `dependencies` let npm nest one whenever the host app's
+  range and this package's range disagreed. The SDK keeps its React contexts as module singletons, so
+  a nested copy hands the components a different context object: `useTheme()` falls back to its empty
+  default (`Cannot read properties of undefined (reading 'chartMenuOptions')`), and
+  `useEmbeddableLayout()` quietly reports `fixed` even on an auto-height dashboard. As peers they
+  resolve to whatever the host installed, and a genuine mismatch is reported at install time instead.
+
+  The ranges accept prereleases (`>=2.14.0-0`), so testing against an SDK `next` build no longer
+  needs an `overrides` entry in the host app.
+
+- 1f9687a: TableScrollable: render every loaded row when the dashboard asks for auto height.
+
+  The component now declares `meta.autoHeight`, so a host rendering with
+  `height-mode="auto"` lets its tile grow to the content instead of clipping it. In that mode the
+  table drops its 50-row scroll paging for a single query with `countRows`, replaces its rows on each
+  response rather than appending, turns off the infinite-scroll prefetch, and says "Showing N of M
+  rows" when the allowance cut the query short. Fixed height is unchanged.
+
+  How many rows it loads when expanded is a new input of its own, **Max rows when expanded**
+  (`autoHeightMaxResults`, default 100). It is deliberately not the existing **Max results to
+  download**: that one sizes the CSV/XLSX export, and the two are worth tuning separately — a
+  reader will want far fewer rows on a page than in a spreadsheet.
+
 ## 0.13.1
 
 ### Patch Changes
