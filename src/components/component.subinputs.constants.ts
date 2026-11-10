@@ -44,7 +44,14 @@ const width = {
   description: 'You can input a number in pixels e.g. 400',
 } as const;
 
-const align = { name: 'align', type: AlignType, label: 'Align' } as const;
+const align = {
+  name: 'align',
+  type: AlignType,
+  label: 'Header align',
+  description: 'Aligns the header and the data. Data align overrides it for the data.',
+} as const;
+
+const dataAlign = { name: 'dataAlign', type: AlignType, label: 'Data align' } as const;
 
 const prefix = { name: 'prefix', type: 'string', label: 'Prefix' } as const;
 
@@ -230,6 +237,7 @@ export const subInputs = {
   string,
   width,
   align,
+  dataAlign,
   prefix,
   suffix,
   displayName,
