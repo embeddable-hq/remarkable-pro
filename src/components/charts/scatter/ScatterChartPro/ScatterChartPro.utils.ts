@@ -87,15 +87,15 @@ export const getScatterChartProOptions = (
       },
       datalabels: {
         labels: {
+          // No `display` here: remarkable-ui's ScatterChart shows each label
+          // only when showValueLabels / showPointLabels is on.
           value: {
-            display: 'auto',
             ...buildDatalabelsValue(xMeasure, yMeasure, formatValue),
             anchor: 'center',
             align: 'bottom',
             offset: valueOffset,
           },
           caption: {
-            display: 'auto',
             anchor: 'center',
             align: 'bottom',
             offset: captionOffset,

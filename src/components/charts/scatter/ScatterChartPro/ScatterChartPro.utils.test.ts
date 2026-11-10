@@ -608,6 +608,24 @@ describe('getScatterChartProOptions', () => {
   } as unknown as Measure;
   const NO_VALUE = 'No value';
 
+  describe('datalabels', () => {
+    // remarkable-ui decides label visibility from showValueLabels and
+    // showPointLabels; a display set here would override the toggles.
+    it.each([true, false])(
+      'leaves label visibility to the chart (showPointLabels: %s)',
+      (showPointLabels) => {
+        const opts = getScatterChartProOptions(
+          { xMeasure, yMeasure, noValueLabel: NO_VALUE, showPointLabels },
+          {} as Theme,
+        );
+        const labels = (opts.plugins?.datalabels as { labels: Record<string, object> }).labels;
+
+        expect(labels.value).not.toHaveProperty('display');
+        expect(labels.caption).not.toHaveProperty('display');
+      },
+    );
+  });
+
   describe('tick callbacks', () => {
     it('formats x axis ticks using themeFormatter.data with xMeasure', () => {
       const opts = getScatterChartProOptions(
