@@ -96,6 +96,9 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   const tableRef = useRef<TableScrollableHandle | null>(null);
   const firstLoadPending = useRef(true);
   const lastHeightModeRef = useRef(isAutoHeightMode);
+  // The response last shown, so a re-run of the effect below for the same
+  // response (React StrictMode runs effects twice on mount) doesn't append it again.
+  const lastShownRowsRef = useRef<DataResponse['data']>(undefined);
   const lastDatasetVariableRef = useRef<Dataset['variableValues'] | null>(null);
 
   useEffect(() => {
@@ -117,6 +120,10 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
 
     const hasHeightModeChanged = lastHeightModeRef.current !== isAutoHeightMode;
     lastHeightModeRef.current = isAutoHeightMode;
+
+    const isSameResponse = rows === lastShownRowsRef.current;
+    lastShownRowsRef.current = rows;
+    if (isSameResponse && !hasHeightModeChanged && !firstLoadPending.current) return;
 
     if (hasHeightModeChanged) {
       // These rows were paged under the mode being left; the new mode's own first page replaces them.

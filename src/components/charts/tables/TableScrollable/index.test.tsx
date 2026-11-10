@@ -1,3 +1,4 @@
+import { StrictMode } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import type { DataResponse, Dimension, DimensionOrMeasure } from '@embeddable.com/core';
@@ -225,6 +226,41 @@ describe('TableScrollablePro', () => {
 
       expect(onRowClicked).not.toHaveBeenCalled();
       expect(dispatchSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('React StrictMode', () => {
+    // StrictMode runs effects twice on mount; the second run must not append
+    // the first page again.
+    const pageOf = (rowCount: number, offset = 0) =>
+      ({
+        data: Array.from({ length: rowCount }, (_, row) => ({ category: `row-${offset + row}` })),
+        isLoading: false,
+      }) as unknown as DataResponse;
+
+    it('shows the first page once', async () => {
+      render(
+        <StrictMode>
+          <TableScrollablePro {...defaultProps} results={pageOf(2)} />
+        </StrictMode>,
+      );
+
+      expect(await rowsPassedToTable()).toHaveLength(2);
+    });
+
+    it('still appends the next page', async () => {
+      const { rerender } = render(
+        <StrictMode>
+          <TableScrollablePro {...defaultProps} results={pageOf(2)} />
+        </StrictMode>,
+      );
+      rerender(
+        <StrictMode>
+          <TableScrollablePro {...defaultProps} results={pageOf(3, 2)} />
+        </StrictMode>,
+      );
+
+      expect(await rowsPassedToTable()).toHaveLength(5);
     });
   });
 
