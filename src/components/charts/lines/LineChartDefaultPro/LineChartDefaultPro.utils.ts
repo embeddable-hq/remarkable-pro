@@ -28,6 +28,8 @@ export const getLineChartProData = (
   const themeFormatter = getThemeFormatter(theme);
 
   const groupedData = groupTailAsOther(props.data, props.dimension, props.measures, props.maxItems);
+  const usedBackgroundColors = new Set<string>();
+  const usedBorderColors = new Set<string>();
 
   return {
     labels: groupedData.map((item) => {
@@ -39,6 +41,10 @@ export const getLineChartProData = (
 
       const lineColor = measure.inputs?.['lineColor'];
       const chartColors = getChartColors();
+      if (isColorValid(lineColor)) {
+        usedBackgroundColors.add(lineColor);
+        usedBorderColors.add(lineColor);
+      }
       const backgroundColor = isColorValid(lineColor)
         ? lineColor
         : getDimensionMeasureColor({
@@ -48,6 +54,7 @@ export const getLineChartProData = (
             value: measure.name,
             chartColors,
             index,
+            usedColors: usedBackgroundColors,
           });
 
       const borderColor = isColorValid(lineColor)
@@ -59,6 +66,7 @@ export const getLineChartProData = (
             value: measure.name,
             chartColors,
             index,
+            usedColors: usedBorderColors,
           });
 
       return {

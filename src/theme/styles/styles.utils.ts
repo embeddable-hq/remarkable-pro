@@ -97,6 +97,8 @@ export type GetDimensionMeasureColorProps = {
   color: 'background' | 'border';
   index: number;
   chartColors: string[];
+  // Colors already used in this chart. Palette colors avoid them; input/theme colors always win.
+  usedColors?: Set<string>;
 };
 
 export const getDimensionMeasureColor = ({
@@ -106,10 +108,16 @@ export const getDimensionMeasureColor = ({
   value,
   index,
   chartColors,
+  usedColors,
 }: GetDimensionMeasureColorProps) => {
+  const markUsed = (c: string) => {
+    usedColors?.add(c);
+    return c;
+  };
+
   // 1) Color from inputs
   const inputColor = dimensionOrMeasure.inputs?.color;
-  if (inputColor) return inputColor;
+  if (inputColor) return markUsed(inputColor);
 
   // 2) Color from theme (entity-specific)
   const entity = dimensionOrMeasure.__type__ === 'measure' ? 'measure' : 'dimensionValue';
@@ -117,13 +125,13 @@ export const getDimensionMeasureColor = ({
   const borderColor = theme.charts['borderColorMap']?.[entity]?.[value];
 
   if (color === 'background') {
-    if (backgroundColor) return backgroundColor;
-    if (borderColor) return borderColor; // fallback to border
+    if (backgroundColor) return markUsed(backgroundColor);
+    if (borderColor) return markUsed(borderColor); // fallback to border
   }
 
   if (color === 'border') {
-    if (borderColor) return borderColor;
-    if (backgroundColor) return backgroundColor; // fallback to background
+    if (borderColor) return markUsed(borderColor);
+    if (backgroundColor) return markUsed(backgroundColor); // fallback to background
   }
 
   // 3) Palette fallback (theme palette -> provided palette)
@@ -133,6 +141,13 @@ export const getDimensionMeasureColor = ({
 
   // Fallback to chartColors
   const palette = theme.charts?.[paletteKey] ?? theme.charts.backgroundColors ?? chartColors;
+  const paletteColor = getColor(key, value, palette, index);
 
-  return getColor(key, value, palette, index);
+  // Already used in this chart? Take the first free palette color (not saved to the cache)
+  if (usedColors?.has(paletteColor)) {
+    const freeColor = palette.find((c) => !usedColors.has(c));
+    if (freeColor) return markUsed(freeColor);
+  }
+
+  return markUsed(paletteColor);
 };

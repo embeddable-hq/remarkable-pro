@@ -1,7 +1,7 @@
 {
   "name": "@embeddable.com/remarkable-pro",
   "author": "embeddable (https://embeddable.com)",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/embeddable-hq/remarkable-pro"
@@ -64,8 +64,6 @@
   },
   "dependencies": {
     "@changesets/cli": "^2.29.6",
-    "@embeddable.com/core": "^2.13.8",
-    "@embeddable.com/react": "^2.13.8",
     "@embeddable.com/remarkable-ui": "^3.7.0",
     "@tabler/icons-react": "^3.34.1",
     "chart.js": "^4.5.0",
@@ -80,8 +78,10 @@
     "xlsx": "npm:@e965/xlsx@^0.20.3"
   },
   "devDependencies": {
-    "@embeddable.com/sdk-core": "^4.8.0",
-    "@embeddable.com/sdk-react": "^4.3.13",
+    "@embeddable.com/core": "^2.15.1",
+    "@embeddable.com/react": "^2.14.0",
+    "@embeddable.com/sdk-core": "^4.10.0",
+    "@embeddable.com/sdk-react": "^4.4.0",
     "@embeddable.com/sdk-utils": "^0.9.1",
     "@eslint/css": "^0.13.0",
     "@eslint/js": "^9.31.0",
@@ -111,6 +111,8 @@
     "vitest": "^4.0.18"
   },
   "peerDependencies": {
+    "@embeddable.com/core": ">=2.13.8-0",
+    "@embeddable.com/react": ">=2.14.0-0",
     "react": ">=19.1.1",
     "react-dom": ">=19.1.1"
   },

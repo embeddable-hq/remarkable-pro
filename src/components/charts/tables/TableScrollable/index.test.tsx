@@ -1,20 +1,29 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import type { DataResponse, Dimension, DimensionOrMeasure } from '@embeddable.com/core';
+import { useEmbeddableLayout } from '@embeddable.com/react';
 import TableScrollablePro from './index';
-import type { TableScrollableProProps } from './index';
+import type { TableScrollableProProps, TableScrollableProState } from './index';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
+  useEmbeddableLayout: vi.fn(() => ({ heightMode: 'fixed' })),
+  HEIGHT_MODES: { fixed: 'fixed', auto: 'auto' },
 }));
 
 vi.mock('../../../../theme/i18n/i18n', () => ({
   i18nSetup: vi.fn(),
-  i18n: { t: vi.fn(() => '') },
+  // Returns the key, so the rendered label is identifiable and the counts assert on the call.
+  i18n: { t: vi.fn((key: string) => key) },
 }));
 
 vi.mock('../../../component.utils', () => ({
   resolveI18nProps: vi.fn((props) => props),
+}));
+
+// Marks what the theme formatter produced, so a browser-formatted count fails the assertion.
+vi.mock('../../../../theme/formatter/formatter.utils', () => ({
+  getThemeFormatter: vi.fn(() => ({ number: (value: number) => `[${value}]` })),
 }));
 
 vi.mock('../../shared/ChartCard/ChartCard', () => ({
@@ -38,15 +47,31 @@ vi.mock('../../shared/ChartCard/ChartCard', () => ({
 }));
 
 vi.mock('@embeddable.com/remarkable-ui', () => ({
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  TableScrollable: vi.fn(({ ref: _ref, onRowIndexClick, ...rest }: Record<string, any>) => (
-    <div data-testid="table-scrollable">
-      <button data-testid="row-click" onClick={() => onRowIndexClick?.(0)}>
-        row
-      </button>
-      <span data-rest={JSON.stringify(Object.keys(rest))} />
-    </div>
-  )),
+  TableScrollable: vi.fn(
+    ({
+      ref: _ref,
+      onRowIndexClick,
+      onNextPage,
+      hasMoreData,
+      ...rest
+    }: {
+      ref?: unknown;
+      onRowIndexClick?: (rowIndex: number) => void;
+      onNextPage?: () => void;
+      hasMoreData?: boolean;
+      [prop: string]: unknown;
+    }) => (
+      <div data-testid="table-scrollable" data-has-more-data={String(Boolean(hasMoreData))}>
+        <button data-testid="row-click" onClick={() => onRowIndexClick?.(0)}>
+          row
+        </button>
+        <button data-testid="next-page" onClick={() => onNextPage?.()}>
+          next
+        </button>
+        <span data-rest={JSON.stringify(Object.keys(rest))} />
+      </div>
+    ),
+  ),
 }));
 
 vi.mock('../tables.utils', () => ({
@@ -78,9 +103,22 @@ const defaultProps: TableScrollableProProps = {
   results: emptyResults,
 };
 
+/** Folds every `setState` updater the component queued into the state they would produce. */
+const appliedState = (setState: ReturnType<typeof vi.fn>): Partial<TableScrollableProState> =>
+  setState.mock.calls.reduce<Partial<TableScrollableProState>>(
+    (state, [update]) => ({ ...state, ...(typeof update === 'function' ? update(state) : update) }),
+    { page: 0 },
+  );
+
+const rowsPassedToTable = async () => {
+  const { getTableRows } = await import('../tables.utils');
+  return vi.mocked(getTableRows).mock.calls.at(-1)?.[0].rows;
+};
+
 describe('TableScrollablePro', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useEmbeddableLayout).mockReturnValue({ heightMode: 'fixed' });
   });
 
   it('renders ChartCard', () => {
@@ -187,6 +225,93 @@ describe('TableScrollablePro', () => {
 
       expect(onRowClicked).not.toHaveBeenCalled();
       expect(dispatchSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('auto height', () => {
+    const resultsOf = (rowCount: number, total?: number) =>
+      ({
+        data: Array.from({ length: rowCount }, (_, row) => ({ category: `row-${row}` })),
+        isLoading: false,
+        total,
+      }) as unknown as DataResponse;
+
+    beforeEach(() => {
+      vi.mocked(useEmbeddableLayout).mockReturnValue({ heightMode: 'auto' });
+    });
+
+    it('parks the mode in embeddable state, which is the only way the query learns it', () => {
+      const setState = vi.fn();
+      render(<TableScrollablePro {...defaultProps} setState={setState} />);
+
+      expect(appliedState(setState)).toMatchObject({ heightMode: 'auto' });
+    });
+
+    it('replaces the rows on a second response rather than appending them', async () => {
+      const { rerender } = render(<TableScrollablePro {...defaultProps} results={resultsOf(2)} />);
+      rerender(<TableScrollablePro {...defaultProps} results={resultsOf(3)} />);
+
+      expect(await rowsPassedToTable()).toHaveLength(3);
+    });
+
+    it('still appends in fixed height, where each response is the next page', async () => {
+      vi.mocked(useEmbeddableLayout).mockReturnValue({ heightMode: 'fixed' });
+
+      const { rerender } = render(<TableScrollablePro {...defaultProps} results={resultsOf(2)} />);
+      rerender(<TableScrollablePro {...defaultProps} results={resultsOf(3)} />);
+
+      expect(await rowsPassedToTable()).toHaveLength(5);
+    });
+
+    it('turns off the scroll prefetch and refuses a next-page request', () => {
+      const setState = vi.fn();
+      render(<TableScrollablePro {...defaultProps} results={resultsOf(100)} setState={setState} />);
+
+      expect(screen.getByTestId('table-scrollable')).toHaveAttribute('data-has-more-data', 'false');
+
+      fireEvent.click(screen.getByTestId('next-page'));
+
+      expect(appliedState(setState)).toMatchObject({ page: 0 });
+    });
+
+    it('says how much of the query is missing when the allowance cut it short', async () => {
+      const { i18n } = await import('../../../../theme/i18n/i18n');
+      render(<TableScrollablePro {...defaultProps} results={resultsOf(2, 5)} />);
+
+      expect(screen.getByText('charts.tableScrollable.truncatedRows')).toBeInTheDocument();
+      expect(i18n.t).toHaveBeenCalledWith('charts.tableScrollable.truncatedRows', {
+        shown: '[2]',
+        total: '[5]',
+      });
+    });
+
+    it('says nothing when every row of the query is on screen', () => {
+      render(<TableScrollablePro {...defaultProps} results={resultsOf(2, 2)} />);
+
+      expect(screen.queryByText('charts.tableScrollable.truncatedRows')).not.toBeInTheDocument();
+    });
+
+    it('says nothing in fixed height, where a short page is the point', () => {
+      vi.mocked(useEmbeddableLayout).mockReturnValue({ heightMode: 'fixed' });
+
+      render(<TableScrollablePro {...defaultProps} results={resultsOf(2, 5)} />);
+
+      expect(screen.queryByText('charts.tableScrollable.truncatedRows')).not.toBeInTheDocument();
+    });
+
+    it('starts the list again when the host switches a mounted table to fixed height', async () => {
+      const results = resultsOf(3);
+      const { rerender } = render(<TableScrollablePro {...defaultProps} results={results} />);
+
+      vi.mocked(useEmbeddableLayout).mockReturnValue({ heightMode: 'fixed' });
+      rerender(<TableScrollablePro {...defaultProps} results={results} />);
+
+      expect(await rowsPassedToTable()).toHaveLength(3);
+
+      // The page the new mode was already fetching replaces that list rather than extending it.
+      rerender(<TableScrollablePro {...defaultProps} results={resultsOf(2)} />);
+
+      expect(await rowsPassedToTable()).toHaveLength(2);
     });
   });
 });

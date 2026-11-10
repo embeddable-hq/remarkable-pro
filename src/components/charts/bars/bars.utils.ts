@@ -93,6 +93,8 @@ export const getBarChartProData = (
   const themeFormatter = getThemeFormatter(theme);
   const groupedData = groupTailAsOther(props.data, props.dimension, props.measures, props.maxItems);
   const chartColors = getChartColors();
+  const usedBackgroundColors = new Set<string>();
+  const usedBorderColors = new Set<string>();
 
   return {
     labels: groupedData.map((item) => {
@@ -106,6 +108,7 @@ export const getBarChartProData = (
         value: measure.name,
         index,
         chartColors,
+        usedColors: usedBackgroundColors,
       });
 
       const borderColor = getDimensionMeasureColor({
@@ -115,6 +118,7 @@ export const getBarChartProData = (
         value: measure.name,
         index,
         chartColors,
+        usedColors: usedBorderColors,
       });
 
       return {
