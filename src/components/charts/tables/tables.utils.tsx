@@ -28,6 +28,9 @@ export const getTableHeaderAlign = (dimOrMeas: DimensionOrMeasure): TableHeaderI
   }
 };
 
+export const getTableDataAlign = (dimOrMeas: DimensionOrMeasure): TableHeaderItemAlign =>
+  dimOrMeas.inputs?.dataAlign ?? getTableHeaderAlign(dimOrMeas);
+
 export const getTableHeaderMinWidth = (dimOrMeas: DimensionOrMeasure): CssSize => {
   const subInputWidth = dimOrMeas.inputs?.width;
 
@@ -56,6 +59,7 @@ export const getTableHeaders = (
 ): TableHeaderItem<any>[] => {
   const themeFormatter = getThemeFormatter(theme);
   return props.dimensionsAndMeasures.map((dimOrMeas) => {
+    const dataAlign = getTableDataAlign(dimOrMeas);
     const displayFormat: string = dimOrMeas.inputs?.displayFormat;
     const hasCustomCellFormatter =
       displayFormat &&
@@ -66,7 +70,8 @@ export const getTableHeaders = (
       id: dimOrMeas.name,
       title: themeFormatter.dimensionOrMeasureTitle(dimOrMeas),
       minWidth: getTableHeaderMinWidth(dimOrMeas),
-      align: getTableHeaderAlign(dimOrMeas),
+      align: dataAlign,
+      headerAlign: getTableHeaderAlign(dimOrMeas),
       accessor: (row) => {
         const updatedDimOrMeas = {
           ...dimOrMeas,
@@ -98,7 +103,7 @@ export const getTableHeaders = (
             }
 
             return (
-              <TableBodyCellWithCopy value={value}>
+              <TableBodyCellWithCopy align={dataAlign} value={value}>
                 {displayFormat === DisplayFormatTypeOptions.MARKDOWN ? (
                   // Markdown
                   <span className={styles.markdownCell}>
