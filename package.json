@@ -1,7 +1,7 @@
 {
   "name": "@embeddable.com/remarkable-pro",
   "author": "embeddable (https://embeddable.com)",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/embeddable-hq/remarkable-pro"
@@ -117,6 +117,6 @@
     "react-dom": ">=19.1.1"
   },
   "overrides": {
-    "axios": "1.18.1"
+    "axios": "1.21.1"
   }
 }

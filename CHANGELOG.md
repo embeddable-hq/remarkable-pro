@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.14.1
+
+### Patch Changes
+
+- a1e444c: Update libs
+
 ## 0.14.0
 
 ### Minor Changes
