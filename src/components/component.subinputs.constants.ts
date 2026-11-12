@@ -1,6 +1,7 @@
 import ColorType from '../editors/ColorEditor/Color.type.emb';
 import { Granularity } from '../theme/defaults/defaults.GranularityOptions.constants';
 import AlignType from './types/Align.type.emb';
+import HeaderAlignType from './types/HeaderAlign.type.emb';
 import DisplayFormatType from './types/DisplayFormat.type.emb';
 import TableCellStyleType from './types/TableCellStyle.type.emb';
 import PivotAggregationType from './types/PivotAggregation.type.emb';
@@ -46,7 +47,7 @@ const width = {
 
 const align = { name: 'align', type: AlignType, label: 'Align' } as const;
 
-const headerAlign = { name: 'headerAlign', type: AlignType, label: 'Header align' } as const;
+const headerAlign = { name: 'headerAlign', type: HeaderAlignType, label: 'Header align' } as const;
 
 const prefix = { name: 'prefix', type: 'string', label: 'Prefix' } as const;
 

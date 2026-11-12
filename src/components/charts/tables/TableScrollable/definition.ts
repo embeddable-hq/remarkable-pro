@@ -37,10 +37,7 @@ const meta = {
         ...inputs.dimensionsAndMeasures.inputs,
         subInputs.width,
         subInputs.align,
-        {
-          ...subInputs.headerAlign,
-          description: 'Aligns the column header. If empty, the header uses Align.',
-        },
+        subInputs.headerAlign,
         subInputs.displayFormat,
         subInputs.tableCellStyle,
       ],
