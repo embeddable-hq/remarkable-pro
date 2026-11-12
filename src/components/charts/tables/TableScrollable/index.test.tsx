@@ -111,6 +111,11 @@ const appliedState = (setState: ReturnType<typeof vi.fn>): Partial<TableScrollab
     { page: 0 },
   );
 
+const pageState = (page: number): TableScrollableProState => ({
+  page,
+  isLoadingDownloadData: false,
+});
+
 const rowsPassedToTable = async () => {
   const { getTableRows } = await import('../tables.utils');
   return vi.mocked(getTableRows).mock.calls.at(-1)?.[0].rows;
@@ -256,11 +261,61 @@ describe('TableScrollablePro', () => {
       );
       rerender(
         <StrictMode>
-          <TableScrollablePro {...defaultProps} results={pageOf(3, 2)} />
+          <TableScrollablePro {...defaultProps} state={pageState(1)} results={pageOf(3, 2)} />
         </StrictMode>,
       );
 
       expect(await rowsPassedToTable()).toHaveLength(5);
+    });
+  });
+
+  describe('paging', () => {
+    const pageOf = (rowCount: number, offset = 0) =>
+      ({
+        data: Array.from({ length: rowCount }, (_, row) => ({ category: `row-${offset + row}` })),
+        isLoading: false,
+      }) as unknown as DataResponse;
+
+    it('does not file the previous page under a page that has not loaded yet', async () => {
+      const firstPage = pageOf(2);
+      const { rerender } = render(<TableScrollablePro {...defaultProps} results={firstPage} />);
+
+      // state.page goes up first; the response on hand is still page 0's.
+      rerender(<TableScrollablePro {...defaultProps} state={pageState(1)} results={firstPage} />);
+      expect(await rowsPassedToTable()).toHaveLength(2);
+
+      // Then it loads, still holding page 0's rows.
+      rerender(
+        <TableScrollablePro
+          {...defaultProps}
+          state={pageState(1)}
+          results={{ ...firstPage, isLoading: true }}
+        />,
+      );
+      expect(await rowsPassedToTable()).toHaveLength(2);
+
+      rerender(
+        <TableScrollablePro {...defaultProps} state={pageState(1)} results={pageOf(3, 2)} />,
+      );
+      expect((await rowsPassedToTable())?.map((row) => row.category)).toEqual([
+        'row-0',
+        'row-1',
+        'row-2',
+        'row-3',
+        'row-4',
+      ]);
+    });
+
+    it('starts again from page 0 when the page resets', async () => {
+      const { rerender } = render(<TableScrollablePro {...defaultProps} results={pageOf(2)} />);
+      rerender(
+        <TableScrollablePro {...defaultProps} state={pageState(1)} results={pageOf(3, 2)} />,
+      );
+      rerender(
+        <TableScrollablePro {...defaultProps} state={pageState(0)} results={pageOf(4, 10)} />,
+      );
+
+      expect(await rowsPassedToTable()).toHaveLength(4);
     });
   });
 
@@ -294,7 +349,9 @@ describe('TableScrollablePro', () => {
       vi.mocked(useEmbeddableLayout).mockReturnValue({ heightMode: 'fixed' });
 
       const { rerender } = render(<TableScrollablePro {...defaultProps} results={resultsOf(2)} />);
-      rerender(<TableScrollablePro {...defaultProps} results={resultsOf(3)} />);
+      rerender(
+        <TableScrollablePro {...defaultProps} state={pageState(1)} results={resultsOf(3)} />,
+      );
 
       expect(await rowsPassedToTable()).toHaveLength(5);
     });
