@@ -155,7 +155,7 @@ const stylesRemarkablePro = {
   '--em-canvas-overlay-max-height': 'none',
   '--em-canvas-overlay-padding': '0 2rem 2.25rem',
   '--em-canvas-overlay-border-radius': '1.75rem',
-  '--em-canvas-overlay-title-color': 'var(--em-sem-text--inverted)',
+  '--em-canvas-overlay-title-color': 'var(--em-overlay-color)',
   '--em-canvas-overlay-action-button-color': 'var(--em-buttonicon-color--secondary)',
   '--em-canvas-overlay-action-button-background': 'var(--em-buttonicon-background--secondary)',
   '--em-canvas-overlay-action-button-border-color': 'var(--em-buttonicon-border-color--secondary)',
