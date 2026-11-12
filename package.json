@@ -64,7 +64,7 @@
   },
   "dependencies": {
     "@changesets/cli": "^2.29.6",
-    "@embeddable.com/remarkable-ui": "^3.7.0",
+    "@embeddable.com/remarkable-ui": "^3.9.0",
     "@tabler/icons-react": "^3.34.1",
     "chart.js": "^4.5.0",
     "chartjs-plugin-datalabels": "^2.2.0",
