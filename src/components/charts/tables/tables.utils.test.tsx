@@ -3,8 +3,8 @@ import { TableHeaderAlign } from '@embeddable.com/remarkable-ui';
 import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
 import { DisplayFormatTypeOptions } from '../../types/DisplayFormat.type.emb';
 import {
-  getTableDataAlign,
-  getTableHeaderAlign,
+  getTableCellAlign,
+  getTableHeadAlign,
   getTableHeaderMinWidth,
   getTableHeaders,
   getTableRows,
@@ -42,50 +42,46 @@ const makeFormatter = (overrides = {}) => ({
 
 // ---------------------------------------------------------------------------
 
-describe('getTableHeaderAlign', () => {
+describe('getTableCellAlign', () => {
   it('returns subInputAlign when set', () => {
     const dim = makeDimOrMeas({ inputs: { align: 'center' } });
-    expect(getTableHeaderAlign(dim)).toBe('center');
+    expect(getTableCellAlign(dim)).toBe('center');
   });
 
   it('returns RIGHT for number nativeType', () => {
-    expect(getTableHeaderAlign(makeDimOrMeas({ nativeType: 'number' }))).toBe(
-      TableHeaderAlign.RIGHT,
-    );
+    expect(getTableCellAlign(makeDimOrMeas({ nativeType: 'number' }))).toBe(TableHeaderAlign.RIGHT);
   });
 
   it('returns RIGHT for time nativeType', () => {
-    expect(getTableHeaderAlign(makeDimOrMeas({ nativeType: 'time' }))).toBe(TableHeaderAlign.RIGHT);
+    expect(getTableCellAlign(makeDimOrMeas({ nativeType: 'time' }))).toBe(TableHeaderAlign.RIGHT);
   });
 
   it('returns RIGHT for boolean nativeType', () => {
-    expect(getTableHeaderAlign(makeDimOrMeas({ nativeType: 'boolean' }))).toBe(
+    expect(getTableCellAlign(makeDimOrMeas({ nativeType: 'boolean' }))).toBe(
       TableHeaderAlign.RIGHT,
     );
   });
 
   it('returns LEFT for string nativeType', () => {
-    expect(getTableHeaderAlign(makeDimOrMeas({ nativeType: 'string' }))).toBe(
-      TableHeaderAlign.LEFT,
-    );
+    expect(getTableCellAlign(makeDimOrMeas({ nativeType: 'string' }))).toBe(TableHeaderAlign.LEFT);
   });
 });
 
 // ---------------------------------------------------------------------------
 
-describe('getTableDataAlign', () => {
-  it('returns dataAlign when set', () => {
-    const dim = makeDimOrMeas({ inputs: { align: 'center', dataAlign: 'right' } });
-    expect(getTableDataAlign(dim)).toBe('right');
+describe('getTableHeadAlign', () => {
+  it('returns headerAlign when set', () => {
+    const dim = makeDimOrMeas({ inputs: { align: 'center', headerAlign: 'right' } });
+    expect(getTableHeadAlign(dim)).toBe('right');
   });
 
-  it('falls back to align when dataAlign is not set', () => {
+  it('falls back to align when headerAlign is not set', () => {
     const dim = makeDimOrMeas({ inputs: { align: 'center' } });
-    expect(getTableDataAlign(dim)).toBe('center');
+    expect(getTableHeadAlign(dim)).toBe('center');
   });
 
   it('falls back to the nativeType default when nothing is set', () => {
-    expect(getTableDataAlign(makeDimOrMeas({ nativeType: 'number' }))).toBe(TableHeaderAlign.RIGHT);
+    expect(getTableHeadAlign(makeDimOrMeas({ nativeType: 'number' }))).toBe(TableHeaderAlign.RIGHT);
   });
 });
 
@@ -160,12 +156,12 @@ describe('getTableHeaders', () => {
     expect(formatter.data).toHaveBeenCalledWith(expect.anything(), 42);
   });
 
-  it('sets headerAlign from align and align from dataAlign', () => {
-    const dim = makeDimOrMeas({ inputs: { align: 'center', dataAlign: 'right' } });
+  it('sets align from align and headerAlign from headerAlign', () => {
+    const dim = makeDimOrMeas({ inputs: { align: 'center', headerAlign: 'right' } });
     const [header] = getTableHeaders({ dimensionsAndMeasures: [dim] }, theme);
 
-    expect(header?.headerAlign).toBe('center');
-    expect(header?.align).toBe('right');
+    expect(header?.align).toBe('center');
+    expect(header?.headerAlign).toBe('right');
   });
 
   describe('cellStyle', () => {
@@ -220,16 +216,16 @@ describe('getTableHeaders', () => {
       expect(header?.cell).toBeDefined();
     });
 
-    it('passes the data align to the custom cell', () => {
+    it('passes the cell align to the custom cell', () => {
       const dim = makeDimOrMeas({
         inputs: {
           displayFormat: DisplayFormatTypeOptions.MARKDOWN,
           align: 'center',
-          dataAlign: 'right',
+          headerAlign: 'right',
         },
       });
       const [header] = getTableHeaders({ dimensionsAndMeasures: [dim] }, theme);
-      expect(header?.cell!({ value: 'text' }).props.align).toBe('right');
+      expect(header?.cell!({ value: 'text' }).props.align).toBe('center');
     });
   });
 

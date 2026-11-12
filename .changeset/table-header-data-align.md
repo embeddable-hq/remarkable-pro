@@ -2,4 +2,4 @@
 '@embeddable.com/remarkable-pro': minor
 ---
 
-TableChartPaginated and TableScrollable: the column "Align" option is renamed to "Header align" and now aligns both the header and the data. A new "Data align" option overrides the alignment of the data only. Markdown and JSON columns now also follow the data alignment.
+TableChartPaginated and TableScrollable: a new "Header align" column option overrides "Align" for the header. "Align" keeps its behavior. Markdown and JSON columns now also follow "Align".
