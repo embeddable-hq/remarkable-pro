@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.14.2
+
+### Patch Changes
+
+- 60f0e68: Fix canvas overlay title color switching to dark in dark mode by using the new `--em-overlay-color` token from remarkable-ui 3.9.0.
+
 ## 0.14.1
 
 ### Patch Changes
