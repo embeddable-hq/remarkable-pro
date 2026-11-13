@@ -88,14 +88,12 @@ export const getScatterChartProOptions = (
       datalabels: {
         labels: {
           value: {
-            display: 'auto',
             ...buildDatalabelsValue(xMeasure, yMeasure, formatValue),
             anchor: 'center',
             align: 'bottom',
             offset: valueOffset,
           },
           caption: {
-            display: 'auto',
             anchor: 'center',
             align: 'bottom',
             offset: captionOffset,
