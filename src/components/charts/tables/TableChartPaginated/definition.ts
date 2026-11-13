@@ -32,6 +32,7 @@ const meta = {
         ...inputs.dimensionsAndMeasures.inputs,
         subInputs.width,
         subInputs.align,
+        subInputs.headerAlign,
         subInputs.tableCellStyle,
       ],
     },

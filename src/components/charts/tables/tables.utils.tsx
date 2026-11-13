@@ -1,18 +1,20 @@
 import { DataResponse, Dimension, DimensionOrMeasure } from '@embeddable.com/core';
-import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
-import { CssSize, Markdown, TableBodyCellWithCopy } from '@embeddable.com/remarkable-ui';
-import { Theme } from '../../../theme/theme.types';
 import {
+  CssSize,
   getStyleNumber,
+  Markdown,
+  TableBodyCellWithCopy,
   TableHeaderAlign,
   TableHeaderItem,
   TableHeaderItemAlign,
 } from '@embeddable.com/remarkable-ui';
+import { getThemeFormatter } from '../../../theme/formatter/formatter.utils';
+import { Theme } from '../../../theme/theme.types';
 import { DisplayFormatTypeOptions } from '../../types/DisplayFormat.type.emb';
 import styles from './tables.module.css';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export const getTableHeaderAlign = (dimOrMeas: DimensionOrMeasure): TableHeaderItemAlign => {
+export const getTableCellAlign = (dimOrMeas: DimensionOrMeasure): TableHeaderItemAlign => {
   const subInputAlign = dimOrMeas.inputs?.align;
 
   if (subInputAlign) return subInputAlign;
@@ -27,6 +29,9 @@ export const getTableHeaderAlign = (dimOrMeas: DimensionOrMeasure): TableHeaderI
       return TableHeaderAlign.LEFT;
   }
 };
+
+export const getTableHeadAlign = (dimOrMeas: DimensionOrMeasure): TableHeaderItemAlign =>
+  dimOrMeas.inputs?.headerAlign ?? getTableCellAlign(dimOrMeas);
 
 export const getTableHeaderMinWidth = (dimOrMeas: DimensionOrMeasure): CssSize => {
   const subInputWidth = dimOrMeas.inputs?.width;
@@ -56,6 +61,7 @@ export const getTableHeaders = (
 ): TableHeaderItem<any>[] => {
   const themeFormatter = getThemeFormatter(theme);
   return props.dimensionsAndMeasures.map((dimOrMeas) => {
+    const dataCellAlign = getTableCellAlign(dimOrMeas);
     const displayFormat: string = dimOrMeas.inputs?.displayFormat;
     const hasCustomCellFormatter =
       displayFormat &&
@@ -66,7 +72,8 @@ export const getTableHeaders = (
       id: dimOrMeas.name,
       title: themeFormatter.dimensionOrMeasureTitle(dimOrMeas),
       minWidth: getTableHeaderMinWidth(dimOrMeas),
-      align: getTableHeaderAlign(dimOrMeas),
+      align: dataCellAlign,
+      headerAlign: getTableHeadAlign(dimOrMeas),
       accessor: (row) => {
         const updatedDimOrMeas = {
           ...dimOrMeas,
@@ -98,7 +105,7 @@ export const getTableHeaders = (
             }
 
             return (
-              <TableBodyCellWithCopy value={value}>
+              <TableBodyCellWithCopy align={dataCellAlign} value={value}>
                 {displayFormat === DisplayFormatTypeOptions.MARKDOWN ? (
                   // Markdown
                   <span className={styles.markdownCell}>
@@ -127,7 +134,6 @@ export const getTableRows = (props: { clickDimension?: Dimension; rows: DataResp
     return props.rows;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return props.rows.map(({ [clickDimensionName]: _, ...row }) => ({
     ...row,
   }));
