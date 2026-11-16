@@ -235,8 +235,6 @@ describe('TableScrollablePro', () => {
   });
 
   describe('React StrictMode', () => {
-    // StrictMode runs effects twice on mount; the second run must not append
-    // the first page again.
     const pageOf = (rowCount: number, offset = 0) =>
       ({
         data: Array.from({ length: rowCount }, (_, row) => ({ category: `row-${offset + row}` })),
@@ -280,11 +278,9 @@ describe('TableScrollablePro', () => {
       const firstPage = pageOf(2);
       const { rerender } = render(<TableScrollablePro {...defaultProps} results={firstPage} />);
 
-      // state.page goes up first; the response on hand is still page 0's.
       rerender(<TableScrollablePro {...defaultProps} state={pageState(1)} results={firstPage} />);
       expect(await rowsPassedToTable()).toHaveLength(2);
 
-      // Then it loads, still holding page 0's rows.
       rerender(
         <TableScrollablePro
           {...defaultProps}

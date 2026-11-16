@@ -67,9 +67,10 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   i18nSetup(theme);
 
   const [isDownloadingData, setIsDownloadingData] = useState(false);
-  // Rows by page number. Writing a page twice gives the same result, so a
-  // re-run effect (React StrictMode runs them twice) can't duplicate rows.
-  const [pages, setPages] = useState<Record<number, any[]>>({});
+  const [{ pages, shownData }, setTable] = useState<{
+    pages: Record<number, any[]>;
+    shownData?: DataResponse['data'];
+  }>({ pages: {} });
   const rowsToDisplay = useMemo(
     () =>
       Object.keys(pages)
@@ -118,17 +119,15 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     }));
   }, [dataset.variableValues]);
 
-  // Runs only when a response arrives, not when state.page changes: the page
-  // goes up before its rows load, and the rows on hand still belong to the page before.
   const page = isAutoHeightMode ? 0 : (state?.page ?? 0);
-  useEffect(() => {
-    if (!results?.data || results.isLoading) return;
-    const pageRows = results.data;
-    // Page 0 starts the list again: first load, sort, variable or height-mode change.
-    // In auto height each response is the whole allowance, so it is always page 0.
-    setPages((prev) => (page === 0 ? { 0: pageRows } : { ...prev, [page]: pageRows }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [results?.data, results?.isLoading]);
+  // File each response once, when it arrives: state.page goes up before its rows load.
+  const data = results?.data;
+  if (data && !results.isLoading && data !== shownData) {
+    setTable((prev) => ({
+      shownData: data,
+      pages: page === 0 ? { 0: data } : { ...prev.pages, [page]: data },
+    }));
+  }
 
   const firstPage = pages[0];
   useEffect(() => {
@@ -147,7 +146,6 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   );
 
   // `props()` cannot call hooks, so this is how the query gets to see the mode at all.
-  // A new mode fetches its own first page, so paging starts again.
   useEffect(() => {
     if (state?.heightMode !== heightMode) {
       handleUpdateEmbeddableState({ heightMode, page: 0 });
@@ -240,7 +238,6 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   const hasMoreData =
     !isAutoHeightMode && results?.data && results.data.length === TABLE_SCROLLABLE_SIZE;
   const isLoading = Boolean(results?.isLoading || allResults?.isLoading);
-  // Later pages load inside the table; the first page loads the whole card.
   const isLoadingTable = results?.isLoading && page > 0;
 
   const totalRows = results?.total;
