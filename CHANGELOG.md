@@ -1,5 +1,11 @@
 # @embeddable/remarkable-ui
 
+## 0.15.0
+
+### Minor Changes
+
+- 41f8e7e: TableChartPaginated and TableScrollable: a new "Header align" column option overrides "Align" for the header. "Align" keeps its behavior. Markdown and JSON columns now also follow "Align".
+
 ## 0.14.2
 
 ### Patch Changes
