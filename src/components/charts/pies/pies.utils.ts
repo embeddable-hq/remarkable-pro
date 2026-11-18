@@ -164,7 +164,12 @@ export const getPieChartProOptions = (
       datalabels: {
         formatter: (value: string | number, context) => {
           if (measure.inputs?.showValueAsPercentage) {
-            return getDatalabelPercentage(Number(value), context.dataset.data, decimalPlaces);
+            return getDatalabelPercentage(
+              Number(value),
+              context.dataset.data,
+              decimalPlaces,
+              theme,
+            );
           }
           return themeFormatter.data(measure, value);
         },
@@ -177,7 +182,7 @@ export const getPieChartProOptions = (
           },
           label(context) {
             const raw = context.raw as number;
-            return `${themeFormatter.data(measure, raw)} (${getDatalabelPercentage(raw, context.dataset.data, decimalPlaces)})`;
+            return `${themeFormatter.data(measure, raw)} (${getDatalabelPercentage(raw, context.dataset.data, decimalPlaces, theme)})`;
           },
         },
       },
