@@ -3,6 +3,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import type { DataResponse, Dimension, DimensionOrMeasure } from '@embeddable.com/core';
 import TableChartPaginatedPro from './index';
 import type { TableChartPaginatedProProps } from './index';
+import { useTableGetRowsPerPage } from '@embeddable.com/remarkable-ui';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
@@ -89,6 +90,28 @@ describe('TableChartPaginatedPro', () => {
   it('renders TablePaginated', () => {
     render(<TableChartPaginatedPro {...defaultProps} />);
     expect(screen.getByTestId('table-paginated')).toBeInTheDocument();
+  });
+
+  it('reports each page size once when setState is a new function on every render', () => {
+    const calls: ReturnType<typeof vi.fn>[] = [];
+    const renderWith = () => {
+      const fn = vi.fn();
+      calls.push(fn);
+      return <TableChartPaginatedPro {...defaultProps} setState={fn} />;
+    };
+    const pageSizeReports = () =>
+      calls.flatMap((fn) => fn.mock.calls).map(([updater]) => updater({}).pageSize);
+
+    const { rerender } = render(renderWith());
+    rerender(renderWith());
+    rerender(renderWith());
+    expect(pageSizeReports()).toEqual([10]);
+
+    vi.mocked(useTableGetRowsPerPage).mockReturnValue(20);
+    rerender(renderWith());
+    rerender(renderWith());
+    expect(pageSizeReports()).toEqual([10, 20]);
+    vi.mocked(useTableGetRowsPerPage).mockReturnValue(10);
   });
 
   describe('row clicks', () => {
