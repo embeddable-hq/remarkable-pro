@@ -44,8 +44,12 @@ export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
   }
 
   const startAction = (onClick: () => void | Promise<void>) => {
-    setTimeout(() => {
-      Promise.resolve(onClick()).finally(() => setIsLoading(false));
+    setTimeout(async () => {
+      try {
+        await onClick();
+      } finally {
+        setIsLoading(false);
+      }
     }, 100);
   };
 
