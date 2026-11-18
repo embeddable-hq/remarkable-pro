@@ -45,7 +45,7 @@ export const GranularitySelectField = (props: GranularitySelectFieldProps) => {
         granularities?.includes(opt.value as TGranularityValue),
       ),
     );
-  }, [primaryTimeRange, granularities]);
+  }, [primaryTimeRange, granularities, theme.i18n?.language]);
 
   useEffect(() => {
     if (granularity) {
