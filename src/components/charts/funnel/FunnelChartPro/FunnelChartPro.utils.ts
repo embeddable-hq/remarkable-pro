@@ -75,19 +75,24 @@ const aggregateFunnelSections = (
   return names.map((name) => ({ name, count: sectionMap.get(name) ?? 0 }));
 };
 
-export const getFunnelOptionsDatalabelsFormatter =
-  (config: Partial<FunnelChartProProps>) => (value: number, context: Context) => {
+export const getFunnelOptionsDatalabelsFormatter = (
+  config: { countMeasure: Measure } & Partial<FunnelChartProProps>,
+  theme: Theme = remarkableTheme,
+) => {
+  const themeFormatter = getThemeFormatter(theme);
+  return (value: number, context: Context) => {
     const labels = context.chart.data.labels as (string | number)[] | undefined;
-    const label = String(labels?.[context.dataIndex] ?? '');
+    const label = config.showSectionLabels ? String(labels?.[context.dataIndex] ?? '') : '';
     if (!config.showValueLabels) return label;
     const data = (context.chart.data.datasets[context.datasetIndex]?.data ?? []) as number[];
     const total = data.reduce((sum, v) => sum + (v || 0), 0);
     const percentage = total > 0 ? (value / total) * 100 : 0;
     const valueText = config.displayPercentages
       ? `${percentage.toFixed(1)}%`
-      : value.toLocaleString();
-    return `${label}: ${valueText}`;
+      : themeFormatter.data(config.countMeasure, value);
+    return label ? `${label}: ${valueText}` : valueText;
   };
+};
 
 export const getFunnelChartProOptions = (
   options: { countMeasure: Measure } & Partial<FunnelChartProProps>,
@@ -112,15 +117,13 @@ export const getFunnelChartProOptions = (
     },
   };
 
-  if (!options.showSectionLabels) return base;
-
   return {
     ...base,
     plugins: {
       ...base.plugins,
       datalabels: {
-        display: 'auto',
-        formatter: getFunnelOptionsDatalabelsFormatter(options),
+        ...(options.showSectionLabels ? { display: 'auto' as const } : {}),
+        formatter: getFunnelOptionsDatalabelsFormatter(options, theme),
       },
     },
   };
