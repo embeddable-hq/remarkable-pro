@@ -261,4 +261,47 @@ describe('ChartCardMenuPro', () => {
     expect(screen.queryByTestId('chart-card-loading')).not.toBeInTheDocument();
     vi.useRealTimers();
   });
+
+  it('clears the loading state when an option onClick throws', async () => {
+    vi.useFakeTimers();
+    // The error is rethrown, not swallowed, so it surfaces as an unhandled rejection.
+    // Vitest would report that as a failure of its own, so it is collected here instead.
+    const vitestListeners = process.listeners('unhandledRejection');
+    process.removeAllListeners('unhandledRejection');
+    const unhandled: unknown[] = [];
+    process.on('unhandledRejection', (reason) => unhandled.push(reason));
+
+    try {
+      const error = new Error('export failed');
+      const onClickMock = vi.fn(() => {
+        throw error;
+      });
+
+      render(
+        <ChartCardMenuPro
+          menuOptions={[{ value: 'csv', labelKey: 'export.csv', onClick: onClickMock }]}
+        />,
+      );
+      fireEvent.click(screen.getByText('export.csv'));
+      expect(screen.getByTestId('chart-card-loading')).toBeInTheDocument();
+
+      await act(async () => {
+        await vi.runAllTimersAsync();
+      });
+      vi.useRealTimers();
+      // Node reports an unhandled rejection after the microtask queue has drained
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+
+      expect(onClickMock).toHaveBeenCalledTimes(1);
+      expect(unhandled).toEqual([error]);
+      expect(screen.queryByTestId('chart-card-loading')).not.toBeInTheDocument();
+      expect(screen.getByTestId('action-icon')).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+      process.removeAllListeners('unhandledRejection');
+      vitestListeners.forEach((listener) => process.on('unhandledRejection', listener));
+    }
+  });
 });
