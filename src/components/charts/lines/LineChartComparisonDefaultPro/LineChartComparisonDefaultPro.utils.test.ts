@@ -12,6 +12,7 @@ import { isColorValid } from '../../../../utils/color.utils';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
 import { getDimensionWithoutTruncation, Y_AXIS_RANGE_CLIP } from '../../charts.utils';
+import { i18n } from '../../../../theme/i18n/i18n';
 
 vi.mock('../../../utils/dimension.utils', () => ({
   getTimeRangeFromDimensionValue: vi.fn(),
@@ -412,5 +413,22 @@ describe('getLineChartComparisonProData', () => {
     expect(calls[0]?.usedColors?.has('#custom')).toBe(true);
     expect(calls[1]?.usedColors?.has('#custom')).toBe(true);
     vi.mocked(isColorValid).mockReturnValue(false);
+  });
+
+  it('labels the comparison dataset with the translated template', () => {
+    const result = getLineChartComparisonProData(
+      {
+        data: [{ date: 'Jan', a: 1 }],
+        dataComparison: [{ date: 'Jan', a: 3 }],
+        dimension: makeDimension(),
+        measures: [makeMeasure({ name: 'a', title: 'Customers' })],
+        hasMinMaxYAxisRange: false,
+      },
+      makeTheme(),
+    );
+
+    expect(result.datasets[0]?.label).toBe('Customers');
+    expect(result.datasets[1]?.label).toBe('charts.comparisonSeriesLabel');
+    expect(i18n.t).toHaveBeenCalledWith('charts.comparisonSeriesLabel', { label: 'Customers' });
   });
 });
