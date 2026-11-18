@@ -257,9 +257,12 @@ export const getAreaChartProOptions = (
 ): ChartOptions<'line'> => {
   const lineOptions = getLineChartGroupedProOptions(options, theme);
 
-  return mergician(lineOptions, {
-    scales: { y: { stacked: true } },
-    interaction: { mode: 'index' as const, intersect: false },
-    ...(theme.charts?.areaChartPro?.options || {}),
-  });
+  return mergician(
+    lineOptions,
+    {
+      scales: { y: { stacked: true } },
+      interaction: { mode: 'index' as const, intersect: false },
+    },
+    theme.charts?.areaChartPro?.options || {},
+  );
 };
