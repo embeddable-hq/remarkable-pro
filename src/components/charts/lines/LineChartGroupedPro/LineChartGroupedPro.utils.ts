@@ -10,6 +10,7 @@ import {
   getDimensionWithoutTruncation,
   groupTailAsOtherPerGroup,
   uniqueSortedWithOtherLast,
+  Y_AXIS_RANGE_CLIP,
 } from '../../charts.utils';
 
 export const getLineChartGroupedProData = (
@@ -52,7 +53,7 @@ export const getLineChartGroupedProData = (
     });
 
     const dataset = {
-      clip: hasMinMaxYAxisRange,
+      clip: hasMinMaxYAxisRange ? Y_AXIS_RANGE_CLIP : false,
       label: themeFormatter.data(groupDimension, groupByItem),
       rawLabel: groupByItem,
       backgroundColor: setColorAlpha(backgroundColor, 0.5),
