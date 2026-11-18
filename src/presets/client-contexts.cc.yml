@@ -1,0 +1,20 @@
+# Test-only presets for the EmKit fixes (branch test/emkit-all). Pick one in the builder's
+# client context dropdown. See https://docs.embeddable.com/development/client-context
+- name: 1. English
+  clientContext:
+    language: "en"
+  canvas:
+    background: "#fff"
+
+- name: 2. German
+  clientContext:
+    language: "de"
+  canvas:
+    background: "#fff"
+
+- name: 3. English + area chart theme scales override
+  clientContext:
+    language: "en"
+    areaScales: true
+  canvas:
+    background: "#fff"
