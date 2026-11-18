@@ -178,6 +178,7 @@ export const getBarChartProOptions = (
                   Number(value),
                   context.dataset.data,
                   measure.inputs?.decimalPlaces,
+                  theme,
                 );
               }
               return themeFormatter.data(measure, value);
@@ -200,7 +201,7 @@ export const getBarChartProOptions = (
 
             let percentage = '';
             if (measure.inputs?.showValueAsPercentage) {
-              percentage = `(${getDatalabelPercentage(raw, context.dataset.data, measure.inputs?.decimalPlaces)})`;
+              percentage = `(${getDatalabelPercentage(raw, context.dataset.data, measure.inputs?.decimalPlaces, theme)})`;
             }
 
             return `${context.dataset.label}: ${measureValue} ${percentage}`;
@@ -264,7 +265,7 @@ export const getBarStackedChartProOptions = (
 
         let percentage = '';
         if (measure.inputs?.showValueAsPercentage) {
-          percentage = `(${getDatalabelPercentage(raw, context.dataset.data, measure.inputs?.decimalPlaces)})`;
+          percentage = `(${getDatalabelPercentage(raw, context.dataset.data, measure.inputs?.decimalPlaces, theme)})`;
         }
 
         const label = themeFormatter.data(

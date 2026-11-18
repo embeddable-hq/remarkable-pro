@@ -6,6 +6,9 @@ import { i18n } from '../../theme/i18n/i18n';
 import { DimensionValueOrTimeRange, GroupedClickArg, SimpleClickArg } from './charts.types';
 import { ChartData } from 'chart.js';
 import { getDimensionFieldName } from '../../utils/data.utils';
+import { Theme } from '../../theme/theme.types';
+import { remarkableTheme } from '../../theme/theme.constants';
+import { getThemeFormatter } from '../../theme/formatter/formatter.utils';
 
 export const getDimensionWithoutTruncation = (dimension: Dimension): Dimension => ({
   ...dimension,
@@ -226,12 +229,16 @@ export const mergeGroupOtherResults = (
 export const getDatalabelPercentage = (
   value: number,
   data: unknown[],
-  decimalPlaces = 2,
+  decimalPlaces?: number,
+  theme: Theme = remarkableTheme,
 ): string => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const total = data.reduce((sum: number, v: any) => sum + Number.parseFloat(v), 0);
-  if (total === 0) return '0%';
-  return `${Number.parseFloat(((value / total) * 100).toFixed(decimalPlaces))}%`;
+  return getThemeFormatter(theme).number(total === 0 ? 0 : value / total, {
+    style: 'percent',
+    minimumFractionDigits: decimalPlaces,
+    maximumFractionDigits: decimalPlaces ?? 2,
+  });
 };
 
 export const createSimpleClickHandler = ({
