@@ -110,8 +110,9 @@ const PivotTablePro = (props: PivotTableProProps) => {
   const [subRowsByRow, setSubRowsByRow] = useState(new Map<string, any[]>());
 
   const handleRowExpand = (rowKey: string) => {
+    if (!setExpandedRowKey) return;
     setLoadingRows((prev) => new Set(prev).add(rowKey));
-    setExpandedRowKey?.(rowKey);
+    setExpandedRowKey(rowKey);
   };
 
   useEffect(() => {
