@@ -1,14 +1,20 @@
 import type { Mock } from 'vitest';
 import dayjs from 'dayjs';
-import { loadDayjsLocale, localToUtcDate } from './date.utils';
+import { renderHook, waitFor } from '@testing-library/react';
+import { useTheme } from '@embeddable.com/react';
+import { loadDayjsLocale, localToUtcDate, useLoadDayjsLocale } from './date.utils';
 
 vi.mock('dayjs', () => {
   const locale = vi.fn();
   return { default: Object.assign(vi.fn(), { locale }) };
 });
 
-// useLoadDayjsLocale is a React hook; testing it requires @testing-library/react
-// which is not currently a dev dependency. Add it to cover the hook in isolation.
+vi.mock('@embeddable.com/react', () => ({
+  useTheme: vi.fn(),
+}));
+
+const mockLanguage = (language: string) =>
+  (useTheme as Mock).mockReturnValue({ i18n: { language }, formatter: { locale: 'en-US' } });
 
 describe('loadDayjsLocale', () => {
   beforeEach(() => {
@@ -40,6 +46,35 @@ describe('loadDayjsLocale', () => {
     await load('fr');
     expect(dayjs.locale).toHaveBeenCalledWith('en');
     vi.doUnmock('dayjs/locale/fr');
+  });
+});
+
+describe('useLoadDayjsLocale', () => {
+  const renderReadyStates = () => {
+    const states: boolean[] = [];
+    renderHook(() => {
+      const { dayjsLocaleReady } = useLoadDayjsLocale();
+      states.push(dayjsLocaleReady);
+    });
+    return states;
+  };
+
+  it('is ready on the first render for English', () => {
+    mockLanguage('en');
+    expect(renderReadyStates()[0]).toBe(true);
+  });
+
+  it('becomes ready after loading a new locale', async () => {
+    mockLanguage('de');
+    const states = renderReadyStates();
+    expect(states[0]).toBe(false);
+    await waitFor(() => expect(states.at(-1)).toBe(true));
+  });
+
+  it('is ready on the first render for an already loaded locale', async () => {
+    await loadDayjsLocale('de');
+    mockLanguage('de');
+    expect(renderReadyStates()[0]).toBe(true);
   });
 });
 
