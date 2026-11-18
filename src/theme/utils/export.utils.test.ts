@@ -182,8 +182,8 @@ describe('exportXLSX', () => {
 
   afterEach(() => vi.clearAllMocks());
 
-  it('passes the formatted 2D array to aoa_to_sheet', () => {
-    exportXLSX({
+  it('passes the formatted 2D array to aoa_to_sheet', async () => {
+    await exportXLSX({
       title: 'test',
       data: [{ city: 'London' }],
       dimensionsAndMeasures: [dim('city', 'City')],
@@ -192,8 +192,8 @@ describe('exportXLSX', () => {
     expect(XLSX.utils.aoa_to_sheet).toHaveBeenCalledWith([['City'], ['London']]);
   });
 
-  it('coerces numeric measures and number dimensions to numbers', () => {
-    exportXLSX({
+  it('coerces numeric measures and number dimensions to numbers', async () => {
+    await exportXLSX({
       title: 'test',
       data: [{ city: 'London', zip: '01234', year: '2024', revenue: '1000.5', note: '7' }],
       dimensionsAndMeasures: [
@@ -211,8 +211,8 @@ describe('exportXLSX', () => {
     ]);
   });
 
-  it('treats measures as numeric unless their type is string, time or boolean', () => {
-    exportXLSX({
+  it('treats measures as numeric unless their type is string, time or boolean', async () => {
+    await exportXLSX({
       title: 'test',
       data: [{ a: '1', b: '2', c: '3', d: '4', e: '5', f: '6' }],
       dimensionsAndMeasures: [
@@ -231,8 +231,8 @@ describe('exportXLSX', () => {
     ]);
   });
 
-  it('falls back to the original string when a numeric value is not a number', () => {
-    exportXLSX({
+  it('falls back to the original string when a numeric value is not a number', async () => {
+    await exportXLSX({
       title: 'test',
       data: [{ revenue: 'N/A' }, { revenue: null }, { revenue: '' }],
       dimensionsAndMeasures: [measure('revenue', 'Revenue')],
@@ -241,8 +241,8 @@ describe('exportXLSX', () => {
     expect(XLSX.utils.aoa_to_sheet).toHaveBeenCalledWith([['Revenue'], ['N/A'], [''], ['']]);
   });
 
-  it('keeps blank, non-finite and unsafe-integer values as the original string', () => {
-    exportXLSX({
+  it('keeps blank, non-finite and unsafe-integer values as the original string', async () => {
+    await exportXLSX({
       title: 'test',
       data: [
         { n: '   ' },
@@ -266,8 +266,8 @@ describe('exportXLSX', () => {
     ]);
   });
 
-  it('serializes object values instead of exporting "[object Object]"', () => {
-    exportXLSX({
+  it('serializes object values instead of exporting "[object Object]"', async () => {
+    await exportXLSX({
       title: 'test',
       data: [{ geo: { lat: 1, lng: 2 } }],
       dimensionsAndMeasures: [dim('geo', 'Geo')],
@@ -276,18 +276,18 @@ describe('exportXLSX', () => {
     expect(XLSX.utils.aoa_to_sheet).toHaveBeenCalledWith([['Geo'], ['{"lat":1,"lng":2}']]);
   });
 
-  it('calls writeFile with the correct filename', () => {
-    exportXLSX({ title: 'MyReport', data: [], dimensionsAndMeasures: [], theme: mockTheme });
+  it('calls writeFile with the correct filename', async () => {
+    await exportXLSX({ title: 'MyReport', data: [], dimensionsAndMeasures: [], theme: mockTheme });
     expect(XLSX.writeFile).toHaveBeenCalledWith(expect.anything(), 'MyReport.xlsx');
   });
 
-  it('falls back to "untitled.xlsx" when no title is given', () => {
-    exportXLSX({ data: [], dimensionsAndMeasures: [], theme: mockTheme });
+  it('falls back to "untitled.xlsx" when no title is given', async () => {
+    await exportXLSX({ data: [], dimensionsAndMeasures: [], theme: mockTheme });
     expect(XLSX.writeFile).toHaveBeenCalledWith(expect.anything(), 'untitled.xlsx');
   });
 
-  it('appends the worksheet to the workbook as "Sheet1"', () => {
-    exportXLSX({ title: 'test', data: [], dimensionsAndMeasures: [], theme: mockTheme });
+  it('appends the worksheet to the workbook as "Sheet1"', async () => {
+    await exportXLSX({ title: 'test', data: [], dimensionsAndMeasures: [], theme: mockTheme });
     expect(XLSX.utils.book_append_sheet).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
