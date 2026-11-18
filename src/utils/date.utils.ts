@@ -109,12 +109,16 @@ const locales: Record<string, () => Promise<any>> = {
   zh_hk: () => import('dayjs/locale/zh-hk'),
   zh_tw: () => import('dayjs/locale/zh-tw'),
 };
+
+const loadedLocales = new Set<string>(['en']);
+
 export async function loadDayjsLocale(locale: string): Promise<void> {
   const loader = locales[locale.toLowerCase()];
   if (!loader) return;
   try {
     await loader();
     dayjs.locale(locale);
+    loadedLocales.add(locale);
   } catch {
     console.warn(`Locale "${locale}" not supported, falling back to "en".`);
     dayjs.locale('en');
@@ -127,17 +131,18 @@ type UseLoadDayjsLocaleProps = {
 
 export const useLoadDayjsLocale = (): UseLoadDayjsLocaleProps => {
   const theme: Theme = useTheme() as Theme;
-  const [dayjsLocaleReady, setDayjsLocaleReady] = useState(false);
-  useEffect(() => {
-    const locale = theme.i18n.language ?? theme.formatter.locale;
-    const loadLocale = async () => {
-      setDayjsLocaleReady(false);
-      await loadDayjsLocale(locale);
-      setDayjsLocaleReady(true);
-    };
+  const locale = theme.i18n.language ?? theme.formatter.locale;
+  const [dayjsLocaleReady, setDayjsLocaleReady] = useState(loadedLocales.has(locale));
 
-    loadLocale();
-  }, [theme.i18n.language, theme.formatter.locale]);
+  useEffect(() => {
+    if (loadedLocales.has(locale)) {
+      dayjs.locale(locale);
+      setDayjsLocaleReady(true);
+      return;
+    }
+    setDayjsLocaleReady(false);
+    loadDayjsLocale(locale).then(() => setDayjsLocaleReady(true));
+  }, [locale]);
 
   return { dayjsLocaleReady };
 };
