@@ -7,6 +7,7 @@ import {
   getSafeSelection,
 } from './GranularitySelectField.utils';
 import type { Granularity } from '@embeddable.com/core';
+import { useTheme } from '@embeddable.com/react';
 
 vi.mock('@embeddable.com/react', () => ({ useTheme: vi.fn().mockReturnValue({}) }));
 vi.mock('../../../../theme/i18n/i18n', () => ({ i18nSetup: vi.fn() }));
@@ -197,5 +198,14 @@ describe('GranularitySelectField', () => {
     );
     const [passedRange] = vi.mocked(getAvailableGranularityOptionsFromTimeRange).mock.calls[0]!;
     expect(passedRange).toBe(timeRange);
+  });
+
+  it('recomputes the available options when the language changes', () => {
+    const { rerender } = render(<GranularitySelectField onChange={vi.fn()} />);
+    expect(getAvailableGranularityOptionsFromTimeRange).toHaveBeenCalledTimes(1);
+
+    vi.mocked(useTheme).mockReturnValueOnce({ i18n: { language: 'de' } });
+    rerender(<GranularitySelectField onChange={vi.fn()} />);
+    expect(getAvailableGranularityOptionsFromTimeRange).toHaveBeenCalledTimes(2);
   });
 });
