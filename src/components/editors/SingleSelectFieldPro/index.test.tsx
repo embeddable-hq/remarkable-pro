@@ -2,6 +2,7 @@ import { render, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
 import SingleSelectFieldPro from './index';
 import type { Dimension, DataResponse } from '@embeddable.com/core';
+import { i18nSetup } from '../../../theme/i18n/i18n';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
@@ -14,6 +15,7 @@ vi.mock('../../../theme/formatter/formatter.utils', () => ({
 }));
 
 vi.mock('../../../theme/i18n/i18n', () => ({
+  i18nSetup: vi.fn(),
   i18n: { t: vi.fn((key: string) => key) },
 }));
 
@@ -235,5 +237,11 @@ describe('SingleSelectFieldPro', () => {
       <SingleSelectFieldPro dimension={country} results={makeResults([])} onChange={onChange} />,
     );
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('sets up i18n from the theme', () => {
+    vi.mocked(i18nSetup).mockClear();
+    render(<SingleSelectFieldPro dimension={country} results={makeResults(['US'])} />);
+    expect(i18nSetup).toHaveBeenCalledTimes(1);
   });
 });
