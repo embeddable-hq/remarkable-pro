@@ -28,6 +28,7 @@ export const de: ResourceLanguage = {
       label: 'Beschriftung',
       primaryPeriod: 'Primärzeitraum',
       comparisonPeriod: 'Vergleichszeitraum',
+      comparisonSeriesLabel: '{{label}} (Vorperiode)',
       'menuOptions.downloadCSV': 'CSV herunterladen',
       'menuOptions.downloadPNG': 'PNG herunterladen',
       'menuOptions.downloadXLSX': 'XLSX herunterladen',
