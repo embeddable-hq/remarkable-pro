@@ -4,6 +4,7 @@ export type LineChartProOptionsClickArg = {
   dimensionValue: string | number | undefined;
   dimensionTimeRange: TimeRange | undefined;
   measureValue?: number;
+  measureValues?: Record<string, unknown>;
 };
 
 export type LineChartGroupedProOptionsClickArg = {

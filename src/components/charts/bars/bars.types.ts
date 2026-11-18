@@ -4,6 +4,7 @@ import { ChartCardHeaderProps } from '../shared/ChartCard/ChartCard';
 export type BarChartProOptionsClickArg = {
   dimensionValue: string | number | undefined;
   dimensionTimeRange: TimeRange | undefined;
+  measureValues?: Record<string, unknown>;
 };
 
 export type BarChartStackedProOptionsClickArg = BarChartProOptionsClickArg & {
