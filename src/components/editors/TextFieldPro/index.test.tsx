@@ -21,13 +21,20 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
     placeholder,
     onChange,
     clearable,
+    'aria-label': ariaLabel,
   }: {
     value: string;
     placeholder: string;
     onChange: (v: string) => void;
     clearable?: boolean;
+    'aria-label'?: string;
   }) => (
-    <div data-testid="text-field" data-clearable={String(clearable)} data-placeholder={placeholder}>
+    <div
+      data-testid="text-field"
+      data-clearable={String(clearable)}
+      data-placeholder={placeholder}
+      data-aria-label={ariaLabel}
+    >
       <input
         data-testid="text-field-input"
         value={value}
@@ -137,5 +144,15 @@ describe('TextFieldPro definition config.props', () => {
     expect(props({ placeholder: 'Search...' } as Parameters<typeof props>[0])).toMatchObject({
       placeholder: 'Search...',
     });
+  });
+
+  it('names the input after the title', () => {
+    render(<TextFieldPro title="Search term" onChange={mockOnChange} />);
+    expect(screen.getByTestId('text-field')).toHaveAttribute('data-aria-label', 'Search term');
+  });
+
+  it('names the input after the placeholder when there is no title', () => {
+    render(<TextFieldPro placeholder="Search..." onChange={mockOnChange} />);
+    expect(screen.getByTestId('text-field')).toHaveAttribute('data-aria-label', 'Search...');
   });
 });
