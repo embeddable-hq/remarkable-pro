@@ -47,6 +47,17 @@ describe('remarkableThemeFormatter', () => {
     expect(remarkableThemeFormatter.locale).toBe(navigator.language);
   });
 
+  it('falls back to en-US without a navigator', async () => {
+    vi.stubGlobal('navigator', undefined);
+    vi.resetModules();
+    try {
+      const { remarkableThemeFormatter: formatter } = await import('./formatter.constants');
+      expect(formatter.locale).toBe('en-US');
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
   it('has empty default number formatter options', () => {
     expect(remarkableThemeFormatter.defaultNumberFormatterOptions).toEqual({});
   });
