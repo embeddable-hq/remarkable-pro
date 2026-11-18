@@ -6,6 +6,9 @@ import { i18n } from '../../theme/i18n/i18n';
 import { DimensionValueOrTimeRange, GroupedClickArg, SimpleClickArg } from './charts.types';
 import { ChartArea, ChartData } from 'chart.js';
 import { getDimensionFieldName } from '../../utils/data.utils';
+import { Theme } from '../../theme/theme.types';
+import { remarkableTheme } from '../../theme/theme.constants';
+import { getThemeFormatter } from '../../theme/formatter/formatter.utils';
 
 // Chart.js accepts per-side `false` (no clip) but types `clip` as a full ChartArea.
 export const Y_AXIS_RANGE_CLIP = {
@@ -234,12 +237,16 @@ export const mergeGroupOtherResults = (
 export const getDatalabelPercentage = (
   value: number,
   data: unknown[],
-  decimalPlaces = 2,
+  decimalPlaces?: number,
+  theme: Theme = remarkableTheme,
 ): string => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const total = data.reduce((sum: number, v: any) => sum + Number.parseFloat(v), 0);
-  if (total === 0) return '0%';
-  return `${Number.parseFloat(((value / total) * 100).toFixed(decimalPlaces))}%`;
+  return getThemeFormatter(theme).number(total === 0 ? 0 : value / total, {
+    style: 'percent',
+    minimumFractionDigits: decimalPlaces,
+    maximumFractionDigits: decimalPlaces ?? 2,
+  });
 };
 
 export const createSimpleClickHandler = ({
