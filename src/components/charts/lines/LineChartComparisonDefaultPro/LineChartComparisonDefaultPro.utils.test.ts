@@ -11,7 +11,7 @@ import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils'
 import { isColorValid } from '../../../../utils/color.utils';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
-import { getDimensionWithoutTruncation } from '../../charts.utils';
+import { getDimensionWithoutTruncation, Y_AXIS_RANGE_CLIP } from '../../charts.utils';
 
 vi.mock('../../../utils/dimension.utils', () => ({
   getTimeRangeFromDimensionValue: vi.fn(),
@@ -23,7 +23,11 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
   getChartjsAxisOptionsScalesTitle: vi.fn(() => ({})),
   getStyleNumber: vi.fn(() => 5),
 }));
-vi.mock('../../charts.utils', () => ({ getDimensionWithoutTruncation: vi.fn((d) => d) }));
+vi.mock('../../charts.utils', async (importOriginal) => ({
+  getDimensionWithoutTruncation: vi.fn((d) => d),
+  Y_AXIS_RANGE_CLIP: (await importOriginal<typeof import('../../charts.utils')>())
+    .Y_AXIS_RANGE_CLIP,
+}));
 vi.mock('../../../../theme/styles/styles.utils', () => ({
   getDimensionMeasureColor: vi.fn(() => '#000'),
 }));
@@ -357,6 +361,27 @@ describe('getLineChartComparisonProData', () => {
 
     expect(result.datasets).toHaveLength(2);
     expect(getDimensionMeasureColor).not.toHaveBeenCalled();
+  });
+
+  it('clips main and comparison datasets only at the top and bottom when a y-axis range is set', () => {
+    const props = {
+      data: [{ date: 'Jan', a: 1 }],
+      dataComparison: [{ date: 'Jan', a: 2 }],
+      dimension: makeDimension(),
+      measures: [makeMeasure({ name: 'a' })],
+    };
+
+    const withRange = getLineChartComparisonProData(
+      { ...props, hasMinMaxYAxisRange: true },
+      makeTheme(),
+    );
+    const withoutRange = getLineChartComparisonProData(
+      { ...props, hasMinMaxYAxisRange: false },
+      makeTheme(),
+    );
+
+    expect(withRange.datasets.map((ds) => ds.clip)).toEqual([Y_AXIS_RANGE_CLIP, Y_AXIS_RANGE_CLIP]);
+    expect(withoutRange.datasets.map((ds) => ds.clip)).toEqual([false, false]);
   });
 
   it('uses a fresh used-colors set per pass so comparison lines match main lines', () => {

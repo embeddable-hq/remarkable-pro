@@ -2,7 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Dimension, Measure } from '@embeddable.com/core';
 import { getLineChartProData, getLineChartProOptions } from './LineChartDefaultPro.utils';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
-import { getDimensionWithoutTruncation, groupTailAsOther } from '../../charts.utils';
+import {
+  getDimensionWithoutTruncation,
+  groupTailAsOther,
+  Y_AXIS_RANGE_CLIP,
+} from '../../charts.utils';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import { isColorValid } from '../../../../utils/color.utils';
 
@@ -11,9 +15,11 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
   getChartColors: vi.fn(() => []),
   getStyleNumber: vi.fn(() => 5),
 }));
-vi.mock('../../charts.utils', () => ({
+vi.mock('../../charts.utils', async (importOriginal) => ({
   getDimensionWithoutTruncation: vi.fn((d) => d),
   groupTailAsOther: vi.fn((data) => data),
+  Y_AXIS_RANGE_CLIP: (await importOriginal<typeof import('../../charts.utils')>())
+    .Y_AXIS_RANGE_CLIP,
 }));
 vi.mock('../../../../theme/styles/styles.utils', () => ({
   getDimensionMeasureColor: vi.fn(() => '#000'),
@@ -97,6 +103,20 @@ describe('getLineChartProData', () => {
     );
 
     expect(result.labels).toEqual(['Jan', 'Feb']);
+  });
+
+  it('clips datasets only at the top and bottom when a y-axis range is set', () => {
+    const props = {
+      data: [{ date: 'Jan', a: 1, b: 2 }],
+      dimension: makeDimension({ name: 'date' }),
+      measures: [makeMeasure({ name: 'a' }), makeMeasure({ name: 'b' })],
+    };
+
+    const withRange = getLineChartProData({ ...props, hasMinMaxYAxisRange: true }, makeTheme());
+    const withoutRange = getLineChartProData({ ...props, hasMinMaxYAxisRange: false }, makeTheme());
+
+    expect(withRange.datasets.map((ds) => ds.clip)).toEqual([Y_AXIS_RANGE_CLIP, Y_AXIS_RANGE_CLIP]);
+    expect(withoutRange.datasets.map((ds) => ds.clip)).toEqual([false, false]);
   });
 
   it('fills null for missing measure values when connectGaps is false', () => {

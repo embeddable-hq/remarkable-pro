@@ -5,18 +5,25 @@ import {
   getLineChartGroupedProOptions,
 } from './LineChartGroupedPro.utils';
 import { getThemeFormatter } from '../../../../theme/formatter/formatter.utils';
-import { getDimensionWithoutTruncation, groupTailAsOtherPerGroup } from '../../charts.utils';
+import {
+  getDimensionWithoutTruncation,
+  groupTailAsOtherPerGroup,
+  Y_AXIS_RANGE_CLIP,
+} from '../../charts.utils';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import { setColorAlpha } from '../../../../utils/color.utils';
 import { i18n } from '../../../../theme/i18n/i18n';
 vi.mock('../../../../theme/formatter/formatter.utils', () => ({ getThemeFormatter: vi.fn() }));
 vi.mock('@embeddable.com/remarkable-ui', () => ({ getChartColors: vi.fn() }));
-vi.mock('../../charts.utils', async (importOriginal) => ({
-  getDimensionWithoutTruncation: vi.fn((d) => d),
-  groupTailAsOtherPerGroup: vi.fn((data) => data ?? []),
-  uniqueSortedWithOtherLast: (await importOriginal<typeof import('../../charts.utils')>())
-    .uniqueSortedWithOtherLast,
-}));
+vi.mock('../../charts.utils', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../charts.utils')>();
+  return {
+    getDimensionWithoutTruncation: vi.fn((d) => d),
+    groupTailAsOtherPerGroup: vi.fn((data) => data ?? []),
+    uniqueSortedWithOtherLast: actual.uniqueSortedWithOtherLast,
+    Y_AXIS_RANGE_CLIP: actual.Y_AXIS_RANGE_CLIP,
+  };
+});
 vi.mock('../../../../theme/styles/styles.utils', () => ({
   getDimensionMeasureColor: vi.fn(() => '#000'),
 }));
@@ -93,6 +100,25 @@ describe('getLineChartGroupedProData', () => {
       measure,
       5,
     );
+  });
+
+  it('clips datasets only at the top and bottom when a y-axis range is set', () => {
+    const data = [
+      { date: 'A', group: 'g1', revenue: 1 },
+      { date: 'A', group: 'g2', revenue: 2 },
+    ];
+
+    const withRange = getLineChartGroupedProData(
+      { data, dimension, groupDimension, measure, hasMinMaxYAxisRange: true },
+      makeTheme(),
+    );
+    const withoutRange = getLineChartGroupedProData(
+      { data, dimension, groupDimension, measure, hasMinMaxYAxisRange: false },
+      makeTheme(),
+    );
+
+    expect(withRange.datasets.map((ds) => ds.clip)).toEqual([Y_AXIS_RANGE_CLIP, Y_AXIS_RANGE_CLIP]);
+    expect(withoutRange.datasets.map((ds) => ds.clip)).toEqual([false, false]);
   });
 
   it('sorts axis labels alphabetically', () => {
