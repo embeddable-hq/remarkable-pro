@@ -33,6 +33,8 @@ export const de: ResourceLanguage = {
       'menuOptions.downloadXLSX': 'XLSX herunterladen',
       'menuOptions.maximize': 'Maximieren',
       'menuOptions.minimize': 'Minimieren',
+      menuButton: 'Diagrammmenü',
+      menuButtonWithTitle: 'Diagrammmenü: {{title}}',
       errorTitle: 'Etwas ist schiefgelaufen.',
       errorMessage: 'Beim Laden des Diagramms ist ein Fehler aufgetreten.',
       emptyTitle: 'Keine Ergebnisse.',

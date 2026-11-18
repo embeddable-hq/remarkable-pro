@@ -27,7 +27,9 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
       {children}
     </div>
   ),
-  ActionIcon: (_props: { icon: unknown }) => <button data-testid="action-icon" />,
+  ActionIcon: ({ 'aria-label': ariaLabel }: { icon: unknown; 'aria-label'?: string }) => (
+    <button data-testid="action-icon" aria-label={ariaLabel} />
+  ),
   SelectFieldContent: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="select-field-content">{children}</div>
   ),
@@ -39,7 +41,10 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
 }));
 
 vi.mock('../../../../../theme/i18n/i18n', () => ({
-  i18n: { t: (key: string) => key },
+  i18n: {
+    t: (key: string, options?: { title?: string }) =>
+      options?.title ? `${key}: ${options.title}` : key,
+  },
   i18nSetup: vi.fn(),
 }));
 
@@ -94,6 +99,29 @@ describe('ChartCardMenuPro', () => {
 
     expect(screen.getByText('export.csv')).toBeInTheDocument();
     expect(screen.getByText('export.png')).toBeInTheDocument();
+  });
+
+  it('names the menu button with the card title', () => {
+    render(
+      <ChartCardMenuPro
+        title="Revenue by region"
+        menuOptions={[{ value: 'csv', labelKey: 'export.csv', onClick: vi.fn() }]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'charts.menuButtonWithTitle: Revenue by region' }),
+    ).toBeInTheDocument();
+  });
+
+  it('gives the menu button a generic name without a title', () => {
+    render(
+      <ChartCardMenuPro
+        menuOptions={[{ value: 'csv', labelKey: 'export.csv', onClick: vi.fn() }]}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'charts.menuButton' })).toBeInTheDocument();
   });
 
   it('renders nothing when menuOptions is an empty array', () => {
