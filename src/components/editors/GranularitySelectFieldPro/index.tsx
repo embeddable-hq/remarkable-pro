@@ -1,19 +1,18 @@
 import { useTheme } from '@embeddable.com/react';
-import { TimeRange } from '@embeddable.com/core';
+import { Granularity, TimeRange } from '@embeddable.com/core';
 import { Theme } from '../../../theme/theme.types';
 import { i18nSetup } from '../../../theme/i18n/i18n';
 import { resolveI18nProps } from '../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
-import { TGranularityValue } from '../../../theme/defaults/defaults.GranularityOptions.constants';
 import { GranularitySelectField } from '../shared/GranularitySelectField/GranularitySelectField';
 import { dispatchEventUserInteraction } from '../../../utils/events.utils';
 
 export type GranularitySelectFieldProProps = {
-  onChange: (newGranularity: string) => void;
+  onChange: (newGranularity: Granularity) => void;
   placeholder?: string;
   primaryTimeRange?: TimeRange;
-  granularity?: TGranularityValue;
-  granularities?: TGranularityValue[];
+  granularity?: Granularity;
+  granularities?: Granularity[];
   clearable?: boolean;
   componentName?: string;
   trackingId?: string;
@@ -34,7 +33,7 @@ const GranularitySelectFieldPro = (props: GranularitySelectFieldProProps) => {
   } = props;
   const { description, tooltip, placeholder, title } = resolveI18nProps(props);
 
-  const handleChange = (newGranularity: string) => {
+  const handleChange = (newGranularity: Granularity) => {
     dispatchEventUserInteraction({ componentName, trackingId, value: newGranularity });
     onChange(newGranularity);
   };
