@@ -167,7 +167,7 @@ const dataOthersFormatter = (theme: Theme, key: DimensionOrMeasure): StringForma
 };
 
 export const remarkableThemeFormatter: ThemeFormatter = {
-  locale: navigator.language,
+  locale: typeof navigator === 'undefined' ? 'en-US' : navigator.language,
 
   defaultNumberFormatterOptions,
   defaultDateTimeFormatOptions,
