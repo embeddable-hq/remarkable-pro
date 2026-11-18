@@ -321,12 +321,21 @@ describe('getFunnelChartProOptions', () => {
     expect(label).toBe('count: 42');
   });
 
-  it('omits datalabels when showSectionLabels is not enabled', () => {
-    const options = getFunnelChartProOptions({ countMeasure }, { charts: {} } as never);
-    expect(options.plugins?.datalabels).toBeUndefined();
+  it('wires the datalabels formatter without overriding display when showSectionLabels is not enabled', () => {
+    const options = getFunnelChartProOptions({ countMeasure, showValueLabels: true }, {
+      charts: {},
+    } as never);
+    const context = {
+      chart: { data: { labels: ['Recordable'], datasets: [{ data: [10] }] } },
+      dataIndex: 0,
+      datasetIndex: 0,
+    } as unknown as Context;
+
+    expect(options.plugins?.datalabels?.display).toBeUndefined();
+    expect(options.plugins?.datalabels?.formatter?.(10, context)).toBe(10);
   });
 
-  it('wires the datalabels formatter from the config when showSectionLabels is enabled', () => {
+  it('wires the datalabels formatter and shows the labels when showSectionLabels is enabled', () => {
     const options = getFunnelChartProOptions({ countMeasure, showSectionLabels: true }, {
       charts: {},
     } as never);
@@ -336,9 +345,8 @@ describe('getFunnelChartProOptions', () => {
       datasetIndex: 0,
     } as unknown as Context;
 
-    const text = options.plugins?.datalabels?.formatter?.(10, context);
-
-    expect(text).toBe('Recordable');
+    expect(options.plugins?.datalabels?.display).toBe('auto');
+    expect(options.plugins?.datalabels?.formatter?.(10, context)).toBe('Recordable');
   });
 });
 
@@ -355,6 +363,31 @@ describe('getFunnelOptionsDatalabelsFormatter', () => {
     } as unknown as Context;
 
     expect(formatter(10, context)).toBe('Recordable');
+  });
+
+  it('returns an empty label when neither section names nor values are shown', () => {
+    const formatter = getFunnelOptionsDatalabelsFormatter({ countMeasure: makeMeasure('count') });
+    const context = {
+      chart: { data: { labels: ['Recordable'], datasets: [{ data: [10] }] } },
+      dataIndex: 0,
+      datasetIndex: 0,
+    } as unknown as Context;
+
+    expect(formatter(10, context)).toBe('');
+  });
+
+  it('returns only the value when showSectionLabels is disabled', () => {
+    const formatter = getFunnelOptionsDatalabelsFormatter({
+      countMeasure: makeMeasure('count'),
+      showValueLabels: true,
+    });
+    const context = {
+      chart: { data: { labels: ['Recordable'], datasets: [{ data: [10, 30] }] } },
+      dataIndex: 0,
+      datasetIndex: 0,
+    } as unknown as Context;
+
+    expect(formatter(10, context)).toBe(10);
   });
 
   it('appends the raw value when showValueLabels is enabled', () => {
@@ -422,6 +455,23 @@ describe('getFunnelOptionsDatalabelsFormatter', () => {
     } as unknown as Context;
 
     expect(formatter(1000.5, context)).toBe('Recordable: $1000.5');
+    expect(data).toHaveBeenCalledWith(countMeasure, 1000.5);
+  });
+
+  it('formats the value like the tooltip when section names are hidden', () => {
+    const data = vi.fn((_measure: unknown, value: unknown) => `$${value}`);
+    vi.mocked(getThemeFormatter).mockReturnValueOnce({ data } as unknown as ReturnType<
+      typeof getThemeFormatter
+    >);
+    const countMeasure = makeMeasure('count');
+    const formatter = getFunnelOptionsDatalabelsFormatter({ countMeasure, showValueLabels: true });
+    const context = {
+      chart: { data: { labels: ['Recordable'], datasets: [{ data: [1000.5, 30] }] } },
+      dataIndex: 0,
+      datasetIndex: 0,
+    } as unknown as Context;
+
+    expect(formatter(1000.5, context)).toBe('$1000.5');
     expect(data).toHaveBeenCalledWith(countMeasure, 1000.5);
   });
 });

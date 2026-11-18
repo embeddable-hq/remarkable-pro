@@ -82,7 +82,7 @@ export const getFunnelOptionsDatalabelsFormatter = (
   const themeFormatter = getThemeFormatter(theme);
   return (value: number, context: Context) => {
     const labels = context.chart.data.labels as (string | number)[] | undefined;
-    const label = String(labels?.[context.dataIndex] ?? '');
+    const label = config.showSectionLabels ? String(labels?.[context.dataIndex] ?? '') : '';
     if (!config.showValueLabels) return label;
     const data = (context.chart.data.datasets[context.datasetIndex]?.data ?? []) as number[];
     const total = data.reduce((sum, v) => sum + (v || 0), 0);
@@ -90,7 +90,7 @@ export const getFunnelOptionsDatalabelsFormatter = (
     const valueText = config.displayPercentages
       ? `${percentage.toFixed(1)}%`
       : themeFormatter.data(config.countMeasure, value);
-    return `${label}: ${valueText}`;
+    return label ? `${label}: ${valueText}` : valueText;
   };
 };
 
@@ -117,14 +117,12 @@ export const getFunnelChartProOptions = (
     },
   };
 
-  if (!options.showSectionLabels) return base;
-
   return {
     ...base,
     plugins: {
       ...base.plugins,
       datalabels: {
-        display: 'auto',
+        ...(options.showSectionLabels ? { display: 'auto' as const } : {}),
         formatter: getFunnelOptionsDatalabelsFormatter(options, theme),
       },
     },
