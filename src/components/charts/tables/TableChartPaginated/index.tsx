@@ -172,9 +172,11 @@ const TableChartPaginatedPro = (props: TableChartPaginatedProProps) => {
     onRowClicked({ dimensionValue, dimensionTimeRange });
   };
 
+  const reportedPageSize = useRef<number | undefined>(undefined);
   // Sync page size changes to embeddable state
   useEffect(() => {
-    if (pageSize) {
+    if (pageSize && pageSize !== reportedPageSize.current) {
+      reportedPageSize.current = pageSize;
       handleUpdateEmbeddableState({ pageSize });
     }
   }, [pageSize, handleUpdateEmbeddableState]);
