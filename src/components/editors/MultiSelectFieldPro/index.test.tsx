@@ -2,6 +2,7 @@ import { render, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
 import MultiSelectFieldPro from './index';
 import type { Dimension, DataResponse } from '@embeddable.com/core';
+import { i18nSetup } from '../../../theme/i18n/i18n';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
@@ -377,5 +378,17 @@ describe('MultiSelectFieldPro', () => {
         'common.deselectAll',
       );
     });
+  });
+
+  it('sets up i18n from the theme', () => {
+    vi.mocked(i18nSetup).mockClear();
+    render(
+      <MultiSelectFieldPro
+        dimension={country}
+        results={resultsWith([{ country: 'US' }])}
+        onChange={vi.fn()}
+      />,
+    );
+    expect(i18nSetup).toHaveBeenCalledTimes(1);
   });
 });
