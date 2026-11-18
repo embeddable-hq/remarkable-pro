@@ -4,8 +4,16 @@ import { getTimeRangeFromDimensionValue } from '../utils/dimension.utils';
 import { dispatchEventUserInteraction } from '../../utils/events.utils';
 import { i18n } from '../../theme/i18n/i18n';
 import { DimensionValueOrTimeRange, GroupedClickArg, SimpleClickArg } from './charts.types';
-import { ChartData } from 'chart.js';
+import { ChartArea, ChartData } from 'chart.js';
 import { getDimensionFieldName } from '../../utils/data.utils';
+
+// Chart.js accepts per-side `false` (no clip) but types `clip` as a full ChartArea.
+export const Y_AXIS_RANGE_CLIP = {
+  top: 0,
+  bottom: 0,
+  left: false,
+  right: false,
+} as unknown as ChartArea;
 
 export const getDimensionWithoutTruncation = (dimension: Dimension): Dimension => ({
   ...dimension,
