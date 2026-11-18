@@ -104,6 +104,13 @@ describe('PivotTablePro', () => {
     expect(screen.getByTestId('pivot-table')).toBeInTheDocument();
   });
 
+  it('renders PivotTable without expandedRowKeys and setExpandedRowKey', () => {
+    render(
+      <PivotTablePro {...defaultProps} expandedRowKeys={undefined} setExpandedRowKey={undefined} />,
+    );
+    expect(screen.getByTestId('pivot-table')).toBeInTheDocument();
+  });
+
   it('passes calculation labels resolved through i18n, not hardcoded English', () => {
     render(<PivotTablePro {...defaultProps} />);
     const pivotTable = screen.getByTestId('pivot-table');
