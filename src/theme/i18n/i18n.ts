@@ -12,6 +12,7 @@ const i18nSetup = (theme: Theme) => {
   i18n.init({
     lng: theme.i18n.language,
     fallbackLng: 'en',
+    showSupportNotice: false,
     resources: theme.i18n.translations,
     interpolation: {
       escapeValue: false,
