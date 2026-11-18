@@ -17,7 +17,6 @@ export const en: ResourceLanguage = {
       label: 'Label',
       primaryPeriod: 'Primary period',
       comparisonPeriod: 'Comparison period',
-      comparisonSeriesLabel: '{{label}} (previous period)',
       'menuOptions.downloadCSV': 'Download CSV',
       'menuOptions.downloadPNG': 'Download PNG',
       'menuOptions.downloadXLSX': 'Download XLSX',

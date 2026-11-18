@@ -82,9 +82,7 @@ const getLineChartComparisonDataset = (
     xAxisID: isPreviousPeriod ? AXIS_ID_COMPARISON : AXIS_ID_MAIN,
     labels: datasetLabels,
     rawLabel,
-    label: isPreviousPeriod
-      ? i18n.t('charts.comparisonSeriesLabel', { label: rawLabel })
-      : rawLabel,
+    label: (isPreviousPeriod ? `${i18n.t('common.compared')} ` : '') + rawLabel,
     data: processedData,
     backgroundColor: setColorAlpha(lineColor, 0.5),
     pointBackgroundColor: lineColor,
