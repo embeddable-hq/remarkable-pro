@@ -14,14 +14,14 @@ export const getComparisonPeriodDateRange = (
   const primaryDateRangeRange = primaryDateRange?.relativeTimeString
     ? theme.defaults.dateRangesOptions
         .find((option) => option.value === primaryDateRange?.relativeTimeString)
-        ?.getRange(theme.clientContext?.timezone)
+        ?.getRange(theme.clientContext?.timezone, theme.defaults.weekStartsOn)
     : primaryDateRange;
 
   const comparisonPeriodOption = theme.defaults.comparisonPeriodsOptions.find(
     (option) => option.value === comparisonPeriod,
   );
 
-  return comparisonPeriodOption?.getRange(primaryDateRangeRange);
+  return comparisonPeriodOption?.getRange(primaryDateRangeRange, theme.defaults.weekStartsOn);
 };
 
 export const getComparisonPeriodLabel = (

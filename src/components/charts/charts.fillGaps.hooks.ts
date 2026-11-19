@@ -1,6 +1,5 @@
 import { DataResponse, Dimension, TimeRange } from '@embeddable.com/core';
 import dayjs, { QUnitType } from 'dayjs';
-import isoWeek from 'dayjs/plugin/isoWeek.js';
 import utc from 'dayjs/plugin/utc.js';
 import timezone from 'dayjs/plugin/timezone.js';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore.js';
@@ -9,9 +8,9 @@ import { useTheme } from '@embeddable.com/react';
 import { useMemo } from 'react';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear.js';
 import { defaultGranularitySelectFieldOptions } from '../../theme/defaults/defaults.GranularityOptions.constants';
+import { startOfWeek } from '../../utils/week.utils';
 
 dayjs.extend(utc);
-dayjs.extend(isoWeek);
 dayjs.extend(timezone);
 dayjs.extend(isSameOrBefore);
 dayjs.extend(quarterOfYear);
@@ -81,7 +80,7 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
     const dateBounds = dateBoundsTmp?.relativeTimeString
       ? theme.defaults.dateRangesOptions
           .find((option) => option.value === dateBoundsTmp?.relativeTimeString)
-          ?.getRange(theme.clientContext.timezone)
+          ?.getRange(theme.clientContext.timezone, theme.defaults.weekStartsOn)
       : dateBoundsTmp;
 
     if (dimension.nativeType !== 'time') return results;
@@ -124,7 +123,10 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
     }
 
     const filled: DataRecord[] = [];
-    let current = from.startOf((granularity === 'week' ? 'isoWeek' : granularity) as QUnitType);
+    let current =
+      granularity === 'week'
+        ? startOfWeek(from, theme.defaults.weekStartsOn)
+        : from.startOf(granularity as QUnitType);
 
     while (current.isSameOrBefore(to)) {
       const key = current.toISOString().split('Z')[0]!;

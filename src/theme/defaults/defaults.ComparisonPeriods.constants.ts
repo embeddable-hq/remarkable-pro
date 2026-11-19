@@ -1,20 +1,19 @@
 import { TimeRange, TimeRangeDeserializedValue } from '@embeddable.com/core';
 import dayjs from 'dayjs';
-import isoWeek from 'dayjs/plugin/isoWeek.js';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear.js';
 import timezone from 'dayjs/plugin/timezone.js';
 import utc from 'dayjs/plugin/utc.js';
+import { endOfWeek, startOfWeek, WeekStartsOn } from '../../utils/week.utils';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.extend(isoWeek);
 dayjs.extend(quarterOfYear);
 
 export type ComparisonPeriodOption = {
   value: string;
   label: string;
   dateFormat: string;
-  getRange: (dateRange: TimeRange) => TimeRange | undefined;
+  getRange: (dateRange: TimeRange, weekStartsOn?: WeekStartsOn) => TimeRange | undefined;
 };
 
 /*--------------------*/
@@ -97,13 +96,13 @@ const getPreviousPeriodRange = (primaryDateRange: TimeRange) => {
   };
 };
 
-const getPreviousWeekRange = (primaryDateRange: TimeRange) => {
+const getPreviousWeekRange = (primaryDateRange: TimeRange, weekStartsOn?: WeekStartsOn) => {
   const { from: primaryFrom } = primaryDateRange as TimeRangeDeserializedValue;
   if (!primaryFrom) return undefined;
 
   const dateFrom = dayjs.utc(getLocalDateString(primaryFrom));
-  const prevWeekStart = dateFrom.startOf('isoWeek').subtract(1, 'week');
-  const prevWeekEnd = prevWeekStart.endOf('isoWeek');
+  const prevWeekStart = startOfWeek(dateFrom, weekStartsOn).subtract(1, 'week');
+  const prevWeekEnd = endOfWeek(prevWeekStart, weekStartsOn);
 
   return {
     from: prevWeekStart.startOf('day').toDate(),

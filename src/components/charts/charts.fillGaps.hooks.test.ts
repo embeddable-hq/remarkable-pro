@@ -28,9 +28,9 @@ vi.mock('@embeddable.com/react', () => ({
   useTheme: () => mockUseTheme(),
 }));
 
-const makeTheme = (timezone?: string) => ({
+const makeTheme = (timezone?: string, weekStartsOn?: number) => ({
   clientContext: { timezone },
-  defaults: { dateRangesOptions: defaultDateRangeOptions },
+  defaults: { dateRangesOptions: defaultDateRangeOptions, weekStartsOn },
 });
 
 const makeDimension = (overrides: Record<string, unknown> = {}): Dimension =>
@@ -298,5 +298,69 @@ describe('useFillGaps', () => {
     expect(result.current.data).toEqual([
       { 'daily_listens.listened_date': '2026-10-01T00:00:00.000', value: 2 },
     ]);
+  });
+
+  describe('week granularity', () => {
+    const day = 'daily_listens.listened_date';
+    const keysOf = (data?: Record<string, unknown>[]) => data?.map((r) => r[day]);
+
+    it('fills Monday weeks by default (no regression)', () => {
+      mockUseTheme.mockReturnValue(makeTheme('UTC'));
+
+      const results = makeResults([
+        { [day]: '2026-10-26T00:00:00.000', total: 1 },
+        { [day]: '2026-11-09T00:00:00.000', total: 35 },
+      ]);
+
+      const { result } = renderHook(() =>
+        useFillGaps({ results, dimension: makeDimension({ granularity: 'week' }) }),
+      );
+
+      expect(keysOf(result.current.data)).toEqual([
+        '2026-10-26T00:00:00.000',
+        '2026-11-02T00:00:00.000',
+        '2026-11-09T00:00:00.000',
+      ]);
+    });
+
+    it('keeps Sunday rows and fills Sunday gaps when weekStartsOn is 0', () => {
+      mockUseTheme.mockReturnValue(makeTheme('UTC', 0));
+
+      const results = makeResults([
+        { [day]: '2026-11-01T00:00:00.000', total: 28 },
+        { [day]: '2026-11-15T00:00:00.000', total: 8 },
+      ]);
+
+      const { result } = renderHook(() =>
+        useFillGaps({ results, dimension: makeDimension({ granularity: 'week' }) }),
+      );
+
+      expect(result.current.data).toEqual([
+        { [day]: '2026-11-01T00:00:00.000', total: 28 },
+        { [day]: '2026-11-08T00:00:00.000' },
+        { [day]: '2026-11-15T00:00:00.000', total: 8 },
+      ]);
+    });
+
+    it('starts Sunday weeks from a dateBounds that begins mid-week', () => {
+      mockUseTheme.mockReturnValue(makeTheme('UTC', 0));
+
+      const results = makeResults([{ [day]: '2026-11-08T00:00:00.000', total: 8 }]);
+      const dimension = makeDimension({
+        granularity: 'week',
+        dateBounds: {
+          from: new Date('2026-11-04T00:00:00.000Z'),
+          to: new Date('2026-11-18T23:59:59.999Z'),
+        },
+      });
+
+      const { result } = renderHook(() => useFillGaps({ results, dimension }));
+
+      expect(keysOf(result.current.data)).toEqual([
+        '2026-11-01T00:00:00.000',
+        '2026-11-08T00:00:00.000',
+        '2026-11-15T00:00:00.000',
+      ]);
+    });
   });
 });

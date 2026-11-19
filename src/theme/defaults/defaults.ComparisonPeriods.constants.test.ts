@@ -62,6 +62,16 @@ describe('defaultComparisonPeriodOptions', () => {
     it('returns undefined when from is missing', () => {
       expect(opt.getRange(noRange)).toBeUndefined();
     });
+
+    it('returns the previous Sun–Sat week when weekStartsOn is 0', () => {
+      const input = range(
+        new Date('2026-11-15T00:00:00.000Z'),
+        new Date('2026-11-21T23:59:59.999Z'),
+      );
+      const result = opt.getRange(input, 0);
+      expect(result?.from).toEqual(new Date('2026-11-08T00:00:00.000Z'));
+      expect(result?.to).toEqual(new Date('2026-11-14T23:59:59.999Z'));
+    });
   });
 
   describe('Previous month', () => {

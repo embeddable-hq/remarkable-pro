@@ -240,4 +240,55 @@ describe('defaultDateRangeOptions', () => {
       expect(to).toEqual(new Date('2024-02-01T00:59:59.999Z')); // Jan 31 23:59:59.999 UTC-1
     });
   });
+
+  describe('getRange() with weekStartsOn 0 (Sunday)', () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    const at = (now: string) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(now));
+    };
+
+    it('This week is Sun–Sat', () => {
+      at('2024-02-15T12:00:00.000Z');
+      const { from, to } = getOption('This week').getRange(
+        undefined,
+        0,
+      ) as TimeRangeDeserializedValue;
+      expect(from).toEqual(new Date('2024-02-11T00:00:00.000Z'));
+      expect(to).toEqual(new Date('2024-02-17T23:59:59.999Z'));
+    });
+
+    it('Last week is the Sun–Sat before', () => {
+      at('2024-02-15T12:00:00.000Z');
+      const { from, to } = getOption('Last week').getRange(
+        undefined,
+        0,
+      ) as TimeRangeDeserializedValue;
+      expect(from).toEqual(new Date('2024-02-04T00:00:00.000Z'));
+      expect(to).toEqual(new Date('2024-02-10T23:59:59.999Z'));
+    });
+
+    it('Week to date starts on Sunday', () => {
+      at('2024-02-15T12:00:00.000Z');
+      const { from, to } = getOption('Week to date').getRange(
+        undefined,
+        0,
+      ) as TimeRangeDeserializedValue;
+      expect(from).toEqual(new Date('2024-02-11T00:00:00.000Z'));
+      expect(to).toEqual(new Date('2024-02-15T23:59:59.999Z'));
+    });
+
+    it('Week to date on a Sunday starts that day', () => {
+      at('2024-02-18T12:00:00.000Z');
+      const { from, to } = getOption('Week to date').getRange(
+        undefined,
+        0,
+      ) as TimeRangeDeserializedValue;
+      expect(from).toEqual(new Date('2024-02-18T00:00:00.000Z'));
+      expect(to).toEqual(new Date('2024-02-18T23:59:59.999Z'));
+    });
+  });
 });

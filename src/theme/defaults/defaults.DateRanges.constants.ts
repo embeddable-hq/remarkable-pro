@@ -2,12 +2,11 @@ import { TimeRange } from '@embeddable.com/core';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
 import timezone from 'dayjs/plugin/timezone.js';
-import isoWeek from 'dayjs/plugin/isoWeek.js';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear.js';
+import { endOfWeek, startOfWeek, WeekStartsOn } from '../../utils/week.utils';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.extend(isoWeek);
 dayjs.extend(quarterOfYear);
 
 const makeTimeRange = (from: Date, to: Date): TimeRange => ({ from, to, relativeTimeString: '' });
@@ -19,9 +18,14 @@ const getDayBounds = (offset = 0, tz?: string): TimeRange => {
   return makeTimeRange(d.startOf('day').toDate(), d.endOf('day').toDate());
 };
 
-const getWeekBounds = (offset = 0, tz?: string): TimeRange => {
+const getWeekBounds = (offset = 0, tz?: string, weekStartsOn?: WeekStartsOn): TimeRange => {
   const d = getNow(tz).add(offset, 'week');
-  return makeTimeRange(d.startOf('isoWeek').toDate(), d.endOf('isoWeek').toDate());
+  return makeTimeRange(startOfWeek(d, weekStartsOn).toDate(), endOfWeek(d, weekStartsOn).toDate());
+};
+
+const getWeekToDate = (tz?: string, weekStartsOn?: WeekStartsOn): TimeRange => {
+  const now = getNow(tz);
+  return makeTimeRange(startOfWeek(now, weekStartsOn).toDate(), now.endOf('day').toDate());
 };
 
 const getMonthBounds = (offset = 0, tz?: string): TimeRange => {
@@ -66,7 +70,7 @@ const getLastNMonths = (n: number, tz?: string): TimeRange => {
   return makeTimeRange(now.subtract(n, 'month').startOf('day').toDate(), now.endOf('day').toDate());
 };
 
-const getUnitToDate = (unit: 'isoWeek' | 'quarter' | 'year', tz?: string): TimeRange => {
+const getUnitToDate = (unit: 'quarter' | 'year', tz?: string): TimeRange => {
   const now = getNow(tz);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return makeTimeRange(now.startOf(unit as any).toDate(), now.endOf('day').toDate());
@@ -76,7 +80,7 @@ export type DateRangeOption = {
   value: string;
   label: string;
   dateFormat: string;
-  getRange: (timezone?: string) => TimeRange;
+  getRange: (timezone?: string, weekStartsOn?: WeekStartsOn) => TimeRange;
 };
 
 export const defaultDateRangeOptions: DateRangeOption[] = [
@@ -96,19 +100,19 @@ export const defaultDateRangeOptions: DateRangeOption[] = [
     value: 'This week',
     label: 'defaults.dateRangeOptions.thisWeek|This week',
     dateFormat: 'MMM DD',
-    getRange: (tz?: string) => getWeekBounds(0, tz),
+    getRange: (tz?: string, weekStartsOn?: WeekStartsOn) => getWeekBounds(0, tz, weekStartsOn),
   },
   {
     value: 'Last week',
     label: 'defaults.dateRangeOptions.lastWeek|Last week',
     dateFormat: 'MMM DD',
-    getRange: (tz?: string) => getWeekBounds(-1, tz),
+    getRange: (tz?: string, weekStartsOn?: WeekStartsOn) => getWeekBounds(-1, tz, weekStartsOn),
   },
   {
     value: 'Week to date',
     label: 'defaults.dateRangeOptions.weekToDate|Week to date',
     dateFormat: 'MMM DD',
-    getRange: (tz?: string) => getUnitToDate('isoWeek', tz),
+    getRange: (tz?: string, weekStartsOn?: WeekStartsOn) => getWeekToDate(tz, weekStartsOn),
   },
   {
     value: 'Last 7 days',

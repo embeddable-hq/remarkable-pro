@@ -55,7 +55,7 @@ describe('getComparisonPeriodDateRange', () => {
 
       const result = getComparisonPeriodDateRange(dr, 'Previous month', theme);
 
-      expect(getRange).toHaveBeenCalledWith(dr);
+      expect(getRange).toHaveBeenCalledWith(dr, undefined);
       expect(result).toBe(expected);
     });
   });
@@ -91,7 +91,7 @@ describe('getComparisonPeriodDateRange', () => {
       getComparisonPeriodDateRange(dr, 'Previous month', theme);
 
       expect(getDateRange).toHaveBeenCalled();
-      expect(getRange).toHaveBeenCalledWith(resolvedRange);
+      expect(getRange).toHaveBeenCalledWith(resolvedRange, undefined);
     });
 
     it('passes undefined to getRange when relativeTimeString is not found in dateRangesOptions', () => {
@@ -111,7 +111,7 @@ describe('getComparisonPeriodDateRange', () => {
 
       getComparisonPeriodDateRange(dr, 'Previous month', theme);
 
-      expect(getRange).toHaveBeenCalledWith(undefined);
+      expect(getRange).toHaveBeenCalledWith(undefined, undefined);
     });
   });
 });
