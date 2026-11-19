@@ -36,16 +36,14 @@ export const GranularitySelectField = (props: GranularitySelectFieldProps) => {
     onChange,
   } = props;
 
-  const granularitySelectFieldOptions = getGranularitySelectFieldOptions();
-
   const availableOptions = useMemo(() => {
-    return getAvailableGranularityOptionsFromTimeRange(
-      primaryTimeRange,
-      granularitySelectFieldOptions.filter((opt) =>
-        granularities?.includes(opt.value as TGranularityValue),
-      ),
+    // Option labels are translated here, so recompute when the language changes.
+    const options = getGranularitySelectFieldOptions().filter((opt) =>
+      granularities?.includes(opt.value as TGranularityValue),
     );
-  }, [primaryTimeRange, granularities]);
+    return getAvailableGranularityOptionsFromTimeRange(primaryTimeRange, options);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [primaryTimeRange, granularities, theme.i18n?.language]);
 
   useEffect(() => {
     if (granularity) {

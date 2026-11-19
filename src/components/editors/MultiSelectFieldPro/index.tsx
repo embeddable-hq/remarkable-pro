@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { Theme } from '../../../theme/theme.types';
 import { EditorCard, EditorCardHeaderProps } from '../shared/EditorCard/EditorCard';
 import { resolveI18nProps } from '../../component.utils';
-import { i18n } from '../../../theme/i18n/i18n';
+import { i18n, i18nSetup } from '../../../theme/i18n/i18n';
 import { MultiSelectField } from '@embeddable.com/remarkable-ui';
 import { dispatchEventUserInteraction } from '../../../utils/events.utils';
 
@@ -29,6 +29,7 @@ export type MultiSelectFieldProProps = {
 
 const MultiSelectFieldPro = (props: MultiSelectFieldProProps) => {
   const theme: Theme = useTheme() as Theme;
+  i18nSetup(theme);
   const themeFormatter = getThemeFormatter(theme);
 
   const { tooltip, title, description, placeholder } = resolveI18nProps(props);

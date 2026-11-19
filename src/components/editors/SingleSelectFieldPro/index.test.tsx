@@ -2,6 +2,8 @@ import { render, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
 import SingleSelectFieldPro from './index';
 import type { Dimension, DataResponse } from '@embeddable.com/core';
+import { i18nSetup } from '../../../theme/i18n/i18n';
+import { resolveI18nProps } from '../../component.utils';
 
 vi.mock('@embeddable.com/react', () => ({
   useTheme: vi.fn(() => ({})),
@@ -14,6 +16,7 @@ vi.mock('../../../theme/formatter/formatter.utils', () => ({
 }));
 
 vi.mock('../../../theme/i18n/i18n', () => ({
+  i18nSetup: vi.fn(),
   i18n: { t: vi.fn((key: string) => key) },
 }));
 
@@ -235,5 +238,15 @@ describe('SingleSelectFieldPro', () => {
       <SingleSelectFieldPro dimension={country} results={makeResults([])} onChange={onChange} />,
     );
     expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('sets up i18n from the theme before resolving the i18n props', () => {
+    vi.mocked(i18nSetup).mockClear();
+    vi.mocked(resolveI18nProps).mockClear();
+    render(<SingleSelectFieldPro dimension={country} results={makeResults(['US'])} />);
+    expect(i18nSetup).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(i18nSetup).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(resolveI18nProps).mock.invocationCallOrder[0]!,
+    );
   });
 });

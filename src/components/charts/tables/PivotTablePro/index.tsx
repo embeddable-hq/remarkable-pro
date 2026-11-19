@@ -14,6 +14,8 @@ import { getPivotAggregationsFor, getPivotDimension, getPivotMeasures } from './
 import { useGetTableSortedResults } from '../tables.hooks';
 import { sortArrayByProp } from '../../../../utils/array.utils';
 
+const NO_EXPANDED_ROW_KEYS: string[] = [];
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export type PivotTableProProps = {
@@ -26,8 +28,8 @@ export type PivotTableProProps = {
   displayNullAs?: string;
   columnWidth?: number;
   firstColumnWidth?: number;
-  expandedRowKeys: string[];
-  setExpandedRowKey: (expandedRowKeys: string) => void;
+  expandedRowKeys?: string[];
+  setExpandedRowKey?: (expandedRowKeys: string) => void;
 } & ChartCardHeaderProps;
 
 const PivotTablePro = (props: PivotTableProProps) => {
@@ -43,7 +45,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
     displayNullAs,
     columnWidth,
     firstColumnWidth,
-    expandedRowKeys,
+    expandedRowKeys = NO_EXPANDED_ROW_KEYS,
     setExpandedRowKey,
   } = props;
 
@@ -108,6 +110,7 @@ const PivotTablePro = (props: PivotTableProProps) => {
   const [subRowsByRow, setSubRowsByRow] = useState(new Map<string, any[]>());
 
   const handleRowExpand = (rowKey: string) => {
+    if (!setExpandedRowKey) return;
     setLoadingRows((prev) => new Set(prev).add(rowKey));
     setExpandedRowKey(rowKey);
   };

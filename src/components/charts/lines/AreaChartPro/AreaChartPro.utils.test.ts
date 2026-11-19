@@ -227,6 +227,27 @@ describe('getAreaChartProOptions', () => {
     expect((result as { animation?: unknown }).animation).toBe(false);
   });
 
+  it('deep-merges theme scales without dropping scales.y.stacked', () => {
+    const theme = {
+      charts: {
+        areaChartPro: { options: { scales: { x: { display: false } } } },
+      },
+    } as never;
+
+    const result = getAreaChartProOptions(
+      {
+        dimension: makeDimension(),
+        groupDimension: makeDimension({ name: 'category' }),
+        measure: makeMeasure(),
+        data: makeChartData([]) as never,
+      },
+      theme,
+    );
+
+    expect(result.scales?.y?.stacked).toBe(true);
+    expect(result.scales?.x?.display).toBe(false);
+  });
+
   it('works without areaChartPro theme options defined', () => {
     const result = getAreaChartProOptions(
       {

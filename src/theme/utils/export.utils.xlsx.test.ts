@@ -25,8 +25,8 @@ describe('exportXLSX cell types', () => {
     });
   });
 
-  it('writes numeric measures as number cells and text dimensions as string cells', () => {
-    exportXLSX({
+  it('writes numeric measures as number cells and text dimensions as string cells', async () => {
+    await exportXLSX({
       title: 'test',
       data: [{ zip: '01234', revenue: '1000.5' }],
       dimensionsAndMeasures: [dim('zip'), measure('revenue', 'sum')],
