@@ -48,7 +48,7 @@ describe('getDateRangeSelectFieldProOptions', () => {
 
     getDateRangeSelectFieldProOptions([opt], 'Australia/Sydney');
 
-    expect(opt.getRange).toHaveBeenCalledWith('Australia/Sydney');
+    expect(opt.getRange).toHaveBeenCalledWith('Australia/Sydney', undefined);
     expect(getTimeRangeLabel).toHaveBeenCalledWith(
       returned,
       'MMM YYYY',

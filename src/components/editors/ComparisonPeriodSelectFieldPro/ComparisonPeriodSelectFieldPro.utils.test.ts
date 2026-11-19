@@ -80,7 +80,7 @@ describe('getComparisonPeriodSelectFieldProOptions', () => {
 
     getComparisonPeriodSelectFieldProOptions([opt], toCompareTimeRange);
 
-    expect(opt.getRange).toHaveBeenCalledWith(toCompareTimeRange);
+    expect(opt.getRange).toHaveBeenCalledWith(toCompareTimeRange, undefined);
   });
 
   it('calls getTimeRangeLabel with the result of getRange and option.dateFormat', () => {
