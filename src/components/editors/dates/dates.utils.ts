@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
 import timezone from 'dayjs/plugin/timezone.js';
 import { DateRangeOption } from '../../../theme/defaults/defaults.DateRanges.constants';
+import { WeekStartsOn } from '../../../utils/week.utils';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -12,6 +13,7 @@ export const getTimeRangeFromPresets = (
   receivedTimeRange: TimeRange,
   options?: DateRangeOption[],
   timezone?: string,
+  weekStartsOn?: WeekStartsOn,
 ): TimeRange => {
   if (options?.length === 0) {
     return receivedTimeRange;
@@ -20,7 +22,7 @@ export const getTimeRangeFromPresets = (
   if (receivedTimeRange?.relativeTimeString) {
     const selectedOption = options
       ?.find((dateRange) => dateRange.value === receivedTimeRange?.relativeTimeString)
-      ?.getRange(timezone);
+      ?.getRange(timezone, weekStartsOn);
 
     const { from, to } = selectedOption || {};
 
@@ -37,8 +39,9 @@ export const getTimeRangeLabel = (
   dateFormat: string,
   options?: DateRangeOption[],
   timezone?: string,
+  weekStartsOn?: WeekStartsOn,
 ): string => {
-  const dateRange = getDateRangeFromTimeRange(range, options, timezone);
+  const dateRange = getDateRangeFromTimeRange(range, options, timezone, weekStartsOn);
 
   if (!dateRange) {
     return '';
@@ -70,6 +73,7 @@ export const getDateRangeFromTimeRange = (
   timeRange: TimeRange,
   options?: DateRangeOption[],
   timezone?: string,
+  weekStartsOn?: WeekStartsOn,
 ): DateRange | undefined => {
   if (!timeRange) {
     return timeRange;
@@ -78,7 +82,7 @@ export const getDateRangeFromTimeRange = (
   let finalTimeRange: TimeRange = timeRange;
   if ((!timeRange?.from || !timeRange?.to) && timeRange?.relativeTimeString && options?.length) {
     const option = options.find((opt) => opt.value === timeRange.relativeTimeString);
-    finalTimeRange = option?.getRange(timezone);
+    finalTimeRange = option?.getRange(timezone, weekStartsOn);
   }
 
   return finalTimeRange;

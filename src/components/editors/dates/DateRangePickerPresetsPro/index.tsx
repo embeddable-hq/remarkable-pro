@@ -61,9 +61,10 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
 
   const dateRangeOptions = theme.defaults.dateRangesOptions;
   const timezone = theme.clientContext.timezone;
+  const weekStartsOn = theme.defaults.weekStartsOn;
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>(
-    getDateRangeFromTimeRange(selectedValue, dateRangeOptions, timezone),
+    getDateRangeFromTimeRange(selectedValue, dateRangeOptions, timezone, weekStartsOn),
   );
 
   const onChangeRef = useRef(onChange);
@@ -74,7 +75,12 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
       return;
     }
     // Step 1: Convert relativeTimeString to actual time range (from/to)
-    const newTimeRange = getTimeRangeFromPresets(selectedValue, dateRangeOptions, timezone);
+    const newTimeRange = getTimeRangeFromPresets(
+      selectedValue,
+      dateRangeOptions,
+      timezone,
+      weekStartsOn,
+    );
 
     if (!shallowEqual(newTimeRange, selectedValue)) {
       onChangeRef.current(newTimeRange);
@@ -82,7 +88,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
 
     setDateRange({ from: newTimeRange?.from, to: newTimeRange?.to });
     // onChange is read via ref so the draft isn't reset just because the parent passed a new callback identity
-  }, [selectedValue, dayjsLocaleReady, dateRangeOptions, timezone]);
+  }, [selectedValue, dayjsLocaleReady, dateRangeOptions, timezone, weekStartsOn]);
 
   if (!dayjsLocaleReady) {
     return null;
@@ -90,13 +96,14 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
 
   const { description, placeholder, title, tooltip } = resolveI18nProps(props);
 
-  const options = getDateRangeSelectFieldProOptions(dateRangeOptions, timezone);
+  const options = getDateRangeSelectFieldProOptions(dateRangeOptions, timezone, weekStartsOn);
 
   const handleOptionChange = (newValue: string | undefined) => {
     const newTimeRange = getTimeRangeFromPresets(
       { relativeTimeString: newValue } as TimeRange,
       dateRangeOptions,
       timezone,
+      weekStartsOn,
     );
 
     dispatchEventUserInteraction({ componentName, trackingId, value: newTimeRange });
@@ -114,7 +121,9 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       // Discard unapplied edits: revert the draft grid to the applied value
-      setDateRange(getDateRangeFromTimeRange(selectedValue, dateRangeOptions, timezone));
+      setDateRange(
+        getDateRangeFromTimeRange(selectedValue, dateRangeOptions, timezone, weekStartsOn),
+      );
     }
     setIsOpen(open);
   };
@@ -134,7 +143,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
     }
 
     if (selectedValue?.from && selectedValue?.to) {
-      return getTimeRangeLabel(selectedValue, 'MMM DD', dateRangeOptions, timezone);
+      return getTimeRangeLabel(selectedValue, 'MMM DD', dateRangeOptions, timezone, weekStartsOn);
     }
 
     return '';

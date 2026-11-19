@@ -52,6 +52,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
     'MMM DD',
     dateRangeOptions,
     theme.clientContext.timezone,
+    theme.defaults.weekStartsOn,
   );
 
   const locale = theme.i18n.language ?? theme.formatter.locale;
@@ -69,6 +70,7 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
           selectedValue,
           dateRangeOptions,
           theme.clientContext.timezone,
+          theme.defaults.weekStartsOn,
         )}
         onChange={handleChange}
         submitLabel={i18n.t('editors.dateRangePicker.apply')}

@@ -52,6 +52,7 @@ const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
     props.primaryDateRange,
     theme.defaults.dateRangesOptions,
     theme.clientContext.timezone,
+    theme.defaults.weekStartsOn,
   );
 
   if (!dayjsLocaleReady) {
@@ -61,6 +62,7 @@ const DateComparisonSelectFieldPro = (props: DateComparisonSelectFieldPro) => {
   const options = getComparisonPeriodSelectFieldProOptions(
     comparisonPeriodOptions,
     primaryDateRange,
+    theme.defaults.weekStartsOn,
   );
 
   const handleChange = (newComparisonPeriod?: string | null) => {
