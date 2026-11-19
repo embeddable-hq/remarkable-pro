@@ -6,11 +6,7 @@ import { getChartColors, getStyleNumber } from '@embeddable.com/remarkable-ui';
 import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils';
 import { mergician } from 'mergician';
 import { isColorValid, setColorAlpha } from '../../../../utils/color.utils';
-import {
-  getDimensionWithoutTruncation,
-  groupTailAsOther,
-  Y_AXIS_RANGE_CLIP,
-} from '../../charts.utils';
+import { getDimensionWithoutTruncation, groupTailAsOther } from '../../charts.utils';
 
 export const getLineChartProData = (
   props: {
@@ -74,7 +70,7 @@ export const getLineChartProData = (
           });
 
       return {
-        clip: props.hasMinMaxYAxisRange ? Y_AXIS_RANGE_CLIP : false,
+        clip: props.hasMinMaxYAxisRange,
         label: themeFormatter.dimensionOrMeasureTitle(measure),
         data: values,
         backgroundColor: setColorAlpha(backgroundColor, 0.5),

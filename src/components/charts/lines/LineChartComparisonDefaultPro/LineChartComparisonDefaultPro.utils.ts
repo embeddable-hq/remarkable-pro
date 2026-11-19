@@ -13,7 +13,7 @@ import { getDimensionMeasureColor } from '../../../../theme/styles/styles.utils'
 import { i18n } from '../../../../theme/i18n/i18n';
 import { mergician } from 'mergician';
 import { isColorValid, setColorAlpha } from '../../../../utils/color.utils';
-import { getDimensionWithoutTruncation, Y_AXIS_RANGE_CLIP } from '../../charts.utils';
+import { getDimensionWithoutTruncation } from '../../charts.utils';
 import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 import { DimensionValueOrTimeRange } from '../../charts.types';
@@ -94,7 +94,7 @@ const getLineChartComparisonDataset = (
       : undefined,
     borderColor: lineColor,
     fill: measure.inputs?.['fillUnderLine'],
-    clip: hasMinMaxYAxisRange ? Y_AXIS_RANGE_CLIP : false,
+    clip: hasMinMaxYAxisRange,
   } as ChartData<'line'>['datasets'][number];
 
   return dataset;
