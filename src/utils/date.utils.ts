@@ -141,7 +141,7 @@ export const useLoadDayjsLocale = (): UseLoadDayjsLocaleProps => {
       return;
     }
     setDayjsLocaleReady(false);
-    loadDayjsLocale(locale).then(() => setDayjsLocaleReady(true));
+    void loadDayjsLocale(locale).then(() => setDayjsLocaleReady(true));
   }, [locale]);
 
   return { dayjsLocaleReady };
