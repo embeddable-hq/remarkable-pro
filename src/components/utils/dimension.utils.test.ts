@@ -110,15 +110,24 @@ describe('getTimeRangeFromDimensionValue', () => {
     // Note: 'quarter' granularity requires dayjs's quarter-of-year plugin which is not loaded;
     // startOf('quarter') silently falls back to day behaviour.
 
-    it('week: covers Mon–Sun (ISO week)', () => {
+    it('week: covers 7 days from a Monday bucket', () => {
       const result = getTimeRangeFromDimensionValue({
-        value: '2024-01-10', // Wednesday
+        value: '2024-01-08',
         stateGranularity: 'week',
         dimension: makeTimeDimension(),
       });
-      // ISO week: Mon 2024-01-08 → Sun 2024-01-14
       expect(result?.from).toEqual(new Date('2024-01-08T00:00:00.000Z'));
       expect(result?.to).toEqual(new Date('2024-01-14T23:59:59.999Z'));
+    });
+
+    it('week: covers 7 days from a Sunday bucket', () => {
+      const result = getTimeRangeFromDimensionValue({
+        value: '2026-11-01T00:00:00.000',
+        stateGranularity: 'week',
+        dimension: makeTimeDimension(),
+      });
+      expect(result?.from).toEqual(new Date('2026-11-01T00:00:00.000Z'));
+      expect(result?.to).toEqual(new Date('2026-11-07T23:59:59.999Z'));
     });
 
     it('hour: covers a single hour', () => {
