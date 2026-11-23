@@ -7,6 +7,7 @@ dayjs.extend(utc);
 /**
  * Constructs a TimeRange covering the full granularity bucket for a clicked time-axis bar.
  * e.g. granularity=month, value="2024-01-01" → { from: 2024-01-01T00:00:00Z, to: 2024-01-31T23:59:59Z }
+ * For week, value must be the bucket start returned by the database; the range is that day plus 6 days.
  */
 export const getTimeRangeFromDimensionValue = ({
   value,

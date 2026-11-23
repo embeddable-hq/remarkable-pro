@@ -28,9 +28,9 @@ vi.mock('@embeddable.com/react', () => ({
   useTheme: () => mockUseTheme(),
 }));
 
-const makeTheme = (timezone?: string, weekStartsOn?: number) => ({
+const makeTheme = (timezone?: string) => ({
   clientContext: { timezone },
-  defaults: { dateRangesOptions: defaultDateRangeOptions, weekStartsOn },
+  defaults: { dateRangesOptions: defaultDateRangeOptions },
 });
 
 const makeDimension = (overrides: Record<string, unknown> = {}): Dimension =>
@@ -323,8 +323,8 @@ describe('useFillGaps', () => {
       ]);
     });
 
-    it('keeps Sunday rows and fills Sunday gaps when weekStartsOn is 0', () => {
-      mockUseTheme.mockReturnValue(makeTheme('UTC', 0));
+    it('keeps Sunday rows and fills Sunday gaps when the data weeks start on Sunday', () => {
+      mockUseTheme.mockReturnValue(makeTheme('UTC'));
 
       const results = makeResults([
         { [day]: '2026-11-01T00:00:00.000', total: 28 },
@@ -343,7 +343,7 @@ describe('useFillGaps', () => {
     });
 
     it('starts Sunday weeks from a dateBounds that begins mid-week', () => {
-      mockUseTheme.mockReturnValue(makeTheme('UTC', 0));
+      mockUseTheme.mockReturnValue(makeTheme('UTC'));
 
       const results = makeResults([{ [day]: '2026-11-08T00:00:00.000', total: 8 }]);
       const dimension = makeDimension({
@@ -360,6 +360,29 @@ describe('useFillGaps', () => {
         '2026-11-01T00:00:00.000',
         '2026-11-08T00:00:00.000',
         '2026-11-15T00:00:00.000',
+      ]);
+    });
+
+    it('keeps Sunday weeks with dateBounds near midnight in a non-UTC timezone', () => {
+      mockUseTheme.mockReturnValue(makeTheme('America/New_York'));
+
+      const results = makeResults([
+        { [day]: '2026-11-01T00:00:00.000', total: 28 },
+        { [day]: '2026-11-08T00:00:00.000', total: 8 },
+      ]);
+      const dimension = makeDimension({
+        granularity: 'week',
+        dateBounds: {
+          from: new Date('2026-11-01T04:00:00.000Z'),
+          to: new Date('2026-11-15T04:59:59.999Z'),
+        },
+      });
+
+      const { result } = renderHook(() => useFillGaps({ results, dimension }));
+
+      expect(result.current.data).toEqual([
+        { [day]: '2026-11-01T00:00:00.000', total: 28 },
+        { [day]: '2026-11-08T00:00:00.000', total: 8 },
       ]);
     });
   });

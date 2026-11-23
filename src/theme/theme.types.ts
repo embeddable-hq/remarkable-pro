@@ -7,7 +7,6 @@ import { ComparisonPeriodOption } from './defaults/defaults.ComparisonPeriods.co
 import { DateRangeOption } from './defaults/defaults.DateRanges.constants';
 import { ChartCardMenuOption } from './defaults/defaults.ChartCardMenu.constants';
 import { TableCellStyleOption } from './defaults/defaults.TableCellStyle.constants';
-import { WeekStartsOn } from '../utils/week.utils';
 
 export type ThemeI18n = { language: string; translations: Resource };
 
@@ -57,7 +56,6 @@ export type ThemeDefaults = {
   dateRangesOptions: DateRangeOption[];
   chartMenuOptions: ChartCardMenuOption[];
   tableCellStyleOptions?: TableCellStyleOption[];
-  weekStartsOn?: WeekStartsOn;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -122,10 +122,13 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
       recordsByDate.set(key, arr);
     }
 
+    const firstDate = sortedResults[0]?.[dimensionName];
+    const weekStartsOn = firstDate != null ? dayjs.utc(firstDate).day() : 1;
+
     const filled: DataRecord[] = [];
     let current =
       granularity === 'week'
-        ? startOfWeek(from, theme.defaults.weekStartsOn)
+        ? startOfWeek(from, weekStartsOn)
         : from.startOf(granularity as QUnitType);
 
     while (current.isSameOrBefore(to)) {
