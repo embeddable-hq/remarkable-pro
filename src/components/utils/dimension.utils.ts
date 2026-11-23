@@ -1,14 +1,13 @@
 import { CUBE_DIMENSION_TYPE_TIME, Dimension, Granularity, TimeRange } from '@embeddable.com/core';
 import dayjs, { QUnitType } from 'dayjs';
-import isoWeek from 'dayjs/plugin/isoWeek.js';
 import utc from 'dayjs/plugin/utc.js';
 
 dayjs.extend(utc);
-dayjs.extend(isoWeek);
 
 /**
  * Constructs a TimeRange covering the full granularity bucket for a clicked time-axis bar.
  * e.g. granularity=month, value="2024-01-01" → { from: 2024-01-01T00:00:00Z, to: 2024-01-31T23:59:59Z }
+ * For week, value must be the bucket start returned by the database; the range is that day plus 6 days.
  */
 export const getTimeRangeFromDimensionValue = ({
   value,
@@ -31,11 +30,18 @@ export const getTimeRangeFromDimensionValue = ({
 
   const granularity = stateGranularity ?? dimension?.inputs?.granularity ?? 'day';
 
-  const isoGranularity = granularity === 'week' ? 'isoWeek' : granularity;
   const utcDate = dayjs.utc(value);
+  if (granularity === 'week') {
+    const from = utcDate.startOf('day');
+    return {
+      from: from.toDate(),
+      to: from.add(6, 'day').endOf('day').toDate(),
+      relativeTimeString: undefined,
+    };
+  }
   return {
-    from: utcDate.startOf(isoGranularity as QUnitType).toDate(),
-    to: utcDate.endOf(isoGranularity as QUnitType).toDate(),
+    from: utcDate.startOf(granularity as QUnitType).toDate(),
+    to: utcDate.endOf(granularity as QUnitType).toDate(),
     relativeTimeString: undefined,
   };
 };
