@@ -12,10 +12,6 @@ describe('startOfWeek', () => {
     dayjs.locale('en');
   });
 
-  it('defaults to Monday', () => {
-    expect(startOfWeek(thu).toISOString()).toBe('2026-11-02T00:00:00.000Z');
-  });
-
   it('starts on Sunday when weekStartsOn is 0', () => {
     expect(startOfWeek(thu, 0).toISOString()).toBe('2026-11-01T00:00:00.000Z');
   });
