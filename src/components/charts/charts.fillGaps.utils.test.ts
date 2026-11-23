@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
 import 'dayjs/locale/en-gb';
-import { startOfWeek } from './week.utils';
+import { startOfWeek } from './charts.fillGaps.utils';
 
 dayjs.extend(utc);
 

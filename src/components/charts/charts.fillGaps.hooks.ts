@@ -8,7 +8,7 @@ import { useTheme } from '@embeddable.com/react';
 import { useMemo } from 'react';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear.js';
 import { defaultGranularitySelectFieldOptions } from '../../theme/defaults/defaults.GranularityOptions.constants';
-import { startOfWeek } from '../../utils/week.utils';
+import { startOfWeek } from './charts.fillGaps.utils';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
