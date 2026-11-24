@@ -1,8 +1,6 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { useTheme } from '@embeddable.com/react';
-import { Theme, ThemeComponentRender, ThemeComponents } from '../../../../../theme/theme.types';
-
-const Render = ({ render }: { render: ThemeComponentRender }) => <>{render(React)}</>;
+import { Theme, ThemeComponents } from '../../../../../theme/theme.types';
 
 export const ThemeComponent = ({
   name,
@@ -12,5 +10,6 @@ export const ThemeComponent = ({
   fallback: ReactNode;
 }) => {
   const render = (useTheme() as Theme).components?.[name];
-  return render ? <Render render={render} /> : fallback;
+  const Rendered = useMemo(() => render && (() => <>{render(React)}</>), [render]);
+  return Rendered ? <Rendered /> : fallback;
 };
