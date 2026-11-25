@@ -7,9 +7,11 @@ import { resolveI18nProps } from '../../../component.utils';
 import { EditorCard, EditorCardHeaderProps } from '../../shared/EditorCard/EditorCard';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import {
+  fromCalendarDateRange,
   getDateRangeFromTimeRange,
   getTimeRangeFromDateRange,
   getTimeRangeLabel,
+  toCalendarDateRange,
 } from '../dates.utils';
 import { IconCalendarFilled } from '@tabler/icons-react';
 import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
@@ -38,9 +40,10 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
   const { onChange, clearable, selectedValue, showTwoMonths, componentName, trackingId } = props;
 
   const handleChange = (newDateRange: DateRange | undefined) => {
+    const timezone = theme.clientContext.timezone;
     const timeRange: TimeRange = getTimeRangeFromDateRange(
-      newDateRange,
-      theme.clientContext.timezone,
+      fromCalendarDateRange(newDateRange, timezone),
+      timezone,
     );
     dispatchEventUserInteraction({ componentName, trackingId, value: timeRange });
     onChange(timeRange);
@@ -65,9 +68,8 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
         placeholder={placeholder}
         displayValue={displayValue}
         numberOfMonths={showTwoMonths ? 2 : 1}
-        value={getDateRangeFromTimeRange(
-          selectedValue,
-          dateRangeOptions,
+        value={toCalendarDateRange(
+          getDateRangeFromTimeRange(selectedValue, dateRangeOptions, theme.clientContext.timezone),
           theme.clientContext.timezone,
         )}
         onChange={handleChange}

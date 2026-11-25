@@ -22,10 +22,12 @@ import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
 import { useEffect, useRef, useState } from 'react';
 import styles from './DateRangePickerPresetsPro.module.css';
 import {
+  fromCalendarDateRange,
   getDateRangeFromTimeRange,
   getTimeRangeFromDateRange,
   getTimeRangeFromPresets,
   getTimeRangeLabel,
+  toCalendarDateRange,
 } from '../dates.utils';
 import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 
@@ -178,8 +180,10 @@ const DateRangePickerPresets = (props: DateRangePickerPresetsProps) => {
               <DateRangePicker
                 locale={locale}
                 numberOfMonths={numberOfMonths}
-                value={dateRange}
-                onChange={setDateRange}
+                value={toCalendarDateRange(dateRange, timezone)}
+                onChange={(newDateRange) =>
+                  setDateRange(fromCalendarDateRange(newDateRange, timezone))
+                }
               />
               <Button
                 size="small"
