@@ -31,6 +31,18 @@ export const getLineChartGroupedProData = (
   const axis = uniqueSortedWithOtherLast(data.map((d) => d[dimension.name]));
   const groupBy = uniqueSortedWithOtherLast(data.map((d) => d[groupDimension.name]));
 
+  const recordsByGroup = new Map<unknown, Map<unknown, (typeof data)[number]>>();
+  for (const d of data) {
+    const groupValue = d[groupDimension.name];
+    let recordsByAxis = recordsByGroup.get(groupValue);
+    if (!recordsByAxis) {
+      recordsByAxis = new Map();
+      recordsByGroup.set(groupValue, recordsByAxis);
+    }
+    const axisValue = d[dimension.name];
+    if (!recordsByAxis.has(axisValue)) recordsByAxis.set(axisValue, d);
+  }
+
   const chartColors = getChartColors();
   const datasets: ChartData<'line'>['datasets'] = groupBy.map((groupByItem, index) => {
     const backgroundColor = getDimensionMeasureColor({
@@ -60,9 +72,7 @@ export const getLineChartGroupedProData = (
       fill: measure.inputs?.['fillUnderLine'],
       borderColor,
       data: axis.map((axisItem) => {
-        const record = data.find(
-          (d) => d[groupDimension.name] === groupByItem && d[dimension.name] === axisItem,
-        );
+        const record = recordsByGroup.get(groupByItem)?.get(axisItem);
         return record?.[measure.name] ?? (measure.inputs?.['connectGaps'] ? 0 : null);
       }),
     } as ChartData<'line'>['datasets'][number];

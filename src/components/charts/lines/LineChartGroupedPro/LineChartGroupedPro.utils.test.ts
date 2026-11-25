@@ -110,6 +110,35 @@ describe('getLineChartGroupedProData', () => {
     expect(result.labels).toEqual(['A', 'B', 'C']);
   });
 
+  it('reads each row a bounded number of times regardless of groups and axis values', () => {
+    const groups = 20;
+    const axisValues = 50;
+    let reads = 0;
+    const data = Array.from({ length: groups * axisValues }, (_, i) => {
+      const row = {
+        date: `d${String(i % axisValues).padStart(3, '0')}`,
+        group: `g${Math.floor(i / axisValues)}`,
+        revenue: i,
+      };
+      return new Proxy(row, {
+        get(target, key, receiver) {
+          reads++;
+          return Reflect.get(target, key, receiver);
+        },
+      });
+    });
+
+    const result = getLineChartGroupedProData(
+      { data, dimension, groupDimension, measure, hasMinMaxYAxisRange: false },
+      makeTheme(),
+    );
+
+    expect(result.datasets).toHaveLength(groups);
+    const g3 = result.datasets.find((d) => (d as { rawLabel?: string }).rawLabel === 'g3');
+    expect(g3!.data[7]).toBe(3 * axisValues + 7);
+    expect(reads).toBeLessThan(data.length * 10);
+  });
+
   it('pins the "Other" axis label to the end instead of sorting it alphabetically', () => {
     const data = [
       { date: 'Other', group: 'g1', revenue: 99 },

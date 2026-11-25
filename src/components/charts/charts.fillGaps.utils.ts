@@ -37,3 +37,11 @@ export const resolveBoundary = (rawValue: Date | string | undefined, tz?: string
 
   return dayjs.utc(dayjs(rawValue).tz(tz).format('YYYY-MM-DDTHH:mm:ss.SSS'));
 };
+
+export const MAX_FILL_GAPS_BUCKETS = 20000;
+
+export const exceedsFillGapsLimit = (
+  from: dayjs.Dayjs,
+  to: dayjs.Dayjs,
+  unit: dayjs.QUnitType | dayjs.OpUnitType,
+): boolean => to.diff(from, unit) > MAX_FILL_GAPS_BUCKETS;
