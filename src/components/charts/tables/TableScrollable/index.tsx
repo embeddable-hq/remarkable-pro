@@ -22,7 +22,7 @@ import { getTimeRangeFromDimensionValue } from '../../../utils/dimension.utils';
 import { dispatchEventUserInteraction } from '../../../../utils/events.utils';
 import { DimensionValueOrTimeRange } from '../../charts.types';
 import { TableScrollable, TableScrollableHandle, TableSort } from '@embeddable.com/remarkable-ui';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getTableHeaders, getTableRows } from '../tables.utils';
 import { ChartCardMenuOptionOnClickProps } from '../../../../theme/defaults/defaults.ChartCardMenu.constants';
 import { TABLE_SCROLLABLE_SIZE } from './TableScrollable.utils';
@@ -67,7 +67,18 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   i18nSetup(theme);
 
   const [isDownloadingData, setIsDownloadingData] = useState(false);
-  const [rowsToDisplay, setRowsToDisplay] = useState<any[]>([]);
+  const [{ pages, shownData }, setTable] = useState<{
+    pages: Record<number, any[]>;
+    shownData?: DataResponse['data'];
+  }>({ pages: {} });
+  const rowsToDisplay = useMemo(
+    () =>
+      Object.keys(pages)
+        .map(Number)
+        .sort((a, b) => a - b)
+        .flatMap((page) => pages[page] ?? []),
+    [pages],
+  );
 
   const resolvedI18nProps = resolveI18nProps(props);
   const { title } = resolvedI18nProps;
@@ -90,12 +101,9 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   const isAutoHeightMode = isAutoHeight(heightMode);
 
   const headers = getTableHeaders({ dimensionsAndMeasures, displayNullAs }, theme);
-  const rows = results?.data ?? [];
 
   const cardContentRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<TableScrollableHandle | null>(null);
-  const firstLoadPending = useRef(true);
-  const lastHeightModeRef = useRef(isAutoHeightMode);
   const lastDatasetVariableRef = useRef<Dataset['variableValues'] | null>(null);
 
   useEffect(() => {
@@ -104,7 +112,6 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     }
 
     // Reset to first page when dataset variable values change
-    firstLoadPending.current = true;
     lastDatasetVariableRef.current = dataset.variableValues;
     setState?.((prevState) => ({
       ...prevState,
@@ -112,31 +119,20 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
     }));
   }, [dataset.variableValues]);
 
+  const page = isAutoHeightMode ? 0 : (state?.page ?? 0);
+  // File each response once, when it arrives: state.page goes up before its rows load.
+  const data = results?.data;
+  if (data && !results.isLoading && data !== shownData) {
+    setTable((prev) => ({
+      shownData: data,
+      pages: page === 0 ? { 0: data } : { ...prev.pages, [page]: data },
+    }));
+  }
+
+  const firstPage = pages[0];
   useEffect(() => {
-    if (!results?.data) return;
-
-    const hasHeightModeChanged = lastHeightModeRef.current !== isAutoHeightMode;
-    lastHeightModeRef.current = isAutoHeightMode;
-
-    if (hasHeightModeChanged) {
-      // These rows were paged under the mode being left; the new mode's own first page replaces them.
-      setRowsToDisplay([...rows]);
-      firstLoadPending.current = true;
-      tableRef.current?.scrollToTop('smooth');
-      return;
-    }
-
-    // In auto height each response is the whole allowance, so appending would duplicate it.
-    if (firstLoadPending.current || isAutoHeightMode) {
-      setRowsToDisplay([...rows]);
-      firstLoadPending.current = false;
-      tableRef.current?.scrollToTop('smooth');
-      return;
-    }
-
-    // Append new rows
-    setRowsToDisplay((prev) => [...prev, ...rows]);
-  }, [rows, isAutoHeightMode]);
+    if (firstPage) tableRef.current?.scrollToTop('smooth');
+  }, [firstPage]);
 
   // Stable updater for embeddable state
   const handleUpdateEmbeddableState = useCallback(
@@ -152,7 +148,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   // `props()` cannot call hooks, so this is how the query gets to see the mode at all.
   useEffect(() => {
     if (state?.heightMode !== heightMode) {
-      handleUpdateEmbeddableState({ heightMode });
+      handleUpdateEmbeddableState({ heightMode, page: 0 });
     }
   }, [heightMode, state?.heightMode, handleUpdateEmbeddableState]);
 
@@ -235,7 +231,6 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   };
 
   const handleSortChange = (newSort: TableSort<any> | undefined) => {
-    firstLoadPending.current = true;
     handleUpdateEmbeddableState({ sort: newSort as TableScrollableProState['sort'], page: 0 });
   };
 
@@ -243,7 +238,7 @@ const TableScrollablePro = (props: TableScrollableProProps) => {
   const hasMoreData =
     !isAutoHeightMode && results?.data && results.data.length === TABLE_SCROLLABLE_SIZE;
   const isLoading = Boolean(results?.isLoading || allResults?.isLoading);
-  const isLoadingTable = results?.isLoading && !firstLoadPending.current;
+  const isLoadingTable = results?.isLoading && page > 0;
 
   const totalRows = results?.total;
   // Match the cells, which the theme's locale formats rather than the browser's.
