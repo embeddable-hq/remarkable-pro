@@ -25,6 +25,55 @@ type UseFillGapsProps = {
   externalDateBounds?: TimeRange;
 };
 
+const sortByDimension = (data: DataRecord[], dimensionName: string): DataRecord[] =>
+  [...data].sort((a, b) => {
+    const aVal = a[dimensionName];
+    const bVal = b[dimensionName];
+    if (aVal == null) return 1;
+    if (bVal == null) return -1;
+    return dayjs.utc(aVal).diff(dayjs.utc(bVal));
+  });
+
+const collectInRange = (
+  sortedResults: DataRecord[],
+  dimensionName: string,
+  from: dayjs.Dayjs,
+  to: dayjs.Dayjs,
+): DataRecord[] =>
+  sortedResults.filter((record) => {
+    const value = record[dimensionName];
+    if (value == null) return false;
+    const date = dayjs.utc(value);
+    return !date.isBefore(from) && date.isSameOrBefore(to);
+  });
+
+const fillBuckets = (
+  recordsByDate: Map<string, DataRecord[]>,
+  dimensionName: string,
+  start: dayjs.Dayjs,
+  to: dayjs.Dayjs,
+  granularity: QUnitType,
+  ignoreEmptyDate: boolean,
+): DataRecord[] => {
+  const filled: DataRecord[] = [];
+  let current = start;
+
+  while (current.isSameOrBefore(to)) {
+    const key = current.toISOString().split('Z')[0]!;
+    const records = recordsByDate.get(key);
+
+    if (records && records.length > 0) {
+      filled.push(...records);
+    } else if (!ignoreEmptyDate) {
+      filled.push({ [dimensionName]: key });
+    }
+
+    current = current.add(1, granularity);
+  }
+
+  return filled;
+};
+
 export function useFillGaps(props: UseFillGapsProps): DataResponse {
   const theme = useTheme() as Theme;
   const { results, dimension, orderDirection = 'asc', externalDateBounds } = props;
@@ -58,13 +107,7 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
 
     if (dimension.nativeType !== 'time') return results;
 
-    const sortedResults = [...(results?.data ?? [])].sort((a, b) => {
-      const aVal = a[dimensionName];
-      const bVal = b[dimensionName];
-      if (aVal == null) return 1;
-      if (bVal == null) return -1;
-      return dayjs.utc(aVal).diff(dayjs.utc(bVal));
-    });
+    const sortedResults = sortByDimension(results?.data ?? [], dimensionName);
 
     // Determine the full date range even if data is empty
     const from = resolveBoundary(
@@ -98,8 +141,7 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
     const firstDate = sortedResults[0]?.[dimensionName];
     const weekStartsOn = firstDate != null ? dayjs.utc(firstDate).day() : 1;
 
-    const filled: DataRecord[] = [];
-    let current =
+    const start =
       granularity === 'week'
         ? startOfWeek(from, weekStartsOn)
         : from.startOf(granularity as QUnitType);
@@ -107,27 +149,16 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
     const skipGapFilling =
       !ignoreEmptyDate && exceedsFillGapsLimit(from, to, granularity as QUnitType);
 
-    if (skipGapFilling) {
-      for (const record of sortedResults) {
-        const value = record[dimensionName];
-        if (value == null) continue;
-        const date = dayjs.utc(value);
-        if (!date.isBefore(current) && date.isSameOrBefore(to)) filled.push(record);
-      }
-    }
-
-    while (!skipGapFilling && current.isSameOrBefore(to)) {
-      const key = current.toISOString().split('Z')[0]!;
-      const records = recordsByDate.get(key);
-
-      if (records && records.length > 0) {
-        filled.push(...records);
-      } else if (!ignoreEmptyDate) {
-        filled.push({ [dimensionName]: key });
-      }
-
-      current = current.add(1, granularity as QUnitType);
-    }
+    const filled = skipGapFilling
+      ? collectInRange(sortedResults, dimensionName, start, to)
+      : fillBuckets(
+          recordsByDate,
+          dimensionName,
+          start,
+          to,
+          granularity as QUnitType,
+          ignoreEmptyDate,
+        );
 
     if (orderDirection === 'desc') {
       filled.reverse();
