@@ -89,6 +89,27 @@ describe('useFillGaps', () => {
     expect(result.current.data).toHaveLength(3);
   });
 
+  it('still drops rows outside explicit dateBounds when the range is too large to fill', () => {
+    mockUseTheme.mockReturnValue(makeTheme('UTC'));
+
+    const dimension = makeDimension({
+      granularity: 'hour',
+      dateBounds: {
+        from: new Date('2020-01-01T00:00:00.000Z'),
+        to: new Date('2023-01-01T00:00:00.000Z'),
+      },
+    });
+    const results = makeResults([
+      { 'daily_listens.listened_date': '2024-05-01T00:00:00.000', value: 3 },
+      { 'daily_listens.listened_date': '2021-05-01T00:00:00.000', value: 2 },
+      { 'daily_listens.listened_date': '2019-05-01T00:00:00.000', value: 1 },
+    ]);
+
+    const { result } = renderHook(() => useFillGaps({ results, dimension }));
+
+    expect(result.current.data?.map((r) => r.value)).toEqual([2]);
+  });
+
   it('respects a day-precision preset dateBounds in a non-UTC timezone (PR #271 case, unchanged)', () => {
     mockUseTheme.mockReturnValue(makeTheme('America/Los_Angeles'));
 

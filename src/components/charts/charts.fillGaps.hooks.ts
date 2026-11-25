@@ -85,10 +85,6 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
       return { ...results, data: [] };
     }
 
-    if (!ignoreEmptyDate && exceedsFillGapsLimit(from, to, granularity as QUnitType)) {
-      return results;
-    }
-
     const recordsByDate = new Map<string, DataRecord[]>();
     for (const record of sortedResults) {
       const value = record[dimensionName];
@@ -108,7 +104,19 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
         ? startOfWeek(from, weekStartsOn)
         : from.startOf(granularity as QUnitType);
 
-    while (current.isSameOrBefore(to)) {
+    const skipGapFilling =
+      !ignoreEmptyDate && exceedsFillGapsLimit(from, to, granularity as QUnitType);
+
+    if (skipGapFilling) {
+      for (const record of sortedResults) {
+        const value = record[dimensionName];
+        if (value == null) continue;
+        const date = dayjs.utc(value);
+        if (!date.isBefore(current) && date.isSameOrBefore(to)) filled.push(record);
+      }
+    }
+
+    while (!skipGapFilling && current.isSameOrBefore(to)) {
       const key = current.toISOString().split('Z')[0]!;
       const records = recordsByDate.get(key);
 
