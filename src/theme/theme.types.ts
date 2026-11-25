@@ -1,3 +1,4 @@
+import type React from 'react';
 import { Resource } from 'i18next';
 import { ThemeFormatter } from './formatter/formatter.types';
 import { ThemeStyles } from './styles/styles.types';
@@ -61,6 +62,13 @@ export type ThemeDefaults = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ThemeClientContext = Record<string, any> & { timezone?: string };
 
+export type ThemeComponentRender = (react: typeof React) => React.ReactNode;
+
+export type ThemeComponents = {
+  ChartCardSkeleton?: ThemeComponentRender;
+  ChartCardLoading?: ThemeComponentRender;
+};
+
 export type Theme = {
   i18n: ThemeI18n;
   charts: ThemeCharts;
@@ -69,4 +77,5 @@ export type Theme = {
   defaults: ThemeDefaults;
   fonts?: ThemeFonts;
   clientContext: ThemeClientContext;
+  components?: ThemeComponents;
 };

@@ -13,6 +13,7 @@ import styles from './ChartCard.module.css';
 import { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import { useTheme } from '@embeddable.com/react';
 import { ChartCardLoading } from './ChartCardLoading/ChartCardLoading';
+import { ThemeComponent } from './ThemeComponent/ThemeComponent';
 import { ChartCardMenuPro } from './ChartCardMenuPro/ChartCardMenuPro';
 import { Theme } from '../../../../theme/theme.types';
 import { i18n, i18nSetup } from '../../../../theme/i18n/i18n';
@@ -80,7 +81,7 @@ export const ChartCard = React.forwardRef<HTMLDivElement, ChartCardProps>((props
 
   const getDisplay = () => {
     if (isLoading && !hasData) {
-      return <Skeleton />;
+      return <ThemeComponent name="ChartCardSkeleton" fallback={<Skeleton />} />;
     }
 
     if (errorMessage) {
