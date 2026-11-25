@@ -37,15 +37,19 @@ export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
 
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const { menuOptions } = props;
+  const { menuOptions, title } = props;
 
   if (menuOptions?.length === 0) {
     return null;
   }
 
   const startAction = (onClick: () => void | Promise<void>) => {
-    setTimeout(() => {
-      Promise.resolve(onClick()).finally(() => setIsLoading(false));
+    setTimeout(async () => {
+      try {
+        await onClick();
+      } finally {
+        setIsLoading(false);
+      }
     }, 100);
   };
 
@@ -69,7 +73,18 @@ export const ChartCardMenuPro: React.FC<ChartCardMenuProProps> = (props) => {
     <Dropdown
       side="bottom"
       align="end"
-      triggerComponent={isLoading ? <ChartCardLoading /> : <ActionIcon icon={IconDotsVertical} />}
+      triggerComponent={
+        isLoading ? (
+          <ChartCardLoading />
+        ) : (
+          <ActionIcon
+            icon={IconDotsVertical}
+            aria-label={
+              title ? i18n.t('charts.menuButtonWithTitle', { title }) : i18n.t('charts.menuButton')
+            }
+          />
+        )
+      }
     >
       <SelectFieldContent className={styles.list} autoFocus>
         {menuOptions?.map((option) => {

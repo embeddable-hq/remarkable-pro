@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import type { DataResponse, Dimension, Measure } from '@embeddable.com/core';
 import PivotTablePro from './index';
@@ -50,7 +50,13 @@ vi.mock('@embeddable.com/remarkable-ui', () => ({
       data-min-label={String(props.minLabel)}
       data-max-label={String(props.maxLabel)}
       data-average-label={String(props.averageLabel)}
-    />
+      data-loading-rows={String((props.loadingRows as Set<string>).size)}
+    >
+      <button
+        data-testid="expand-row"
+        onClick={() => (props.onRowExpand as (rowKey: string) => void)('r1')}
+      />
+    </div>
   ),
 }));
 
@@ -102,6 +108,27 @@ describe('PivotTablePro', () => {
   it('renders PivotTable', () => {
     render(<PivotTablePro {...defaultProps} />);
     expect(screen.getByTestId('pivot-table')).toBeInTheDocument();
+  });
+
+  it('renders PivotTable without expandedRowKeys and setExpandedRowKey', () => {
+    render(
+      <PivotTablePro {...defaultProps} expandedRowKeys={undefined} setExpandedRowKey={undefined} />,
+    );
+    expect(screen.getByTestId('pivot-table')).toBeInTheDocument();
+  });
+
+  it('does not mark a row as loading when there is no expansion handler', () => {
+    render(<PivotTablePro {...defaultProps} setExpandedRowKey={undefined} />);
+    fireEvent.click(screen.getByTestId('expand-row'));
+    expect(screen.getByTestId('pivot-table')).toHaveAttribute('data-loading-rows', '0');
+  });
+
+  it('marks a row as loading and reports it when expanded', () => {
+    const setExpandedRowKey = vi.fn();
+    render(<PivotTablePro {...defaultProps} setExpandedRowKey={setExpandedRowKey} />);
+    fireEvent.click(screen.getByTestId('expand-row'));
+    expect(setExpandedRowKey).toHaveBeenCalledWith('r1');
+    expect(screen.getByTestId('pivot-table')).toHaveAttribute('data-loading-rows', '1');
   });
 
   it('passes calculation labels resolved through i18n, not hardcoded English', () => {

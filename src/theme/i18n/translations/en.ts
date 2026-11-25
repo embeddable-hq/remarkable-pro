@@ -22,6 +22,8 @@ export const en: ResourceLanguage = {
       'menuOptions.downloadXLSX': 'Download XLSX',
       'menuOptions.maximize': 'Maximize',
       'menuOptions.minimize': 'Minimize',
+      menuButton: 'Chart menu',
+      menuButtonWithTitle: 'Chart menu: {{title}}',
       errorTitle: 'Something went wrong.',
       errorMessage: 'An error occurred while loading the chart.',
       emptyTitle: 'No results.',
