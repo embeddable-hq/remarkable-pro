@@ -16,6 +16,7 @@ import {
 } from './charts.utils';
 import { i18n } from '../../theme/i18n/i18n';
 import { getTimeRangeFromDimensionValue } from '../utils/dimension.utils';
+import { remarkableTheme } from '../../theme/theme.constants';
 
 // -- mocks -------------------------------------------------------------------
 
@@ -85,6 +86,18 @@ describe('getDatalabelPercentage', () => {
 
   it('defaults to 2 decimal places when decimalPlaces is undefined', () => {
     expect(getDatalabelPercentage(1, [1, 1, 1], undefined)).toBe('33.33%');
+  });
+
+  it('keeps the configured decimal places exactly', () => {
+    expect(getDatalabelPercentage(1, [4], 1)).toBe('25.0%');
+  });
+
+  it('formats in the theme locale', () => {
+    const theme = {
+      ...remarkableTheme,
+      formatter: { ...remarkableTheme.formatter, locale: 'de-DE' },
+    };
+    expect(getDatalabelPercentage(1, [1, 1, 1], 1, theme)).toBe('33,3 %');
   });
 });
 

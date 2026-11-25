@@ -184,6 +184,7 @@ export const getBarLineChartProOptions = (
                   Number(value),
                   context.dataset.data,
                   measure.inputs?.decimalPlaces,
+                  theme,
                 );
               }
               return themeFormatter.data(measure, value);
@@ -208,7 +209,7 @@ export const getBarLineChartProOptions = (
             const raw = context.raw as number;
             const formatted = themeFormatter.data(measure, raw);
             const percentage = measure.inputs?.showValueAsPercentage
-              ? ` (${getDatalabelPercentage(raw, context.dataset.data, measure.inputs?.decimalPlaces)})`
+              ? ` (${getDatalabelPercentage(raw, context.dataset.data, measure.inputs?.decimalPlaces, theme)})`
               : '';
             return `${context.dataset.label}: ${formatted}${percentage}`;
           },
