@@ -74,6 +74,21 @@ describe('useFillGaps', () => {
     ]);
   });
 
+  it('skips gap filling instead of generating hundreds of thousands of buckets for a far-future outlier date', () => {
+    mockUseTheme.mockReturnValue(makeTheme('UTC'));
+
+    const dimension = makeDimension({ granularity: 'week' });
+    const results = makeResults([
+      { 'daily_listens.listened_date': '2010-06-14T00:00:00.000', value: 1 },
+      { 'daily_listens.listened_date': '2010-06-28T00:00:00.000', value: 2 },
+      { 'daily_listens.listened_date': '9999-12-27T00:00:00.000', value: 3 },
+    ]);
+
+    const { result } = renderHook(() => useFillGaps({ results, dimension }));
+
+    expect(result.current.data).toHaveLength(3);
+  });
+
   it('respects a day-precision preset dateBounds in a non-UTC timezone (PR #271 case, unchanged)', () => {
     mockUseTheme.mockReturnValue(makeTheme('America/Los_Angeles'));
 

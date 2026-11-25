@@ -7,7 +7,12 @@ import { useTheme } from '@embeddable.com/react';
 import { useMemo } from 'react';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear.js';
 import { defaultGranularitySelectFieldOptions } from '../../theme/defaults/defaults.GranularityOptions.constants';
-import { DataRecord, resolveBoundary, startOfWeek } from './charts.fillGaps.utils';
+import {
+  DataRecord,
+  exceedsFillGapsLimit,
+  resolveBoundary,
+  startOfWeek,
+} from './charts.fillGaps.utils';
 
 dayjs.extend(utc);
 dayjs.extend(isSameOrBefore);
@@ -78,6 +83,10 @@ export function useFillGaps(props: UseFillGapsProps): DataResponse {
     // If we *still* don’t have valid date bounds, bail out safely
     if (!from.isValid() || !to.isValid()) {
       return { ...results, data: [] };
+    }
+
+    if (!ignoreEmptyDate && exceedsFillGapsLimit(from, to, granularity as QUnitType)) {
+      return results;
     }
 
     const recordsByDate = new Map<string, DataRecord[]>();
